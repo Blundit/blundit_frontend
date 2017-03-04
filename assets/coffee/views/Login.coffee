@@ -4,10 +4,10 @@ Header = require("components/Header")
 Footer = require("components/Footer")
 
 module.exports = React.createFactory React.createClass
-  displayName: 'Landing'
+  displayName: 'Login'
   
   render: ->
     div {},
       Header {}, ''
-      "Landing"
+      "Login"
       Footer {}, ''

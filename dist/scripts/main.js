@@ -11,20 +11,56 @@ module.exports = React.createFactory(React.createClass({
 
 
 },{}],2:[function(require,module,exports){
-var div;
+var div, menuItems;
 
 div = React.DOM.div;
 
+menuItems = [
+  {
+    label: "My Bookmarks",
+    path: "/bookmarks",
+    logged: true
+  }, {
+    label: "Me",
+    path: "/me",
+    logged: true
+  }, {
+    label: "Claims",
+    path: "/claims"
+  }, {
+    label: "Predictions",
+    path: "/predictions"
+  }, {
+    label: "Experts",
+    path: "/experts"
+  }
+];
+
 module.exports = React.createFactory(React.createClass({
+  navigateToLocation: function(path) {
+    return navigate(path);
+  },
   render: function() {
-    return div({}, "Header");
+    return div({}, div({
+      className: "header__logo"
+    }, "Blundit"), div({
+      className: "header__items"
+    }, menuItems.map((function(_this) {
+      return function(item, index) {
+        return div({
+          className: "header__item",
+          key: "header-item-" + index,
+          onClick: _this.navigateToLocation.bind(_this, item.path)
+        }, item.label);
+      };
+    })(this))));
   }
 }));
 
 
 },{}],3:[function(require,module,exports){
 (function() {
-  var Blundit, Footer, Header, RouterMixin, UserStore, div, startBlundit,
+  var API, Blundit, Footer, Header, RouterMixin, UserStore, div, menuItems, startBlundit,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   window.React = require('react');
@@ -37,6 +73,10 @@ module.exports = React.createFactory(React.createClass({
 
   window._ = require('lodash');
 
+  window.UserStore = UserStore = require("stores/UserStore");
+
+  window.API = require("shared/API");
+
   Header = require("./components/Header");
 
   Footer = require("./components/Footer");
@@ -45,21 +85,98 @@ module.exports = React.createFactory(React.createClass({
 
   Blundit = React.createFactory(React.createClass({
     mixins: [RouterMixin],
-    componentWillMount: function() {
-      return console.log("will mount");
-    },
-    componentWillUnmount: function() {
-      return console.log("will componentWillUnmount");
-    },
+    componentWillMount: function() {},
+    componentWillUnmount: function() {},
     routes: {
-      '/': 'landing'
+      '/': 'landing',
+      '/me': 'userProfile',
+      '/bookmarks': 'bookmarks',
+      '/users': 'users',
+      '/users/:id': 'user',
+      '/register': 'userRegister',
+      '/login': 'userLogin',
+      '/predictions': 'predictions',
+      '/predictions/:id': 'prediction',
+      '/experts': 'experts',
+      '/experts/:id': 'expert',
+      '/claims': 'claims',
+      '/claims/:id': 'claim'
     },
     landing: function() {
-      return div({
-        className: "base"
-      }, require("views/Landing")({}));
+      return div({}, require("views/Landing")({
+        path: this.state.path
+      }));
+    },
+    users: function() {
+      return div({}, require("views/Users")({
+        path: this.state.path
+      }));
+    },
+    user: function(id) {
+      return div({}, require("views/User")({
+        path: this.state.path,
+        user_id: id
+      }));
+    },
+    userProfile: function() {
+      return div({}, require("views/User")({
+        path: this.state.path,
+        me: true
+      }));
+    },
+    predictions: function() {
+      return div({}, require("views/Predictions")({
+        path: this.state.path
+      }));
+    },
+    prediction: function(id) {
+      return div({}, require("views/Prediction")({
+        path: this.state.path,
+        user_id: id
+      }));
+    },
+    claims: function() {
+      return div({}, require("views/Claims")({
+        path: this.state.path
+      }));
+    },
+    claim: function(id) {
+      return div({}, require("views/Claim")({
+        path: this.state.path,
+        user_id: id
+      }));
+    },
+    experts: function() {
+      return div({}, require("views/Experts")({
+        path: this.state.path
+      }));
+    },
+    expert: function(id) {
+      return div({}, require("views/Expert")({
+        path: this.state.path,
+        user_id: id
+      }));
+    },
+    bookmarks: function() {
+      return div({}, require("views/Bookmarks")({
+        path: this.state.path
+      }));
+    },
+    notFound: function(path) {
+      return div({}, require("views/404")({}));
     },
     render: function() {
+      var params;
+      params = {
+        path: "claims",
+        path_variables: {
+          claim_id: 1
+        },
+        data: {
+          id: "xxx"
+        }
+      };
+      API.call(params);
       return div({}, this.renderCurrentRoute());
     }
   }));
@@ -88,11 +205,135 @@ module.exports = React.createFactory(React.createClass({
 
   div = React.DOM.div;
 
+  menuItems = [
+    {
+      label: "My Bookmarks",
+      path: "/bookmarks",
+      logged: true
+    }, {
+      label: "Me",
+      path: "/me",
+      logged: true
+    }, {
+      label: "Claims",
+      path: "/claims"
+    }, {
+      label: "Predictions",
+      path: "/predictions"
+    }, {
+      label: "Experts",
+      path: "/experts"
+    }
+  ];
+
   module.exports = React.createFactory(React.createClass({
+    navigateToLocation: function(path) {
+      return navigate(path);
+    },
     render: function() {
-      return div({}, "Header");
+      return div({}, div({
+        className: "header__logo"
+      }, "Blundit"), div({
+        className: "header__items"
+      }, menuItems.map((function(_this) {
+        return function(item, index) {
+          return div({
+            className: "header__item",
+            key: "header-item-" + index,
+            onClick: _this.navigateToLocation.bind(_this, item.path)
+          }, item.label);
+        };
+      })(this))));
     }
   }));
+
+
+  /*
+  API Class.
+  Usage to call is like this:
+  path is required.
+  path_variables is optional, and used for replacement in paths, like 'claims/%claim_id%/add_commment'
+  data is optional.
+  
+  params = {
+    path: "claims"
+    path_variables:
+      claim_id: 1
+    data:
+      id: "xxx"
+  }
+  API.call(params)
+   */
+
+  module.exports = API = (function() {
+    function API() {}
+
+    API.paths = {
+      register: {
+        path: "users/register",
+        method: "POST"
+      },
+      login: {
+        path: "users/login",
+        method: "POST"
+      },
+      claims: {
+        path: "claims/%claim_id%/add_comment",
+        method: "POST"
+      }
+    };
+
+    API.server = function() {
+      return "http://localhost:3000/api/v1/";
+    };
+
+    API.method = function(params) {
+      return this.paths[params.path].method;
+    };
+
+    API.path = function(params) {
+      var key, ref, value;
+      this.p = this.server() + this.paths[params.path].path;
+      ref = params.path_variables;
+      for (key in ref) {
+        value = ref[key];
+        this.p = this.p.replace('%' + key + '%', value);
+      }
+      return this.p;
+    };
+
+    API.data = function(params) {
+      if (params.data != null) {
+        return this.data = params.data;
+      } else {
+        return this.data = {};
+      }
+    };
+
+    API.call = function(params) {
+      return $.ajax({
+        type: this.method(params),
+        url: this.path(params),
+        headers: {
+          Authorization: UserStore.getAuthHeader()
+        },
+        data: this.data(params),
+        success: function(data) {
+          if (params.success != null) {
+            return params.success(data);
+          }
+        },
+        error: function(error) {
+          if (params.error != null) {
+            return params.error(error);
+          }
+        }
+      });
+    };
+
+    return API;
+
+  })();
 
   UserStore = (function() {
     function UserStore() {
@@ -145,6 +386,15 @@ module.exports = React.createFactory(React.createClass({
 
     UserStore.prototype.setToken = function(token) {
       return this.data.token = token;
+    };
+
+    UserStore.getAuthHeader = function() {
+      this.user = this.get();
+      if ((this.user != null) && (this.user.token != null)) {
+        return "Bearer " + this.user.token;
+      } else {
+        return "Bearer 23";
+      }
     };
 
     UserStore.prototype.getAuthHeader = function() {
@@ -206,6 +456,10 @@ module.exports = React.createFactory(React.createClass({
       }
     };
 
+    UserStore.get = function() {
+      return UserStore.data;
+    };
+
     UserStore.prototype.get = function() {
       return this.data;
     };
@@ -225,14 +479,183 @@ module.exports = React.createFactory(React.createClass({
   Footer = require("components/Footer");
 
   module.exports = React.createFactory(React.createClass({
+    displayName: '404',
+    render: function() {
+      return div({}, Header({}, ''), "404", Footer({}, ''));
+    }
+  }));
+
+  div = React.DOM.div;
+
+  Header = require("components/Header");
+
+  Footer = require("components/Footer");
+
+  module.exports = React.createFactory(React.createClass({
+    displayName: 'Bookmarks',
+    render: function() {
+      return div({}, Header({}, ''), "Bookmarks", Footer({}, ''));
+    }
+  }));
+
+  div = React.DOM.div;
+
+  Header = require("components/Header");
+
+  Footer = require("components/Footer");
+
+  module.exports = React.createFactory(React.createClass({
+    displayName: 'Landing',
+    render: function() {
+      return div({}, Header({}, ''), "Claim", Footer({}, ''));
+    }
+  }));
+
+  div = React.DOM.div;
+
+  Header = require("components/Header");
+
+  Footer = require("components/Footer");
+
+  module.exports = React.createFactory(React.createClass({
+    displayName: 'Claims',
+    render: function() {
+      return div({}, Header({}, ''), "Claims", Footer({}, ''));
+    }
+  }));
+
+  div = React.DOM.div;
+
+  Header = require("components/Header");
+
+  Footer = require("components/Footer");
+
+  module.exports = React.createFactory(React.createClass({
+    displayName: 'Expert',
+    render: function() {
+      return div({}, Header({}, ''), "Expert", Footer({}, ''));
+    }
+  }));
+
+  div = React.DOM.div;
+
+  Header = require("components/Header");
+
+  Footer = require("components/Footer");
+
+  module.exports = React.createFactory(React.createClass({
+    displayName: 'Experts',
+    render: function() {
+      return div({}, Header({}, ''), "Expert", Footer({}, ''));
+    }
+  }));
+
+  div = React.DOM.div;
+
+  Header = require("components/Header");
+
+  Footer = require("components/Footer");
+
+  module.exports = React.createFactory(React.createClass({
+    displayName: 'Landing',
     render: function() {
       return div({}, Header({}, ''), "Landing", Footer({}, ''));
     }
   }));
 
+  div = React.DOM.div;
+
+  Header = require("components/Header");
+
+  Footer = require("components/Footer");
+
+  module.exports = React.createFactory(React.createClass({
+    displayName: 'Login',
+    render: function() {
+      return div({}, Header({}, ''), "Login", Footer({}, ''));
+    }
+  }));
+
+  div = React.DOM.div;
+
+  Header = require("components/Header");
+
+  Footer = require("components/Footer");
+
+  module.exports = React.createFactory(React.createClass({
+    displayName: 'Prediction',
+    render: function() {
+      return div({}, Header({}, ''), "Prediction", Footer({}, ''));
+    }
+  }));
+
+  div = React.DOM.div;
+
+  Header = require("components/Header");
+
+  Footer = require("components/Footer");
+
+  module.exports = React.createFactory(React.createClass({
+    displayName: 'Predictions',
+    render: function() {
+      return div({}, Header({}, ''), "Predictions", Footer({}, ''));
+    }
+  }));
+
+  div = React.DOM.div;
+
+  Header = require("components/Header");
+
+  Footer = require("components/Footer");
+
+  module.exports = React.createFactory(React.createClass({
+    displayName: 'Register',
+    render: function() {
+      return div({}, Header({}, ''), "Register", Footer({}, ''));
+    }
+  }));
+
+  div = React.DOM.div;
+
+  Header = require("components/Header");
+
+  Footer = require("components/Footer");
+
+  module.exports = React.createFactory(React.createClass({
+    displayName: 'User',
+    componentDidMount: function() {
+      return UserStore.subscribe(this.handleUserChange);
+    },
+    componentWillUnMount: function() {
+      return UserStore.unsubscribe(this.handleUserChange);
+    },
+    handleUserChange: function() {
+      this.setState({
+        user: UserStore.get()
+      });
+      return console.log(UserStore.get());
+    },
+    render: function() {
+      return div({}, Header({}, ''), div({}, this.props.me === true ? "My page" : "User " + this.props.user_id), Footer({}, ''));
+    }
+  }));
+
+  div = React.DOM.div;
+
+  Header = require("components/Header");
+
+  Footer = require("components/Footer");
+
+  module.exports = React.createFactory(React.createClass({
+    displayName: 'Users',
+    render: function() {
+      return div({}, Header({}, ''), "Users", Footer({}, ''));
+    }
+  }));
+
 }).call(this);
 
-},{"./components/Footer":1,"./components/Header":2,"components/Footer":187,"components/Header":188,"lodash":31,"react":185,"react-dom":34,"react-mini-router":35,"views/Landing":189}],4:[function(require,module,exports){
+},{"./components/Footer":1,"./components/Header":2,"components/Footer":187,"components/Header":188,"lodash":31,"react":185,"react-dom":34,"react-mini-router":35,"shared/API":189,"stores/UserStore":190,"views/404":191,"views/Bookmarks":192,"views/Claim":193,"views/Claims":194,"views/Expert":195,"views/Experts":196,"views/Landing":197,"views/Prediction":198,"views/Predictions":199,"views/User":200,"views/Users":201}],4:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -38674,6 +39097,239 @@ module.exports=require(1)
 },{}],188:[function(require,module,exports){
 module.exports=require(2)
 },{}],189:[function(require,module,exports){
+
+/*
+API Class.
+Usage to call is like this:
+path is required.
+path_variables is optional, and used for replacement in paths, like 'claims/%claim_id%/add_commment'
+data is optional.
+
+params = {
+  path: "claims"
+  path_variables:
+    claim_id: 1
+  data:
+    id: "xxx"
+}
+API.call(params)
+ */
+var API;
+
+module.exports = API = (function() {
+  function API() {}
+
+  API.paths = {
+    register: {
+      path: "users/register",
+      method: "POST"
+    },
+    login: {
+      path: "users/login",
+      method: "POST"
+    },
+    claims: {
+      path: "claims/%claim_id%/add_comment",
+      method: "POST"
+    }
+  };
+
+  API.server = function() {
+    return "http://localhost:3000/api/v1/";
+  };
+
+  API.method = function(params) {
+    return this.paths[params.path].method;
+  };
+
+  API.path = function(params) {
+    var key, ref, value;
+    this.p = this.server() + this.paths[params.path].path;
+    ref = params.path_variables;
+    for (key in ref) {
+      value = ref[key];
+      this.p = this.p.replace('%' + key + '%', value);
+    }
+    return this.p;
+  };
+
+  API.data = function(params) {
+    if (params.data != null) {
+      return this.data = params.data;
+    } else {
+      return this.data = {};
+    }
+  };
+
+  API.call = function(params) {
+    return $.ajax({
+      type: this.method(params),
+      url: this.path(params),
+      headers: {
+        Authorization: UserStore.getAuthHeader()
+      },
+      data: this.data(params),
+      success: function(data) {
+        if (params.success != null) {
+          return params.success(data);
+        }
+      },
+      error: function(error) {
+        if (params.error != null) {
+          return params.error(error);
+        }
+      }
+    });
+  };
+
+  return API;
+
+})();
+
+
+},{}],190:[function(require,module,exports){
+var UserStore,
+  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+
+UserStore = (function() {
+  function UserStore() {
+    this.get = bind(this.get, this);
+    this.set = bind(this.set, this);
+    this.emitChange = bind(this.emitChange, this);
+    this.unsubscribe = bind(this.unsubscribe, this);
+    this.subscribe = bind(this.subscribe, this);
+  }
+
+  UserStore.prototype.data = {};
+
+  UserStore.prototype.subscribers = 0;
+
+  UserStore.prototype.changeEvent = 'blundit:user';
+
+  UserStore.prototype.fetchMessagesTimeout = null;
+
+  UserStore.prototype.lastMessagesFetch = null;
+
+  UserStore.prototype.messagesTtl = 60000;
+
+  UserStore.prototype.subscribe = function(callback) {
+    addEventListener(this.changeEvent, callback, false);
+    this.subscribers++;
+    if (this.data != null) {
+      return this.emitChange();
+    }
+  };
+
+  UserStore.prototype.unsubscribe = function(callback) {
+    removeEventListener(this.changeEvent, callback);
+    this.subscribers--;
+    if (!(this.subscribers > 0)) {
+      return this.dequeueMessagesFetch();
+    }
+  };
+
+  UserStore.prototype.emitChange = function() {
+    var event;
+    event = document.createEvent('Event');
+    event.initEvent(this.changeEvent, true, true);
+    return dispatchEvent(event);
+  };
+
+  UserStore.prototype.set = function(data) {
+    this.data = data;
+    return this.emitChange();
+  };
+
+  UserStore.prototype.setToken = function(token) {
+    return this.data.token = token;
+  };
+
+  UserStore.getAuthHeader = function() {
+    this.user = this.get();
+    if ((this.user != null) && (this.user.token != null)) {
+      return "Bearer " + this.user.token;
+    } else {
+      return "Bearer 23";
+    }
+  };
+
+  UserStore.prototype.getAuthHeader = function() {
+    this.user = this.get();
+    if ((this.user != null) && (this.user.token != null)) {
+      return "Bearer " + this.user.token;
+    } else {
+      return '';
+    }
+  };
+
+  UserStore.prototype.fetchUserData = function(navigateTarget) {
+    return $.ajax({
+      type: 'GET',
+      headers: {
+        Authorization: this.getAuthHeader()
+      },
+      url: this.urls.get_user_data,
+      dataType: 'json',
+      success: (function(_this) {
+        return function(data) {
+          _this.setUserAccounts(_this.fixDates(data));
+          _this.doQueueMessages();
+          _this.fetchUserProfile();
+          if (navigateTarget != null) {
+            return window.navigate(navigateTarget);
+          }
+        };
+      })(this)
+    });
+  };
+
+  UserStore.prototype.fetchUserProfile = function(navigateTarget) {
+    return $.ajax({
+      type: 'GET',
+      headers: {
+        Authorization: this.getAuthHeader()
+      },
+      url: this.urls.get_current_user,
+      dataType: 'json',
+      success: (function(_this) {
+        return function(data) {
+          return _this.setUserProfile(data);
+        };
+      })(this)
+    });
+  };
+
+  UserStore.prototype.setUserProfile = function(data) {
+    this.data.profile = data;
+    return this.emitChange();
+  };
+
+  UserStore.prototype.doQueueMessages = function() {
+    if (this.subscribers > 0) {
+      return this.queueMessagesFetch();
+    } else {
+      return this.dequeueMessagesFetch();
+    }
+  };
+
+  UserStore.get = function() {
+    return UserStore.data;
+  };
+
+  UserStore.prototype.get = function() {
+    return this.data;
+  };
+
+  return UserStore;
+
+})();
+
+module.exports = new UserStore({
+  messagestl: 1000 * 60
+});
+
+
+},{}],191:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -38683,8 +39339,191 @@ Header = require("components/Header");
 Footer = require("components/Footer");
 
 module.exports = React.createFactory(React.createClass({
+  displayName: '404',
+  render: function() {
+    return div({}, Header({}, ''), "404", Footer({}, ''));
+  }
+}));
+
+
+},{"components/Footer":187,"components/Header":188}],192:[function(require,module,exports){
+var Footer, Header, div;
+
+div = React.DOM.div;
+
+Header = require("components/Header");
+
+Footer = require("components/Footer");
+
+module.exports = React.createFactory(React.createClass({
+  displayName: 'Bookmarks',
+  render: function() {
+    return div({}, Header({}, ''), "Bookmarks", Footer({}, ''));
+  }
+}));
+
+
+},{"components/Footer":187,"components/Header":188}],193:[function(require,module,exports){
+var Footer, Header, div;
+
+div = React.DOM.div;
+
+Header = require("components/Header");
+
+Footer = require("components/Footer");
+
+module.exports = React.createFactory(React.createClass({
+  displayName: 'Landing',
+  render: function() {
+    return div({}, Header({}, ''), "Claim", Footer({}, ''));
+  }
+}));
+
+
+},{"components/Footer":187,"components/Header":188}],194:[function(require,module,exports){
+var Footer, Header, div;
+
+div = React.DOM.div;
+
+Header = require("components/Header");
+
+Footer = require("components/Footer");
+
+module.exports = React.createFactory(React.createClass({
+  displayName: 'Claims',
+  render: function() {
+    return div({}, Header({}, ''), "Claims", Footer({}, ''));
+  }
+}));
+
+
+},{"components/Footer":187,"components/Header":188}],195:[function(require,module,exports){
+var Footer, Header, div;
+
+div = React.DOM.div;
+
+Header = require("components/Header");
+
+Footer = require("components/Footer");
+
+module.exports = React.createFactory(React.createClass({
+  displayName: 'Expert',
+  render: function() {
+    return div({}, Header({}, ''), "Expert", Footer({}, ''));
+  }
+}));
+
+
+},{"components/Footer":187,"components/Header":188}],196:[function(require,module,exports){
+var Footer, Header, div;
+
+div = React.DOM.div;
+
+Header = require("components/Header");
+
+Footer = require("components/Footer");
+
+module.exports = React.createFactory(React.createClass({
+  displayName: 'Experts',
+  render: function() {
+    return div({}, Header({}, ''), "Expert", Footer({}, ''));
+  }
+}));
+
+
+},{"components/Footer":187,"components/Header":188}],197:[function(require,module,exports){
+var Footer, Header, div;
+
+div = React.DOM.div;
+
+Header = require("components/Header");
+
+Footer = require("components/Footer");
+
+module.exports = React.createFactory(React.createClass({
+  displayName: 'Landing',
   render: function() {
     return div({}, Header({}, ''), "Landing", Footer({}, ''));
+  }
+}));
+
+
+},{"components/Footer":187,"components/Header":188}],198:[function(require,module,exports){
+var Footer, Header, div;
+
+div = React.DOM.div;
+
+Header = require("components/Header");
+
+Footer = require("components/Footer");
+
+module.exports = React.createFactory(React.createClass({
+  displayName: 'Prediction',
+  render: function() {
+    return div({}, Header({}, ''), "Prediction", Footer({}, ''));
+  }
+}));
+
+
+},{"components/Footer":187,"components/Header":188}],199:[function(require,module,exports){
+var Footer, Header, div;
+
+div = React.DOM.div;
+
+Header = require("components/Header");
+
+Footer = require("components/Footer");
+
+module.exports = React.createFactory(React.createClass({
+  displayName: 'Predictions',
+  render: function() {
+    return div({}, Header({}, ''), "Predictions", Footer({}, ''));
+  }
+}));
+
+
+},{"components/Footer":187,"components/Header":188}],200:[function(require,module,exports){
+var Footer, Header, div;
+
+div = React.DOM.div;
+
+Header = require("components/Header");
+
+Footer = require("components/Footer");
+
+module.exports = React.createFactory(React.createClass({
+  displayName: 'User',
+  componentDidMount: function() {
+    return UserStore.subscribe(this.handleUserChange);
+  },
+  componentWillUnMount: function() {
+    return UserStore.unsubscribe(this.handleUserChange);
+  },
+  handleUserChange: function() {
+    this.setState({
+      user: UserStore.get()
+    });
+    return console.log(UserStore.get());
+  },
+  render: function() {
+    return div({}, Header({}, ''), div({}, this.props.me === true ? "My page" : "User " + this.props.user_id), Footer({}, ''));
+  }
+}));
+
+
+},{"components/Footer":187,"components/Header":188}],201:[function(require,module,exports){
+var Footer, Header, div;
+
+div = React.DOM.div;
+
+Header = require("components/Header");
+
+Footer = require("components/Footer");
+
+module.exports = React.createFactory(React.createClass({
+  displayName: 'Users',
+  render: function() {
+    return div({}, Header({}, ''), "Users", Footer({}, ''));
   }
 }));
 

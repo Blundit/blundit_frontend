@@ -35,6 +35,14 @@ class UserStore
     @data.token = token
 
   
+  @getAuthHeader: ->
+    @user = @get()
+    if @user? and @user.token?
+      return "Bearer " + @user.token
+    else
+      return "Bearer 23"
+
+
   getAuthHeader: ->
     @user = @get()
     if @user? and @user.token?
@@ -42,7 +50,7 @@ class UserStore
     else
       return ''
 
-  
+
   fetchUserData: (navigateTarget) ->
     $.ajax
       type: 'GET'
@@ -79,6 +87,10 @@ class UserStore
       @queueMessagesFetch()
     else
       @dequeueMessagesFetch()
+
+  
+  @get: =>
+    @data
 
   
   get: =>
