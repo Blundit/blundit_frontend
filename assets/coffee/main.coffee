@@ -1,8 +1,7 @@
 window.React = require('react')
 window.ReactDOM = require('react-dom')
-
-# RouterMixin = require('react-mini-router').RouterMixin
-# window.navigate = require('react-mini-router').navigate
+RouterMixin = require('react-mini-router').RouterMixin
+window.navigate = require('react-mini-router').navigate
 window._ = require('lodash')
 
 # window.UserStore = UserStore = require("./stores/UserStore")
@@ -10,10 +9,11 @@ window._ = require('lodash')
 Header = require("./components/Header")
 Footer = require("./components/Footer")
 
-{ div } = React.DOM
+
+{ div, hr } = window.ReactDOM
 
 Blundit = React.createFactory React.createClass
-  # mixins: [RouterMixin]
+  mixins: [RouterMixin]
 
   componentWillMount: ->
     console.log "will mount"
@@ -28,15 +28,13 @@ Blundit = React.createFactory React.createClass
 
   
   landing: ->
-    div {},
-      Header {}
-      Footer {}
+    div { className: "base" },
+      require("views/Landing") {}
 
 
   render: ->
     div {},
-      # @renderCurrentRoute()
-      @landing()
+      @renderCurrentRoute()
 
 
 startBlundit = ->
