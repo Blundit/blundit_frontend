@@ -1,4 +1,4 @@
-{ div } = ReactDOM
+{ div } = React.DOM
 
 Header = require("components/Header")
 Footer = require("components/Footer")

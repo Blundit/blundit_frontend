@@ -9,8 +9,7 @@ window._ = require('lodash')
 Header = require("./components/Header")
 Footer = require("./components/Footer")
 
-
-{ div, hr } = window.ReactDOM
+{ div } = React.DOM
 
 Blundit = React.createFactory React.createClass
   mixins: [RouterMixin]
