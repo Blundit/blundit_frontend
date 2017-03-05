@@ -3,6 +3,7 @@
 menuItems = [
   { label: "My Bookmarks", path: "/bookmarks", logged: true }
   { label: "Me", path: "/me", logged: true },
+  { label: "Categories", path: "/categories" },
   { label: "Claims", path: "/claims" },
   { label: "Predictions", path: "/predictions" },
   { label: "Experts", path: "/experts" },

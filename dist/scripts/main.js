@@ -25,6 +25,9 @@ menuItems = [
     path: "/me",
     logged: true
   }, {
+    label: "Categories",
+    path: "/categories"
+  }, {
     label: "Claims",
     path: "/claims"
   }, {
@@ -60,7 +63,7 @@ module.exports = React.createFactory(React.createClass({
 
 },{}],3:[function(require,module,exports){
 (function() {
-  var API, Blundit, Footer, Header, RouterMixin, UserStore, div, menuItems, startBlundit,
+  var API, Blundit, CategoryClaims, CategoryExperts, CategoryPredictions, CategorySubHead, Footer, Header, RouterMixin, UserStore, div, menuItems, startBlundit,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   window.React = require('react');
@@ -100,7 +103,12 @@ module.exports = React.createFactory(React.createClass({
       '/experts': 'experts',
       '/experts/:id': 'expert',
       '/claims': 'claims',
-      '/claims/:id': 'claim'
+      '/claims/:id': 'claim',
+      '/categories': 'categories',
+      '/categories/:id': 'categoryAll',
+      '/categories/:id/predictions': 'categoryPredictions',
+      '/categories/:id/claims': 'categoryClaims',
+      '/categories/:id/experts': 'categoryExperts'
     },
     landing: function() {
       return div({}, require("views/Landing")({
@@ -162,21 +170,39 @@ module.exports = React.createFactory(React.createClass({
         path: this.state.path
       }));
     },
+    categories: function() {
+      return div({}, require("views/Categories")({
+        path: this.state.path
+      }));
+    },
+    categoryAll: function(id) {
+      return div({}, require("views/CategoryAll")({
+        path: this.state.path,
+        id: id
+      }));
+    },
+    categoryPredictions: function(id) {
+      return div({}, require("views/CategoryPredictions")({
+        path: this.state.path,
+        id: id
+      }));
+    },
+    categoryExperts: function(id) {
+      return div({}, require("views/CategoryExperts")({
+        path: this.state.path,
+        id: id
+      }));
+    },
+    categoryClaims: function(id) {
+      return div({}, require("views/CategoryClaims")({
+        path: this.state.path,
+        id: id
+      }));
+    },
     notFound: function(path) {
       return div({}, require("views/404")({}));
     },
     render: function() {
-      var params;
-      params = {
-        path: "claims",
-        path_variables: {
-          claim_id: 1
-        },
-        data: {
-          id: "xxx"
-        }
-      };
-      API.call(params);
       return div({}, this.renderCurrentRoute());
     }
   }));
@@ -198,6 +224,134 @@ module.exports = React.createFactory(React.createClass({
   div = React.DOM.div;
 
   module.exports = React.createFactory(React.createClass({
+    displayName: "Category Claims - Latest",
+    render: function() {
+      return div({
+        className: "categories__claims"
+      }, div({
+        className: "categories__claims-title"
+      }, "Claims"), this.props.claims.length > 0 ? this.props.claims.map((function(_this) {
+        return function(claim, index) {
+          return div({
+            className: "categories__claims__claim"
+          }, div({
+            className: "categories__claims__claim-title"
+          }, claim.title));
+        };
+      })(this)) : div({
+        className: "categories__claims--empty"
+      }, "There are no claims in this category."));
+    }
+  }));
+
+  div = React.DOM.div;
+
+  module.exports = React.createFactory(React.createClass({
+    displayName: "Category Experts - Latest",
+    render: function() {
+      return div({
+        className: "categories__experts"
+      }, div({
+        className: "categories__experts-title"
+      }, "Experts"), this.props.experts.length > 0 ? this.props.experts.map((function(_this) {
+        return function(expert, index) {
+          return div({
+            className: "categories__experts__expert"
+          }, div({
+            className: "categories__experts__expert-name"
+          }, expert.name));
+        };
+      })(this)) : div({
+        className: "categories__experts--empty"
+      }, "There are no experts in this category."));
+    }
+  }));
+
+  div = React.DOM.div;
+
+  module.exports = React.createFactory(React.createClass({
+    displayName: "Category Predictions - Latest",
+    render: function() {
+      return div({
+        className: "categories__predictions"
+      }, div({
+        className: "categories__predictions-title"
+      }, "Predictions"), this.props.predictions.length > 0 ? this.props.predictions.map((function(_this) {
+        return function(prediction, index) {
+          return div({
+            className: "categories__predictions__prediction"
+          }, div({
+            className: "categories__predictions__prediction-title"
+          }, prediction.title));
+        };
+      })(this)) : div({
+        className: "categories__predictions--empty"
+      }, "There are no predictions in this category."));
+    }
+  }));
+
+  div = React.DOM.div;
+
+  module.exports = React.createFactory(React.createClass({
+    displayName: "Category Filter Subhead",
+    showAll: function() {
+      return navigate("/categories/" + this.props.category_id + "/all");
+    },
+    showExperts: function() {
+      return navigate("/categories/" + this.props.category_id + "/experts");
+    },
+    showClaims: function() {
+      return navigate("/categories/" + this.props.category_id + "/claims");
+    },
+    showPredictions: function() {
+      return navigate("/categories/" + this.props.category_id + "/predictions");
+    },
+    currentPage: function(id) {
+      this.path = window.location.pathname;
+      if (id === '') {
+        if (this.path.indexOf(("/" + this.props.category_id + "/") === -1)) {
+          return true;
+        } else {
+          return false;
+        }
+      } else {
+        if (this.path.indexOf(("/" + this.props.category_id + "/" + id) === -1)) {
+          return false;
+        } else {
+          return true;
+        }
+      }
+    },
+    render: function() {
+      return div({
+        className: "page-subhead"
+      }, this.currentPage('') ? div({
+        className: "page-subhead__item",
+        onClick: this.showAll
+      }, 'All') : div({
+        className: "page-subhead__item--active"
+      }, 'All'), this.currentPage('experts') ? div({
+        className: "page-subhead__item",
+        onClick: this.showExperts
+      }, 'Experts') : div({
+        className: "page-subhead__item--active"
+      }, 'Experts'), this.currentPage('predictions') ? div({
+        className: "page-subhead__item",
+        onClick: this.showPredictions
+      }, 'Predictions') : div({
+        className: "page-subhead__item--active"
+      }, 'Predictions'), this.currentPage('claims') ? div({
+        className: "page-subhead__item",
+        onClick: this.showClaims
+      }, 'Claims') : div({
+        className: "page-subhead__item--active"
+      }, 'Claims'));
+    }
+  }));
+
+  div = React.DOM.div;
+
+  module.exports = React.createFactory(React.createClass({
     render: function() {
       return div({}, "Footer");
     }
@@ -214,6 +368,9 @@ module.exports = React.createFactory(React.createClass({
       label: "Me",
       path: "/me",
       logged: true
+    }, {
+      label: "Categories",
+      path: "/categories"
     }, {
       label: "Claims",
       path: "/claims"
@@ -261,6 +418,8 @@ module.exports = React.createFactory(React.createClass({
       claim_id: 1
     data:
       id: "xxx"
+    success: @function
+    error: @function
   }
   API.call(params)
    */
@@ -277,9 +436,29 @@ module.exports = React.createFactory(React.createClass({
         path: "users/login",
         method: "POST"
       },
-      claims: {
-        path: "claims/%claim_id%/add_comment",
+      categories: {
+        path: "categories",
+        method: "GET"
+      },
+      category: {
+        path: "categories/%category_id%",
+        method: "GET"
+      },
+      category_predictions: {
+        path: "categories/%category_id%/predictions",
+        method: "GET"
+      },
+      category_claims: {
+        path: "categories/%category_id%/claims",
         method: "POST"
+      },
+      category_experts: {
+        path: "categories/%category_id%/experts",
+        method: "GET"
+      },
+      category_all: {
+        path: "categories/%category_id%/all",
+        method: "GET"
       }
     };
 
@@ -303,21 +482,24 @@ module.exports = React.createFactory(React.createClass({
     };
 
     API.data = function(params) {
+      var data;
       if (params.data != null) {
-        return this.data = params.data;
+        data = params.data;
       } else {
-        return this.data = {};
+        data = {};
       }
+      return data;
     };
 
     API.call = function(params) {
       return $.ajax({
-        type: this.method(params),
+        method: this.method(params),
         url: this.path(params),
         headers: {
           Authorization: UserStore.getAuthHeader()
         },
         data: this.data(params),
+        dataType: "json",
         success: function(data) {
           if (params.success != null) {
             return params.success(data);
@@ -505,6 +687,351 @@ module.exports = React.createFactory(React.createClass({
   Footer = require("components/Footer");
 
   module.exports = React.createFactory(React.createClass({
+    displayName: 'Categories',
+    getInitialState: function() {
+      return {
+        categories: []
+      };
+    },
+    componentDidMount: function() {
+      ({
+        params: {
+          path: "categories",
+          success: this.categoryListSuccess,
+          error: this.categoryListError
+        }
+      });
+      return API.call(params);
+    },
+    categoryListSuccess: function(data) {
+      return this.setState({
+        categories: data
+      });
+    },
+    categoryListError: function(error) {
+      return console.log("error", error);
+    },
+    render: function() {
+      return div({}, Header({}, ''), "Expert", Footer({}, ''));
+    }
+  }));
+
+  div = React.DOM.div;
+
+  Header = require("components/Header");
+
+  Footer = require("components/Footer");
+
+  CategoryExperts = require("components/CategoryExperts");
+
+  CategoryClaims = require("components/CategoryClaims");
+
+  CategoryPredictions = require("components/CategoryPredictions");
+
+  CategorySubHead = require("components/CategorySubHead");
+
+  module.exports = React.createFactory(React.createClass({
+    displayName: 'Categories',
+    getInitialState: function() {
+      return {
+        data: null,
+        category: null
+      };
+    },
+    componentDidMount: function() {
+      this.getCategoryAllInfo();
+      return this.getCategoryInfo();
+    },
+    getCategoryAllInfo: function() {
+      var params;
+      params = {
+        path: "category_all",
+        path_variables: {
+          category_id: this.props.id
+        },
+        success: this.categoryAllSuccess,
+        error: this.categoryAllError
+      };
+      return API.call(params);
+    },
+    getCategoryInfo: function() {
+      var params;
+      params = {
+        path: "category",
+        path_variables: {
+          category_id: this.props.id
+        },
+        success: this.categorySuccess,
+        error: this.categoryError
+      };
+      return API.call(params);
+    },
+    categoryAllSuccess: function(data) {
+      console.log("!", data);
+      return this.setState({
+        data: data
+      });
+    },
+    categoryAllError: function(error) {
+      return console.log("error", error);
+    },
+    categorySuccess: function(data) {
+      return this.setState({
+        category: data
+      });
+    },
+    categoryError: function(error) {
+      return console.log("error", error);
+    },
+    render: function() {
+      return div({}, Header({}, ''), this.state.category != null ? (console.log(this.state.category), div({
+        className: "page-title"
+      }, "Category '" + this.state.category.name + "' - Showing Experts, Claims and Predictions", CategorySubHead({
+        category_id: this.props.id
+      }))) : div({}, "Loading..."), this.state.data != null ? div({
+        className: "categories"
+      }, CategoryExperts({
+        experts: this.state.data.experts
+      }), CategoryPredictions({
+        predictions: this.state.data.predictions
+      }), CategoryClaims({
+        claims: this.state.data.claims
+      })) : void 0, Footer({}, ''));
+    }
+  }));
+
+  div = React.DOM.div;
+
+  Header = require("components/Header");
+
+  Footer = require("components/Footer");
+
+  CategoryClaims = require("components/CategoryClaims");
+
+  CategorySubHead = require("components/CategorySubHead");
+
+  module.exports = React.createFactory(React.createClass({
+    displayName: 'Category - Claims',
+    getInitialState: function() {
+      return {
+        data: null,
+        category: null
+      };
+    },
+    componentDidMount: function() {
+      this.getCategoryAllInfo();
+      return this.getCategoryInfo();
+    },
+    getCategoryAllInfo: function() {
+      var params;
+      params = {
+        path: "category_claims",
+        path_variables: {
+          category_id: this.props.id
+        },
+        success: this.categoryAllSuccess,
+        error: this.categoryAllError
+      };
+      return API.call(params);
+    },
+    getCategoryInfo: function() {
+      var params;
+      params = {
+        path: "category",
+        path_variables: {
+          category_id: this.props.id
+        },
+        success: this.categorySuccess,
+        error: this.categoryError
+      };
+      return API.call(params);
+    },
+    categoryAllSuccess: function(data) {
+      return this.setState({
+        categories: data
+      });
+    },
+    categoryAllError: function(error) {
+      return console.log("error", error);
+    },
+    categorySuccess: function(data) {
+      return this.setState({
+        category: data
+      });
+    },
+    categoryError: function(error) {
+      return console.log("error", error);
+    },
+    render: function() {
+      return div({}, Header({}, ''), this.state.category ? div({
+        className: "page-title"
+      }, "Category '" + this.state.category.name + "' - Showing Claims", CategorySubHead({
+        category_id: this.props.id
+      })) : void 0, this.state.categories != null ? div({
+        className: "categories"
+      }, CategoryClaims({
+        claims: this.state.data
+      })) : void 0, Footer({}, ''));
+    }
+  }));
+
+  div = React.DOM.div;
+
+  Header = require("components/Header");
+
+  Footer = require("components/Footer");
+
+  CategoryExperts = require("components/CategoryExperts");
+
+  CategorySubHead = require("components/CategorySubHead");
+
+  module.exports = React.createFactory(React.createClass({
+    displayName: 'Category - Experts',
+    getInitialState: function() {
+      return {
+        data: null,
+        category: null
+      };
+    },
+    componentDidMount: function() {
+      this.getCategoryAllInfo();
+      return this.getCategoryInfo();
+    },
+    getCategoryAllInfo: function() {
+      var params;
+      params = {
+        path: "category_experts",
+        path_variables: {
+          category_id: this.props.id
+        },
+        success: this.categoryAllSuccess,
+        error: this.categoryAllError
+      };
+      return API.call(params);
+    },
+    getCategoryInfo: function() {
+      var params;
+      params = {
+        path: "category",
+        path_variables: {
+          category_id: this.props.id
+        },
+        success: this.categorySuccess,
+        error: this.categoryError
+      };
+      return API.call(params);
+    },
+    categoryAllSuccess: function(data) {
+      return this.setState({
+        categories: data
+      });
+    },
+    categoryAllError: function(error) {
+      return console.log("error", error);
+    },
+    categorySuccess: function(data) {
+      return this.setState({
+        category: data
+      });
+    },
+    categoryError: function(error) {
+      return console.log("error", error);
+    },
+    render: function() {
+      return div({}, Header({}, ''), this.state.category ? div({
+        className: "page-title"
+      }, "Category '" + this.state.category.name + "' - Showing Experts", CategorySubHead({
+        category_id: this.props.id
+      })) : void 0, this.state.categories != null ? div({
+        className: "categories"
+      }, CategoryExperts({
+        experts: this.state.data
+      })) : void 0, Footer({}, ''));
+    }
+  }));
+
+  div = React.DOM.div;
+
+  Header = require("components/Header");
+
+  Footer = require("components/Footer");
+
+  CategoryPredictions = require("components/CategoryPredictions");
+
+  CategorySubHead = require("components/CategorySubHead");
+
+  module.exports = React.createFactory(React.createClass({
+    displayName: 'Category - Predictions',
+    getInitialState: function() {
+      return {
+        data: null,
+        category: null
+      };
+    },
+    componentDidMount: function() {
+      this.getCategoryAllInfo();
+      return this.getCategoryInfo();
+    },
+    getCategoryAllInfo: function() {
+      var params;
+      params = {
+        path: "category_predictions",
+        path_variables: {
+          category_id: this.props.id
+        },
+        success: this.categoryAllSuccess,
+        error: this.categoryAllError
+      };
+      return API.call(params);
+    },
+    getCategoryInfo: function() {
+      var params;
+      params = {
+        path: "category",
+        path_variables: {
+          category_id: this.props.id
+        },
+        success: this.categorySuccess,
+        error: this.categoryError
+      };
+      return API.call(params);
+    },
+    categoryAllSuccess: function(data) {
+      return this.setState({
+        categories: data
+      });
+    },
+    categoryAllError: function(error) {
+      return console.log("error", error);
+    },
+    categorySuccess: function(data) {
+      return this.setState({
+        category: data
+      });
+    },
+    categoryError: function(error) {
+      return console.log("error", error);
+    },
+    render: function() {
+      return div({}, Header({}, ''), this.state.category ? div({
+        className: "page-title"
+      }, "Category '" + this.state.category.name + "' - Showing Experts, Claims and Predictions", CategorySubHead({
+        category_id: this.props.id
+      })) : void 0, this.state.categories != null ? div({
+        className: "categories"
+      }, CategoryPredictions({
+        predictions: this.state.data
+      })) : void 0, Footer({}, ''));
+    }
+  }));
+
+  div = React.DOM.div;
+
+  Header = require("components/Header");
+
+  Footer = require("components/Footer");
+
+  module.exports = React.createFactory(React.createClass({
     displayName: 'Landing',
     render: function() {
       return div({}, Header({}, ''), "Claim", Footer({}, ''));
@@ -655,7 +1182,7 @@ module.exports = React.createFactory(React.createClass({
 
 }).call(this);
 
-},{"./components/Footer":1,"./components/Header":2,"components/Footer":187,"components/Header":188,"lodash":31,"react":185,"react-dom":34,"react-mini-router":35,"shared/API":189,"stores/UserStore":190,"views/404":191,"views/Bookmarks":192,"views/Claim":193,"views/Claims":194,"views/Expert":195,"views/Experts":196,"views/Landing":197,"views/Prediction":198,"views/Predictions":199,"views/User":200,"views/Users":201}],4:[function(require,module,exports){
+},{"./components/Footer":1,"./components/Header":2,"components/CategoryClaims":187,"components/CategoryExperts":188,"components/CategoryPredictions":189,"components/CategorySubHead":190,"components/Footer":191,"components/Header":192,"lodash":31,"react":185,"react-dom":34,"react-mini-router":35,"shared/API":193,"stores/UserStore":194,"views/404":195,"views/Bookmarks":196,"views/Categories":197,"views/CategoryAll":198,"views/CategoryClaims":199,"views/CategoryExperts":200,"views/CategoryPredictions":201,"views/Claim":202,"views/Claims":203,"views/Expert":204,"views/Experts":205,"views/Landing":206,"views/Prediction":207,"views/Predictions":208,"views/User":209,"views/Users":210}],4:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -39093,10 +39620,154 @@ module.exports = require('./lib/React');
 }).call(this);
 
 },{}],187:[function(require,module,exports){
-module.exports=require(1)
+var div;
+
+div = React.DOM.div;
+
+module.exports = React.createFactory(React.createClass({
+  displayName: "Category Claims - Latest",
+  render: function() {
+    return div({
+      className: "categories__claims"
+    }, div({
+      className: "categories__claims-title"
+    }, "Claims"), this.props.claims.length > 0 ? this.props.claims.map((function(_this) {
+      return function(claim, index) {
+        return div({
+          className: "categories__claims__claim"
+        }, div({
+          className: "categories__claims__claim-title"
+        }, claim.title));
+      };
+    })(this)) : div({
+      className: "categories__claims--empty"
+    }, "There are no claims in this category."));
+  }
+}));
+
+
 },{}],188:[function(require,module,exports){
-module.exports=require(2)
+var div;
+
+div = React.DOM.div;
+
+module.exports = React.createFactory(React.createClass({
+  displayName: "Category Experts - Latest",
+  render: function() {
+    return div({
+      className: "categories__experts"
+    }, div({
+      className: "categories__experts-title"
+    }, "Experts"), this.props.experts.length > 0 ? this.props.experts.map((function(_this) {
+      return function(expert, index) {
+        return div({
+          className: "categories__experts__expert"
+        }, div({
+          className: "categories__experts__expert-name"
+        }, expert.name));
+      };
+    })(this)) : div({
+      className: "categories__experts--empty"
+    }, "There are no experts in this category."));
+  }
+}));
+
+
 },{}],189:[function(require,module,exports){
+var div;
+
+div = React.DOM.div;
+
+module.exports = React.createFactory(React.createClass({
+  displayName: "Category Predictions - Latest",
+  render: function() {
+    return div({
+      className: "categories__predictions"
+    }, div({
+      className: "categories__predictions-title"
+    }, "Predictions"), this.props.predictions.length > 0 ? this.props.predictions.map((function(_this) {
+      return function(prediction, index) {
+        return div({
+          className: "categories__predictions__prediction"
+        }, div({
+          className: "categories__predictions__prediction-title"
+        }, prediction.title));
+      };
+    })(this)) : div({
+      className: "categories__predictions--empty"
+    }, "There are no predictions in this category."));
+  }
+}));
+
+
+},{}],190:[function(require,module,exports){
+var div;
+
+div = React.DOM.div;
+
+module.exports = React.createFactory(React.createClass({
+  displayName: "Category Filter Subhead",
+  showAll: function() {
+    return navigate("/categories/" + this.props.category_id + "/all");
+  },
+  showExperts: function() {
+    return navigate("/categories/" + this.props.category_id + "/experts");
+  },
+  showClaims: function() {
+    return navigate("/categories/" + this.props.category_id + "/claims");
+  },
+  showPredictions: function() {
+    return navigate("/categories/" + this.props.category_id + "/predictions");
+  },
+  currentPage: function(id) {
+    this.path = window.location.pathname;
+    if (id === '') {
+      if (this.path.indexOf(("/" + this.props.category_id + "/") === -1)) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      if (this.path.indexOf(("/" + this.props.category_id + "/" + id) === -1)) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+  },
+  render: function() {
+    return div({
+      className: "page-subhead"
+    }, this.currentPage('') ? div({
+      className: "page-subhead__item",
+      onClick: this.showAll
+    }, 'All') : div({
+      className: "page-subhead__item--active"
+    }, 'All'), this.currentPage('experts') ? div({
+      className: "page-subhead__item",
+      onClick: this.showExperts
+    }, 'Experts') : div({
+      className: "page-subhead__item--active"
+    }, 'Experts'), this.currentPage('predictions') ? div({
+      className: "page-subhead__item",
+      onClick: this.showPredictions
+    }, 'Predictions') : div({
+      className: "page-subhead__item--active"
+    }, 'Predictions'), this.currentPage('claims') ? div({
+      className: "page-subhead__item",
+      onClick: this.showClaims
+    }, 'Claims') : div({
+      className: "page-subhead__item--active"
+    }, 'Claims'));
+  }
+}));
+
+
+},{}],191:[function(require,module,exports){
+module.exports=require(1)
+},{}],192:[function(require,module,exports){
+module.exports=require(2)
+},{}],193:[function(require,module,exports){
 
 /*
 API Class.
@@ -39111,6 +39782,8 @@ params = {
     claim_id: 1
   data:
     id: "xxx"
+  success: @function
+  error: @function
 }
 API.call(params)
  */
@@ -39128,9 +39801,29 @@ module.exports = API = (function() {
       path: "users/login",
       method: "POST"
     },
-    claims: {
-      path: "claims/%claim_id%/add_comment",
+    categories: {
+      path: "categories",
+      method: "GET"
+    },
+    category: {
+      path: "categories/%category_id%",
+      method: "GET"
+    },
+    category_predictions: {
+      path: "categories/%category_id%/predictions",
+      method: "GET"
+    },
+    category_claims: {
+      path: "categories/%category_id%/claims",
       method: "POST"
+    },
+    category_experts: {
+      path: "categories/%category_id%/experts",
+      method: "GET"
+    },
+    category_all: {
+      path: "categories/%category_id%/all",
+      method: "GET"
     }
   };
 
@@ -39154,21 +39847,24 @@ module.exports = API = (function() {
   };
 
   API.data = function(params) {
+    var data;
     if (params.data != null) {
-      return this.data = params.data;
+      data = params.data;
     } else {
-      return this.data = {};
+      data = {};
     }
+    return data;
   };
 
   API.call = function(params) {
     return $.ajax({
-      type: this.method(params),
+      method: this.method(params),
       url: this.path(params),
       headers: {
         Authorization: UserStore.getAuthHeader()
       },
       data: this.data(params),
+      dataType: "json",
       success: function(data) {
         if (params.success != null) {
           return params.success(data);
@@ -39187,7 +39883,7 @@ module.exports = API = (function() {
 })();
 
 
-},{}],190:[function(require,module,exports){
+},{}],194:[function(require,module,exports){
 var UserStore,
   bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
@@ -39329,7 +40025,7 @@ module.exports = new UserStore({
 });
 
 
-},{}],191:[function(require,module,exports){
+},{}],195:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -39346,7 +40042,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":187,"components/Header":188}],192:[function(require,module,exports){
+},{"components/Footer":191,"components/Header":192}],196:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -39363,7 +40059,372 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":187,"components/Header":188}],193:[function(require,module,exports){
+},{"components/Footer":191,"components/Header":192}],197:[function(require,module,exports){
+var Footer, Header, div;
+
+div = React.DOM.div;
+
+Header = require("components/Header");
+
+Footer = require("components/Footer");
+
+module.exports = React.createFactory(React.createClass({
+  displayName: 'Categories',
+  getInitialState: function() {
+    return {
+      categories: []
+    };
+  },
+  componentDidMount: function() {
+    ({
+      params: {
+        path: "categories",
+        success: this.categoryListSuccess,
+        error: this.categoryListError
+      }
+    });
+    return API.call(params);
+  },
+  categoryListSuccess: function(data) {
+    return this.setState({
+      categories: data
+    });
+  },
+  categoryListError: function(error) {
+    return console.log("error", error);
+  },
+  render: function() {
+    return div({}, Header({}, ''), "Expert", Footer({}, ''));
+  }
+}));
+
+
+},{"components/Footer":191,"components/Header":192}],198:[function(require,module,exports){
+var CategoryClaims, CategoryExperts, CategoryPredictions, CategorySubHead, Footer, Header, div;
+
+div = React.DOM.div;
+
+Header = require("components/Header");
+
+Footer = require("components/Footer");
+
+CategoryExperts = require("components/CategoryExperts");
+
+CategoryClaims = require("components/CategoryClaims");
+
+CategoryPredictions = require("components/CategoryPredictions");
+
+CategorySubHead = require("components/CategorySubHead");
+
+module.exports = React.createFactory(React.createClass({
+  displayName: 'Categories',
+  getInitialState: function() {
+    return {
+      data: null,
+      category: null
+    };
+  },
+  componentDidMount: function() {
+    this.getCategoryAllInfo();
+    return this.getCategoryInfo();
+  },
+  getCategoryAllInfo: function() {
+    var params;
+    params = {
+      path: "category_all",
+      path_variables: {
+        category_id: this.props.id
+      },
+      success: this.categoryAllSuccess,
+      error: this.categoryAllError
+    };
+    return API.call(params);
+  },
+  getCategoryInfo: function() {
+    var params;
+    params = {
+      path: "category",
+      path_variables: {
+        category_id: this.props.id
+      },
+      success: this.categorySuccess,
+      error: this.categoryError
+    };
+    return API.call(params);
+  },
+  categoryAllSuccess: function(data) {
+    console.log("!", data);
+    return this.setState({
+      data: data
+    });
+  },
+  categoryAllError: function(error) {
+    return console.log("error", error);
+  },
+  categorySuccess: function(data) {
+    return this.setState({
+      category: data
+    });
+  },
+  categoryError: function(error) {
+    return console.log("error", error);
+  },
+  render: function() {
+    return div({}, Header({}, ''), this.state.category != null ? (console.log(this.state.category), div({
+      className: "page-title"
+    }, "Category '" + this.state.category.name + "' - Showing Experts, Claims and Predictions", CategorySubHead({
+      category_id: this.props.id
+    }))) : div({}, "Loading..."), this.state.data != null ? div({
+      className: "categories"
+    }, CategoryExperts({
+      experts: this.state.data.experts
+    }), CategoryPredictions({
+      predictions: this.state.data.predictions
+    }), CategoryClaims({
+      claims: this.state.data.claims
+    })) : void 0, Footer({}, ''));
+  }
+}));
+
+
+},{"components/CategoryClaims":187,"components/CategoryExperts":188,"components/CategoryPredictions":189,"components/CategorySubHead":190,"components/Footer":191,"components/Header":192}],199:[function(require,module,exports){
+var CategoryClaims, CategorySubHead, Footer, Header, div;
+
+div = React.DOM.div;
+
+Header = require("components/Header");
+
+Footer = require("components/Footer");
+
+CategoryClaims = require("components/CategoryClaims");
+
+CategorySubHead = require("components/CategorySubHead");
+
+module.exports = React.createFactory(React.createClass({
+  displayName: 'Category - Claims',
+  getInitialState: function() {
+    return {
+      data: null,
+      category: null
+    };
+  },
+  componentDidMount: function() {
+    this.getCategoryAllInfo();
+    return this.getCategoryInfo();
+  },
+  getCategoryAllInfo: function() {
+    var params;
+    params = {
+      path: "category_claims",
+      path_variables: {
+        category_id: this.props.id
+      },
+      success: this.categoryAllSuccess,
+      error: this.categoryAllError
+    };
+    return API.call(params);
+  },
+  getCategoryInfo: function() {
+    var params;
+    params = {
+      path: "category",
+      path_variables: {
+        category_id: this.props.id
+      },
+      success: this.categorySuccess,
+      error: this.categoryError
+    };
+    return API.call(params);
+  },
+  categoryAllSuccess: function(data) {
+    return this.setState({
+      categories: data
+    });
+  },
+  categoryAllError: function(error) {
+    return console.log("error", error);
+  },
+  categorySuccess: function(data) {
+    return this.setState({
+      category: data
+    });
+  },
+  categoryError: function(error) {
+    return console.log("error", error);
+  },
+  render: function() {
+    return div({}, Header({}, ''), this.state.category ? div({
+      className: "page-title"
+    }, "Category '" + this.state.category.name + "' - Showing Claims", CategorySubHead({
+      category_id: this.props.id
+    })) : void 0, this.state.categories != null ? div({
+      className: "categories"
+    }, CategoryClaims({
+      claims: this.state.data
+    })) : void 0, Footer({}, ''));
+  }
+}));
+
+
+},{"components/CategoryClaims":187,"components/CategorySubHead":190,"components/Footer":191,"components/Header":192}],200:[function(require,module,exports){
+var CategoryExperts, CategorySubHead, Footer, Header, div;
+
+div = React.DOM.div;
+
+Header = require("components/Header");
+
+Footer = require("components/Footer");
+
+CategoryExperts = require("components/CategoryExperts");
+
+CategorySubHead = require("components/CategorySubHead");
+
+module.exports = React.createFactory(React.createClass({
+  displayName: 'Category - Experts',
+  getInitialState: function() {
+    return {
+      data: null,
+      category: null
+    };
+  },
+  componentDidMount: function() {
+    this.getCategoryAllInfo();
+    return this.getCategoryInfo();
+  },
+  getCategoryAllInfo: function() {
+    var params;
+    params = {
+      path: "category_experts",
+      path_variables: {
+        category_id: this.props.id
+      },
+      success: this.categoryAllSuccess,
+      error: this.categoryAllError
+    };
+    return API.call(params);
+  },
+  getCategoryInfo: function() {
+    var params;
+    params = {
+      path: "category",
+      path_variables: {
+        category_id: this.props.id
+      },
+      success: this.categorySuccess,
+      error: this.categoryError
+    };
+    return API.call(params);
+  },
+  categoryAllSuccess: function(data) {
+    return this.setState({
+      categories: data
+    });
+  },
+  categoryAllError: function(error) {
+    return console.log("error", error);
+  },
+  categorySuccess: function(data) {
+    return this.setState({
+      category: data
+    });
+  },
+  categoryError: function(error) {
+    return console.log("error", error);
+  },
+  render: function() {
+    return div({}, Header({}, ''), this.state.category ? div({
+      className: "page-title"
+    }, "Category '" + this.state.category.name + "' - Showing Experts", CategorySubHead({
+      category_id: this.props.id
+    })) : void 0, this.state.categories != null ? div({
+      className: "categories"
+    }, CategoryExperts({
+      experts: this.state.data
+    })) : void 0, Footer({}, ''));
+  }
+}));
+
+
+},{"components/CategoryExperts":188,"components/CategorySubHead":190,"components/Footer":191,"components/Header":192}],201:[function(require,module,exports){
+var CategoryPredictions, CategorySubHead, Footer, Header, div;
+
+div = React.DOM.div;
+
+Header = require("components/Header");
+
+Footer = require("components/Footer");
+
+CategoryPredictions = require("components/CategoryPredictions");
+
+CategorySubHead = require("components/CategorySubHead");
+
+module.exports = React.createFactory(React.createClass({
+  displayName: 'Category - Predictions',
+  getInitialState: function() {
+    return {
+      data: null,
+      category: null
+    };
+  },
+  componentDidMount: function() {
+    this.getCategoryAllInfo();
+    return this.getCategoryInfo();
+  },
+  getCategoryAllInfo: function() {
+    var params;
+    params = {
+      path: "category_predictions",
+      path_variables: {
+        category_id: this.props.id
+      },
+      success: this.categoryAllSuccess,
+      error: this.categoryAllError
+    };
+    return API.call(params);
+  },
+  getCategoryInfo: function() {
+    var params;
+    params = {
+      path: "category",
+      path_variables: {
+        category_id: this.props.id
+      },
+      success: this.categorySuccess,
+      error: this.categoryError
+    };
+    return API.call(params);
+  },
+  categoryAllSuccess: function(data) {
+    return this.setState({
+      categories: data
+    });
+  },
+  categoryAllError: function(error) {
+    return console.log("error", error);
+  },
+  categorySuccess: function(data) {
+    return this.setState({
+      category: data
+    });
+  },
+  categoryError: function(error) {
+    return console.log("error", error);
+  },
+  render: function() {
+    return div({}, Header({}, ''), this.state.category ? div({
+      className: "page-title"
+    }, "Category '" + this.state.category.name + "' - Showing Experts, Claims and Predictions", CategorySubHead({
+      category_id: this.props.id
+    })) : void 0, this.state.categories != null ? div({
+      className: "categories"
+    }, CategoryPredictions({
+      predictions: this.state.data
+    })) : void 0, Footer({}, ''));
+  }
+}));
+
+
+},{"components/CategoryPredictions":189,"components/CategorySubHead":190,"components/Footer":191,"components/Header":192}],202:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -39380,7 +40441,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":187,"components/Header":188}],194:[function(require,module,exports){
+},{"components/Footer":191,"components/Header":192}],203:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -39397,7 +40458,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":187,"components/Header":188}],195:[function(require,module,exports){
+},{"components/Footer":191,"components/Header":192}],204:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -39414,7 +40475,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":187,"components/Header":188}],196:[function(require,module,exports){
+},{"components/Footer":191,"components/Header":192}],205:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -39431,7 +40492,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":187,"components/Header":188}],197:[function(require,module,exports){
+},{"components/Footer":191,"components/Header":192}],206:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -39448,7 +40509,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":187,"components/Header":188}],198:[function(require,module,exports){
+},{"components/Footer":191,"components/Header":192}],207:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -39465,7 +40526,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":187,"components/Header":188}],199:[function(require,module,exports){
+},{"components/Footer":191,"components/Header":192}],208:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -39482,7 +40543,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":187,"components/Header":188}],200:[function(require,module,exports){
+},{"components/Footer":191,"components/Header":192}],209:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -39511,7 +40572,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":187,"components/Header":188}],201:[function(require,module,exports){
+},{"components/Footer":191,"components/Header":192}],210:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -39528,4 +40589,4 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":187,"components/Header":188}]},{},[3])
+},{"components/Footer":191,"components/Header":192}]},{},[3])

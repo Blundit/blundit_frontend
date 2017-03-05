@@ -11,6 +11,8 @@ params = {
     claim_id: 1
   data:
     id: "xxx"
+  success: @function
+  error: @function
 }
 API.call(params)
 ###
@@ -23,9 +25,24 @@ module.exports = class API
     login:
       path: "users/login"
       method: "POST"
-    claims:
-      path: "claims/%claim_id%/add_comment"
+    categories:
+      path: "categories"
+      method: "GET"
+    category:
+      path: "categories/%category_id%"
+      method: "GET"
+    category_predictions:
+      path: "categories/%category_id%/predictions"
+      method: "GET"
+    category_claims:
+      path: "categories/%category_id%/claims"
       method: "POST"
+    category_experts:
+      path: "categories/%category_id%/experts"
+      method: "GET"
+    category_all:
+      path: "categories/%category_id%/all"
+      method: "GET"
 
 
   @server = ->
@@ -47,18 +64,21 @@ module.exports = class API
 
   @data = (params) ->
     if params.data?
-      @data = params.data
+      data = params.data
     else
-      @data = {}
+      data = {}
+
+    return data
 
 
   @call = (params) ->
     $.ajax
-      type: @method(params)
+      method: @method(params)
       url: @path(params)
       headers:
         Authorization: UserStore.getAuthHeader()
       data: @data(params)
+      dataType: "json"
       success: (data) ->
         params.success(data) if params.success?
       error: (error) ->

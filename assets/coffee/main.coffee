@@ -1,5 +1,6 @@
 window.React = require('react')
 window.ReactDOM = require('react-dom')
+
 RouterMixin = require('react-mini-router').RouterMixin
 window.navigate = require('react-mini-router').navigate
 window._ = require('lodash')
@@ -37,6 +38,11 @@ Blundit = React.createFactory React.createClass
     '/experts/:id': 'expert'
     '/claims': 'claims'
     '/claims/:id': 'claim'
+    '/categories': 'categories'
+    '/categories/:id': 'categoryAll'
+    '/categories/:id/predictions': 'categoryPredictions'
+    '/categories/:id/claims': 'categoryClaims'
+    '/categories/:id/experts': 'categoryExperts'
     
 
   landing: ->
@@ -110,6 +116,39 @@ Blundit = React.createFactory React.createClass
         path: @state.path
 
 
+  categories: ->
+    div {},
+      require("views/Categories")
+        path: @state.path
+
+
+  categoryAll: (id) ->
+    div {},
+      require("views/CategoryAll")
+        path: @state.path
+        id: id
+
+  
+  categoryPredictions: (id) ->
+    div {},
+      require("views/CategoryPredictions")
+        path: @state.path
+        id: id
+
+
+  categoryExperts: (id) ->
+    div {},
+      require("views/CategoryExperts")
+        path: @state.path
+        id: id
+
+  
+  categoryClaims: (id) ->
+    div {},
+      require("views/CategoryClaims")
+        path: @state.path
+        id: id
+
   
   notFound: (path) ->
     div {},
@@ -117,16 +156,7 @@ Blundit = React.createFactory React.createClass
 
 
   render: ->
-    params = {
-      path: "claims"
-      path_variables:
-        claim_id: 1
-      data:
-        id: "xxx"
-    }
-    API.call(params)
     div {},
-    
       @renderCurrentRoute()
 
 
