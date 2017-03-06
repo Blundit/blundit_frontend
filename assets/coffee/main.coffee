@@ -81,7 +81,7 @@ Blundit = React.createFactory React.createClass
     div {},
       require("views/Prediction")
         path: @state.path
-        user_id: id
+        id: id
 
 
   claims: ->
@@ -94,7 +94,7 @@ Blundit = React.createFactory React.createClass
     div {},
       require("views/Claim")
         path: @state.path
-        user_id: id
+        id: id
 
 
   experts: ->
@@ -107,7 +107,7 @@ Blundit = React.createFactory React.createClass
     div {},
       require("views/Expert")
         path: @state.path
-        user_id: id
+        id: id
 
 
   bookmarks: ->

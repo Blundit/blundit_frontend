@@ -43,6 +43,24 @@ module.exports = class API
     category_all:
       path: "categories/%category_id%/all"
       method: "GET"
+    claims:
+      path: "claims"
+      method: "GET"
+    claim:
+      path: "claims/%claim_id%"
+      method: "GET"
+    predictions:
+      path: "predictions"
+      method: "GET"
+    prediction:
+      path: "predictions/%prediction_id%"
+      method: "GET"
+    experts:
+      path: "experts"
+      method: "GET"
+    expert:
+      path: "experts/%expert_id%"
+      method: "GET"
     bookmarks:
       path: "user/bookmarks"
       method: "GET"

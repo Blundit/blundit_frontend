@@ -46,9 +46,9 @@ module.exports = React.createFactory(React.createClass({
   getUserAvatar: function() {
     var avatar;
     if (!UserStore.get() || (UserStore.get().avatar == null)) {
-      avatar = "images/avatars/placeholder.png";
+      avatar = "/images/avatars/placeholder.png";
     } else {
-      avatar = "images/avatars/" + (UserStore.get().avatar);
+      avatar = "/images/avatars/" + (UserStore.get().avatar);
     }
     return "url(" + avatar + ")";
   },
@@ -95,7 +95,7 @@ module.exports = React.createFactory(React.createClass({
 
 },{}],3:[function(require,module,exports){
 (function() {
-  var API, Blundit, CategoryClaims, CategoryExperts, CategoryPredictions, CategorySubHead, Footer, Header, RouterMixin, UserStore, div, img, menuItems, ref, startBlundit,
+  var API, Blundit, CategoryClaims, CategoryExperts, CategoryPredictions, CategorySubHead, ClaimExpertCard, ExpertClaimCard, ExpertPredictionCard, Footer, Header, PredictionExpertCard, RouterMixin, UserStore, div, img, menuItems, ref, startBlundit,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   window.React = require('react');
@@ -172,7 +172,7 @@ module.exports = React.createFactory(React.createClass({
     prediction: function(id) {
       return div({}, require("views/Prediction")({
         path: this.state.path,
-        user_id: id
+        id: id
       }));
     },
     claims: function() {
@@ -183,7 +183,7 @@ module.exports = React.createFactory(React.createClass({
     claim: function(id) {
       return div({}, require("views/Claim")({
         path: this.state.path,
-        user_id: id
+        id: id
       }));
     },
     experts: function() {
@@ -194,7 +194,7 @@ module.exports = React.createFactory(React.createClass({
     expert: function(id) {
       return div({}, require("views/Expert")({
         path: this.state.path,
-        user_id: id
+        id: id
       }));
     },
     bookmarks: function() {
@@ -404,6 +404,60 @@ module.exports = React.createFactory(React.createClass({
   div = React.DOM.div;
 
   module.exports = React.createFactory(React.createClass({
+    goToItem: function(id) {
+      return navigate("/experts/" + id);
+    },
+    render: function() {
+      var expert;
+      expert = this.props.expert;
+      return div({
+        className: "claim__experts-list-item"
+      }, div({
+        className: "claim__experts-list-item__title",
+        onClick: this.goToItem.bind(this, expert.alias)
+      }, expert.name));
+    }
+  }));
+
+  div = React.DOM.div;
+
+  module.exports = React.createFactory(React.createClass({
+    goToItem: function(id) {
+      return navigate("/claims/" + id);
+    },
+    render: function() {
+      var claim;
+      claim = this.props.claim;
+      return div({
+        className: "expert__claims-list-item"
+      }, div({
+        className: "expert__claims-list-item__title",
+        onClick: this.goToItem.bind(this, claim.alias)
+      }, claim.title));
+    }
+  }));
+
+  div = React.DOM.div;
+
+  module.exports = React.createFactory(React.createClass({
+    goToItem: function(id) {
+      return navigate("/predictions/" + id);
+    },
+    render: function() {
+      var prediction;
+      prediction = this.props.prediction;
+      return div({
+        className: "expert__predictions-list-item"
+      }, div({
+        className: "expert__predictions-list-item__title",
+        onClick: this.goToItem.bind(this, prediction.alias)
+      }, prediction.title));
+    }
+  }));
+
+  div = React.DOM.div;
+
+  module.exports = React.createFactory(React.createClass({
     render: function() {
       return div({
         className: "footer-wrapper"
@@ -442,9 +496,9 @@ module.exports = React.createFactory(React.createClass({
     getUserAvatar: function() {
       var avatar;
       if (!UserStore.get() || (UserStore.get().avatar == null)) {
-        avatar = "images/avatars/placeholder.png";
+        avatar = "/images/avatars/placeholder.png";
       } else {
-        avatar = "images/avatars/" + (UserStore.get().avatar);
+        avatar = "/images/avatars/" + (UserStore.get().avatar);
       }
       return "url(" + avatar + ")";
     },
@@ -488,122 +542,23 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
+  div = React.DOM.div;
 
-  /*
-  API Class.
-  Usage to call is like this:
-  path is required.
-  path_variables is optional, and used for replacement in paths, like 'claims/%claim_id%/add_commment'
-  data is optional.
-  
-  params = {
-    path: "claims"
-    path_variables:
-      claim_id: 1
-    data:
-      id: "xxx"
-    success: @function
-    error: @function
-  }
-  API.call(params)
-   */
-
-  module.exports = API = (function() {
-    function API() {}
-
-    API.paths = {
-      register: {
-        path: "users/register",
-        method: "POST"
-      },
-      login: {
-        path: "users/login",
-        method: "POST"
-      },
-      categories: {
-        path: "categories",
-        method: "GET"
-      },
-      category: {
-        path: "categories/%category_id%",
-        method: "GET"
-      },
-      category_predictions: {
-        path: "categories/%category_id%/predictions",
-        method: "GET"
-      },
-      category_claims: {
-        path: "categories/%category_id%/claims",
-        method: "GET"
-      },
-      category_experts: {
-        path: "categories/%category_id%/experts",
-        method: "GET"
-      },
-      category_all: {
-        path: "categories/%category_id%/all",
-        method: "GET"
-      },
-      bookmarks: {
-        path: "user/bookmarks",
-        method: "GET"
-      }
-    };
-
-    API.server = function() {
-      return "http://localhost:3000/api/v1/";
-    };
-
-    API.method = function(params) {
-      return this.paths[params.path].method;
-    };
-
-    API.path = function(params) {
-      var key, ref1, value;
-      this.p = this.server() + this.paths[params.path].path;
-      ref1 = params.path_variables;
-      for (key in ref1) {
-        value = ref1[key];
-        this.p = this.p.replace('%' + key + '%', value);
-      }
-      return this.p;
-    };
-
-    API.data = function(params) {
-      var data;
-      if (params.data != null) {
-        data = params.data;
-      } else {
-        data = {};
-      }
-      return data;
-    };
-
-    API.call = function(params) {
-      return $.ajax({
-        method: this.method(params),
-        url: this.path(params),
-        headers: {
-          Authorization: UserStore.getAuthHeader()
-        },
-        data: this.data(params),
-        dataType: "json",
-        success: function(data) {
-          if (params.success != null) {
-            return params.success(data);
-          }
-        },
-        error: function(error) {
-          if (params.error != null) {
-            return params.error(error);
-          }
-        }
-      });
-    };
-
-    return API;
-
-  })();
+  module.exports = React.createFactory(React.createClass({
+    goToItem: function(id) {
+      return navigate("/experts/" + id);
+    },
+    render: function() {
+      var expert;
+      expert = this.props.expert;
+      return div({
+        className: "claim__predictions-list-item"
+      }, div({
+        className: "claim__predictions-list-item__title",
+        onClick: this.goToItem.bind(this, expert.alias)
+      }, expert.name));
+    }
+  }));
 
   UserStore = (function() {
     function UserStore() {
@@ -672,7 +627,7 @@ module.exports = React.createFactory(React.createClass({
       if ((this.user != null) && (this.user.token != null)) {
         return "Bearer " + this.user.token;
       } else {
-        return '';
+        return 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.lXpqdZte4jlKBjYo_IK7DhuqVNYh2bQ89U7zQWR4O9w';
       }
     };
 
@@ -742,6 +697,147 @@ module.exports = React.createFactory(React.createClass({
     messagestl: 1000 * 60
   });
 
+
+  /*
+  API Class.
+  Usage to call is like this:
+  path is required.
+  path_variables is optional, and used for replacement in paths, like 'claims/%claim_id%/add_commment'
+  data is optional.
+  
+  params = {
+    path: "claims"
+    path_variables:
+      claim_id: 1
+    data:
+      id: "xxx"
+    success: @function
+    error: @function
+  }
+  API.call(params)
+   */
+
+  module.exports = API = (function() {
+    function API() {}
+
+    API.paths = {
+      register: {
+        path: "users/register",
+        method: "POST"
+      },
+      login: {
+        path: "users/login",
+        method: "POST"
+      },
+      categories: {
+        path: "categories",
+        method: "GET"
+      },
+      category: {
+        path: "categories/%category_id%",
+        method: "GET"
+      },
+      category_predictions: {
+        path: "categories/%category_id%/predictions",
+        method: "GET"
+      },
+      category_claims: {
+        path: "categories/%category_id%/claims",
+        method: "GET"
+      },
+      category_experts: {
+        path: "categories/%category_id%/experts",
+        method: "GET"
+      },
+      category_all: {
+        path: "categories/%category_id%/all",
+        method: "GET"
+      },
+      claims: {
+        path: "claims",
+        method: "GET"
+      },
+      claim: {
+        path: "claims/%claim_id%",
+        method: "GET"
+      },
+      predictions: {
+        path: "predictions",
+        method: "GET"
+      },
+      prediction: {
+        path: "predictions/%prediction_id%",
+        method: "GET"
+      },
+      experts: {
+        path: "experts",
+        method: "GET"
+      },
+      expert: {
+        path: "experts/%expert_id%",
+        method: "GET"
+      },
+      bookmarks: {
+        path: "user/bookmarks",
+        method: "GET"
+      }
+    };
+
+    API.server = function() {
+      return "http://localhost:3000/api/v1/";
+    };
+
+    API.method = function(params) {
+      return this.paths[params.path].method;
+    };
+
+    API.path = function(params) {
+      var key, ref1, value;
+      this.p = this.server() + this.paths[params.path].path;
+      ref1 = params.path_variables;
+      for (key in ref1) {
+        value = ref1[key];
+        this.p = this.p.replace('%' + key + '%', value);
+      }
+      return this.p;
+    };
+
+    API.data = function(params) {
+      var data;
+      if (params.data != null) {
+        data = params.data;
+      } else {
+        data = {};
+      }
+      return data;
+    };
+
+    API.call = function(params) {
+      return $.ajax({
+        method: this.method(params),
+        url: this.path(params),
+        headers: {
+          Authorization: UserStore.getAuthHeader()
+        },
+        data: this.data(params),
+        dataType: "json",
+        success: function(data) {
+          if (params.success != null) {
+            return params.success(data);
+          }
+        },
+        error: function(error) {
+          if (params.error != null) {
+            return params.error(error);
+          }
+        }
+      });
+    };
+
+    return API;
+
+  })();
+
   div = React.DOM.div;
 
   Header = require("components/Header");
@@ -751,7 +847,11 @@ module.exports = React.createFactory(React.createClass({
   module.exports = React.createFactory(React.createClass({
     displayName: '404',
     render: function() {
-      return div({}, Header({}, ''), "404", Footer({}, ''));
+      return div({}, Header({}, ''), div({
+        className: "not-found-wrapper"
+      }, div({
+        className: "not-found-content"
+      }, "404")), Footer({}, ''));
     }
   }));
 
@@ -1200,14 +1300,66 @@ module.exports = React.createFactory(React.createClass({
 
   Footer = require("components/Footer");
 
+  ClaimExpertCard = require("components/ClaimExpertCard");
+
   module.exports = React.createFactory(React.createClass({
     displayName: 'Landing',
+    getInitialState: function() {
+      return {
+        claim: null,
+        experts: [],
+        loadError: null
+      };
+    },
+    componentDidMount: function() {
+      var params;
+      params = {
+        path: "claim",
+        path_variables: {
+          claim_id: this.props.id
+        },
+        success: this.claimSuccess,
+        error: this.claimError
+      };
+      return API.call(params);
+    },
+    claimSuccess: function(data) {
+      this.setState({
+        claim: data.claim
+      });
+      return this.setState({
+        experts: data.experts
+      });
+    },
+    claimError: function(error) {
+      return this.setState({
+        loadError: error.responseJSON.errors
+      });
+    },
     render: function() {
+      var claim, experts, ref1;
+      ref1 = this.state, claim = ref1.claim, experts = ref1.experts;
       return div({}, Header({}, ''), div({
         className: "claims-wrapper"
       }, div({
         className: "claims-content"
-      }, "Claim")), Footer({}, ''));
+      }, claim != null ? div({
+        className: "claim"
+      }, div({
+        className: "claim__title"
+      }, claim.title), div({
+        className: "claim__experts"
+      }, div({
+        className: "claim__experts-name"
+      }, "Experts:"), div({
+        className: "claim__experts-list"
+      }, experts.length > 0 ? experts.map(function(expert, index) {
+        return ClaimExpertCard({
+          expert: expert,
+          claim: claim,
+          key: "claim-expert-" + index
+        });
+      }) : "No experts"))) : div({}, this.state.loadError))), Footer({}, ''));
     }
   }));
 
@@ -1219,12 +1371,48 @@ module.exports = React.createFactory(React.createClass({
 
   module.exports = React.createFactory(React.createClass({
     displayName: 'Claims',
+    getInitialState: function() {
+      return {
+        claims: null
+      };
+    },
+    componentDidMount: function() {
+      var params;
+      params = {
+        path: "claims",
+        success: this.claimListSuccess,
+        error: this.claimListError
+      };
+      return API.call(params);
+    },
+    claimListSuccess: function(data) {
+      console.log("!!!", data);
+      return this.setState({
+        claims: data.claims
+      });
+    },
+    claimListError: function(error) {
+      return console.log("error", error);
+    },
+    goToClaim: function(id) {
+      return navigate("/claims/" + id);
+    },
     render: function() {
       return div({}, Header({}, ''), div({
         className: "claims-wrapper"
       }, div({
         className: "claims-content"
-      }, "Claims")), Footer({}, ''));
+      }, div({
+        className: "claims__list"
+      }, this.state.claims != null ? this.state.claims.map((function(_this) {
+        return function(claim, index) {
+          return div({
+            className: "claims__list__item",
+            key: "claim-" + index,
+            onClick: _this.goToClaim.bind(_this, claim.alias)
+          }, claim.title);
+        };
+      })(this)) : void 0))), Footer({}, ''));
     }
   }));
 
@@ -1234,14 +1422,83 @@ module.exports = React.createFactory(React.createClass({
 
   Footer = require("components/Footer");
 
+  ExpertClaimCard = require("components/ExpertClaimCard");
+
+  ExpertPredictionCard = require("components/ExpertPredictionCard");
+
   module.exports = React.createFactory(React.createClass({
-    displayName: 'Expert',
+    displayName: 'Experts',
+    getInitialState: function() {
+      return {
+        expert: null,
+        claims: [],
+        predictions: [],
+        loadError: null
+      };
+    },
+    componentDidMount: function() {
+      var params;
+      params = {
+        path: "expert",
+        path_variables: {
+          expert_id: this.props.id
+        },
+        success: this.expertSuccess,
+        error: this.expertError
+      };
+      return API.call(params);
+    },
+    expertSuccess: function(data) {
+      this.setState({
+        expert: data.expert
+      });
+      this.setState({
+        claims: data.claims
+      });
+      return this.setState({
+        predictions: data.predictions
+      });
+    },
+    expertError: function(error) {
+      return this.setState({
+        loadError: error.responseJSON.errors
+      });
+    },
     render: function() {
+      var claims, expert, predictions, ref1;
+      ref1 = this.state, expert = ref1.expert, predictions = ref1.predictions, claims = ref1.claims;
       return div({}, Header({}, ''), div({
         className: "experts-wrapper"
       }, div({
         className: "experts-content"
-      }, "Expert")), Footer({}, ''));
+      }, expert != null ? div({
+        className: "expert"
+      }, div({
+        className: "expert__name"
+      }, expert.name), div({
+        className: "expert__predictions"
+      }, div({
+        className: "expert__predictions-title"
+      }, "Predictions:"), div({
+        className: "expert__predictions-list"
+      }, predictions.length > 0 ? predictions.map(function(prediction, index) {
+        return ExpertPredictionCard({
+          expert: expert,
+          prediction: prediction
+        });
+      }) : "No predictions")), div({
+        className: "expert__claims"
+      }, div({
+        className: "expert__claims-title"
+      }, "Claims:"), div({
+        className: "expert__claims-list"
+      }, claims.length > 0 ? claims.map(function(claim, index) {
+        return ExpertClaimCard({
+          expert: expert,
+          claim: claim,
+          key: "claim-expert-" + index
+        });
+      }) : "No claims"))) : div({}, this.state.loadError))), Footer({}, ''));
     }
   }));
 
@@ -1253,12 +1510,48 @@ module.exports = React.createFactory(React.createClass({
 
   module.exports = React.createFactory(React.createClass({
     displayName: 'Experts',
+    getInitialState: function() {
+      return {
+        experts: null
+      };
+    },
+    componentDidMount: function() {
+      var params;
+      params = {
+        path: "experts",
+        success: this.expertListSuccess,
+        error: this.expertListError
+      };
+      return API.call(params);
+    },
+    expertListSuccess: function(data) {
+      console.log("!!!", data);
+      return this.setState({
+        experts: data
+      });
+    },
+    expertListError: function(error) {
+      return console.log("error", error);
+    },
+    goToExpert: function(id) {
+      return navigate("/experts/" + id);
+    },
     render: function() {
       return div({}, Header({}, ''), div({
         className: "experts-wrapper"
       }, div({
         className: "experts-content"
-      }, "Expert")), Footer({}, ''));
+      }, div({
+        className: "experts__list"
+      }, this.state.experts != null ? this.state.experts.map((function(_this) {
+        return function(expert, index) {
+          return div({
+            className: "experts__list__item",
+            key: "expert-" + index,
+            onClick: _this.goToExpert.bind(_this, expert.alias)
+          }, expert.name);
+        };
+      })(this)) : void 0))), Footer({}, ''));
     }
   }));
 
@@ -1302,14 +1595,66 @@ module.exports = React.createFactory(React.createClass({
 
   Footer = require("components/Footer");
 
+  PredictionExpertCard = require("components/PredictionExpertCard");
+
   module.exports = React.createFactory(React.createClass({
     displayName: 'Prediction',
+    getInitialState: function() {
+      return {
+        prediction: null,
+        experts: [],
+        loadError: null
+      };
+    },
+    componentDidMount: function() {
+      var params;
+      params = {
+        path: "prediction",
+        path_variables: {
+          prediction_id: this.props.id
+        },
+        success: this.predictionSuccess,
+        error: this.predictionError
+      };
+      return API.call(params);
+    },
+    predictionSuccess: function(data) {
+      this.setState({
+        prediction: data.prediction
+      });
+      return this.setState({
+        experts: data.experts
+      });
+    },
+    predictionError: function(error) {
+      return this.setState({
+        loadError: error.responseJSON.errors
+      });
+    },
     render: function() {
+      var experts, prediction, ref1;
+      ref1 = this.state, prediction = ref1.prediction, experts = ref1.experts;
       return div({}, Header({}, ''), div({
         className: "predictions-wrapper"
       }, div({
         className: "predictions-content"
-      }, "Prediction")), Footer({}, ''));
+      }, prediction != null ? div({
+        className: "prediction"
+      }, div({
+        className: "prediction__title"
+      }, prediction.title), div({
+        className: "prediction__experts"
+      }, div({
+        className: "prediction__experts-name"
+      }, "Experts:"), div({
+        className: "prediction__experts-list"
+      }, experts.length > 0 ? experts.map(function(expert, index) {
+        return PredictionExpertCard({
+          expert: expert,
+          prediction: prediction,
+          key: "prediction-expert-" + index
+        });
+      }) : "No experts"))) : div({}, this.state.loadError))), Footer({}, ''));
     }
   }));
 
@@ -1321,12 +1666,48 @@ module.exports = React.createFactory(React.createClass({
 
   module.exports = React.createFactory(React.createClass({
     displayName: 'Predictions',
+    getInitialState: function() {
+      return {
+        predictions: null
+      };
+    },
+    componentDidMount: function() {
+      var params;
+      params = {
+        path: "predictions",
+        success: this.predictionListSuccess,
+        error: this.predictionListError
+      };
+      return API.call(params);
+    },
+    predictionListSuccess: function(data) {
+      console.log("!!!", data);
+      return this.setState({
+        predictions: data.predictions
+      });
+    },
+    predictionListError: function(error) {
+      return console.log("error", error);
+    },
+    goToClaim: function(id) {
+      return navigate("/predictions/" + id);
+    },
     render: function() {
       return div({}, Header({}, ''), div({
         className: "predictions-wrapper"
       }, div({
         className: "predictions-content"
-      }, "Predictions")), Footer({}, ''));
+      }, div({
+        className: "predictions__list"
+      }, this.state.predictions != null ? this.state.predictions.map((function(_this) {
+        return function(prediction, index) {
+          return div({
+            className: "predictions__list__item",
+            key: "prediction-" + index,
+            onClick: _this.goToClaim.bind(_this, prediction.alias)
+          }, prediction.title);
+        };
+      })(this)) : void 0))), Footer({}, ''));
     }
   }));
 
@@ -1395,7 +1776,7 @@ module.exports = React.createFactory(React.createClass({
 
 }).call(this);
 
-},{"./components/Footer":1,"./components/Header":2,"components/CategoryClaims":187,"components/CategoryExperts":188,"components/CategoryPredictions":189,"components/CategorySubHead":190,"components/Footer":191,"components/Header":192,"lodash":31,"react":185,"react-dom":34,"react-mini-router":35,"shared/API":193,"stores/UserStore":194,"views/404":195,"views/Bookmarks":196,"views/Categories":197,"views/CategoryAll":198,"views/CategoryClaims":199,"views/CategoryExperts":200,"views/CategoryPredictions":201,"views/Claim":202,"views/Claims":203,"views/Expert":204,"views/Experts":205,"views/Landing":206,"views/Prediction":207,"views/Predictions":208,"views/User":209,"views/Users":210}],4:[function(require,module,exports){
+},{"./components/Footer":1,"./components/Header":2,"components/CategoryClaims":187,"components/CategoryExperts":188,"components/CategoryPredictions":189,"components/CategorySubHead":190,"components/ClaimExpertCard":191,"components/ExpertClaimCard":192,"components/ExpertPredictionCard":193,"components/Footer":194,"components/Header":195,"components/PredictionExpertCard":196,"lodash":31,"react":185,"react-dom":34,"react-mini-router":35,"shared/API":197,"stores/UserStore":198,"views/404":199,"views/Bookmarks":200,"views/Categories":201,"views/CategoryAll":202,"views/CategoryClaims":203,"views/CategoryExperts":204,"views/CategoryPredictions":205,"views/Claim":206,"views/Claims":207,"views/Expert":208,"views/Experts":209,"views/Landing":210,"views/Prediction":211,"views/Predictions":212,"views/User":213,"views/Users":214}],4:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -39997,10 +40378,98 @@ module.exports = React.createFactory(React.createClass({
 
 
 },{}],191:[function(require,module,exports){
-module.exports=require(1)
+var div;
+
+div = React.DOM.div;
+
+module.exports = React.createFactory(React.createClass({
+  goToItem: function(id) {
+    return navigate("/experts/" + id);
+  },
+  render: function() {
+    var expert;
+    expert = this.props.expert;
+    return div({
+      className: "claim__experts-list-item"
+    }, div({
+      className: "claim__experts-list-item__title",
+      onClick: this.goToItem.bind(this, expert.alias)
+    }, expert.name));
+  }
+}));
+
+
 },{}],192:[function(require,module,exports){
-module.exports=require(2)
+var div;
+
+div = React.DOM.div;
+
+module.exports = React.createFactory(React.createClass({
+  goToItem: function(id) {
+    return navigate("/claims/" + id);
+  },
+  render: function() {
+    var claim;
+    claim = this.props.claim;
+    return div({
+      className: "expert__claims-list-item"
+    }, div({
+      className: "expert__claims-list-item__title",
+      onClick: this.goToItem.bind(this, claim.alias)
+    }, claim.title));
+  }
+}));
+
+
 },{}],193:[function(require,module,exports){
+var div;
+
+div = React.DOM.div;
+
+module.exports = React.createFactory(React.createClass({
+  goToItem: function(id) {
+    return navigate("/predictions/" + id);
+  },
+  render: function() {
+    var prediction;
+    prediction = this.props.prediction;
+    return div({
+      className: "expert__predictions-list-item"
+    }, div({
+      className: "expert__predictions-list-item__title",
+      onClick: this.goToItem.bind(this, prediction.alias)
+    }, prediction.title));
+  }
+}));
+
+
+},{}],194:[function(require,module,exports){
+module.exports=require(1)
+},{}],195:[function(require,module,exports){
+module.exports=require(2)
+},{}],196:[function(require,module,exports){
+var div;
+
+div = React.DOM.div;
+
+module.exports = React.createFactory(React.createClass({
+  goToItem: function(id) {
+    return navigate("/experts/" + id);
+  },
+  render: function() {
+    var expert;
+    expert = this.props.expert;
+    return div({
+      className: "claim__predictions-list-item"
+    }, div({
+      className: "claim__predictions-list-item__title",
+      onClick: this.goToItem.bind(this, expert.alias)
+    }, expert.name));
+  }
+}));
+
+
+},{}],197:[function(require,module,exports){
 
 /*
 API Class.
@@ -40056,6 +40525,30 @@ module.exports = API = (function() {
     },
     category_all: {
       path: "categories/%category_id%/all",
+      method: "GET"
+    },
+    claims: {
+      path: "claims",
+      method: "GET"
+    },
+    claim: {
+      path: "claims/%claim_id%",
+      method: "GET"
+    },
+    predictions: {
+      path: "predictions",
+      method: "GET"
+    },
+    prediction: {
+      path: "predictions/%prediction_id%",
+      method: "GET"
+    },
+    experts: {
+      path: "experts",
+      method: "GET"
+    },
+    expert: {
+      path: "experts/%expert_id%",
       method: "GET"
     },
     bookmarks: {
@@ -40120,7 +40613,7 @@ module.exports = API = (function() {
 })();
 
 
-},{}],194:[function(require,module,exports){
+},{}],198:[function(require,module,exports){
 var UserStore,
   bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
@@ -40191,7 +40684,7 @@ UserStore = (function() {
     if ((this.user != null) && (this.user.token != null)) {
       return "Bearer " + this.user.token;
     } else {
-      return '';
+      return 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.lXpqdZte4jlKBjYo_IK7DhuqVNYh2bQ89U7zQWR4O9w';
     }
   };
 
@@ -40262,7 +40755,7 @@ module.exports = new UserStore({
 });
 
 
-},{}],195:[function(require,module,exports){
+},{}],199:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -40274,12 +40767,16 @@ Footer = require("components/Footer");
 module.exports = React.createFactory(React.createClass({
   displayName: '404',
   render: function() {
-    return div({}, Header({}, ''), "404", Footer({}, ''));
+    return div({}, Header({}, ''), div({
+      className: "not-found-wrapper"
+    }, div({
+      className: "not-found-content"
+    }, "404")), Footer({}, ''));
   }
 }));
 
 
-},{"components/Footer":191,"components/Header":192}],196:[function(require,module,exports){
+},{"components/Footer":194,"components/Header":195}],200:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -40346,7 +40843,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":191,"components/Header":192}],197:[function(require,module,exports){
+},{"components/Footer":194,"components/Header":195}],201:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -40402,7 +40899,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":191,"components/Header":192}],198:[function(require,module,exports){
+},{"components/Footer":194,"components/Header":195}],202:[function(require,module,exports){
 var CategoryClaims, CategoryExperts, CategoryPredictions, CategorySubHead, Footer, Header, div;
 
 div = React.DOM.div;
@@ -40493,7 +40990,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/CategoryClaims":187,"components/CategoryExperts":188,"components/CategoryPredictions":189,"components/CategorySubHead":190,"components/Footer":191,"components/Header":192}],199:[function(require,module,exports){
+},{"components/CategoryClaims":187,"components/CategoryExperts":188,"components/CategoryPredictions":189,"components/CategorySubHead":190,"components/Footer":194,"components/Header":195}],203:[function(require,module,exports){
 var CategoryClaims, CategorySubHead, Footer, Header, div;
 
 div = React.DOM.div;
@@ -40576,7 +41073,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/CategoryClaims":187,"components/CategorySubHead":190,"components/Footer":191,"components/Header":192}],200:[function(require,module,exports){
+},{"components/CategoryClaims":187,"components/CategorySubHead":190,"components/Footer":194,"components/Header":195}],204:[function(require,module,exports){
 var CategoryExperts, CategorySubHead, Footer, Header, div;
 
 div = React.DOM.div;
@@ -40659,7 +41156,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/CategoryExperts":188,"components/CategorySubHead":190,"components/Footer":191,"components/Header":192}],201:[function(require,module,exports){
+},{"components/CategoryExperts":188,"components/CategorySubHead":190,"components/Footer":194,"components/Header":195}],205:[function(require,module,exports){
 var CategoryPredictions, CategorySubHead, Footer, Header, div;
 
 div = React.DOM.div;
@@ -40742,8 +41239,8 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/CategoryPredictions":189,"components/CategorySubHead":190,"components/Footer":191,"components/Header":192}],202:[function(require,module,exports){
-var Footer, Header, div;
+},{"components/CategoryPredictions":189,"components/CategorySubHead":190,"components/Footer":194,"components/Header":195}],206:[function(require,module,exports){
+var ClaimExpertCard, Footer, Header, div;
 
 div = React.DOM.div;
 
@@ -40751,19 +41248,71 @@ Header = require("components/Header");
 
 Footer = require("components/Footer");
 
+ClaimExpertCard = require("components/ClaimExpertCard");
+
 module.exports = React.createFactory(React.createClass({
   displayName: 'Landing',
+  getInitialState: function() {
+    return {
+      claim: null,
+      experts: [],
+      loadError: null
+    };
+  },
+  componentDidMount: function() {
+    var params;
+    params = {
+      path: "claim",
+      path_variables: {
+        claim_id: this.props.id
+      },
+      success: this.claimSuccess,
+      error: this.claimError
+    };
+    return API.call(params);
+  },
+  claimSuccess: function(data) {
+    this.setState({
+      claim: data.claim
+    });
+    return this.setState({
+      experts: data.experts
+    });
+  },
+  claimError: function(error) {
+    return this.setState({
+      loadError: error.responseJSON.errors
+    });
+  },
   render: function() {
+    var claim, experts, ref;
+    ref = this.state, claim = ref.claim, experts = ref.experts;
     return div({}, Header({}, ''), div({
       className: "claims-wrapper"
     }, div({
       className: "claims-content"
-    }, "Claim")), Footer({}, ''));
+    }, claim != null ? div({
+      className: "claim"
+    }, div({
+      className: "claim__title"
+    }, claim.title), div({
+      className: "claim__experts"
+    }, div({
+      className: "claim__experts-name"
+    }, "Experts:"), div({
+      className: "claim__experts-list"
+    }, experts.length > 0 ? experts.map(function(expert, index) {
+      return ClaimExpertCard({
+        expert: expert,
+        claim: claim,
+        key: "claim-expert-" + index
+      });
+    }) : "No experts"))) : div({}, this.state.loadError))), Footer({}, ''));
   }
 }));
 
 
-},{"components/Footer":191,"components/Header":192}],203:[function(require,module,exports){
+},{"components/ClaimExpertCard":191,"components/Footer":194,"components/Header":195}],207:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -40774,18 +41323,54 @@ Footer = require("components/Footer");
 
 module.exports = React.createFactory(React.createClass({
   displayName: 'Claims',
+  getInitialState: function() {
+    return {
+      claims: null
+    };
+  },
+  componentDidMount: function() {
+    var params;
+    params = {
+      path: "claims",
+      success: this.claimListSuccess,
+      error: this.claimListError
+    };
+    return API.call(params);
+  },
+  claimListSuccess: function(data) {
+    console.log("!!!", data);
+    return this.setState({
+      claims: data.claims
+    });
+  },
+  claimListError: function(error) {
+    return console.log("error", error);
+  },
+  goToClaim: function(id) {
+    return navigate("/claims/" + id);
+  },
   render: function() {
     return div({}, Header({}, ''), div({
       className: "claims-wrapper"
     }, div({
       className: "claims-content"
-    }, "Claims")), Footer({}, ''));
+    }, div({
+      className: "claims__list"
+    }, this.state.claims != null ? this.state.claims.map((function(_this) {
+      return function(claim, index) {
+        return div({
+          className: "claims__list__item",
+          key: "claim-" + index,
+          onClick: _this.goToClaim.bind(_this, claim.alias)
+        }, claim.title);
+      };
+    })(this)) : void 0))), Footer({}, ''));
   }
 }));
 
 
-},{"components/Footer":191,"components/Header":192}],204:[function(require,module,exports){
-var Footer, Header, div;
+},{"components/Footer":194,"components/Header":195}],208:[function(require,module,exports){
+var ExpertClaimCard, ExpertPredictionCard, Footer, Header, div;
 
 div = React.DOM.div;
 
@@ -40793,19 +41378,88 @@ Header = require("components/Header");
 
 Footer = require("components/Footer");
 
+ExpertClaimCard = require("components/ExpertClaimCard");
+
+ExpertPredictionCard = require("components/ExpertPredictionCard");
+
 module.exports = React.createFactory(React.createClass({
-  displayName: 'Expert',
+  displayName: 'Experts',
+  getInitialState: function() {
+    return {
+      expert: null,
+      claims: [],
+      predictions: [],
+      loadError: null
+    };
+  },
+  componentDidMount: function() {
+    var params;
+    params = {
+      path: "expert",
+      path_variables: {
+        expert_id: this.props.id
+      },
+      success: this.expertSuccess,
+      error: this.expertError
+    };
+    return API.call(params);
+  },
+  expertSuccess: function(data) {
+    this.setState({
+      expert: data.expert
+    });
+    this.setState({
+      claims: data.claims
+    });
+    return this.setState({
+      predictions: data.predictions
+    });
+  },
+  expertError: function(error) {
+    return this.setState({
+      loadError: error.responseJSON.errors
+    });
+  },
   render: function() {
+    var claims, expert, predictions, ref;
+    ref = this.state, expert = ref.expert, predictions = ref.predictions, claims = ref.claims;
     return div({}, Header({}, ''), div({
       className: "experts-wrapper"
     }, div({
       className: "experts-content"
-    }, "Expert")), Footer({}, ''));
+    }, expert != null ? div({
+      className: "expert"
+    }, div({
+      className: "expert__name"
+    }, expert.name), div({
+      className: "expert__predictions"
+    }, div({
+      className: "expert__predictions-title"
+    }, "Predictions:"), div({
+      className: "expert__predictions-list"
+    }, predictions.length > 0 ? predictions.map(function(prediction, index) {
+      return ExpertPredictionCard({
+        expert: expert,
+        prediction: prediction
+      });
+    }) : "No predictions")), div({
+      className: "expert__claims"
+    }, div({
+      className: "expert__claims-title"
+    }, "Claims:"), div({
+      className: "expert__claims-list"
+    }, claims.length > 0 ? claims.map(function(claim, index) {
+      return ExpertClaimCard({
+        expert: expert,
+        claim: claim,
+        key: "claim-expert-" + index
+      });
+    }) : "No claims"))) : div({}, this.state.loadError))), Footer({}, ''));
   }
 }));
 
 
-},{"components/Footer":191,"components/Header":192}],205:[function(require,module,exports){
+},{"components/ExpertClaimCard":192,"components/ExpertPredictionCard":193,"components/Footer":194,"components/Header":195}],209:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -40816,17 +41470,53 @@ Footer = require("components/Footer");
 
 module.exports = React.createFactory(React.createClass({
   displayName: 'Experts',
+  getInitialState: function() {
+    return {
+      experts: null
+    };
+  },
+  componentDidMount: function() {
+    var params;
+    params = {
+      path: "experts",
+      success: this.expertListSuccess,
+      error: this.expertListError
+    };
+    return API.call(params);
+  },
+  expertListSuccess: function(data) {
+    console.log("!!!", data);
+    return this.setState({
+      experts: data
+    });
+  },
+  expertListError: function(error) {
+    return console.log("error", error);
+  },
+  goToExpert: function(id) {
+    return navigate("/experts/" + id);
+  },
   render: function() {
     return div({}, Header({}, ''), div({
       className: "experts-wrapper"
     }, div({
       className: "experts-content"
-    }, "Expert")), Footer({}, ''));
+    }, div({
+      className: "experts__list"
+    }, this.state.experts != null ? this.state.experts.map((function(_this) {
+      return function(expert, index) {
+        return div({
+          className: "experts__list__item",
+          key: "expert-" + index,
+          onClick: _this.goToExpert.bind(_this, expert.alias)
+        }, expert.name);
+      };
+    })(this)) : void 0))), Footer({}, ''));
   }
 }));
 
 
-},{"components/Footer":191,"components/Header":192}],206:[function(require,module,exports){
+},{"components/Footer":194,"components/Header":195}],210:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -40847,8 +41537,8 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":191,"components/Header":192}],207:[function(require,module,exports){
-var Footer, Header, div;
+},{"components/Footer":194,"components/Header":195}],211:[function(require,module,exports){
+var Footer, Header, PredictionExpertCard, div;
 
 div = React.DOM.div;
 
@@ -40856,19 +41546,71 @@ Header = require("components/Header");
 
 Footer = require("components/Footer");
 
+PredictionExpertCard = require("components/PredictionExpertCard");
+
 module.exports = React.createFactory(React.createClass({
   displayName: 'Prediction',
+  getInitialState: function() {
+    return {
+      prediction: null,
+      experts: [],
+      loadError: null
+    };
+  },
+  componentDidMount: function() {
+    var params;
+    params = {
+      path: "prediction",
+      path_variables: {
+        prediction_id: this.props.id
+      },
+      success: this.predictionSuccess,
+      error: this.predictionError
+    };
+    return API.call(params);
+  },
+  predictionSuccess: function(data) {
+    this.setState({
+      prediction: data.prediction
+    });
+    return this.setState({
+      experts: data.experts
+    });
+  },
+  predictionError: function(error) {
+    return this.setState({
+      loadError: error.responseJSON.errors
+    });
+  },
   render: function() {
+    var experts, prediction, ref;
+    ref = this.state, prediction = ref.prediction, experts = ref.experts;
     return div({}, Header({}, ''), div({
       className: "predictions-wrapper"
     }, div({
       className: "predictions-content"
-    }, "Prediction")), Footer({}, ''));
+    }, prediction != null ? div({
+      className: "prediction"
+    }, div({
+      className: "prediction__title"
+    }, prediction.title), div({
+      className: "prediction__experts"
+    }, div({
+      className: "prediction__experts-name"
+    }, "Experts:"), div({
+      className: "prediction__experts-list"
+    }, experts.length > 0 ? experts.map(function(expert, index) {
+      return PredictionExpertCard({
+        expert: expert,
+        prediction: prediction,
+        key: "prediction-expert-" + index
+      });
+    }) : "No experts"))) : div({}, this.state.loadError))), Footer({}, ''));
   }
 }));
 
 
-},{"components/Footer":191,"components/Header":192}],208:[function(require,module,exports){
+},{"components/Footer":194,"components/Header":195,"components/PredictionExpertCard":196}],212:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -40879,17 +41621,53 @@ Footer = require("components/Footer");
 
 module.exports = React.createFactory(React.createClass({
   displayName: 'Predictions',
+  getInitialState: function() {
+    return {
+      predictions: null
+    };
+  },
+  componentDidMount: function() {
+    var params;
+    params = {
+      path: "predictions",
+      success: this.predictionListSuccess,
+      error: this.predictionListError
+    };
+    return API.call(params);
+  },
+  predictionListSuccess: function(data) {
+    console.log("!!!", data);
+    return this.setState({
+      predictions: data.predictions
+    });
+  },
+  predictionListError: function(error) {
+    return console.log("error", error);
+  },
+  goToClaim: function(id) {
+    return navigate("/predictions/" + id);
+  },
   render: function() {
     return div({}, Header({}, ''), div({
       className: "predictions-wrapper"
     }, div({
       className: "predictions-content"
-    }, "Predictions")), Footer({}, ''));
+    }, div({
+      className: "predictions__list"
+    }, this.state.predictions != null ? this.state.predictions.map((function(_this) {
+      return function(prediction, index) {
+        return div({
+          className: "predictions__list__item",
+          key: "prediction-" + index,
+          onClick: _this.goToClaim.bind(_this, prediction.alias)
+        }, prediction.title);
+      };
+    })(this)) : void 0))), Footer({}, ''));
   }
 }));
 
 
-},{"components/Footer":191,"components/Header":192}],209:[function(require,module,exports){
+},{"components/Footer":194,"components/Header":195}],213:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -40922,7 +41700,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":191,"components/Header":192}],210:[function(require,module,exports){
+},{"components/Footer":194,"components/Header":195}],214:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -40943,4 +41721,4 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":191,"components/Header":192}]},{},[3])
+},{"components/Footer":194,"components/Header":195}]},{},[3])

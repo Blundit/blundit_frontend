@@ -5,11 +5,45 @@ Footer = require("components/Footer")
 
 module.exports = React.createFactory React.createClass
   displayName: 'Experts'
+
+  getInitialState: ->
+    experts: null
+
+
+  componentDidMount: ->
+    params = {
+      path: "experts"
+      success: @expertListSuccess
+      error: @expertListError
+    }
+    API.call(params)
+
+
+  expertListSuccess: (data) ->
+    console.log "!!!", data
+    @setState experts: data
+
+
+  expertListError: (error) ->
+    console.log "error", error
+
+  
+  goToExpert: (id) ->
+    navigate("/experts/#{id}")
+  
   
   render: ->
     div {},
       Header {}, ''
       div { className: "experts-wrapper" },
         div { className: "experts-content" },
-          "Expert"
+          div { className: "experts__list" },
+            if @state.experts?
+              @state.experts.map (expert, index) =>
+                div
+                  className: "experts__list__item"
+                  key: "expert-#{index}"
+                  onClick: @goToExpert.bind(@, expert.alias)
+                  expert.name
+
       Footer {}, ''

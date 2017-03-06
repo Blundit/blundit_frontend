@@ -16,9 +16,9 @@ module.exports = React.createFactory React.createClass
 
   getUserAvatar: ->
     if !UserStore.get() or !UserStore.get().avatar?
-      avatar = "images/avatars/placeholder.png"
+      avatar = "/images/avatars/placeholder.png"
     else
-      avatar = "images/avatars/#{UserStore.get().avatar}"
+      avatar = "/images/avatars/#{UserStore.get().avatar}"
 
     return "url(#{avatar})"
 

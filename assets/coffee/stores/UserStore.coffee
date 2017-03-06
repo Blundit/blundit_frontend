@@ -48,7 +48,7 @@ class UserStore
     if @user? and @user.token?
       return "Bearer " + @user.token
     else
-      return ''
+      return 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.lXpqdZte4jlKBjYo_IK7DhuqVNYh2bQ89U7zQWR4O9w'
 
 
   fetchUserData: (navigateTarget) ->

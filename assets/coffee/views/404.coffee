@@ -9,5 +9,7 @@ module.exports = React.createFactory React.createClass
   render: ->
     div {},
       Header {}, ''
-      "404"
+      div { className: "not-found-wrapper" },
+        div { className: "not-found-content" },
+          "404"
       Footer {}, ''
