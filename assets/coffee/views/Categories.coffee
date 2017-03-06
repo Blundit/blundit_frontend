@@ -7,11 +7,11 @@ module.exports = React.createFactory React.createClass
   displayName: 'Categories'
 
   getInitialState: ->
-    categories: []
+    categories: null
 
 
   componentDidMount: ->
-    params: {
+    params = {
       path: "categories"
       success: @categoryListSuccess
       error: @categoryListError
@@ -26,9 +26,22 @@ module.exports = React.createFactory React.createClass
   categoryListError: (error) ->
     console.log "error", error
 
+
+  goToCategory: (id) ->
+    navigate("/categories/#{id}")
+
   
   render: ->
     div {},
       Header {}, ''
-      "Expert"
+      
+      div { className: "categories__list" },
+        if @state.categories?
+          @state.categories.map (category, index) =>
+            div
+              className: "categories__list__item"
+              onClick: @goToCategory.bind(@, category.id)
+              category.name
+
+
       Footer {}, ''

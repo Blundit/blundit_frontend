@@ -225,17 +225,22 @@ module.exports = React.createFactory(React.createClass({
 
   module.exports = React.createFactory(React.createClass({
     displayName: "Category Claims - Latest",
+    goToClaim: function(id) {
+      return navigate("/claims/" + id);
+    },
     render: function() {
       return div({
         className: "categories__claims"
       }, div({
         className: "categories__claims-title"
-      }, "Claims"), this.props.claims.length > 0 ? this.props.claims.map((function(_this) {
+      }, "Claims:"), this.props.claims.length > 0 ? this.props.claims.map((function(_this) {
         return function(claim, index) {
           return div({
-            className: "categories__claims__claim"
+            className: "categories__claims__claim",
+            key: "category-claim-" + index
           }, div({
-            className: "categories__claims__claim-title"
+            className: "categories__claims__claim-title",
+            onClick: _this.goToClaim.bind(_this, claim.id)
           }, claim.title));
         };
       })(this)) : div({
@@ -248,17 +253,22 @@ module.exports = React.createFactory(React.createClass({
 
   module.exports = React.createFactory(React.createClass({
     displayName: "Category Experts - Latest",
+    goToExpert: function(id) {
+      return navigate("/experts/" + id);
+    },
     render: function() {
       return div({
         className: "categories__experts"
       }, div({
         className: "categories__experts-title"
-      }, "Experts"), this.props.experts.length > 0 ? this.props.experts.map((function(_this) {
+      }, "Experts:"), this.props.experts.length > 0 ? this.props.experts.map((function(_this) {
         return function(expert, index) {
           return div({
-            className: "categories__experts__expert"
+            className: "categories__experts__expert",
+            key: "category-expert-" + index
           }, div({
-            className: "categories__experts__expert-name"
+            className: "categories__experts__expert-name",
+            onClick: _this.goToExpert.bind(_this, expert.id)
           }, expert.name));
         };
       })(this)) : div({
@@ -271,17 +281,22 @@ module.exports = React.createFactory(React.createClass({
 
   module.exports = React.createFactory(React.createClass({
     displayName: "Category Predictions - Latest",
+    goToPredictions: function(id) {
+      return navigate("/predictions/" + id);
+    },
     render: function() {
       return div({
         className: "categories__predictions"
       }, div({
         className: "categories__predictions-title"
-      }, "Predictions"), this.props.predictions.length > 0 ? this.props.predictions.map((function(_this) {
+      }, "Predictions:"), this.props.predictions.length > 0 ? this.props.predictions.map((function(_this) {
         return function(prediction, index) {
           return div({
-            className: "categories__predictions__prediction"
+            className: "categories__predictions__prediction",
+            key: "category-predictions-" + index
           }, div({
-            className: "categories__predictions__prediction-title"
+            className: "categories__predictions__prediction-title",
+            onClick: _this.goToPredictions.bind(_this, prediction.id)
           }, prediction.title));
         };
       })(this)) : div({
@@ -295,7 +310,7 @@ module.exports = React.createFactory(React.createClass({
   module.exports = React.createFactory(React.createClass({
     displayName: "Category Filter Subhead",
     showAll: function() {
-      return navigate("/categories/" + this.props.category_id + "/all");
+      return navigate("/categories/" + this.props.category_id);
     },
     showExperts: function() {
       return navigate("/categories/" + this.props.category_id + "/experts");
@@ -309,42 +324,47 @@ module.exports = React.createFactory(React.createClass({
     currentPage: function(id) {
       this.path = window.location.pathname;
       if (id === '') {
-        if (this.path.indexOf(("/" + this.props.category_id + "/") === -1)) {
+        if (this.path.indexOf("/" + this.props.category_id + "/") === -1) {
           return true;
         } else {
           return false;
         }
       } else {
-        if (this.path.indexOf(("/" + this.props.category_id + "/" + id) === -1)) {
+        if (this.path.indexOf("/" + this.props.category_id + "/" + id) === -1) {
           return false;
         } else {
           return true;
         }
       }
     },
+    goBack: function() {
+      return navigate("/categories");
+    },
     render: function() {
       return div({
         className: "page-subhead"
-      }, this.currentPage('') ? div({
+      }, div({
+        onClick: this.goBack
+      }, '<<'), this.currentPage('') ? div({
+        className: "page-subhead__item--active"
+      }, 'All') : div({
         className: "page-subhead__item",
         onClick: this.showAll
-      }, 'All') : div({
-        className: "page-subhead__item--active"
       }, 'All'), this.currentPage('experts') ? div({
+        className: "page-subhead__item--active"
+      }, 'Experts') : div({
         className: "page-subhead__item",
         onClick: this.showExperts
-      }, 'Experts') : div({
-        className: "page-subhead__item--active"
       }, 'Experts'), this.currentPage('predictions') ? div({
+        className: "page-subhead__item--active"
+      }, 'Predictions') : div({
         className: "page-subhead__item",
         onClick: this.showPredictions
-      }, 'Predictions') : div({
-        className: "page-subhead__item--active"
       }, 'Predictions'), this.currentPage('claims') ? div({
+        className: "page-subhead__item--active"
+      }, 'Claims') : div({
         className: "page-subhead__item",
         onClick: this.showClaims
-      }, 'Claims') : div({
-        className: "page-subhead__item--active"
       }, 'Claims'));
     }
   }));
@@ -450,7 +470,7 @@ module.exports = React.createFactory(React.createClass({
       },
       category_claims: {
         path: "categories/%category_id%/claims",
-        method: "POST"
+        method: "GET"
       },
       category_experts: {
         path: "categories/%category_id%/experts",
@@ -690,17 +710,16 @@ module.exports = React.createFactory(React.createClass({
     displayName: 'Categories',
     getInitialState: function() {
       return {
-        categories: []
+        categories: null
       };
     },
     componentDidMount: function() {
-      ({
-        params: {
-          path: "categories",
-          success: this.categoryListSuccess,
-          error: this.categoryListError
-        }
-      });
+      var params;
+      params = {
+        path: "categories",
+        success: this.categoryListSuccess,
+        error: this.categoryListError
+      };
       return API.call(params);
     },
     categoryListSuccess: function(data) {
@@ -711,8 +730,20 @@ module.exports = React.createFactory(React.createClass({
     categoryListError: function(error) {
       return console.log("error", error);
     },
+    goToCategory: function(id) {
+      return navigate("/categories/" + id);
+    },
     render: function() {
-      return div({}, Header({}, ''), "Expert", Footer({}, ''));
+      return div({}, Header({}, ''), div({
+        className: "categories__list"
+      }, this.state.categories != null ? this.state.categories.map((function(_this) {
+        return function(category, index) {
+          return div({
+            className: "categories__list__item",
+            onClick: _this.goToCategory.bind(_this, category.id)
+          }, category.name);
+        };
+      })(this)) : void 0), Footer({}, ''));
     }
   }));
 
@@ -767,7 +798,6 @@ module.exports = React.createFactory(React.createClass({
       return API.call(params);
     },
     categoryAllSuccess: function(data) {
-      console.log("!", data);
       return this.setState({
         data: data
       });
@@ -784,11 +814,11 @@ module.exports = React.createFactory(React.createClass({
       return console.log("error", error);
     },
     render: function() {
-      return div({}, Header({}, ''), this.state.category != null ? (console.log(this.state.category), div({
+      return div({}, Header({}, ''), this.state.category != null ? div({
         className: "page-title"
       }, "Category '" + this.state.category.name + "' - Showing Experts, Claims and Predictions", CategorySubHead({
         category_id: this.props.id
-      }))) : div({}, "Loading..."), this.state.data != null ? div({
+      })) : div({}, "Loading..."), this.state.data != null ? div({
         className: "categories"
       }, CategoryExperts({
         experts: this.state.data.experts
@@ -848,7 +878,7 @@ module.exports = React.createFactory(React.createClass({
     },
     categoryAllSuccess: function(data) {
       return this.setState({
-        categories: data
+        data: data
       });
     },
     categoryAllError: function(error) {
@@ -867,7 +897,7 @@ module.exports = React.createFactory(React.createClass({
         className: "page-title"
       }, "Category '" + this.state.category.name + "' - Showing Claims", CategorySubHead({
         category_id: this.props.id
-      })) : void 0, this.state.categories != null ? div({
+      })) : void 0, this.state.data != null ? div({
         className: "categories"
       }, CategoryClaims({
         claims: this.state.data
@@ -923,7 +953,7 @@ module.exports = React.createFactory(React.createClass({
     },
     categoryAllSuccess: function(data) {
       return this.setState({
-        categories: data
+        data: data
       });
     },
     categoryAllError: function(error) {
@@ -942,7 +972,7 @@ module.exports = React.createFactory(React.createClass({
         className: "page-title"
       }, "Category '" + this.state.category.name + "' - Showing Experts", CategorySubHead({
         category_id: this.props.id
-      })) : void 0, this.state.categories != null ? div({
+      })) : void 0, this.state.data != null ? div({
         className: "categories"
       }, CategoryExperts({
         experts: this.state.data
@@ -998,7 +1028,7 @@ module.exports = React.createFactory(React.createClass({
     },
     categoryAllSuccess: function(data) {
       return this.setState({
-        categories: data
+        data: data
       });
     },
     categoryAllError: function(error) {
@@ -1017,7 +1047,7 @@ module.exports = React.createFactory(React.createClass({
         className: "page-title"
       }, "Category '" + this.state.category.name + "' - Showing Experts, Claims and Predictions", CategorySubHead({
         category_id: this.props.id
-      })) : void 0, this.state.categories != null ? div({
+      })) : void 0, this.state.data != null ? div({
         className: "categories"
       }, CategoryPredictions({
         predictions: this.state.data
@@ -39626,17 +39656,22 @@ div = React.DOM.div;
 
 module.exports = React.createFactory(React.createClass({
   displayName: "Category Claims - Latest",
+  goToClaim: function(id) {
+    return navigate("/claims/" + id);
+  },
   render: function() {
     return div({
       className: "categories__claims"
     }, div({
       className: "categories__claims-title"
-    }, "Claims"), this.props.claims.length > 0 ? this.props.claims.map((function(_this) {
+    }, "Claims:"), this.props.claims.length > 0 ? this.props.claims.map((function(_this) {
       return function(claim, index) {
         return div({
-          className: "categories__claims__claim"
+          className: "categories__claims__claim",
+          key: "category-claim-" + index
         }, div({
-          className: "categories__claims__claim-title"
+          className: "categories__claims__claim-title",
+          onClick: _this.goToClaim.bind(_this, claim.id)
         }, claim.title));
       };
     })(this)) : div({
@@ -39653,17 +39688,22 @@ div = React.DOM.div;
 
 module.exports = React.createFactory(React.createClass({
   displayName: "Category Experts - Latest",
+  goToExpert: function(id) {
+    return navigate("/experts/" + id);
+  },
   render: function() {
     return div({
       className: "categories__experts"
     }, div({
       className: "categories__experts-title"
-    }, "Experts"), this.props.experts.length > 0 ? this.props.experts.map((function(_this) {
+    }, "Experts:"), this.props.experts.length > 0 ? this.props.experts.map((function(_this) {
       return function(expert, index) {
         return div({
-          className: "categories__experts__expert"
+          className: "categories__experts__expert",
+          key: "category-expert-" + index
         }, div({
-          className: "categories__experts__expert-name"
+          className: "categories__experts__expert-name",
+          onClick: _this.goToExpert.bind(_this, expert.id)
         }, expert.name));
       };
     })(this)) : div({
@@ -39680,17 +39720,22 @@ div = React.DOM.div;
 
 module.exports = React.createFactory(React.createClass({
   displayName: "Category Predictions - Latest",
+  goToPredictions: function(id) {
+    return navigate("/predictions/" + id);
+  },
   render: function() {
     return div({
       className: "categories__predictions"
     }, div({
       className: "categories__predictions-title"
-    }, "Predictions"), this.props.predictions.length > 0 ? this.props.predictions.map((function(_this) {
+    }, "Predictions:"), this.props.predictions.length > 0 ? this.props.predictions.map((function(_this) {
       return function(prediction, index) {
         return div({
-          className: "categories__predictions__prediction"
+          className: "categories__predictions__prediction",
+          key: "category-predictions-" + index
         }, div({
-          className: "categories__predictions__prediction-title"
+          className: "categories__predictions__prediction-title",
+          onClick: _this.goToPredictions.bind(_this, prediction.id)
         }, prediction.title));
       };
     })(this)) : div({
@@ -39708,7 +39753,7 @@ div = React.DOM.div;
 module.exports = React.createFactory(React.createClass({
   displayName: "Category Filter Subhead",
   showAll: function() {
-    return navigate("/categories/" + this.props.category_id + "/all");
+    return navigate("/categories/" + this.props.category_id);
   },
   showExperts: function() {
     return navigate("/categories/" + this.props.category_id + "/experts");
@@ -39722,42 +39767,47 @@ module.exports = React.createFactory(React.createClass({
   currentPage: function(id) {
     this.path = window.location.pathname;
     if (id === '') {
-      if (this.path.indexOf(("/" + this.props.category_id + "/") === -1)) {
+      if (this.path.indexOf("/" + this.props.category_id + "/") === -1) {
         return true;
       } else {
         return false;
       }
     } else {
-      if (this.path.indexOf(("/" + this.props.category_id + "/" + id) === -1)) {
+      if (this.path.indexOf("/" + this.props.category_id + "/" + id) === -1) {
         return false;
       } else {
         return true;
       }
     }
   },
+  goBack: function() {
+    return navigate("/categories");
+  },
   render: function() {
     return div({
       className: "page-subhead"
-    }, this.currentPage('') ? div({
+    }, div({
+      onClick: this.goBack
+    }, '<<'), this.currentPage('') ? div({
+      className: "page-subhead__item--active"
+    }, 'All') : div({
       className: "page-subhead__item",
       onClick: this.showAll
-    }, 'All') : div({
-      className: "page-subhead__item--active"
     }, 'All'), this.currentPage('experts') ? div({
+      className: "page-subhead__item--active"
+    }, 'Experts') : div({
       className: "page-subhead__item",
       onClick: this.showExperts
-    }, 'Experts') : div({
-      className: "page-subhead__item--active"
     }, 'Experts'), this.currentPage('predictions') ? div({
+      className: "page-subhead__item--active"
+    }, 'Predictions') : div({
       className: "page-subhead__item",
       onClick: this.showPredictions
-    }, 'Predictions') : div({
-      className: "page-subhead__item--active"
     }, 'Predictions'), this.currentPage('claims') ? div({
+      className: "page-subhead__item--active"
+    }, 'Claims') : div({
       className: "page-subhead__item",
       onClick: this.showClaims
-    }, 'Claims') : div({
-      className: "page-subhead__item--active"
     }, 'Claims'));
   }
 }));
@@ -39815,7 +39865,7 @@ module.exports = API = (function() {
     },
     category_claims: {
       path: "categories/%category_id%/claims",
-      method: "POST"
+      method: "GET"
     },
     category_experts: {
       path: "categories/%category_id%/experts",
@@ -40072,17 +40122,16 @@ module.exports = React.createFactory(React.createClass({
   displayName: 'Categories',
   getInitialState: function() {
     return {
-      categories: []
+      categories: null
     };
   },
   componentDidMount: function() {
-    ({
-      params: {
-        path: "categories",
-        success: this.categoryListSuccess,
-        error: this.categoryListError
-      }
-    });
+    var params;
+    params = {
+      path: "categories",
+      success: this.categoryListSuccess,
+      error: this.categoryListError
+    };
     return API.call(params);
   },
   categoryListSuccess: function(data) {
@@ -40093,8 +40142,20 @@ module.exports = React.createFactory(React.createClass({
   categoryListError: function(error) {
     return console.log("error", error);
   },
+  goToCategory: function(id) {
+    return navigate("/categories/" + id);
+  },
   render: function() {
-    return div({}, Header({}, ''), "Expert", Footer({}, ''));
+    return div({}, Header({}, ''), div({
+      className: "categories__list"
+    }, this.state.categories != null ? this.state.categories.map((function(_this) {
+      return function(category, index) {
+        return div({
+          className: "categories__list__item",
+          onClick: _this.goToCategory.bind(_this, category.id)
+        }, category.name);
+      };
+    })(this)) : void 0), Footer({}, ''));
   }
 }));
 
@@ -40153,7 +40214,6 @@ module.exports = React.createFactory(React.createClass({
     return API.call(params);
   },
   categoryAllSuccess: function(data) {
-    console.log("!", data);
     return this.setState({
       data: data
     });
@@ -40170,11 +40230,11 @@ module.exports = React.createFactory(React.createClass({
     return console.log("error", error);
   },
   render: function() {
-    return div({}, Header({}, ''), this.state.category != null ? (console.log(this.state.category), div({
+    return div({}, Header({}, ''), this.state.category != null ? div({
       className: "page-title"
     }, "Category '" + this.state.category.name + "' - Showing Experts, Claims and Predictions", CategorySubHead({
       category_id: this.props.id
-    }))) : div({}, "Loading..."), this.state.data != null ? div({
+    })) : div({}, "Loading..."), this.state.data != null ? div({
       className: "categories"
     }, CategoryExperts({
       experts: this.state.data.experts
@@ -40238,7 +40298,7 @@ module.exports = React.createFactory(React.createClass({
   },
   categoryAllSuccess: function(data) {
     return this.setState({
-      categories: data
+      data: data
     });
   },
   categoryAllError: function(error) {
@@ -40257,7 +40317,7 @@ module.exports = React.createFactory(React.createClass({
       className: "page-title"
     }, "Category '" + this.state.category.name + "' - Showing Claims", CategorySubHead({
       category_id: this.props.id
-    })) : void 0, this.state.categories != null ? div({
+    })) : void 0, this.state.data != null ? div({
       className: "categories"
     }, CategoryClaims({
       claims: this.state.data
@@ -40317,7 +40377,7 @@ module.exports = React.createFactory(React.createClass({
   },
   categoryAllSuccess: function(data) {
     return this.setState({
-      categories: data
+      data: data
     });
   },
   categoryAllError: function(error) {
@@ -40336,7 +40396,7 @@ module.exports = React.createFactory(React.createClass({
       className: "page-title"
     }, "Category '" + this.state.category.name + "' - Showing Experts", CategorySubHead({
       category_id: this.props.id
-    })) : void 0, this.state.categories != null ? div({
+    })) : void 0, this.state.data != null ? div({
       className: "categories"
     }, CategoryExperts({
       experts: this.state.data
@@ -40396,7 +40456,7 @@ module.exports = React.createFactory(React.createClass({
   },
   categoryAllSuccess: function(data) {
     return this.setState({
-      categories: data
+      data: data
     });
   },
   categoryAllError: function(error) {
@@ -40415,7 +40475,7 @@ module.exports = React.createFactory(React.createClass({
       className: "page-title"
     }, "Category '" + this.state.category.name + "' - Showing Experts, Claims and Predictions", CategorySubHead({
       category_id: this.props.id
-    })) : void 0, this.state.categories != null ? div({
+    })) : void 0, this.state.data != null ? div({
       className: "categories"
     }, CategoryPredictions({
       predictions: this.state.data

@@ -44,7 +44,6 @@ module.exports = React.createFactory React.createClass
 
     
   categoryAllSuccess: (data) ->
-    console.log "!", data
     @setState data: data
 
 
@@ -64,7 +63,6 @@ module.exports = React.createFactory React.createClass
     div {},
       Header {}, ''
         if @state.category?
-          console.log @state.category
           div { className: "page-title" },
             "Category '#{@state.category.name}' - Showing Experts, Claims and Predictions"
             CategorySubHead

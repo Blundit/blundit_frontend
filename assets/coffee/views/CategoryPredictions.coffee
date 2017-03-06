@@ -42,7 +42,7 @@ module.exports = React.createFactory React.createClass
 
     
   categoryAllSuccess: (data) ->
-    @setState categories: data
+    @setState data: data
 
 
   categoryAllError: (error) ->
@@ -66,7 +66,7 @@ module.exports = React.createFactory React.createClass
             CategorySubHead
               category_id: @props.id
 
-        if @state.categories?
+        if @state.data?
           div { className: "categories" },
             CategoryPredictions
               predictions: @state.data

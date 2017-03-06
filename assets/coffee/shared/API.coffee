@@ -36,7 +36,7 @@ module.exports = class API
       method: "GET"
     category_claims:
       path: "categories/%category_id%/claims"
-      method: "POST"
+      method: "GET"
     category_experts:
       path: "categories/%category_id%/experts"
       method: "GET"

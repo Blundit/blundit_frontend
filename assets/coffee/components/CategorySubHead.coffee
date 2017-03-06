@@ -4,7 +4,7 @@ module.exports = React.createFactory React.createClass
   displayName: "Category Filter Subhead"
 
   showAll: ->
-    navigate("/categories/#{@props.category_id}/all")
+    navigate("/categories/#{@props.category_id}")
 
 
   showExperts: ->
@@ -22,54 +22,62 @@ module.exports = React.createFactory React.createClass
   currentPage: (id) ->
     @path = window.location.pathname
     if id == ''
-      if @path.indexOf "/#{@props.category_id}/" == -1
+      if @path.indexOf("/#{@props.category_id}/") == -1
         return true
       else
         return false
     else
-      if @path.indexOf "/#{@props.category_id}/#{id}" == -1
+      if @path.indexOf("/#{@props.category_id}/#{id}") == -1
         return false
       else
         return true
 
 
+  goBack: ->
+    navigate("/categories")
+
+
   render: ->
     div { className: "page-subhead" },
+      div
+        onClick: @goBack
+        '<<'
       if @currentPage('')
+        div
+          className: "page-subhead__item--active"
+          'All'
+      else
         div
           className: "page-subhead__item"
           onClick: @showAll
           'All'
-      else
-        div
-          className: "page-subhead__item--active"
-          'All'
 
       if @currentPage('experts')
+        div
+          className: "page-subhead__item--active"
+          'Experts'
+      else
         div
           className: "page-subhead__item"
           onClick: @showExperts
           'Experts'
-      else
+
+      if @currentPage('predictions')
         div
           className: "page-subhead__item--active"
-          'Experts'
-      if @currentPage('predictions')
+          'Predictions'
+      else
         div
           className: "page-subhead__item"
           onClick: @showPredictions
           'Predictions'
-      else
-        div
-          className: "page-subhead__item--active"
-          'Predictions'
       
       if @currentPage('claims')
         div
-          className: "page-subhead__item"
-          onClick: @showClaims
+          className: "page-subhead__item--active"
           'Claims'
       else
         div
-          className: "page-subhead__item--active"
+          className: "page-subhead__item"
+          onClick: @showClaims
           'Claims'
