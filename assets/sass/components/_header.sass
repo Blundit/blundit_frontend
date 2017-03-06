@@ -1,11 +1,58 @@
-.header__items
-  width: 100%
-  display: inline-block
-  margin-bottom: 10px
+.header-wrapper
+  @extend %full-width
+  background-color: $header-background-color
+  padding-top: 10px
+  padding-bottom: 10px
 
-.header__item
-  float: right
-  margin-right: 20px
+.header
+  @extend %margin-width
+  +clearfix
+  font-family: $body-font
 
-  &:first-of-type
-    margin-right: 0px
+  &__logo
+    width: 110px
+    float: left
+    padding-top: 15px
+    cursor: pointer
+    img
+      width: 100%
+      height: auto
+
+  &__items
+    width: calc(100% - 179px)
+    float: left
+    display: inline-block
+    margin: 0px 15px 10px 0px
+    padding-top: 20px
+
+  &__item
+    float: right
+    margin-right: 20px
+    font-size: em(15px)
+    text-transform: uppercase
+    color: $black-color
+    cursor: pointer
+    +fast_transition(all)
+    
+    &:hover
+      color: $menu-link-rollover-color
+      +fast_transition(all)
+
+    &:first-of-type
+      margin-right: 0px
+
+  &__item--active
+    @extend .header__item
+    color: $menu-link-rollover-color
+
+  &__user
+    width: 50px
+    float: left
+
+    &__avatar
+      width: 50px
+      height: 50px
+      border: 2px solid $avatar-border-color
+      border-radius: 40px
+      cursor: pointer
+      background-size: contain

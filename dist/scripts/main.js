@@ -5,24 +5,24 @@ div = React.DOM.div;
 
 module.exports = React.createFactory(React.createClass({
   render: function() {
-    return div({}, "Footer");
+    return div({
+      className: "footer-wrapper"
+    }, div({
+      className: "footer-content"
+    }, "Footer"));
   }
 }));
 
 
 },{}],2:[function(require,module,exports){
-var div, menuItems;
+var div, img, menuItems, ref;
 
-div = React.DOM.div;
+ref = React.DOM, div = ref.div, img = ref.img;
 
 menuItems = [
   {
     label: "My Bookmarks",
     path: "/bookmarks",
-    logged: true
-  }, {
-    label: "Me",
-    path: "/me",
     logged: true
   }, {
     label: "Categories",
@@ -43,27 +43,59 @@ module.exports = React.createFactory(React.createClass({
   navigateToLocation: function(path) {
     return navigate(path);
   },
+  getUserAvatar: function() {
+    var avatar;
+    if (!UserStore.get() || (UserStore.get().avatar == null)) {
+      avatar = "images/avatars/placeholder.png";
+    } else {
+      avatar = "images/avatars/" + (UserStore.get().avatar);
+    }
+    return "url(" + avatar + ")";
+  },
+  getHeaderItemClass: function(item) {
+    this["class"] = "header__item";
+    this.path = window.location.pathname;
+    if (this.path.indexOf(item.path, 0) > -1) {
+      this["class"] += "--active";
+    }
+    return this["class"];
+  },
   render: function() {
-    return div({}, div({
-      className: "header__logo"
-    }, "Blundit"), div({
+    return div({
+      className: "header-wrapper"
+    }, div({
+      className: "header"
+    }, div({
+      className: "header__logo",
+      onClick: this.navigateToLocation.bind(this, "/")
+    }, img({
+      src: "/images/logo_wordmark.png"
+    })), div({
       className: "header__items"
     }, menuItems.map((function(_this) {
       return function(item, index) {
         return div({
-          className: "header__item",
+          className: _this.getHeaderItemClass(item),
           key: "header-item-" + index,
           onClick: _this.navigateToLocation.bind(_this, item.path)
         }, item.label);
       };
-    })(this))));
+    })(this))), div({
+      className: "header__user"
+    }, div({
+      className: "header__user__avatar",
+      onClick: this.navigateToLocation.bind(this, "/me"),
+      style: {
+        backgroundImage: this.getUserAvatar()
+      }
+    }))));
   }
 }));
 
 
 },{}],3:[function(require,module,exports){
 (function() {
-  var API, Blundit, CategoryClaims, CategoryExperts, CategoryPredictions, CategorySubHead, Footer, Header, RouterMixin, UserStore, div, menuItems, startBlundit,
+  var API, Blundit, CategoryClaims, CategoryExperts, CategoryPredictions, CategorySubHead, Footer, Header, RouterMixin, UserStore, div, img, menuItems, ref, startBlundit,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   window.React = require('react');
@@ -373,20 +405,20 @@ module.exports = React.createFactory(React.createClass({
 
   module.exports = React.createFactory(React.createClass({
     render: function() {
-      return div({}, "Footer");
+      return div({
+        className: "footer-wrapper"
+      }, div({
+        className: "footer-content"
+      }, "Footer"));
     }
   }));
 
-  div = React.DOM.div;
+  ref = React.DOM, div = ref.div, img = ref.img;
 
   menuItems = [
     {
       label: "My Bookmarks",
       path: "/bookmarks",
-      logged: true
-    }, {
-      label: "Me",
-      path: "/me",
       logged: true
     }, {
       label: "Categories",
@@ -407,20 +439,52 @@ module.exports = React.createFactory(React.createClass({
     navigateToLocation: function(path) {
       return navigate(path);
     },
+    getUserAvatar: function() {
+      var avatar;
+      if (!UserStore.get() || (UserStore.get().avatar == null)) {
+        avatar = "images/avatars/placeholder.png";
+      } else {
+        avatar = "images/avatars/" + (UserStore.get().avatar);
+      }
+      return "url(" + avatar + ")";
+    },
+    getHeaderItemClass: function(item) {
+      this["class"] = "header__item";
+      this.path = window.location.pathname;
+      if (this.path.indexOf(item.path, 0) > -1) {
+        this["class"] += "--active";
+      }
+      return this["class"];
+    },
     render: function() {
-      return div({}, div({
-        className: "header__logo"
-      }, "Blundit"), div({
+      return div({
+        className: "header-wrapper"
+      }, div({
+        className: "header"
+      }, div({
+        className: "header__logo",
+        onClick: this.navigateToLocation.bind(this, "/")
+      }, img({
+        src: "/images/logo_wordmark.png"
+      })), div({
         className: "header__items"
       }, menuItems.map((function(_this) {
         return function(item, index) {
           return div({
-            className: "header__item",
+            className: _this.getHeaderItemClass(item),
             key: "header-item-" + index,
             onClick: _this.navigateToLocation.bind(_this, item.path)
           }, item.label);
         };
-      })(this))));
+      })(this))), div({
+        className: "header__user"
+      }, div({
+        className: "header__user__avatar",
+        onClick: this.navigateToLocation.bind(this, "/me"),
+        style: {
+          backgroundImage: this.getUserAvatar()
+        }
+      }))));
     }
   }));
 
@@ -495,11 +559,11 @@ module.exports = React.createFactory(React.createClass({
     };
 
     API.path = function(params) {
-      var key, ref, value;
+      var key, ref1, value;
       this.p = this.server() + this.paths[params.path].path;
-      ref = params.path_variables;
-      for (key in ref) {
-        value = ref[key];
+      ref1 = params.path_variables;
+      for (key in ref1) {
+        value = ref1[key];
         this.p = this.p.replace('%' + key + '%', value);
       }
       return this.p;
@@ -733,6 +797,10 @@ module.exports = React.createFactory(React.createClass({
     },
     render: function() {
       return div({}, Header({}, ''), div({
+        className: "bookmarks-wrapper"
+      }, div({
+        className: "bookmarks-content"
+      }, div({
         className: "bookmarks__list"
       }, this.state.bookmarks != null ? this.state.bookmarks.map((function(_this) {
         return function(bookmark, index) {
@@ -746,7 +814,7 @@ module.exports = React.createFactory(React.createClass({
             className: "bookmarks__list__item-new"
           }, _this.showBookmarkNewStatus(bookmark["new"])));
         };
-      })(this)) : void 0), Footer({}, ''));
+      })(this)) : void 0))), Footer({}, ''));
     }
   }));
 
@@ -785,6 +853,10 @@ module.exports = React.createFactory(React.createClass({
     },
     render: function() {
       return div({}, Header({}, ''), div({
+        className: "categories-wrapper"
+      }, div({
+        className: "categories-content"
+      }, div({
         className: "categories__list"
       }, this.state.categories != null ? this.state.categories.map((function(_this) {
         return function(category, index) {
@@ -794,7 +866,7 @@ module.exports = React.createFactory(React.createClass({
             onClick: _this.goToCategory.bind(_this, category.id)
           }, category.name);
         };
-      })(this)) : void 0), Footer({}, ''));
+      })(this)) : void 0))), Footer({}, ''));
     }
   }));
 
@@ -865,7 +937,11 @@ module.exports = React.createFactory(React.createClass({
       return console.log("error", error);
     },
     render: function() {
-      return div({}, Header({}, ''), this.state.category != null ? div({
+      return div({}, Header({}, ''), div({
+        className: "categories-wrapper"
+      }, div({
+        className: "categories-content"
+      }, this.state.category != null ? div({
         className: "page-title"
       }, "Category '" + this.state.category.name + "' - Showing Experts, Claims and Predictions", CategorySubHead({
         category_id: this.props.id
@@ -877,7 +953,7 @@ module.exports = React.createFactory(React.createClass({
         predictions: this.state.data.predictions
       }), CategoryClaims({
         claims: this.state.data.claims
-      })) : void 0, Footer({}, ''));
+      })) : void 0)), Footer({}, ''));
     }
   }));
 
@@ -944,7 +1020,11 @@ module.exports = React.createFactory(React.createClass({
       return console.log("error", error);
     },
     render: function() {
-      return div({}, Header({}, ''), this.state.category ? div({
+      return div({}, Header({}, ''), div({
+        className: "categories-wrapper"
+      }, div({
+        className: "categories-content"
+      }, this.state.category ? div({
         className: "page-title"
       }, "Category '" + this.state.category.name + "' - Showing Claims", CategorySubHead({
         category_id: this.props.id
@@ -952,7 +1032,7 @@ module.exports = React.createFactory(React.createClass({
         className: "categories"
       }, CategoryClaims({
         claims: this.state.data
-      })) : void 0, Footer({}, ''));
+      })) : void 0)), Footer({}, ''));
     }
   }));
 
@@ -1019,7 +1099,11 @@ module.exports = React.createFactory(React.createClass({
       return console.log("error", error);
     },
     render: function() {
-      return div({}, Header({}, ''), this.state.category ? div({
+      return div({}, Header({}, ''), div({
+        className: "categories-wrapper"
+      }, div({
+        className: "categories-content"
+      }, this.state.category ? div({
         className: "page-title"
       }, "Category '" + this.state.category.name + "' - Showing Experts", CategorySubHead({
         category_id: this.props.id
@@ -1027,7 +1111,7 @@ module.exports = React.createFactory(React.createClass({
         className: "categories"
       }, CategoryExperts({
         experts: this.state.data
-      })) : void 0, Footer({}, ''));
+      })) : void 0)), Footer({}, ''));
     }
   }));
 
@@ -1094,7 +1178,11 @@ module.exports = React.createFactory(React.createClass({
       return console.log("error", error);
     },
     render: function() {
-      return div({}, Header({}, ''), this.state.category ? div({
+      return div({}, Header({}, ''), div({
+        className: "categories-wrapper"
+      }, div({
+        className: "categories-content"
+      }, this.state.category ? div({
         className: "page-title"
       }, "Category '" + this.state.category.name + "' - Showing Experts, Claims and Predictions", CategorySubHead({
         category_id: this.props.id
@@ -1102,7 +1190,7 @@ module.exports = React.createFactory(React.createClass({
         className: "categories"
       }, CategoryPredictions({
         predictions: this.state.data
-      })) : void 0, Footer({}, ''));
+      })) : void 0)), Footer({}, ''));
     }
   }));
 
@@ -1115,7 +1203,11 @@ module.exports = React.createFactory(React.createClass({
   module.exports = React.createFactory(React.createClass({
     displayName: 'Landing',
     render: function() {
-      return div({}, Header({}, ''), "Claim", Footer({}, ''));
+      return div({}, Header({}, ''), div({
+        className: "claims-wrapper"
+      }, div({
+        className: "claims-content"
+      }, "Claim")), Footer({}, ''));
     }
   }));
 
@@ -1128,7 +1220,11 @@ module.exports = React.createFactory(React.createClass({
   module.exports = React.createFactory(React.createClass({
     displayName: 'Claims',
     render: function() {
-      return div({}, Header({}, ''), "Claims", Footer({}, ''));
+      return div({}, Header({}, ''), div({
+        className: "claims-wrapper"
+      }, div({
+        className: "claims-content"
+      }, "Claims")), Footer({}, ''));
     }
   }));
 
@@ -1141,7 +1237,11 @@ module.exports = React.createFactory(React.createClass({
   module.exports = React.createFactory(React.createClass({
     displayName: 'Expert',
     render: function() {
-      return div({}, Header({}, ''), "Expert", Footer({}, ''));
+      return div({}, Header({}, ''), div({
+        className: "experts-wrapper"
+      }, div({
+        className: "experts-content"
+      }, "Expert")), Footer({}, ''));
     }
   }));
 
@@ -1154,7 +1254,11 @@ module.exports = React.createFactory(React.createClass({
   module.exports = React.createFactory(React.createClass({
     displayName: 'Experts',
     render: function() {
-      return div({}, Header({}, ''), "Expert", Footer({}, ''));
+      return div({}, Header({}, ''), div({
+        className: "experts-wrapper"
+      }, div({
+        className: "experts-content"
+      }, "Expert")), Footer({}, ''));
     }
   }));
 
@@ -1167,7 +1271,11 @@ module.exports = React.createFactory(React.createClass({
   module.exports = React.createFactory(React.createClass({
     displayName: 'Landing',
     render: function() {
-      return div({}, Header({}, ''), "Landing", Footer({}, ''));
+      return div({}, Header({}, ''), div({
+        className: "landing-wrapper"
+      }, div({
+        className: "landing-content"
+      }, "Landing")), Footer({}, ''));
     }
   }));
 
@@ -1180,7 +1288,11 @@ module.exports = React.createFactory(React.createClass({
   module.exports = React.createFactory(React.createClass({
     displayName: 'Login',
     render: function() {
-      return div({}, Header({}, ''), "Login", Footer({}, ''));
+      return div({}, Header({}, ''), div({
+        className: "user-wrapper"
+      }, div({
+        className: "user-content"
+      }, "Login")), Footer({}, ''));
     }
   }));
 
@@ -1193,7 +1305,11 @@ module.exports = React.createFactory(React.createClass({
   module.exports = React.createFactory(React.createClass({
     displayName: 'Prediction',
     render: function() {
-      return div({}, Header({}, ''), "Prediction", Footer({}, ''));
+      return div({}, Header({}, ''), div({
+        className: "predictions-wrapper"
+      }, div({
+        className: "predictions-content"
+      }, "Prediction")), Footer({}, ''));
     }
   }));
 
@@ -1206,7 +1322,11 @@ module.exports = React.createFactory(React.createClass({
   module.exports = React.createFactory(React.createClass({
     displayName: 'Predictions',
     render: function() {
-      return div({}, Header({}, ''), "Predictions", Footer({}, ''));
+      return div({}, Header({}, ''), div({
+        className: "predictions-wrapper"
+      }, div({
+        className: "predictions-content"
+      }, "Predictions")), Footer({}, ''));
     }
   }));
 
@@ -1219,7 +1339,11 @@ module.exports = React.createFactory(React.createClass({
   module.exports = React.createFactory(React.createClass({
     displayName: 'Register',
     render: function() {
-      return div({}, Header({}, ''), "Register", Footer({}, ''));
+      return div({}, Header({}, ''), div({
+        className: "user-wrapper"
+      }, div({
+        className: "user-content"
+      }, "Register")), Footer({}, ''));
     }
   }));
 
@@ -1244,7 +1368,11 @@ module.exports = React.createFactory(React.createClass({
       return console.log(UserStore.get());
     },
     render: function() {
-      return div({}, Header({}, ''), div({}, this.props.me === true ? "My page" : "User " + this.props.user_id), Footer({}, ''));
+      return div({}, Header({}, ''), div({
+        className: "user-wrapper"
+      }, div({
+        className: "user-content"
+      }, this.props.me === true ? "My page" : "User " + this.props.user_id)), Footer({}, ''));
     }
   }));
 
@@ -1257,7 +1385,11 @@ module.exports = React.createFactory(React.createClass({
   module.exports = React.createFactory(React.createClass({
     displayName: 'Users',
     render: function() {
-      return div({}, Header({}, ''), "Users", Footer({}, ''));
+      return div({}, Header({}, ''), div({
+        className: "user-wrapper"
+      }, div({
+        className: "user-content"
+      }, "Users")), Footer({}, ''));
     }
   }));
 
@@ -40192,6 +40324,10 @@ module.exports = React.createFactory(React.createClass({
   },
   render: function() {
     return div({}, Header({}, ''), div({
+      className: "bookmarks-wrapper"
+    }, div({
+      className: "bookmarks-content"
+    }, div({
       className: "bookmarks__list"
     }, this.state.bookmarks != null ? this.state.bookmarks.map((function(_this) {
       return function(bookmark, index) {
@@ -40205,7 +40341,7 @@ module.exports = React.createFactory(React.createClass({
           className: "bookmarks__list__item-new"
         }, _this.showBookmarkNewStatus(bookmark["new"])));
       };
-    })(this)) : void 0), Footer({}, ''));
+    })(this)) : void 0))), Footer({}, ''));
   }
 }));
 
@@ -40248,6 +40384,10 @@ module.exports = React.createFactory(React.createClass({
   },
   render: function() {
     return div({}, Header({}, ''), div({
+      className: "categories-wrapper"
+    }, div({
+      className: "categories-content"
+    }, div({
       className: "categories__list"
     }, this.state.categories != null ? this.state.categories.map((function(_this) {
       return function(category, index) {
@@ -40257,7 +40397,7 @@ module.exports = React.createFactory(React.createClass({
           onClick: _this.goToCategory.bind(_this, category.id)
         }, category.name);
       };
-    })(this)) : void 0), Footer({}, ''));
+    })(this)) : void 0))), Footer({}, ''));
   }
 }));
 
@@ -40332,7 +40472,11 @@ module.exports = React.createFactory(React.createClass({
     return console.log("error", error);
   },
   render: function() {
-    return div({}, Header({}, ''), this.state.category != null ? div({
+    return div({}, Header({}, ''), div({
+      className: "categories-wrapper"
+    }, div({
+      className: "categories-content"
+    }, this.state.category != null ? div({
       className: "page-title"
     }, "Category '" + this.state.category.name + "' - Showing Experts, Claims and Predictions", CategorySubHead({
       category_id: this.props.id
@@ -40344,7 +40488,7 @@ module.exports = React.createFactory(React.createClass({
       predictions: this.state.data.predictions
     }), CategoryClaims({
       claims: this.state.data.claims
-    })) : void 0, Footer({}, ''));
+    })) : void 0)), Footer({}, ''));
   }
 }));
 
@@ -40415,7 +40559,11 @@ module.exports = React.createFactory(React.createClass({
     return console.log("error", error);
   },
   render: function() {
-    return div({}, Header({}, ''), this.state.category ? div({
+    return div({}, Header({}, ''), div({
+      className: "categories-wrapper"
+    }, div({
+      className: "categories-content"
+    }, this.state.category ? div({
       className: "page-title"
     }, "Category '" + this.state.category.name + "' - Showing Claims", CategorySubHead({
       category_id: this.props.id
@@ -40423,7 +40571,7 @@ module.exports = React.createFactory(React.createClass({
       className: "categories"
     }, CategoryClaims({
       claims: this.state.data
-    })) : void 0, Footer({}, ''));
+    })) : void 0)), Footer({}, ''));
   }
 }));
 
@@ -40494,7 +40642,11 @@ module.exports = React.createFactory(React.createClass({
     return console.log("error", error);
   },
   render: function() {
-    return div({}, Header({}, ''), this.state.category ? div({
+    return div({}, Header({}, ''), div({
+      className: "categories-wrapper"
+    }, div({
+      className: "categories-content"
+    }, this.state.category ? div({
       className: "page-title"
     }, "Category '" + this.state.category.name + "' - Showing Experts", CategorySubHead({
       category_id: this.props.id
@@ -40502,7 +40654,7 @@ module.exports = React.createFactory(React.createClass({
       className: "categories"
     }, CategoryExperts({
       experts: this.state.data
-    })) : void 0, Footer({}, ''));
+    })) : void 0)), Footer({}, ''));
   }
 }));
 
@@ -40573,7 +40725,11 @@ module.exports = React.createFactory(React.createClass({
     return console.log("error", error);
   },
   render: function() {
-    return div({}, Header({}, ''), this.state.category ? div({
+    return div({}, Header({}, ''), div({
+      className: "categories-wrapper"
+    }, div({
+      className: "categories-content"
+    }, this.state.category ? div({
       className: "page-title"
     }, "Category '" + this.state.category.name + "' - Showing Experts, Claims and Predictions", CategorySubHead({
       category_id: this.props.id
@@ -40581,7 +40737,7 @@ module.exports = React.createFactory(React.createClass({
       className: "categories"
     }, CategoryPredictions({
       predictions: this.state.data
-    })) : void 0, Footer({}, ''));
+    })) : void 0)), Footer({}, ''));
   }
 }));
 
@@ -40598,7 +40754,11 @@ Footer = require("components/Footer");
 module.exports = React.createFactory(React.createClass({
   displayName: 'Landing',
   render: function() {
-    return div({}, Header({}, ''), "Claim", Footer({}, ''));
+    return div({}, Header({}, ''), div({
+      className: "claims-wrapper"
+    }, div({
+      className: "claims-content"
+    }, "Claim")), Footer({}, ''));
   }
 }));
 
@@ -40615,7 +40775,11 @@ Footer = require("components/Footer");
 module.exports = React.createFactory(React.createClass({
   displayName: 'Claims',
   render: function() {
-    return div({}, Header({}, ''), "Claims", Footer({}, ''));
+    return div({}, Header({}, ''), div({
+      className: "claims-wrapper"
+    }, div({
+      className: "claims-content"
+    }, "Claims")), Footer({}, ''));
   }
 }));
 
@@ -40632,7 +40796,11 @@ Footer = require("components/Footer");
 module.exports = React.createFactory(React.createClass({
   displayName: 'Expert',
   render: function() {
-    return div({}, Header({}, ''), "Expert", Footer({}, ''));
+    return div({}, Header({}, ''), div({
+      className: "experts-wrapper"
+    }, div({
+      className: "experts-content"
+    }, "Expert")), Footer({}, ''));
   }
 }));
 
@@ -40649,7 +40817,11 @@ Footer = require("components/Footer");
 module.exports = React.createFactory(React.createClass({
   displayName: 'Experts',
   render: function() {
-    return div({}, Header({}, ''), "Expert", Footer({}, ''));
+    return div({}, Header({}, ''), div({
+      className: "experts-wrapper"
+    }, div({
+      className: "experts-content"
+    }, "Expert")), Footer({}, ''));
   }
 }));
 
@@ -40666,7 +40838,11 @@ Footer = require("components/Footer");
 module.exports = React.createFactory(React.createClass({
   displayName: 'Landing',
   render: function() {
-    return div({}, Header({}, ''), "Landing", Footer({}, ''));
+    return div({}, Header({}, ''), div({
+      className: "landing-wrapper"
+    }, div({
+      className: "landing-content"
+    }, "Landing")), Footer({}, ''));
   }
 }));
 
@@ -40683,7 +40859,11 @@ Footer = require("components/Footer");
 module.exports = React.createFactory(React.createClass({
   displayName: 'Prediction',
   render: function() {
-    return div({}, Header({}, ''), "Prediction", Footer({}, ''));
+    return div({}, Header({}, ''), div({
+      className: "predictions-wrapper"
+    }, div({
+      className: "predictions-content"
+    }, "Prediction")), Footer({}, ''));
   }
 }));
 
@@ -40700,7 +40880,11 @@ Footer = require("components/Footer");
 module.exports = React.createFactory(React.createClass({
   displayName: 'Predictions',
   render: function() {
-    return div({}, Header({}, ''), "Predictions", Footer({}, ''));
+    return div({}, Header({}, ''), div({
+      className: "predictions-wrapper"
+    }, div({
+      className: "predictions-content"
+    }, "Predictions")), Footer({}, ''));
   }
 }));
 
@@ -40729,7 +40913,11 @@ module.exports = React.createFactory(React.createClass({
     return console.log(UserStore.get());
   },
   render: function() {
-    return div({}, Header({}, ''), div({}, this.props.me === true ? "My page" : "User " + this.props.user_id), Footer({}, ''));
+    return div({}, Header({}, ''), div({
+      className: "user-wrapper"
+    }, div({
+      className: "user-content"
+    }, this.props.me === true ? "My page" : "User " + this.props.user_id)), Footer({}, ''));
   }
 }));
 
@@ -40746,7 +40934,11 @@ Footer = require("components/Footer");
 module.exports = React.createFactory(React.createClass({
   displayName: 'Users',
   render: function() {
-    return div({}, Header({}, ''), "Users", Footer({}, ''));
+    return div({}, Header({}, ''), div({
+      className: "user-wrapper"
+    }, div({
+      className: "user-content"
+    }, "Users")), Footer({}, ''));
   }
 }));
 

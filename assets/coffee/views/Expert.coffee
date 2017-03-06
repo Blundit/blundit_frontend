@@ -9,5 +9,7 @@ module.exports = React.createFactory React.createClass
   render: ->
     div {},
       Header {}, ''
-      "Expert"
+      div { className: "experts-wrapper" },
+        div { className: "experts-content" },
+          "Expert"
       Footer {}, ''

@@ -34,15 +34,16 @@ module.exports = React.createFactory React.createClass
   render: ->
     div {},
       Header {}, ''
-      
-      div { className: "categories__list" },
-        if @state.categories?
-          @state.categories.map (category, index) =>
-            div
-              className: "categories__list__item"
-              key: "category-#{index}"
-              onClick: @goToCategory.bind(@, category.id)
-              category.name
+      div { className: "categories-wrapper" },
+        div { className: "categories-content" },
+          div { className: "categories__list" },
+            if @state.categories?
+              @state.categories.map (category, index) =>
+                div
+                  className: "categories__list__item"
+                  key: "category-#{index}"
+                  onClick: @goToCategory.bind(@, category.id)
+                  category.name
 
 
       Footer {}, ''

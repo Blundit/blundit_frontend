@@ -41,20 +41,21 @@ module.exports = React.createFactory React.createClass
   render: ->
     div {},
       Header {}, ''
-      
-      div { className: "bookmarks__list" },
-        if @state.bookmarks?
-          @state.bookmarks.map (bookmark, index) =>
-            div
-              className: "bookmarks__list__item"
-              key: "bookmark-#{index}"
-              div
-                className: "bookmarks__list__item-title"
-                onClick: @goToItem.bind(@, bookmark)
-                bookmark.title
-              div
-                className: "bookmarks__list__item-new"
-                @showBookmarkNewStatus(bookmark.new)
+      div { className: "bookmarks-wrapper" },
+        div { className: "bookmarks-content" },
+          div { className: "bookmarks__list" },
+            if @state.bookmarks?
+              @state.bookmarks.map (bookmark, index) =>
+                div
+                  className: "bookmarks__list__item"
+                  key: "bookmark-#{index}"
+                  div
+                    className: "bookmarks__list__item-title"
+                    onClick: @goToItem.bind(@, bookmark)
+                    bookmark.title
+                  div
+                    className: "bookmarks__list__item-new"
+                    @showBookmarkNewStatus(bookmark.new)
 
 
       Footer {}, ''

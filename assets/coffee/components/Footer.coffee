@@ -2,5 +2,6 @@
 
 module.exports = React.createFactory React.createClass
   render: ->
-    div {},
-      "Footer"
+    div { className: "footer-wrapper" },
+      div { className: "footer-content" },
+        "Footer"

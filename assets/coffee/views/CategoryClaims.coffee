@@ -59,14 +59,16 @@ module.exports = React.createFactory React.createClass
   render: ->
     div {},
       Header {}, ''
-        if @state.category
-          div { className: "page-title" },
-            "Category '#{@state.category.name}' - Showing Claims"
-            CategorySubHead
-              category_id: @props.id
+      div { className: "categories-wrapper" },
+        div { className: "categories-content" },
+          if @state.category
+            div { className: "page-title" },
+              "Category '#{@state.category.name}' - Showing Claims"
+              CategorySubHead
+                category_id: @props.id
 
-        if @state.data?
-          div { className: "categories" },
-            CategoryClaims
-              claims: @state.data
+          if @state.data?
+            div { className: "categories" },
+              CategoryClaims
+                claims: @state.data
       Footer {}, ''

@@ -9,5 +9,7 @@ module.exports = React.createFactory React.createClass
   render: ->
     div {},
       Header {}, ''
-      "Prediction"
+      div { className: "predictions-wrapper" },
+        div { className: "predictions-content" },
+          "Prediction"
       Footer {}, ''

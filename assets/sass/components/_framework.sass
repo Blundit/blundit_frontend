@@ -1,0 +1,21 @@
+%full-width
+  width: 100%
+
+%margin-width
+  @media (max-width: $tablet-breakpoint)
+    width: 100%
+
+  @media (min-width: $tablet-breakpoint + 1)
+    width: $tablet-breakpoint
+    margin-left: auto
+    margin-right: auto
+
+  @media (min-width: $desktop-breakpoint)
+    width: $desktop-breakpoint
+    margin-left: auto
+    margin-right: auto
+
+
+
+.body
+  font-family: $body-font

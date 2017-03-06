@@ -9,5 +9,7 @@ module.exports = React.createFactory React.createClass
   render: ->
     div {},
       Header {}, ''
-      "Landing"
+      div { className: "landing-wrapper" },
+        div { className: "landing-content" },
+          "Landing"
       Footer {}, ''

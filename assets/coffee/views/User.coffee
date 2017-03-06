@@ -22,10 +22,11 @@ module.exports = React.createFactory React.createClass
   render: ->
     div {},
       Header {}, ''
-      div {},
-        if @props.me == true
-          "My page"
-        else
-          "User #{@props.user_id}"
+      div { className: "user-wrapper" },
+        div { className: "user-content" },
+          if @props.me == true
+            "My page"
+          else
+            "User #{@props.user_id}"
 
       Footer {}, ''
