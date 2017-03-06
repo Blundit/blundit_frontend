@@ -479,6 +479,10 @@ module.exports = React.createFactory(React.createClass({
       category_all: {
         path: "categories/%category_id%/all",
         method: "GET"
+      },
+      bookmarks: {
+        path: "user/bookmarks",
+        method: "GET"
       }
     };
 
@@ -695,8 +699,54 @@ module.exports = React.createFactory(React.createClass({
 
   module.exports = React.createFactory(React.createClass({
     displayName: 'Bookmarks',
+    getInitialState: function() {
+      return {
+        bookmarks: null
+      };
+    },
+    componentDidMount: function() {
+      var params;
+      params = {
+        path: "bookmarks",
+        success: this.getBookmarksSuccess,
+        error: this.getBookmarksError
+      };
+      return API.call(params);
+    },
+    getBookmarksSuccess: function(data) {
+      return this.setState({
+        bookmarks: data
+      });
+    },
+    getBookmarksError: function(error) {
+      return console.log("error");
+    },
+    showBookmarkNewStatus: function(status) {
+      if (status === true) {
+        return "!";
+      } else {
+        return "";
+      }
+    },
+    goToItem: function(bookmark) {
+      return navigate("/" + bookmark.type + "s/" + bookmark.id);
+    },
     render: function() {
-      return div({}, Header({}, ''), "Bookmarks", Footer({}, ''));
+      return div({}, Header({}, ''), div({
+        className: "bookmarks__list"
+      }, this.state.bookmarks != null ? this.state.bookmarks.map((function(_this) {
+        return function(bookmark, index) {
+          return div({
+            className: "bookmarks__list__item",
+            key: "bookmark-" + index
+          }, div({
+            className: "bookmarks__list__item-title",
+            onClick: _this.goToItem.bind(_this, bookmark)
+          }, bookmark.title), div({
+            className: "bookmarks__list__item-new"
+          }, _this.showBookmarkNewStatus(bookmark["new"])));
+        };
+      })(this)) : void 0), Footer({}, ''));
     }
   }));
 
@@ -740,6 +790,7 @@ module.exports = React.createFactory(React.createClass({
         return function(category, index) {
           return div({
             className: "categories__list__item",
+            key: "category-" + index,
             onClick: _this.goToCategory.bind(_this, category.id)
           }, category.name);
         };
@@ -39874,6 +39925,10 @@ module.exports = API = (function() {
     category_all: {
       path: "categories/%category_id%/all",
       method: "GET"
+    },
+    bookmarks: {
+      path: "user/bookmarks",
+      method: "GET"
     }
   };
 
@@ -40103,8 +40158,54 @@ Footer = require("components/Footer");
 
 module.exports = React.createFactory(React.createClass({
   displayName: 'Bookmarks',
+  getInitialState: function() {
+    return {
+      bookmarks: null
+    };
+  },
+  componentDidMount: function() {
+    var params;
+    params = {
+      path: "bookmarks",
+      success: this.getBookmarksSuccess,
+      error: this.getBookmarksError
+    };
+    return API.call(params);
+  },
+  getBookmarksSuccess: function(data) {
+    return this.setState({
+      bookmarks: data
+    });
+  },
+  getBookmarksError: function(error) {
+    return console.log("error");
+  },
+  showBookmarkNewStatus: function(status) {
+    if (status === true) {
+      return "!";
+    } else {
+      return "";
+    }
+  },
+  goToItem: function(bookmark) {
+    return navigate("/" + bookmark.type + "s/" + bookmark.id);
+  },
   render: function() {
-    return div({}, Header({}, ''), "Bookmarks", Footer({}, ''));
+    return div({}, Header({}, ''), div({
+      className: "bookmarks__list"
+    }, this.state.bookmarks != null ? this.state.bookmarks.map((function(_this) {
+      return function(bookmark, index) {
+        return div({
+          className: "bookmarks__list__item",
+          key: "bookmark-" + index
+        }, div({
+          className: "bookmarks__list__item-title",
+          onClick: _this.goToItem.bind(_this, bookmark)
+        }, bookmark.title), div({
+          className: "bookmarks__list__item-new"
+        }, _this.showBookmarkNewStatus(bookmark["new"])));
+      };
+    })(this)) : void 0), Footer({}, ''));
   }
 }));
 
@@ -40152,6 +40253,7 @@ module.exports = React.createFactory(React.createClass({
       return function(category, index) {
         return div({
           className: "categories__list__item",
+          key: "category-" + index,
           onClick: _this.goToCategory.bind(_this, category.id)
         }, category.name);
       };

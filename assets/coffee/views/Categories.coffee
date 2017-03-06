@@ -40,6 +40,7 @@ module.exports = React.createFactory React.createClass
           @state.categories.map (category, index) =>
             div
               className: "categories__list__item"
+              key: "category-#{index}"
               onClick: @goToCategory.bind(@, category.id)
               category.name
 

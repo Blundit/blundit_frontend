@@ -43,6 +43,9 @@ module.exports = class API
     category_all:
       path: "categories/%category_id%/all"
       method: "GET"
+    bookmarks:
+      path: "user/bookmarks"
+      method: "GET"
 
 
   @server = ->
