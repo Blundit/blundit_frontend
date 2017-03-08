@@ -20,12 +20,11 @@ module.exports = React.createFactory React.createClass
 
 
   claimListSuccess: (data) ->
-    console.log "!!!", data
     @setState claims: data.claims
 
 
   claimListError: (error) ->
-    console.log "error", error
+    # console.log "error", error
 
   
   goToClaim: (id) ->

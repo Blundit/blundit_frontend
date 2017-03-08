@@ -1,5 +1,7 @@
 { div, img } = React.DOM
 
+RaisedButton = Material.RaisedButton
+
 menuItems = [
   { label: "My Bookmarks", path: "/bookmarks", logged: true }
   { label: "Categories", path: "/categories" },
@@ -9,6 +11,21 @@ menuItems = [
 ]
 
 module.exports = React.createFactory React.createClass
+  getInitialState: ->
+    user: null
+
+  handleUserChange: (data) ->
+    console.log "HHHH", UserStore.get()
+    @setState user: UserStore.get()
+
+
+  componentDidMount: ->
+    UserStore.subscribe(@handleUserChange)
+
+  
+  componentWillUnmount: ->
+    UserStore.unsubscribe(@handleUserChange)
+
 
   navigateToLocation: (path) ->
     navigate(path)
@@ -32,8 +49,13 @@ module.exports = React.createFactory React.createClass
 
     return @class
 
+  
+  goToLogin: ->
+    navigate('/login')
+
 
   render: ->
+    console.log @state.user
     div { className: "header-wrapper" },
       div { className: "header" },
         div
@@ -50,8 +72,13 @@ module.exports = React.createFactory React.createClass
               item.label
         
         div { className: "header__user" },
-          div
-            className: "header__user__avatar"
-            onClick: @navigateToLocation.bind(@, "/me")
-            style:
-              backgroundImage: @getUserAvatar()
+          if @state.user?.token?
+            div
+              className: "header__user__avatar"
+              onClick: @navigateToLocation.bind(@, "/me")
+              style:
+                backgroundImage: @getUserAvatar()
+          else
+            div {},
+              React.createElement(RaisedButton, { label: "Login/Signup", primary: true, onClick: @goToLogin })
+

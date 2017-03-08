@@ -24,7 +24,7 @@ module.exports = React.createFactory React.createClass
 
 
   categoryListError: (error) ->
-    console.log "error", error
+    #console.log "error", error
 
 
   goToCategory: (id) ->

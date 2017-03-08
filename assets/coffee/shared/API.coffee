@@ -20,10 +20,12 @@ API.call(params)
 module.exports = class API
   @paths =
     register:
-      path: "users/register"
+      path: "auth/register"
+      non_api: true
       method: "POST"
     login:
-      path: "users/login"
+      path: "auth/sign_in"
+      non_api: true
       method: "POST"
     categories:
       path: "categories"
@@ -67,10 +69,14 @@ module.exports = class API
     verify_token:
       path: 'auth/verify_token?access-token=%accessToken%&client=%client%&uid=%uid%'
       method: "GET"
+      non_api: true
 
 
 
-  @server = ->
+  @server = (params) ->
+    if @paths[params.path].non_api? and @paths[params.path].non_api == true
+      return "http://localhost:3000/"
+      
     return "http://localhost:3000/api/v1/"
     
   
@@ -79,11 +85,11 @@ module.exports = class API
 
 
   @path = (params) ->
-    @p = @server() + @paths[params.path].path
+    @p = @server(params) + @paths[params.path].path
 
     for key, value of params.path_variables
       @p = @p.replace '%'+key+'%', value
-    
+
     return @p
 
 
@@ -104,7 +110,7 @@ module.exports = class API
         Authorization: UserStore.getAuthHeader()
       data: @data(params)
       dataType: "json"
-      success: (data) ->
-        params.success(data) if params.success?
+      success: (data, status, request) ->
+        params.success(data, request) if params.success?
       error: (error) ->
         params.error(error) if params.error?

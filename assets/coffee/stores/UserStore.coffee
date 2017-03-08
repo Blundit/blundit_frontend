@@ -7,6 +7,11 @@ class UserStore
   messagesTtl: 60000
   
 
+  loggedIn: ->
+    return true if @data.token?
+    return false
+
+
   subscribe: (callback) =>
     addEventListener(@changeEvent, callback, false)
     @subscribers++
@@ -26,8 +31,19 @@ class UserStore
     dispatchEvent(event)
 
 
-  set: (data) =>
+  set: (data, request) =>
     @data = data
+    console.log "!@REQUEST"
+    console.log request
+
+    if request?
+      console.log request.getAllResponseHeaders()
+      console.log request.getResponseHeader('access-token')
+      @data.token = request.getResponseHeader('access-token')
+      @data.uid = request.getResponseHeader('uid')
+      @data.client = request.getResponseHeader('client')
+
+    console.log @data
     @emitChange()
 
 

@@ -15,9 +15,11 @@ module.exports = React.createFactory(React.createClass({
 
 
 },{}],2:[function(require,module,exports){
-var div, img, menuItems, ref;
+var RaisedButton, div, img, menuItems, ref;
 
 ref = React.DOM, div = ref.div, img = ref.img;
+
+RaisedButton = Material.RaisedButton;
 
 menuItems = [
   {
@@ -40,6 +42,23 @@ menuItems = [
 ];
 
 module.exports = React.createFactory(React.createClass({
+  getInitialState: function() {
+    return {
+      user: null
+    };
+  },
+  handleUserChange: function(data) {
+    console.log("HHHH", UserStore.get());
+    return this.setState({
+      user: UserStore.get()
+    });
+  },
+  componentDidMount: function() {
+    return UserStore.subscribe(this.handleUserChange);
+  },
+  componentWillUnmount: function() {
+    return UserStore.unsubscribe(this.handleUserChange);
+  },
   navigateToLocation: function(path) {
     return navigate(path);
   },
@@ -60,7 +79,12 @@ module.exports = React.createFactory(React.createClass({
     }
     return this["class"];
   },
+  goToLogin: function() {
+    return navigate('/login');
+  },
   render: function() {
+    var ref1;
+    console.log(this.state.user);
     return div({
       className: "header-wrapper"
     }, div({
@@ -82,20 +106,24 @@ module.exports = React.createFactory(React.createClass({
       };
     })(this))), div({
       className: "header__user"
-    }, div({
+    }, ((ref1 = this.state.user) != null ? ref1.token : void 0) != null ? div({
       className: "header__user__avatar",
       onClick: this.navigateToLocation.bind(this, "/me"),
       style: {
         backgroundImage: this.getUserAvatar()
       }
-    }))));
+    }) : div({}, React.createElement(RaisedButton, {
+      label: "Login/Signup",
+      primary: true,
+      onClick: this.goToLogin
+    })))));
   }
 }));
 
 
 },{}],3:[function(require,module,exports){
 (function() {
-  var API, Blundit, Card, CardActions, CardHeader, CardMedia, CardText, CardTitle, CategoryClaims, CategoryExperts, CategoryPredictions, CategorySubHead, ClaimExpertCard, ExpertCard, ExpertClaimCard, ExpertPredictionCard, FlatButton, Footer, Header, MuiThemeProvider, PredictionExpertCard, RouterMixin, SessionMixin, UserStore, deepOrange500, div, getMuiTheme, img, menuItems, muiTheme, ref, ref1, startBlundit,
+  var API, Blundit, Card, CardActions, CardHeader, CardMedia, CardText, CardTitle, CategoryClaims, CategoryExperts, CategoryPredictions, CategorySubHead, ClaimExpertCard, ExpertCard, ExpertClaimCard, ExpertPredictionCard, FlatButton, Footer, Header, MuiThemeProvider, PredictionExpertCard, RaisedButton, RouterMixin, SessionMixin, TextField, UserStore, a, deepOrange500, div, getMuiTheme, img, menuItems, muiTheme, ref, ref1, ref2, ref3, startBlundit,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   window.React = require('react');
@@ -114,12 +142,6 @@ module.exports = React.createFactory(React.createClass({
 
   window.API = require("shared/API");
 
-  SessionMixin = require("mixins/SessionMixin");
-
-  Header = require("./components/Header");
-
-  Footer = require("./components/Footer");
-
   getMuiTheme = require('material-ui/styles/getMuiTheme')["default"];
 
   deepOrange500 = require('material-ui/styles/colors').deepOrange500;
@@ -130,9 +152,16 @@ module.exports = React.createFactory(React.createClass({
 
   muiTheme = getMuiTheme({
     palette: {
+      primary1Color: "#4869b2",
       accent1Color: deepOrange500
     }
   });
+
+  SessionMixin = require("mixins/SessionMixin");
+
+  Header = require("./components/Header");
+
+  Footer = require("./components/Footer");
 
   div = React.DOM.div;
 
@@ -143,9 +172,7 @@ module.exports = React.createFactory(React.createClass({
         verificationComplete: false
       };
     },
-    componentWillMount: function() {
-      return this.verifyUserToken();
-    },
+    componentWillMount: function() {},
     componentWillUnmount: function() {},
     routes: {
       '/': 'landing',
@@ -153,8 +180,9 @@ module.exports = React.createFactory(React.createClass({
       '/bookmarks': 'bookmarks',
       '/users': 'users',
       '/users/:id': 'user',
-      '/register': 'userRegister',
-      '/login': 'userLogin',
+      '/register': 'register',
+      '/login': 'login',
+      '/forgot_password': 'forgotPassword',
       '/predictions': 'predictions',
       '/predictions/:id': 'prediction',
       '/experts': 'experts',
@@ -181,6 +209,21 @@ module.exports = React.createFactory(React.createClass({
       return div({}, require("views/User")({
         path: this.state.path,
         user_id: id
+      }));
+    },
+    login: function() {
+      return div({}, require("views/Login")({
+        path: this.state.path
+      }));
+    },
+    forgotPassword: function() {
+      return div({}, require("views/ForgotPassword")({
+        path: this.state.path
+      }));
+    },
+    register: function() {
+      return div({}, require("views/Register")({
+        path: this.state.path
       }));
     },
     userProfile: function() {
@@ -266,7 +309,6 @@ module.exports = React.createFactory(React.createClass({
 
   startBlundit = function() {
     if (document.getElementById('app') != null) {
-      console.log("starting Blundit!");
       return ReactDOM.render(React.createElement(MuiThemeProvider, {
         muiTheme: muiTheme
       }, Blundit({
@@ -280,144 +322,6 @@ module.exports = React.createFactory(React.createClass({
   } else {
     window.attachEvent('onload', startBlundit);
   }
-
-  module.exports = {
-    setUser: function(data) {
-      this.newUser = data;
-      window.UserStore.subscribe(this.handleUserChange);
-      window.UserStore.set(data);
-      this.user = window.UserStore.get();
-      if ((this.user != null) && (this.user.token != null)) {
-        this.setCookie('access-token', this.user.token);
-        this.setCookie('uid', this.user.uid);
-        return this.setCookie('client', this.user.client);
-      } else {
-        this.deleteCookie('access-token');
-        this.deleteCookie('uid');
-        return this.deleteCookie('client');
-      }
-    },
-    getParameterByName: function(name, url) {
-      var regex, results;
-      if (!url) {
-        url = window.location.href;
-      }
-      name = name.replace(/[\[\]]/g, "\\$&");
-      regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
-      results = regex.exec(url);
-      if (!results) {
-        return null;
-      }
-      if (!results[2]) {
-        return '';
-      }
-      return decodeURIComponent(results[2].replace(/\+/g, " "));
-    },
-    getUrlParams: function() {
-      var j, key, len, params, query, raw_vars, ref, v, val;
-      query = window.location.search.substring(1);
-      raw_vars = query.split("&");
-      params = {};
-      for (j = 0, len = raw_vars.length; j < len; j++) {
-        v = raw_vars[j];
-        ref = v.split("="), key = ref[0], val = ref[1];
-        params[key] = decodeURIComponent(val);
-      }
-      return params;
-    },
-    getUser: function() {
-      var obj;
-      obj = {};
-      this.token = this.getCookie('access-token');
-      this.client = this.getCookie('client');
-      this.uid = this.getCookie('uid');
-      if (this.token != null) {
-        obj.token = this.token;
-        obj.client = this.client;
-        obj.uid = this.uid;
-      }
-      if (obj === {}) {
-        return false;
-      }
-      return obj;
-    },
-    unsetUser: function() {
-      window.UserStore.set(null);
-      this.deleteCookie('access-token');
-      this.deleteCookie('client');
-      return this.deleteCookie('uid');
-    },
-    authHeader: function() {
-      return this.user = window.UserStore.getAuthHeader();
-    },
-    verifyUserToken: function() {
-      if (this.getCookie('access-token')) {
-        return this.verifyToken();
-      } else {
-        return this.setState({
-          verificationComplete: true
-        });
-      }
-    },
-    verifyToken: function() {
-      var params;
-      params = {
-        path: "verify_token",
-        path_variables: {
-          accessToken: this.getCookie('access-token'),
-          client: this.getCookie('client'),
-          uid: this.getCookie('uid')
-        },
-        success: this.verifyTokenSuccess,
-        error: this.verifyTokenError
-      };
-      return API.call(params);
-    },
-    verifyTokenSuccess: function(data) {
-      if (data.code === 200) {
-        this.setUser({
-          token: this.getCookie('access-token'),
-          client: this.getCookie('client'),
-          uid: this.getCookie('uid')
-        });
-        return window.UserStore.fetchUserData();
-      }
-    },
-    verifyTokenError: function(error) {
-      return this.setUser(null);
-    },
-    setCookie: function(name, value, days) {
-      var date, expires;
-      if (days) {
-        date = new Date();
-        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-        expires = "; expires=" + date.toGMTString();
-      } else {
-        expires = "";
-      }
-      return document.cookie = name + "=" + value + expires + "; path=/";
-    },
-    getCookie: function(name) {
-      var c, ca, i, nameEQ;
-      nameEQ = name + "=";
-      ca = document.cookie.split(";");
-      i = 0;
-      while (i < ca.length) {
-        c = ca[i];
-        while (c.charAt(0) === " ") {
-          c = c.substring(1, c.length);
-        }
-        if (c.indexOf(nameEQ) === 0) {
-          return c.substring(nameEQ.length, c.length);
-        }
-        i++;
-      }
-      return null;
-    },
-    deleteCookie: function(name) {
-      return this.setCookie(name, "", -1);
-    }
-  };
 
   div = React.DOM.div;
 
@@ -684,6 +588,8 @@ module.exports = React.createFactory(React.createClass({
 
   ref1 = React.DOM, div = ref1.div, img = ref1.img;
 
+  RaisedButton = Material.RaisedButton;
+
   menuItems = [
     {
       label: "My Bookmarks",
@@ -705,6 +611,23 @@ module.exports = React.createFactory(React.createClass({
   ];
 
   module.exports = React.createFactory(React.createClass({
+    getInitialState: function() {
+      return {
+        user: null
+      };
+    },
+    handleUserChange: function(data) {
+      console.log("HHHH", UserStore.get());
+      return this.setState({
+        user: UserStore.get()
+      });
+    },
+    componentDidMount: function() {
+      return UserStore.subscribe(this.handleUserChange);
+    },
+    componentWillUnmount: function() {
+      return UserStore.unsubscribe(this.handleUserChange);
+    },
     navigateToLocation: function(path) {
       return navigate(path);
     },
@@ -725,7 +648,12 @@ module.exports = React.createFactory(React.createClass({
       }
       return this["class"];
     },
+    goToLogin: function() {
+      return navigate('/login');
+    },
     render: function() {
+      var ref2;
+      console.log(this.state.user);
       return div({
         className: "header-wrapper"
       }, div({
@@ -747,13 +675,17 @@ module.exports = React.createFactory(React.createClass({
         };
       })(this))), div({
         className: "header__user"
-      }, div({
+      }, ((ref2 = this.state.user) != null ? ref2.token : void 0) != null ? div({
         className: "header__user__avatar",
         onClick: this.navigateToLocation.bind(this, "/me"),
         style: {
           backgroundImage: this.getUserAvatar()
         }
-      }))));
+      }) : div({}, React.createElement(RaisedButton, {
+        label: "Login/Signup",
+        primary: true,
+        onClick: this.goToLogin
+      })))));
     }
   }));
 
@@ -774,6 +706,144 @@ module.exports = React.createFactory(React.createClass({
       }, expert.name));
     }
   }));
+
+  module.exports = {
+    setUser: function(data, request) {
+      this.newUser = data;
+      window.UserStore.subscribe(this.handleUserChange);
+      window.UserStore.set(data, request);
+      this.user = window.UserStore.get();
+      if ((this.user != null) && (this.user.token != null)) {
+        this.setCookie('access-token', this.user.token);
+        this.setCookie('uid', this.user.uid);
+        return this.setCookie('client', this.user.client);
+      } else {
+        this.deleteCookie('access-token');
+        this.deleteCookie('uid');
+        return this.deleteCookie('client');
+      }
+    },
+    getParameterByName: function(name, url) {
+      var regex, results;
+      if (!url) {
+        url = window.location.href;
+      }
+      name = name.replace(/[\[\]]/g, "\\$&");
+      regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
+      results = regex.exec(url);
+      if (!results) {
+        return null;
+      }
+      if (!results[2]) {
+        return '';
+      }
+      return decodeURIComponent(results[2].replace(/\+/g, " "));
+    },
+    getUrlParams: function() {
+      var j, key, len, params, query, raw_vars, ref2, v, val;
+      query = window.location.search.substring(1);
+      raw_vars = query.split("&");
+      params = {};
+      for (j = 0, len = raw_vars.length; j < len; j++) {
+        v = raw_vars[j];
+        ref2 = v.split("="), key = ref2[0], val = ref2[1];
+        params[key] = decodeURIComponent(val);
+      }
+      return params;
+    },
+    getUser: function() {
+      var obj;
+      obj = {};
+      this.token = this.getCookie('access-token');
+      this.client = this.getCookie('client');
+      this.uid = this.getCookie('uid');
+      if (this.token != null) {
+        obj.token = this.token;
+        obj.client = this.client;
+        obj.uid = this.uid;
+      }
+      if (obj === {}) {
+        return false;
+      }
+      return obj;
+    },
+    unsetUser: function() {
+      window.UserStore.set(null);
+      this.deleteCookie('access-token');
+      this.deleteCookie('client');
+      return this.deleteCookie('uid');
+    },
+    authHeader: function() {
+      return this.user = window.UserStore.getAuthHeader();
+    },
+    verifyUserToken: function() {
+      if (this.getCookie('access-token')) {
+        return this.verifyToken();
+      } else {
+        return this.setState({
+          verificationComplete: true
+        });
+      }
+    },
+    verifyToken: function() {
+      var params;
+      params = {
+        path: "verify_token",
+        path_variables: {
+          accessToken: this.getCookie('access-token'),
+          client: this.getCookie('client'),
+          uid: this.getCookie('uid')
+        },
+        success: this.verifyTokenSuccess,
+        error: this.verifyTokenError
+      };
+      return API.call(params);
+    },
+    verifyTokenSuccess: function(data) {
+      if (data.code === 200) {
+        this.setUser({
+          token: this.getCookie('access-token'),
+          client: this.getCookie('client'),
+          uid: this.getCookie('uid')
+        });
+        return window.UserStore.fetchUserData();
+      }
+    },
+    verifyTokenError: function(error) {
+      return this.setUser(null);
+    },
+    setCookie: function(name, value, days) {
+      var date, expires;
+      if (days) {
+        date = new Date();
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+        expires = "; expires=" + date.toGMTString();
+      } else {
+        expires = "";
+      }
+      return document.cookie = name + "=" + value + expires + "; path=/";
+    },
+    getCookie: function(name) {
+      var c, ca, i, nameEQ;
+      nameEQ = name + "=";
+      ca = document.cookie.split(";");
+      i = 0;
+      while (i < ca.length) {
+        c = ca[i];
+        while (c.charAt(0) === " ") {
+          c = c.substring(1, c.length);
+        }
+        if (c.indexOf(nameEQ) === 0) {
+          return c.substring(nameEQ.length, c.length);
+        }
+        i++;
+      }
+      return null;
+    },
+    deleteCookie: function(name) {
+      return this.setCookie(name, "", -1);
+    }
+  };
 
 
   /*
@@ -800,11 +870,13 @@ module.exports = React.createFactory(React.createClass({
 
     API.paths = {
       register: {
-        path: "users/register",
+        path: "auth/register",
+        non_api: true,
         method: "POST"
       },
       login: {
-        path: "users/login",
+        path: "auth/sign_in",
+        non_api: true,
         method: "POST"
       },
       categories: {
@@ -861,11 +933,15 @@ module.exports = React.createFactory(React.createClass({
       },
       verify_token: {
         path: 'auth/verify_token?access-token=%accessToken%&client=%client%&uid=%uid%',
-        method: "GET"
+        method: "GET",
+        non_api: true
       }
     };
 
-    API.server = function() {
+    API.server = function(params) {
+      if ((this.paths[params.path].non_api != null) && this.paths[params.path].non_api === true) {
+        return "http://localhost:3000/";
+      }
       return "http://localhost:3000/api/v1/";
     };
 
@@ -875,7 +951,7 @@ module.exports = React.createFactory(React.createClass({
 
     API.path = function(params) {
       var key, ref2, value;
-      this.p = this.server() + this.paths[params.path].path;
+      this.p = this.server(params) + this.paths[params.path].path;
       ref2 = params.path_variables;
       for (key in ref2) {
         value = ref2[key];
@@ -903,9 +979,9 @@ module.exports = React.createFactory(React.createClass({
         },
         data: this.data(params),
         dataType: "json",
-        success: function(data) {
+        success: function(data, status, request) {
           if (params.success != null) {
-            return params.success(data);
+            return params.success(data, request);
           }
         },
         error: function(error) {
@@ -941,6 +1017,13 @@ module.exports = React.createFactory(React.createClass({
 
     UserStore.prototype.messagesTtl = 60000;
 
+    UserStore.prototype.loggedIn = function() {
+      if (this.data.token != null) {
+        return true;
+      }
+      return false;
+    };
+
     UserStore.prototype.subscribe = function(callback) {
       addEventListener(this.changeEvent, callback, false);
       this.subscribers++;
@@ -964,8 +1047,18 @@ module.exports = React.createFactory(React.createClass({
       return dispatchEvent(event);
     };
 
-    UserStore.prototype.set = function(data) {
+    UserStore.prototype.set = function(data, request) {
       this.data = data;
+      console.log("!@REQUEST");
+      console.log(request);
+      if (request != null) {
+        console.log(request.getAllResponseHeaders());
+        console.log(request.getResponseHeader('access-token'));
+        this.data.token = request.getResponseHeader('access-token');
+        this.data.uid = request.getResponseHeader('uid');
+        this.data.client = request.getResponseHeader('client');
+      }
+      console.log(this.data);
       return this.emitChange();
     };
 
@@ -1101,9 +1194,7 @@ module.exports = React.createFactory(React.createClass({
         bookmarks: data
       });
     },
-    getBookmarksError: function(error) {
-      return console.log("error");
-    },
+    getBookmarksError: function(error) {},
     showBookmarkNewStatus: function(status) {
       if (status === true) {
         return "!";
@@ -1164,9 +1255,7 @@ module.exports = React.createFactory(React.createClass({
         categories: data
       });
     },
-    categoryListError: function(error) {
-      return console.log("error", error);
-    },
+    categoryListError: function(error) {},
     goToCategory: function(id) {
       return navigate("/categories/" + id);
     },
@@ -1244,17 +1333,13 @@ module.exports = React.createFactory(React.createClass({
         data: data
       });
     },
-    categoryAllError: function(error) {
-      return console.log("error", error);
-    },
+    categoryAllError: function(error) {},
     categorySuccess: function(data) {
       return this.setState({
         category: data
       });
     },
-    categoryError: function(error) {
-      return console.log("error", error);
-    },
+    categoryError: function(error) {},
     render: function() {
       return div({}, Header({}, ''), div({
         className: "categories-wrapper"
@@ -1327,17 +1412,13 @@ module.exports = React.createFactory(React.createClass({
         data: data
       });
     },
-    categoryAllError: function(error) {
-      return console.log("error", error);
-    },
+    categoryAllError: function(error) {},
     categorySuccess: function(data) {
       return this.setState({
         category: data
       });
     },
-    categoryError: function(error) {
-      return console.log("error", error);
-    },
+    categoryError: function(error) {},
     render: function() {
       return div({}, Header({}, ''), div({
         className: "categories-wrapper"
@@ -1406,17 +1487,13 @@ module.exports = React.createFactory(React.createClass({
         data: data
       });
     },
-    categoryAllError: function(error) {
-      return console.log("error", error);
-    },
+    categoryAllError: function(error) {},
     categorySuccess: function(data) {
       return this.setState({
         category: data
       });
     },
-    categoryError: function(error) {
-      return console.log("error", error);
-    },
+    categoryError: function(error) {},
     render: function() {
       return div({}, Header({}, ''), div({
         className: "categories-wrapper"
@@ -1485,17 +1562,13 @@ module.exports = React.createFactory(React.createClass({
         data: data
       });
     },
-    categoryAllError: function(error) {
-      return console.log("error", error);
-    },
+    categoryAllError: function(error) {},
     categorySuccess: function(data) {
       return this.setState({
         category: data
       });
     },
-    categoryError: function(error) {
-      return console.log("error", error);
-    },
+    categoryError: function(error) {},
     render: function() {
       return div({}, Header({}, ''), div({
         className: "categories-wrapper"
@@ -1605,14 +1678,11 @@ module.exports = React.createFactory(React.createClass({
       return API.call(params);
     },
     claimListSuccess: function(data) {
-      console.log("!!!", data);
       return this.setState({
         claims: data.claims
       });
     },
-    claimListError: function(error) {
-      return console.log("error", error);
-    },
+    claimListError: function(error) {},
     goToClaim: function(id) {
       return navigate("/claims/" + id);
     },
@@ -1746,14 +1816,11 @@ module.exports = React.createFactory(React.createClass({
       return API.call(params);
     },
     expertListSuccess: function(data) {
-      console.log("!!!", data);
       return this.setState({
         experts: data
       });
     },
-    expertListError: function(error) {
-      return console.log("error", error);
-    },
+    expertListError: function(error) {},
     goToExpert: function(id) {
       return navigate("/experts/" + id);
     },
@@ -1782,13 +1849,18 @@ module.exports = React.createFactory(React.createClass({
   Footer = require("components/Footer");
 
   module.exports = React.createFactory(React.createClass({
-    displayName: 'Landing',
+    displayName: 'Forgot Password',
+    goToLogin: function() {
+      return navigate('/login');
+    },
     render: function() {
       return div({}, Header({}, ''), div({
-        className: "landing-wrapper"
+        className: "user-wrapper"
       }, div({
-        className: "landing-content"
-      }, "Landing")), Footer({}, ''));
+        className: "user-content"
+      }, "Forgot Password", div({}, "Remembered your password? ", a({
+        onClick: this.goToLogin
+      }, 'Click here to login')))), Footer({}, ''));
     }
   }));
 
@@ -1799,13 +1871,128 @@ module.exports = React.createFactory(React.createClass({
   Footer = require("components/Footer");
 
   module.exports = React.createFactory(React.createClass({
+    displayName: 'Landing',
+    render: function() {
+      return div({}, Header({}, ''), div({
+        className: "landing-wrapper"
+      }, div({
+        className: "landing-content"
+      }, "Landing")), Footer({}, ''));
+    }
+  }));
+
+  ref2 = React.DOM, div = ref2.div, a = ref2.a;
+
+  Header = require("components/Header");
+
+  Footer = require("components/Footer");
+
+  SessionMixin = require("mixins/SessionMixin");
+
+  TextField = Material.TextField;
+
+  RaisedButton = Material.RaisedButton;
+
+  module.exports = React.createFactory(React.createClass({
+    mixins: [SessionMixin],
     displayName: 'Login',
+    getInitialState: function() {
+      return {
+        email: '',
+        password: '',
+        errors: []
+      };
+    },
+    goToRegister: function() {
+      return navigate('/register');
+    },
+    handleEmailChange: function(event) {
+      return this.setState({
+        email: event.target.value
+      });
+    },
+    handlePasswordChange: function(event) {
+      return this.setState({
+        password: event.target.value
+      });
+    },
+    validateInputs: function() {
+      this.errors = [];
+      if (this.state.email.length < 6 || this.state.email.indexOf("@", 0) === -1 || this.state.email.indexOf(".", 0) === -1) {
+        this.errors.push({
+          id: "email",
+          text: "Valid Email Required"
+        });
+      }
+      if (this.state.password === '') {
+        this.errors.push({
+          id: "password",
+          text: "Password Required"
+        });
+      }
+      this.setState({
+        errors: this.errors
+      });
+      if (this.errors.length === 0) {
+        return true;
+      }
+      return false;
+    },
+    processLogin: function() {
+      var params;
+      if (this.validateInputs()) {
+        params = {
+          path: "login",
+          data: {
+            email: this.state.email,
+            password: this.state.password
+          },
+          success: this.loginSuccess,
+          error: this.loginError
+        };
+        return API.call(params);
+      }
+    },
+    loginSuccess: function(data, request) {
+      return this.setUser(data.data, request);
+    },
+    loginError: function(error) {},
+    getErrorText: function(key) {
+      var error, j, len, ref3;
+      ref3 = this.state.errors;
+      for (j = 0, len = ref3.length; j < len; j++) {
+        error = ref3[j];
+        if (error.id === key) {
+          return error.text;
+        }
+      }
+      return null;
+    },
     render: function() {
       return div({}, Header({}, ''), div({
         className: "user-wrapper"
       }, div({
         className: "user-content"
-      }, "Login")), Footer({}, ''));
+      }, "Login", div({}, div({}, React.createElement(TextField, {
+        id: "login-email",
+        floatingLabelText: "Email",
+        value: this.state.email,
+        onChange: this.handleEmailChange,
+        errorText: this.getErrorText("email")
+      })), div({}, React.createElement(TextField, {
+        id: "login-password",
+        floatingLabelText: "Password",
+        type: "password",
+        value: this.state.password,
+        onChange: this.handlePasswordChange,
+        errorText: this.getErrorText("password")
+      })), div({}, React.createElement(RaisedButton, {
+        label: "Login",
+        primary: true,
+        onClick: this.processLogin
+      }))), div({}, "Don't have an account? ", a({
+        onClick: this.goToRegister
+      }, 'Click here to register')))), Footer({}, ''));
     }
   }));
 
@@ -1852,8 +2039,8 @@ module.exports = React.createFactory(React.createClass({
       });
     },
     render: function() {
-      var experts, prediction, ref2;
-      ref2 = this.state, prediction = ref2.prediction, experts = ref2.experts;
+      var experts, prediction, ref3;
+      ref3 = this.state, prediction = ref3.prediction, experts = ref3.experts;
       return div({}, Header({}, ''), div({
         className: "predictions-wrapper"
       }, div({
@@ -1901,14 +2088,11 @@ module.exports = React.createFactory(React.createClass({
       return API.call(params);
     },
     predictionListSuccess: function(data) {
-      console.log("!!!", data);
       return this.setState({
         predictions: data.predictions
       });
     },
-    predictionListError: function(error) {
-      return console.log("error", error);
-    },
+    predictionListError: function(error) {},
     goToClaim: function(id) {
       return navigate("/predictions/" + id);
     },
@@ -1931,7 +2115,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  div = React.DOM.div;
+  ref3 = React.DOM, div = ref3.div, a = ref3.a;
 
   Header = require("components/Header");
 
@@ -1939,12 +2123,17 @@ module.exports = React.createFactory(React.createClass({
 
   module.exports = React.createFactory(React.createClass({
     displayName: 'Register',
+    goToLogin: function() {
+      return navigate('/login');
+    },
     render: function() {
       return div({}, Header({}, ''), div({
         className: "user-wrapper"
       }, div({
         className: "user-content"
-      }, "Register")), Footer({}, ''));
+      }, "Register", div({}, a({
+        onClick: this.goToLogin
+      }, 'Click here to login')))), Footer({}, ''));
     }
   }));
 
@@ -1963,10 +2152,9 @@ module.exports = React.createFactory(React.createClass({
       return UserStore.unsubscribe(this.handleUserChange);
     },
     handleUserChange: function() {
-      this.setState({
+      return this.setState({
         user: UserStore.get()
       });
-      return console.log(UserStore.get());
     },
     render: function() {
       return div({}, Header({}, ''), div({
@@ -1996,7 +2184,7 @@ module.exports = React.createFactory(React.createClass({
 
 }).call(this);
 
-},{"./components/Footer":1,"./components/Header":2,"components/CategoryClaims":566,"components/CategoryExperts":567,"components/CategoryPredictions":568,"components/CategorySubHead":569,"components/ClaimExpertCard":570,"components/ExpertCard":571,"components/ExpertClaimCard":572,"components/ExpertPredictionCard":573,"components/Footer":574,"components/Header":575,"components/PredictionExpertCard":576,"lodash":180,"material-ui":318,"material-ui/styles/MuiThemeProvider":337,"material-ui/styles/colors":339,"material-ui/styles/getMuiTheme":340,"mixins/SessionMixin":577,"react":551,"react-dom":377,"react-mini-router":509,"react-tap-event-plugin":520,"shared/API":578,"stores/UserStore":579,"views/404":580,"views/Bookmarks":581,"views/Categories":582,"views/CategoryAll":583,"views/CategoryClaims":584,"views/CategoryExperts":585,"views/CategoryPredictions":586,"views/Claim":587,"views/Claims":588,"views/Expert":589,"views/Experts":590,"views/Landing":591,"views/Prediction":592,"views/Predictions":593,"views/User":594,"views/Users":595}],4:[function(require,module,exports){
+},{"./components/Footer":1,"./components/Header":2,"components/CategoryClaims":566,"components/CategoryExperts":567,"components/CategoryPredictions":568,"components/CategorySubHead":569,"components/ClaimExpertCard":570,"components/ExpertCard":571,"components/ExpertClaimCard":572,"components/ExpertPredictionCard":573,"components/Footer":574,"components/Header":575,"components/PredictionExpertCard":576,"lodash":180,"material-ui":318,"material-ui/styles/MuiThemeProvider":337,"material-ui/styles/colors":339,"material-ui/styles/getMuiTheme":340,"mixins/SessionMixin":577,"react":551,"react-dom":377,"react-mini-router":509,"react-tap-event-plugin":520,"shared/API":578,"stores/UserStore":579,"views/404":580,"views/Bookmarks":581,"views/Categories":582,"views/CategoryAll":583,"views/CategoryClaims":584,"views/CategoryExperts":585,"views/CategoryPredictions":586,"views/Claim":587,"views/Claims":588,"views/Expert":589,"views/Experts":590,"views/ForgotPassword":591,"views/Landing":592,"views/Login":593,"views/Prediction":594,"views/Predictions":595,"views/Register":596,"views/User":597,"views/Users":598}],4:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/array/from"), __esModule: true };
 },{"core-js/library/fn/array/from":26}],5:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/get-iterator"), __esModule: true };
@@ -79412,10 +79600,10 @@ module.exports = React.createFactory(React.createClass({
 
 },{}],577:[function(require,module,exports){
 module.exports = {
-  setUser: function(data) {
+  setUser: function(data, request) {
     this.newUser = data;
     window.UserStore.subscribe(this.handleUserChange);
-    window.UserStore.set(data);
+    window.UserStore.set(data, request);
     this.user = window.UserStore.get();
     if ((this.user != null) && (this.user.token != null)) {
       this.setCookie('access-token', this.user.token);
@@ -79577,11 +79765,13 @@ module.exports = API = (function() {
 
   API.paths = {
     register: {
-      path: "users/register",
+      path: "auth/register",
+      non_api: true,
       method: "POST"
     },
     login: {
-      path: "users/login",
+      path: "auth/sign_in",
+      non_api: true,
       method: "POST"
     },
     categories: {
@@ -79638,11 +79828,15 @@ module.exports = API = (function() {
     },
     verify_token: {
       path: 'auth/verify_token?access-token=%accessToken%&client=%client%&uid=%uid%',
-      method: "GET"
+      method: "GET",
+      non_api: true
     }
   };
 
-  API.server = function() {
+  API.server = function(params) {
+    if ((this.paths[params.path].non_api != null) && this.paths[params.path].non_api === true) {
+      return "http://localhost:3000/";
+    }
     return "http://localhost:3000/api/v1/";
   };
 
@@ -79652,7 +79846,7 @@ module.exports = API = (function() {
 
   API.path = function(params) {
     var key, ref, value;
-    this.p = this.server() + this.paths[params.path].path;
+    this.p = this.server(params) + this.paths[params.path].path;
     ref = params.path_variables;
     for (key in ref) {
       value = ref[key];
@@ -79680,9 +79874,9 @@ module.exports = API = (function() {
       },
       data: this.data(params),
       dataType: "json",
-      success: function(data) {
+      success: function(data, status, request) {
         if (params.success != null) {
-          return params.success(data);
+          return params.success(data, request);
         }
       },
       error: function(error) {
@@ -79723,6 +79917,13 @@ UserStore = (function() {
 
   UserStore.prototype.messagesTtl = 60000;
 
+  UserStore.prototype.loggedIn = function() {
+    if (this.data.token != null) {
+      return true;
+    }
+    return false;
+  };
+
   UserStore.prototype.subscribe = function(callback) {
     addEventListener(this.changeEvent, callback, false);
     this.subscribers++;
@@ -79746,8 +79947,18 @@ UserStore = (function() {
     return dispatchEvent(event);
   };
 
-  UserStore.prototype.set = function(data) {
+  UserStore.prototype.set = function(data, request) {
     this.data = data;
+    console.log("!@REQUEST");
+    console.log(request);
+    if (request != null) {
+      console.log(request.getAllResponseHeaders());
+      console.log(request.getResponseHeader('access-token'));
+      this.data.token = request.getResponseHeader('access-token');
+      this.data.uid = request.getResponseHeader('uid');
+      this.data.client = request.getResponseHeader('client');
+    }
+    console.log(this.data);
     return this.emitChange();
   };
 
@@ -79891,9 +80102,7 @@ module.exports = React.createFactory(React.createClass({
       bookmarks: data
     });
   },
-  getBookmarksError: function(error) {
-    return console.log("error");
-  },
+  getBookmarksError: function(error) {},
   showBookmarkNewStatus: function(status) {
     if (status === true) {
       return "!";
@@ -79958,9 +80167,7 @@ module.exports = React.createFactory(React.createClass({
       categories: data
     });
   },
-  categoryListError: function(error) {
-    return console.log("error", error);
-  },
+  categoryListError: function(error) {},
   goToCategory: function(id) {
     return navigate("/categories/" + id);
   },
@@ -80042,17 +80249,13 @@ module.exports = React.createFactory(React.createClass({
       data: data
     });
   },
-  categoryAllError: function(error) {
-    return console.log("error", error);
-  },
+  categoryAllError: function(error) {},
   categorySuccess: function(data) {
     return this.setState({
       category: data
     });
   },
-  categoryError: function(error) {
-    return console.log("error", error);
-  },
+  categoryError: function(error) {},
   render: function() {
     return div({}, Header({}, ''), div({
       className: "categories-wrapper"
@@ -80129,17 +80332,13 @@ module.exports = React.createFactory(React.createClass({
       data: data
     });
   },
-  categoryAllError: function(error) {
-    return console.log("error", error);
-  },
+  categoryAllError: function(error) {},
   categorySuccess: function(data) {
     return this.setState({
       category: data
     });
   },
-  categoryError: function(error) {
-    return console.log("error", error);
-  },
+  categoryError: function(error) {},
   render: function() {
     return div({}, Header({}, ''), div({
       className: "categories-wrapper"
@@ -80212,17 +80411,13 @@ module.exports = React.createFactory(React.createClass({
       data: data
     });
   },
-  categoryAllError: function(error) {
-    return console.log("error", error);
-  },
+  categoryAllError: function(error) {},
   categorySuccess: function(data) {
     return this.setState({
       category: data
     });
   },
-  categoryError: function(error) {
-    return console.log("error", error);
-  },
+  categoryError: function(error) {},
   render: function() {
     return div({}, Header({}, ''), div({
       className: "categories-wrapper"
@@ -80295,17 +80490,13 @@ module.exports = React.createFactory(React.createClass({
       data: data
     });
   },
-  categoryAllError: function(error) {
-    return console.log("error", error);
-  },
+  categoryAllError: function(error) {},
   categorySuccess: function(data) {
     return this.setState({
       category: data
     });
   },
-  categoryError: function(error) {
-    return console.log("error", error);
-  },
+  categoryError: function(error) {},
   render: function() {
     return div({}, Header({}, ''), div({
       className: "categories-wrapper"
@@ -80423,14 +80614,11 @@ module.exports = React.createFactory(React.createClass({
     return API.call(params);
   },
   claimListSuccess: function(data) {
-    console.log("!!!", data);
     return this.setState({
       claims: data.claims
     });
   },
-  claimListError: function(error) {
-    return console.log("error", error);
-  },
+  claimListError: function(error) {},
   goToClaim: function(id) {
     return navigate("/claims/" + id);
   },
@@ -80572,14 +80760,11 @@ module.exports = React.createFactory(React.createClass({
     return API.call(params);
   },
   expertListSuccess: function(data) {
-    console.log("!!!", data);
     return this.setState({
       experts: data
     });
   },
-  expertListError: function(error) {
-    return console.log("error", error);
-  },
+  expertListError: function(error) {},
   goToExpert: function(id) {
     return navigate("/experts/" + id);
   },
@@ -80612,6 +80797,32 @@ Header = require("components/Header");
 Footer = require("components/Footer");
 
 module.exports = React.createFactory(React.createClass({
+  displayName: 'Forgot Password',
+  goToLogin: function() {
+    return navigate('/login');
+  },
+  render: function() {
+    return div({}, Header({}, ''), div({
+      className: "user-wrapper"
+    }, div({
+      className: "user-content"
+    }, "Forgot Password", div({}, "Remembered your password? ", a({
+      onClick: this.goToLogin
+    }, 'Click here to login')))), Footer({}, ''));
+  }
+}));
+
+
+},{"components/Footer":574,"components/Header":575}],592:[function(require,module,exports){
+var Footer, Header, div;
+
+div = React.DOM.div;
+
+Header = require("components/Header");
+
+Footer = require("components/Footer");
+
+module.exports = React.createFactory(React.createClass({
   displayName: 'Landing',
   render: function() {
     return div({}, Header({}, ''), div({
@@ -80623,7 +80834,126 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":574,"components/Header":575}],592:[function(require,module,exports){
+},{"components/Footer":574,"components/Header":575}],593:[function(require,module,exports){
+var Footer, Header, RaisedButton, SessionMixin, TextField, a, div, ref;
+
+ref = React.DOM, div = ref.div, a = ref.a;
+
+Header = require("components/Header");
+
+Footer = require("components/Footer");
+
+SessionMixin = require("mixins/SessionMixin");
+
+TextField = Material.TextField;
+
+RaisedButton = Material.RaisedButton;
+
+module.exports = React.createFactory(React.createClass({
+  mixins: [SessionMixin],
+  displayName: 'Login',
+  getInitialState: function() {
+    return {
+      email: '',
+      password: '',
+      errors: []
+    };
+  },
+  goToRegister: function() {
+    return navigate('/register');
+  },
+  handleEmailChange: function(event) {
+    return this.setState({
+      email: event.target.value
+    });
+  },
+  handlePasswordChange: function(event) {
+    return this.setState({
+      password: event.target.value
+    });
+  },
+  validateInputs: function() {
+    this.errors = [];
+    if (this.state.email.length < 6 || this.state.email.indexOf("@", 0) === -1 || this.state.email.indexOf(".", 0) === -1) {
+      this.errors.push({
+        id: "email",
+        text: "Valid Email Required"
+      });
+    }
+    if (this.state.password === '') {
+      this.errors.push({
+        id: "password",
+        text: "Password Required"
+      });
+    }
+    this.setState({
+      errors: this.errors
+    });
+    if (this.errors.length === 0) {
+      return true;
+    }
+    return false;
+  },
+  processLogin: function() {
+    var params;
+    if (this.validateInputs()) {
+      params = {
+        path: "login",
+        data: {
+          email: this.state.email,
+          password: this.state.password
+        },
+        success: this.loginSuccess,
+        error: this.loginError
+      };
+      return API.call(params);
+    }
+  },
+  loginSuccess: function(data, request) {
+    return this.setUser(data.data, request);
+  },
+  loginError: function(error) {},
+  getErrorText: function(key) {
+    var error, i, len, ref1;
+    ref1 = this.state.errors;
+    for (i = 0, len = ref1.length; i < len; i++) {
+      error = ref1[i];
+      if (error.id === key) {
+        return error.text;
+      }
+    }
+    return null;
+  },
+  render: function() {
+    return div({}, Header({}, ''), div({
+      className: "user-wrapper"
+    }, div({
+      className: "user-content"
+    }, "Login", div({}, div({}, React.createElement(TextField, {
+      id: "login-email",
+      floatingLabelText: "Email",
+      value: this.state.email,
+      onChange: this.handleEmailChange,
+      errorText: this.getErrorText("email")
+    })), div({}, React.createElement(TextField, {
+      id: "login-password",
+      floatingLabelText: "Password",
+      type: "password",
+      value: this.state.password,
+      onChange: this.handlePasswordChange,
+      errorText: this.getErrorText("password")
+    })), div({}, React.createElement(RaisedButton, {
+      label: "Login",
+      primary: true,
+      onClick: this.processLogin
+    }))), div({}, "Don't have an account? ", a({
+      onClick: this.goToRegister
+    }, 'Click here to register')))), Footer({}, ''));
+  }
+}));
+
+
+},{"components/Footer":574,"components/Header":575,"mixins/SessionMixin":577}],594:[function(require,module,exports){
 var Footer, Header, PredictionExpertCard, div;
 
 div = React.DOM.div;
@@ -80696,7 +81026,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":574,"components/Header":575,"components/PredictionExpertCard":576}],593:[function(require,module,exports){
+},{"components/Footer":574,"components/Header":575,"components/PredictionExpertCard":576}],595:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -80722,14 +81052,11 @@ module.exports = React.createFactory(React.createClass({
     return API.call(params);
   },
   predictionListSuccess: function(data) {
-    console.log("!!!", data);
     return this.setState({
       predictions: data.predictions
     });
   },
-  predictionListError: function(error) {
-    return console.log("error", error);
-  },
+  predictionListError: function(error) {},
   goToClaim: function(id) {
     return navigate("/predictions/" + id);
   },
@@ -80753,7 +81080,33 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":574,"components/Header":575}],594:[function(require,module,exports){
+},{"components/Footer":574,"components/Header":575}],596:[function(require,module,exports){
+var Footer, Header, a, div, ref;
+
+ref = React.DOM, div = ref.div, a = ref.a;
+
+Header = require("components/Header");
+
+Footer = require("components/Footer");
+
+module.exports = React.createFactory(React.createClass({
+  displayName: 'Register',
+  goToLogin: function() {
+    return navigate('/login');
+  },
+  render: function() {
+    return div({}, Header({}, ''), div({
+      className: "user-wrapper"
+    }, div({
+      className: "user-content"
+    }, "Register", div({}, a({
+      onClick: this.goToLogin
+    }, 'Click here to login')))), Footer({}, ''));
+  }
+}));
+
+
+},{"components/Footer":574,"components/Header":575}],597:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -80771,10 +81124,9 @@ module.exports = React.createFactory(React.createClass({
     return UserStore.unsubscribe(this.handleUserChange);
   },
   handleUserChange: function() {
-    this.setState({
+    return this.setState({
       user: UserStore.get()
     });
-    return console.log(UserStore.get());
   },
   render: function() {
     return div({}, Header({}, ''), div({
@@ -80786,7 +81138,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":574,"components/Header":575}],595:[function(require,module,exports){
+},{"components/Footer":574,"components/Header":575}],598:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;

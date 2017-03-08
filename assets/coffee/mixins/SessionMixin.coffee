@@ -1,9 +1,9 @@
 module.exports =
-  setUser: (data) ->
+  setUser: (data, request) ->
     @newUser = data
 
     window.UserStore.subscribe(@handleUserChange)
-    window.UserStore.set data
+    window.UserStore.set data, request
     @user = window.UserStore.get()
 
     # save cookie

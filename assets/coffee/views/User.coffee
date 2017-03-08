@@ -16,7 +16,6 @@ module.exports = React.createFactory React.createClass
 
   handleUserChange: ->
     @setState user: UserStore.get()
-    console.log UserStore.get()
 
   
   render: ->

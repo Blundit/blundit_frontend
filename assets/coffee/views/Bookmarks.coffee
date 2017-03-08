@@ -24,7 +24,7 @@ module.exports = React.createFactory React.createClass
 
   
   getBookmarksError: (error) ->
-    console.log "error"
+    #console.log "error"
 
 
   showBookmarkNewStatus: (status) ->

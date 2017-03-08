@@ -21,12 +21,11 @@ module.exports = React.createFactory React.createClass
 
 
   expertListSuccess: (data) ->
-    console.log "!!!", data
     @setState experts: data
 
 
   expertListError: (error) ->
-    console.log "error", error
+    # console.log "error", error
 
   
   goToExpert: (id) ->

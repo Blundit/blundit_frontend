@@ -20,12 +20,11 @@ module.exports = React.createFactory React.createClass
 
 
   predictionListSuccess: (data) ->
-    console.log "!!!", data
     @setState predictions: data.predictions
 
 
   predictionListError: (error) ->
-    console.log "error", error
+    # console.log "error", error
 
   
   goToClaim: (id) ->

@@ -46,7 +46,7 @@ module.exports = React.createFactory React.createClass
 
 
   categoryAllError: (error) ->
-    console.log "error", error
+    # console.log "error", error
 
 
   categorySuccess: (data) ->
@@ -54,7 +54,7 @@ module.exports = React.createFactory React.createClass
 
 
   categoryError: (error) ->
-    console.log "error", error
+    # console.log "error", error
 
   
   render: ->

@@ -10,17 +10,20 @@ window._ = require('lodash')
 window.UserStore = UserStore = require("stores/UserStore")
 window.API = require("shared/API")
 
-SessionMixin = require("mixins/SessionMixin")
-
-Header = require("./components/Header")
-Footer = require("./components/Footer")
-
 getMuiTheme = require('material-ui/styles/getMuiTheme').default
 deepOrange500 = require('material-ui/styles/colors').deepOrange500
 MuiThemeProvider = require('material-ui/styles/MuiThemeProvider').default
 window.Material = require("material-ui")
 
-muiTheme = getMuiTheme(palette: {accent1Color: deepOrange500})
+muiTheme = getMuiTheme(palette: {
+  primary1Color: "#4869b2",
+  accent1Color: deepOrange500
+})
+
+SessionMixin = require("mixins/SessionMixin")
+
+Header = require("./components/Header")
+Footer = require("./components/Footer")
 
 { div } = React.DOM
 
@@ -32,7 +35,7 @@ Blundit = React.createFactory React.createClass
 
 
   componentWillMount: ->
-    @verifyUserToken()
+    # @verifyUserToken()
 
 
   componentWillUnmount: ->
@@ -45,8 +48,9 @@ Blundit = React.createFactory React.createClass
     '/bookmarks': 'bookmarks'
     '/users': 'users'
     '/users/:id': 'user'
-    '/register': 'userRegister'
-    '/login': 'userLogin'
+    '/register': 'register'
+    '/login': 'login'
+    '/forgot_password': 'forgotPassword'
     '/predictions': 'predictions'
     '/predictions/:id': 'prediction'
     '/experts': 'experts'
@@ -77,6 +81,24 @@ Blundit = React.createFactory React.createClass
       require("views/User")
         path: @state.path
         user_id: id
+
+
+  login: ->
+    div {},
+      require("views/Login")
+        path: @state.path
+
+  
+  forgotPassword: ->
+    div {},
+      require("views/ForgotPassword")
+        path: @state.path
+
+  
+  register: ->
+    div {},
+      require("views/Register")
+        path: @state.path
 
   
   userProfile: ->
@@ -177,13 +199,10 @@ Blundit = React.createFactory React.createClass
 
 startBlundit = ->
   if document.getElementById('app')?
-    console.log "starting Blundit!"
-
     ReactDOM.render(
       React.createElement(MuiThemeProvider, { muiTheme: muiTheme }, Blundit { history: true })
       document.getElementById('app')
     )
-
 
 if window.addEventListener
   window.addEventListener('DOMContentLoaded', startBlundit)
