@@ -1,6 +1,8 @@
 window.React = require('react')
 window.ReactDOM = require('react-dom')
 
+require('react-tap-event-plugin')()
+
 RouterMixin = require('react-mini-router').RouterMixin
 window.navigate = require('react-mini-router').navigate
 window._ = require('lodash')
@@ -8,16 +10,29 @@ window._ = require('lodash')
 window.UserStore = UserStore = require("stores/UserStore")
 window.API = require("shared/API")
 
+SessionMixin = require("mixins/SessionMixin")
+
 Header = require("./components/Header")
 Footer = require("./components/Footer")
+
+getMuiTheme = require('material-ui/styles/getMuiTheme').default
+deepOrange500 = require('material-ui/styles/colors').deepOrange500
+MuiThemeProvider = require('material-ui/styles/MuiThemeProvider').default
+window.Material = require("material-ui")
+
+muiTheme = getMuiTheme(palette: {accent1Color: deepOrange500})
 
 { div } = React.DOM
 
 Blundit = React.createFactory React.createClass
-  mixins: [RouterMixin]
+  mixins: [RouterMixin, SessionMixin]
+
+  getInitialState: ->
+    verificationComplete: false
+
 
   componentWillMount: ->
-    # console.log "will mount"
+    @verifyUserToken()
 
 
   componentWillUnmount: ->
@@ -162,10 +177,13 @@ Blundit = React.createFactory React.createClass
 
 startBlundit = ->
   if document.getElementById('app')?
+    console.log "starting Blundit!"
+
     ReactDOM.render(
-      Blundit { history: true }
+      React.createElement(MuiThemeProvider, { muiTheme: muiTheme }, Blundit { history: true })
       document.getElementById('app')
     )
+
 
 if window.addEventListener
   window.addEventListener('DOMContentLoaded', startBlundit)

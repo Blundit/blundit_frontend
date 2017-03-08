@@ -64,6 +64,10 @@ module.exports = class API
     bookmarks:
       path: "user/bookmarks"
       method: "GET"
+    verify_token:
+      path: 'auth/verify_token?access-token=%accessToken%&client=%client%&uid=%uid%'
+      method: "GET"
+
 
 
   @server = ->

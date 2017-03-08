@@ -10,11 +10,13 @@
     "gulp-sourcemaps": "^2.2.0",
     "gulp-uglifycss": "^1.0.6",
     "lodash": "^4.15.0",
-    "react": "^15.2.1",
+    "material-ui": "^0.17.0",
+    "react": "^15.4.2",
     "react-addons-css-transition-group": "^15.3.0",
     "react-autobind": "^1.0.6",
-    "react-dom": "^15.2.1",
+    "react-dom": "^15.4.2",
     "react-mini-router": "^2.0.0",
+    "react-tap-event-plugin": "^2.0.1",
     "vinyl-buffer": "^1.0.0"
   },
   "devDependencies": {

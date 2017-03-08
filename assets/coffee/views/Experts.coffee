@@ -2,6 +2,7 @@
 
 Header = require("components/Header")
 Footer = require("components/Footer")
+ExpertCard = require("components/ExpertCard")
 
 module.exports = React.createFactory React.createClass
   displayName: 'Experts'
@@ -40,10 +41,13 @@ module.exports = React.createFactory React.createClass
           div { className: "experts__list" },
             if @state.experts?
               @state.experts.map (expert, index) =>
-                div
-                  className: "experts__list__item"
-                  key: "expert-#{index}"
-                  onClick: @goToExpert.bind(@, expert.alias)
-                  expert.name
+                ExpertCard
+                  expert: expert
+                  key: "expert-card-#{index}"
+                # div
+                #   className: "experts__list__item"
+                #   key: "expert-#{index}"
+                #   onClick: @goToExpert.bind(@, expert.alias)
+                #   expert.name
 
       Footer {}, ''
