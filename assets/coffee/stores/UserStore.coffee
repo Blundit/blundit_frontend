@@ -8,8 +8,13 @@ class UserStore
   
 
   loggedIn: ->
-    return true if @data.token?
+    return true if @data and @data.token?
     return false
+
+
+  dequeueMessagesFetch: =>
+    clearTimeout(@fetchMessagesTimeout)
+    @fetchMessagesTimeout = null
 
 
   subscribe: (callback) =>
@@ -33,18 +38,32 @@ class UserStore
 
   set: (data, request) =>
     @data = data
-    console.log "!@REQUEST"
-    console.log request
 
     if request?
-      console.log request.getAllResponseHeaders()
-      console.log request.getResponseHeader('access-token')
       @data.token = request.getResponseHeader('access-token')
       @data.uid = request.getResponseHeader('uid')
       @data.client = request.getResponseHeader('client')
 
-    console.log @data
     @emitChange()
+
+  
+  logout: () ->
+    params = {
+      path: "logout"
+      success: @logoutSuccess
+      error: @logoutError
+    }
+
+    API.call(params)
+
+
+  logoutSuccess: ->
+    # console.log
+
+
+  logoutError: ->
+    # console.log
+
 
 
   setToken: (token) ->

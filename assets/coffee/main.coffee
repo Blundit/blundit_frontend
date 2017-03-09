@@ -49,6 +49,7 @@ Blundit = React.createFactory React.createClass
     '/users': 'users'
     '/users/:id': 'user'
     '/register': 'register'
+    '/register_successful': 'registerSuccessful'
     '/login': 'login'
     '/forgot_password': 'forgotPassword'
     '/predictions': 'predictions'
@@ -98,6 +99,12 @@ Blundit = React.createFactory React.createClass
   register: ->
     div {},
       require("views/Register")
+        path: @state.path
+
+
+  registerSuccessful: ->
+    div {},
+      require("views/RegisterSuccessful")
         path: @state.path
 
   

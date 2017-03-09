@@ -20,13 +20,17 @@ API.call(params)
 module.exports = class API
   @paths =
     register:
-      path: "auth/register"
+      path: "auth/"
       non_api: true
       method: "POST"
     login:
       path: "auth/sign_in"
       non_api: true
       method: "POST"
+    logout:
+      path: "auth/sign_out"
+      non_api: true
+      method: "DELETE"
     categories:
       path: "categories"
       method: "GET"

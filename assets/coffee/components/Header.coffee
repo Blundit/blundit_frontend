@@ -15,7 +15,6 @@ module.exports = React.createFactory React.createClass
     user: null
 
   handleUserChange: (data) ->
-    console.log "HHHH", UserStore.get()
     @setState user: UserStore.get()
 
 
@@ -55,7 +54,6 @@ module.exports = React.createFactory React.createClass
 
 
   render: ->
-    console.log @state.user
     div { className: "header-wrapper" },
       div { className: "header" },
         div

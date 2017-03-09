@@ -92,6 +92,7 @@ module.exports =
     }
     
     API.call(params)
+    
 
   verifyTokenSuccess: (data) ->
     if data.code == 200
@@ -102,9 +103,10 @@ module.exports =
 
       }
       window.UserStore.fetchUserData()
-    
+  
+      
   verifyTokenError: (error) ->
-    @setUser null
+    @setUser {}
 
 
   setCookie: (name, value, days) ->

@@ -7,6 +7,7 @@ SessionMixin = require("mixins/SessionMixin")
 
 TextField = Material.TextField
 RaisedButton = Material.RaisedButton
+RefreshIndicator = Material.RefreshIndicator
 
 
 module.exports = React.createFactory React.createClass
@@ -18,6 +19,8 @@ module.exports = React.createFactory React.createClass
     email: ''
     password: ''
     errors: []
+    loginError: null
+    loginLoading: false
 
 
   goToRegister: ->
@@ -48,6 +51,10 @@ module.exports = React.createFactory React.createClass
   
   processLogin: ->
     if @validateInputs()
+      @setState errors: []
+      @setState loginError: false
+      @setState loginLoading: true
+
       params = {
         path: "login"
         data:
@@ -61,11 +68,15 @@ module.exports = React.createFactory React.createClass
 
 
   loginSuccess: (data, request) ->
+    @setState loginLoading: false
     @setUser(data.data, request)
+    navigate('/me')
 
 
   loginError: (error) ->
-    # console.log "ERROR", error
+    @setState loginLoading: false
+    if error.responseJSON? and error.responseJSON.errors?
+      @setState loginError: error.responseJSON.errors[0]
 
 
   getErrorText: (key) ->
@@ -89,7 +100,20 @@ module.exports = React.createFactory React.createClass
             div {},
               React.createElement(TextField, {id: "login-password", floatingLabelText: "Password", type: "password", value: @state.password, onChange: @handlePasswordChange, errorText: @getErrorText("password") })
             div {},
-              React.createElement(RaisedButton, {label: "Login", primary: true, onClick: @processLogin })
+              if @state.loginLoading == true
+                @style = {
+                  display: 'inline-block'
+                  position: 'relative'
+                  boxShadow: 'none'
+                }
+                React.createElement(RefreshIndicator, { style: @style, size: 50, left: 0, top: 0, status:"loading" })
+
+              else
+                React.createElement(RaisedButton, {label: "Login", primary: true, onClick: @processLogin })
+            if @state.loginError?
+              div {},
+                @state.loginError
+
 
           div {},
             "Don't have an account? "
