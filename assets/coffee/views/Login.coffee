@@ -26,6 +26,10 @@ module.exports = React.createFactory React.createClass
   goToRegister: ->
     navigate('/register')
 
+
+  goToForgotPassword: ->
+    navigate('/forgot_password')
+
   
   handleEmailChange: (event) ->
     @setState email: event.target.value
@@ -116,9 +120,11 @@ module.exports = React.createFactory React.createClass
 
 
           div {},
-            "Don't have an account? "
             a
               onClick: @goToRegister
               'Click here to register'
+            a
+              onClick: @goToForgotPassword
+              'Forgot your password?'
 
       Footer {}, ''

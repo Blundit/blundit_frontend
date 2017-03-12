@@ -65,7 +65,6 @@ class UserStore
     # console.log
 
 
-
   setToken: (token) ->
     @data.token = token
 
@@ -73,24 +72,32 @@ class UserStore
   @getAuthHeader: ->
     @user = @get()
     if @user? and @user.token?
-      return "Bearer " + @user.token
+      return {
+        "access-token": @user.token,
+        "client": @user.client,
+        "uid": @user.uid
+      }
     else
-      return "Bearer 23"
+      return {}
 
 
   getAuthHeader: ->
     @user = @get()
     if @user? and @user.token?
-      return "Bearer " + @user.token
+      return {
+        "access-token": @user.token,
+        "client": @user.client,
+        "uid": @user.uid
+      }
     else
-      return 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.lXpqdZte4jlKBjYo_IK7DhuqVNYh2bQ89U7zQWR4O9w'
+      return {}
 
 
   fetchUserData: (navigateTarget) ->
+    return
     $.ajax
       type: 'GET'
-      headers:
-        Authorization: @getAuthHeader()
+      headers: @getAuthHeader()
       url: @urls.get_user_data
       dataType: 'json'
       success: (data) =>
@@ -104,8 +111,7 @@ class UserStore
   fetchUserProfile: (navigateTarget) ->
     $.ajax
       type: 'GET'
-      headers:
-        Authorization: @getAuthHeader()
+      headers: @getAuthHeader()
       url: @urls.get_current_user
       dataType: 'json'
       success: (data) =>
@@ -130,6 +136,22 @@ class UserStore
   
   get: =>
     @data
+
+  
+  updateHeaderInfo: (request) ->
+    return if !request.getResponseHeader('access-token')?
+    @token = request.getResponseHeader('access-token')
+    @uid = request.getResponseHeader('uid')
+    @client = request.getResponseHeader('client')
+
+    window.global.setCookie 'access-token', @token
+    window.global.setCookie 'uid', @uid
+    window.global.setCookie 'client', @client
+
+    @user = @get()
+    @user.token = @token
+    @user.uid = @uid
+    @user.client = @client
 
 
 module.exports = new UserStore

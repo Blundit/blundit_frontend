@@ -77,7 +77,7 @@ module.exports = React.createFactory React.createClass
 
   registerSuccess: (data, request) ->
     @setState registerLoading: false
-    navigate('/registration_successful')
+    navigate('/register_success')
 
 
   registerError: (error) ->

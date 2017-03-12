@@ -13,16 +13,43 @@ module.exports = React.createFactory(React.createClass({
     UserStore.logout();
     return this.setUser(null);
   },
+  testAddComment: function() {
+    var params;
+    params = {
+      path: "claim_add_comment",
+      path_variables: {
+        claim_id: 1
+      },
+      data: {
+        title: "Tester",
+        content: "API"
+      },
+      success: this.addCommentSuccess,
+      error: this.addCommentError
+    };
+    console.log("test add comment");
+    return API.call(params);
+  },
+  addCommentSuccess: function(data) {
+    console.log("SUCCESS!");
+    return console.log(data);
+  },
+  addCommentError: function(error) {
+    console.log("ERROR?!");
+    return console.log(error);
+  },
   render: function() {
     return div({
       className: "footer-wrapper"
     }, div({
       className: "footer-content"
-    }, "Footer", UserStore.loggedIn() ? div({}, React.createElement(RaisedButton, {
+    }, "Footer", UserStore.loggedIn() ? div({}, div({
+      onClick: this.testAddComment
+    }, 'Test Add Comment'), div({}, React.createElement(RaisedButton, {
       label: "Signout",
       primary: true,
       onClick: this.logout
-    })) : void 0));
+    }))) : void 0));
   }
 }));
 
@@ -134,7 +161,7 @@ module.exports = React.createFactory(React.createClass({
 
 },{}],3:[function(require,module,exports){
 (function() {
-  var API, Blundit, Card, CardActions, CardHeader, CardMedia, CardText, CardTitle, CategoryClaims, CategoryExperts, CategoryPredictions, CategorySubHead, ClaimExpertCard, ExpertCard, ExpertClaimCard, ExpertPredictionCard, FlatButton, Footer, Header, MuiThemeProvider, PredictionExpertCard, RaisedButton, RefreshIndicator, RouterMixin, SessionMixin, TextField, UserStore, a, deepOrange500, div, getMuiTheme, img, menuItems, muiTheme, ref, ref1, ref2, ref3, startBlundit,
+  var API, Blundit, Card, CardActions, CardHeader, CardMedia, CardText, CardTitle, CategoryClaims, CategoryExperts, CategoryPredictions, CategorySubHead, ClaimExpertCard, ExpertCard, ExpertClaimCard, ExpertPredictionCard, FlatButton, Footer, Global, Header, MuiThemeProvider, PredictionExpertCard, RaisedButton, RefreshIndicator, RouterMixin, SessionMixin, TextField, UserStore, a, deepOrange500, div, getMuiTheme, img, menuItems, muiTheme, ref, ref1, ref2, ref3, ref4, startBlundit,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   window.React = require('react');
@@ -152,6 +179,8 @@ module.exports = React.createFactory(React.createClass({
   window.UserStore = UserStore = require("stores/UserStore");
 
   window.API = require("shared/API");
+
+  window.global = require("shared/Global");
 
   getMuiTheme = require('material-ui/styles/getMuiTheme')["default"];
 
@@ -183,7 +212,9 @@ module.exports = React.createFactory(React.createClass({
         verificationComplete: false
       };
     },
-    componentWillMount: function() {},
+    componentWillMount: function() {
+      return this.verifyUserToken();
+    },
     componentWillUnmount: function() {},
     routes: {
       '/': 'landing',
@@ -192,7 +223,7 @@ module.exports = React.createFactory(React.createClass({
       '/users': 'users',
       '/users/:id': 'user',
       '/register': 'register',
-      '/register_successful': 'registerSuccessful',
+      '/register_success': 'registerSuccessful',
       '/login': 'login',
       '/forgot_password': 'forgotPassword',
       '/predictions': 'predictions',
@@ -603,16 +634,43 @@ module.exports = React.createFactory(React.createClass({
       UserStore.logout();
       return this.setUser(null);
     },
+    testAddComment: function() {
+      var params;
+      params = {
+        path: "claim_add_comment",
+        path_variables: {
+          claim_id: 1
+        },
+        data: {
+          title: "Tester",
+          content: "API"
+        },
+        success: this.addCommentSuccess,
+        error: this.addCommentError
+      };
+      console.log("test add comment");
+      return API.call(params);
+    },
+    addCommentSuccess: function(data) {
+      console.log("SUCCESS!");
+      return console.log(data);
+    },
+    addCommentError: function(error) {
+      console.log("ERROR?!");
+      return console.log(error);
+    },
     render: function() {
       return div({
         className: "footer-wrapper"
       }, div({
         className: "footer-content"
-      }, "Footer", UserStore.loggedIn() ? div({}, React.createElement(RaisedButton, {
+      }, "Footer", UserStore.loggedIn() ? div({}, div({
+        onClick: this.testAddComment
+      }, 'Test Add Comment'), div({}, React.createElement(RaisedButton, {
         label: "Signout",
         primary: true,
         onClick: this.logout
-      })) : void 0));
+      }))) : void 0));
     }
   }));
 
@@ -737,18 +795,16 @@ module.exports = React.createFactory(React.createClass({
 
   module.exports = {
     setUser: function(data, request) {
-      this.newUser = data;
-      window.UserStore.subscribe(this.handleUserChange);
       window.UserStore.set(data, request);
       this.user = window.UserStore.get();
       if ((this.user != null) && (this.user.token != null)) {
-        this.setCookie('access-token', this.user.token);
-        this.setCookie('uid', this.user.uid);
-        return this.setCookie('client', this.user.client);
+        window.global.setCookie('access-token', this.user.token);
+        window.global.setCookie('uid', this.user.uid);
+        return window.global.setCookie('client', this.user.client);
       } else {
-        this.deleteCookie('access-token');
-        this.deleteCookie('uid');
-        return this.deleteCookie('client');
+        window.global.deleteCookie('access-token');
+        window.global.deleteCookie('uid');
+        return window.global.deleteCookie('client');
       }
     },
     getParameterByName: function(name, url) {
@@ -782,9 +838,9 @@ module.exports = React.createFactory(React.createClass({
     getUser: function() {
       var obj;
       obj = {};
-      this.token = this.getCookie('access-token');
-      this.client = this.getCookie('client');
-      this.uid = this.getCookie('uid');
+      this.token = window.global.getCookie('access-token');
+      this.client = window.global.getCookie('client');
+      this.uid = window.global.getCookie('uid');
       if (this.token != null) {
         obj.token = this.token;
         obj.client = this.client;
@@ -797,15 +853,15 @@ module.exports = React.createFactory(React.createClass({
     },
     unsetUser: function() {
       window.UserStore.set(null);
-      this.deleteCookie('access-token');
-      this.deleteCookie('client');
-      return this.deleteCookie('uid');
+      window.global.deleteCookie('access-token');
+      window.global.deleteCookie('client');
+      return window.global.deleteCookie('uid');
     },
     authHeader: function() {
       return this.user = window.UserStore.getAuthHeader();
     },
     verifyUserToken: function() {
-      if (this.getCookie('access-token')) {
+      if (window.global.getCookie('access-token')) {
         return this.verifyToken();
       } else {
         return this.setState({
@@ -818,9 +874,9 @@ module.exports = React.createFactory(React.createClass({
       params = {
         path: "verify_token",
         path_variables: {
-          accessToken: this.getCookie('access-token'),
-          client: this.getCookie('client'),
-          uid: this.getCookie('uid')
+          accessToken: window.global.getCookie('access-token'),
+          client: window.global.getCookie('client'),
+          uid: window.global.getCookie('uid')
         },
         success: this.verifyTokenSuccess,
         error: this.verifyTokenError
@@ -828,49 +884,17 @@ module.exports = React.createFactory(React.createClass({
       return API.call(params);
     },
     verifyTokenSuccess: function(data) {
-      if (data.code === 200) {
-        this.setUser({
-          token: this.getCookie('access-token'),
-          client: this.getCookie('client'),
-          uid: this.getCookie('uid')
-        });
-        return window.UserStore.fetchUserData();
+      if (data) {
+        data.data.token = window.global.getCookie('access-token');
+        data.data.client = window.global.getCookie('client');
+        data.data.uid = window.global.getCookie('uid');
+        return this.setUser(data.data);
       }
     },
     verifyTokenError: function(error) {
       return this.setUser({});
     },
-    setCookie: function(name, value, days) {
-      var date, expires;
-      if (days) {
-        date = new Date();
-        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-        expires = "; expires=" + date.toGMTString();
-      } else {
-        expires = "";
-      }
-      return document.cookie = name + "=" + value + expires + "; path=/";
-    },
-    getCookie: function(name) {
-      var c, ca, i, nameEQ;
-      nameEQ = name + "=";
-      ca = document.cookie.split(";");
-      i = 0;
-      while (i < ca.length) {
-        c = ca[i];
-        while (c.charAt(0) === " ") {
-          c = c.substring(1, c.length);
-        }
-        if (c.indexOf(nameEQ) === 0) {
-          return c.substring(nameEQ.length, c.length);
-        }
-        i++;
-      }
-      return null;
-    },
-    deleteCookie: function(name) {
-      return this.setCookie(name, "", -1);
-    }
+    updateUserHeaderInfo: function(request) {}
   };
 
 
@@ -912,6 +936,11 @@ module.exports = React.createFactory(React.createClass({
         non_api: true,
         method: "DELETE"
       },
+      forgot_password: {
+        path: "auth/password",
+        non_api: true,
+        method: "POST"
+      },
       categories: {
         path: "categories",
         method: "GET"
@@ -944,6 +973,10 @@ module.exports = React.createFactory(React.createClass({
         path: "claims/%claim_id%",
         method: "GET"
       },
+      claim_add_comment: {
+        path: "claims/%claim_id%/add_comment",
+        method: "POST"
+      },
       predictions: {
         path: "predictions",
         method: "GET"
@@ -965,7 +998,7 @@ module.exports = React.createFactory(React.createClass({
         method: "GET"
       },
       verify_token: {
-        path: 'auth/verify_token?access-token=%accessToken%&client=%client%&uid=%uid%',
+        path: 'auth/validate_token?access-token=%accessToken%&client=%client%&uid=%uid%',
         method: "GET",
         non_api: true
       }
@@ -1007,12 +1040,11 @@ module.exports = React.createFactory(React.createClass({
       return $.ajax({
         method: this.method(params),
         url: this.path(params),
-        headers: {
-          Authorization: UserStore.getAuthHeader()
-        },
+        headers: UserStore.getAuthHeader(),
         data: this.data(params),
         dataType: "json",
         success: function(data, status, request) {
+          UserStore.updateHeaderInfo(request);
           if (params.success != null) {
             return params.success(data, request);
           }
@@ -1026,6 +1058,47 @@ module.exports = React.createFactory(React.createClass({
     };
 
     return API;
+
+  })();
+
+  module.exports = Global = (function() {
+    function Global() {}
+
+    Global.setCookie = function(name, value, days) {
+      var date, expires;
+      if (days) {
+        date = new Date();
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+        expires = "; expires=" + date.toGMTString();
+      } else {
+        expires = "";
+      }
+      return document.cookie = name + "=" + value + expires + "; path=/";
+    };
+
+    Global.getCookie = function(name) {
+      var c, ca, i, nameEQ;
+      nameEQ = name + "=";
+      ca = document.cookie.split(";");
+      i = 0;
+      while (i < ca.length) {
+        c = ca[i];
+        while (c.charAt(0) === " ") {
+          c = c.substring(1, c.length);
+        }
+        if (c.indexOf(nameEQ) === 0) {
+          return c.substring(nameEQ.length, c.length);
+        }
+        i++;
+      }
+      return null;
+    };
+
+    Global.deleteCookie = function(name) {
+      return this.setCookie(name, "", -1);
+    };
+
+    return Global;
 
   })();
 
@@ -1117,27 +1190,34 @@ module.exports = React.createFactory(React.createClass({
     UserStore.getAuthHeader = function() {
       this.user = this.get();
       if ((this.user != null) && (this.user.token != null)) {
-        return "Bearer " + this.user.token;
+        return {
+          "access-token": this.user.token,
+          "client": this.user.client,
+          "uid": this.user.uid
+        };
       } else {
-        return "Bearer 23";
+        return {};
       }
     };
 
     UserStore.prototype.getAuthHeader = function() {
       this.user = this.get();
       if ((this.user != null) && (this.user.token != null)) {
-        return "Bearer " + this.user.token;
+        return {
+          "access-token": this.user.token,
+          "client": this.user.client,
+          "uid": this.user.uid
+        };
       } else {
-        return 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.lXpqdZte4jlKBjYo_IK7DhuqVNYh2bQ89U7zQWR4O9w';
+        return {};
       }
     };
 
     UserStore.prototype.fetchUserData = function(navigateTarget) {
+      return;
       return $.ajax({
         type: 'GET',
-        headers: {
-          Authorization: this.getAuthHeader()
-        },
+        headers: this.getAuthHeader(),
         url: this.urls.get_user_data,
         dataType: 'json',
         success: (function(_this) {
@@ -1156,9 +1236,7 @@ module.exports = React.createFactory(React.createClass({
     UserStore.prototype.fetchUserProfile = function(navigateTarget) {
       return $.ajax({
         type: 'GET',
-        headers: {
-          Authorization: this.getAuthHeader()
-        },
+        headers: this.getAuthHeader(),
         url: this.urls.get_current_user,
         dataType: 'json',
         success: (function(_this) {
@@ -1188,6 +1266,22 @@ module.exports = React.createFactory(React.createClass({
 
     UserStore.prototype.get = function() {
       return this.data;
+    };
+
+    UserStore.prototype.updateHeaderInfo = function(request) {
+      if (request.getResponseHeader('access-token') == null) {
+        return;
+      }
+      this.token = request.getResponseHeader('access-token');
+      this.uid = request.getResponseHeader('uid');
+      this.client = request.getResponseHeader('client');
+      window.global.setCookie('access-token', this.token);
+      window.global.setCookie('uid', this.uid);
+      window.global.setCookie('client', this.client);
+      this.user = this.get();
+      this.user.token = this.token;
+      this.user.uid = this.uid;
+      return this.user.client = this.client;
     };
 
     return UserStore;
@@ -1890,25 +1984,137 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  div = React.DOM.div;
+  ref2 = React.DOM, div = ref2.div, a = ref2.a;
 
   Header = require("components/Header");
 
   Footer = require("components/Footer");
 
+  TextField = Material.TextField;
+
+  RaisedButton = Material.RaisedButton;
+
+  RefreshIndicator = Material.RefreshIndicator;
+
   module.exports = React.createFactory(React.createClass({
     displayName: 'Forgot Password',
+    getInitialState: function() {
+      return {
+        inputs: {
+          email: {
+            validateEmail: true,
+            value: ''
+          }
+        },
+        errors: [],
+        forgotLoading: false,
+        forgotError: false,
+        sentRecoveryEmail: false
+      };
+    },
     goToLogin: function() {
       return navigate('/login');
+    },
+    processForgotPassword: function() {
+      var params;
+      if (this.validateInputs()) {
+        this.setState({
+          errors: []
+        });
+        this.setState({
+          forgotLoading: true
+        });
+        params = {
+          path: "forgot_password",
+          data: {
+            email: this.state.inputs.email.value
+          },
+          success: this.forgotPasswordSuccess,
+          error: this.forgotPasswordError
+        };
+        return API.call(params);
+      }
+    },
+    handleEmailChange: function(event) {
+      this.inputs = this.state.inputs;
+      this.inputs.email.value = event.target.value;
+      return this.setState({
+        inputs: this.inputs
+      });
+    },
+    validateInputs: function() {
+      this.errors = [];
+      if (this.state.inputs.email.value.length < 6 || this.state.inputs.email.value.indexOf("@", 0) === -1 || this.state.inputs.email.value.indexOf(".", 0) === -1) {
+        this.errors.push({
+          id: "email",
+          text: "Valid Email Required"
+        });
+      }
+      this.setState({
+        errors: this.errors
+      });
+      if (this.errors.length === 0) {
+        return true;
+      }
+      return false;
+    },
+    getErrorText: function(key) {
+      var error, j, len, ref3;
+      ref3 = this.state.errors;
+      for (j = 0, len = ref3.length; j < len; j++) {
+        error = ref3[j];
+        if (error.id === key) {
+          return error.text;
+        }
+      }
+      return null;
+    },
+    forgotPasswordSuccess: function(data) {
+      this.setState({
+        sentRecoveryEmail: true
+      });
+      return this.setState({
+        forgotLoading: false
+      });
+    },
+    forgotPasswordError: function(error) {
+      this.setState({
+        forgotLoading: false
+      });
+      if ((error.responseJSON != null) && (error.responseJSON.errors != null)) {
+        return this.setState({
+          forgotError: error.responseJSON.errors[0]
+        });
+      }
     },
     render: function() {
       return div({}, Header({}, ''), div({
         className: "user-wrapper"
       }, div({
         className: "user-content"
-      }, "Forgot Password", div({}, "Remembered your password? ", a({
+      }, "Forgot Password", this.state.sentRecoveryEmail === false ? div({}, div({}, React.createElement(TextField, {
+        id: "forgot-email",
+        floatingLabelText: "Email",
+        value: this.state.inputs.email.value,
+        onChange: this.handleEmailChange,
+        errorText: this.getErrorText("email")
+      })), div({}, this.state.loginLoading === true ? (this.style = {
+        display: 'inline-block',
+        position: 'relative',
+        boxShadow: 'none'
+      }, React.createElement(RefreshIndicator, {
+        style: this.style,
+        size: 50,
+        left: 0,
+        top: 0,
+        status: "loading"
+      })) : React.createElement(RaisedButton, {
+        label: "Reset Password",
+        primary: true,
+        onClick: this.processForgotPassword
+      })), this.state.forgotError != null ? div({}, this.state.forgotError) : void 0, div({}, "Remembered your password? ", a({
         onClick: this.goToLogin
-      }, 'Click here to login')))), Footer({}, ''));
+      }, 'Click here to login'))) : div({}, "An email with a link to reset your password has been sent to you."))), Footer({}, ''));
     }
   }));
 
@@ -1929,7 +2135,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref2 = React.DOM, div = ref2.div, a = ref2.a;
+  ref3 = React.DOM, div = ref3.div, a = ref3.a;
 
   Header = require("components/Header");
 
@@ -1957,6 +2163,9 @@ module.exports = React.createFactory(React.createClass({
     },
     goToRegister: function() {
       return navigate('/register');
+    },
+    goToForgotPassword: function() {
+      return navigate('/forgot_password');
     },
     handleEmailChange: function(event) {
       return this.setState({
@@ -2032,10 +2241,10 @@ module.exports = React.createFactory(React.createClass({
       }
     },
     getErrorText: function(key) {
-      var error, j, len, ref3;
-      ref3 = this.state.errors;
-      for (j = 0, len = ref3.length; j < len; j++) {
-        error = ref3[j];
+      var error, j, len, ref4;
+      ref4 = this.state.errors;
+      for (j = 0, len = ref4.length; j < len; j++) {
+        error = ref4[j];
         if (error.id === key) {
           return error.text;
         }
@@ -2074,9 +2283,11 @@ module.exports = React.createFactory(React.createClass({
         label: "Login",
         primary: true,
         onClick: this.processLogin
-      })), this.state.loginError != null ? div({}, this.state.loginError) : void 0), div({}, "Don't have an account? ", a({
+      })), this.state.loginError != null ? div({}, this.state.loginError) : void 0), div({}, a({
         onClick: this.goToRegister
-      }, 'Click here to register')))), Footer({}, ''));
+      }, 'Click here to register'), a({
+        onClick: this.goToForgotPassword
+      }, 'Forgot your password?')))), Footer({}, ''));
     }
   }));
 
@@ -2123,8 +2334,8 @@ module.exports = React.createFactory(React.createClass({
       });
     },
     render: function() {
-      var experts, prediction, ref3;
-      ref3 = this.state, prediction = ref3.prediction, experts = ref3.experts;
+      var experts, prediction, ref4;
+      ref4 = this.state, prediction = ref4.prediction, experts = ref4.experts;
       return div({}, Header({}, ''), div({
         className: "predictions-wrapper"
       }, div({
@@ -2199,7 +2410,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref3 = React.DOM, div = ref3.div, a = ref3.a;
+  ref4 = React.DOM, div = ref4.div, a = ref4.a;
 
   Header = require("components/Header");
 
@@ -2308,11 +2519,11 @@ module.exports = React.createFactory(React.createClass({
       this.setState({
         registerLoading: false
       });
-      return navigate('/registration_successful');
+      return navigate('/register_success');
     },
     registerError: function(error) {
       this.setState({
-        loginLoading: false
+        registerLoading: false
       });
       if ((error.responseJSON != null) && (error.responseJSON.errors != null)) {
         return this.setState({
@@ -2321,10 +2532,10 @@ module.exports = React.createFactory(React.createClass({
       }
     },
     getErrorText: function(key) {
-      var error, j, len, ref4;
-      ref4 = this.state.errors;
-      for (j = 0, len = ref4.length; j < len; j++) {
-        error = ref4[j];
+      var error, j, len, ref5;
+      ref5 = this.state.errors;
+      for (j = 0, len = ref5.length; j < len; j++) {
+        error = ref5[j];
         if (error.id === key) {
           return error.text;
         }
@@ -2440,7 +2651,7 @@ module.exports = React.createFactory(React.createClass({
 
 }).call(this);
 
-},{"./components/Footer":1,"./components/Header":2,"components/CategoryClaims":566,"components/CategoryExperts":567,"components/CategoryPredictions":568,"components/CategorySubHead":569,"components/ClaimExpertCard":570,"components/ExpertCard":571,"components/ExpertClaimCard":572,"components/ExpertPredictionCard":573,"components/Footer":574,"components/Header":575,"components/PredictionExpertCard":576,"lodash":180,"material-ui":318,"material-ui/styles/MuiThemeProvider":337,"material-ui/styles/colors":339,"material-ui/styles/getMuiTheme":340,"mixins/SessionMixin":577,"react":551,"react-dom":377,"react-mini-router":509,"react-tap-event-plugin":520,"shared/API":578,"stores/UserStore":579,"views/404":580,"views/Bookmarks":581,"views/Categories":582,"views/CategoryAll":583,"views/CategoryClaims":584,"views/CategoryExperts":585,"views/CategoryPredictions":586,"views/Claim":587,"views/Claims":588,"views/Expert":589,"views/Experts":590,"views/ForgotPassword":591,"views/Landing":592,"views/Login":593,"views/Prediction":594,"views/Predictions":595,"views/Register":596,"views/RegisterSuccessful":597,"views/User":598,"views/Users":599}],4:[function(require,module,exports){
+},{"./components/Footer":1,"./components/Header":2,"components/CategoryClaims":566,"components/CategoryExperts":567,"components/CategoryPredictions":568,"components/CategorySubHead":569,"components/ClaimExpertCard":570,"components/ExpertCard":571,"components/ExpertClaimCard":572,"components/ExpertPredictionCard":573,"components/Footer":574,"components/Header":575,"components/PredictionExpertCard":576,"lodash":180,"material-ui":318,"material-ui/styles/MuiThemeProvider":337,"material-ui/styles/colors":339,"material-ui/styles/getMuiTheme":340,"mixins/SessionMixin":577,"react":551,"react-dom":377,"react-mini-router":509,"react-tap-event-plugin":520,"shared/API":578,"shared/Global":579,"stores/UserStore":580,"views/404":581,"views/Bookmarks":582,"views/Categories":583,"views/CategoryAll":584,"views/CategoryClaims":585,"views/CategoryExperts":586,"views/CategoryPredictions":587,"views/Claim":588,"views/Claims":589,"views/Expert":590,"views/Experts":591,"views/ForgotPassword":592,"views/Landing":593,"views/Login":594,"views/Prediction":595,"views/Predictions":596,"views/Register":597,"views/RegisterSuccessful":598,"views/User":599,"views/Users":600}],4:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/array/from"), __esModule: true };
 },{"core-js/library/fn/array/from":26}],5:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/get-iterator"), __esModule: true };
@@ -79857,18 +80068,16 @@ module.exports = React.createFactory(React.createClass({
 },{}],577:[function(require,module,exports){
 module.exports = {
   setUser: function(data, request) {
-    this.newUser = data;
-    window.UserStore.subscribe(this.handleUserChange);
     window.UserStore.set(data, request);
     this.user = window.UserStore.get();
     if ((this.user != null) && (this.user.token != null)) {
-      this.setCookie('access-token', this.user.token);
-      this.setCookie('uid', this.user.uid);
-      return this.setCookie('client', this.user.client);
+      window.global.setCookie('access-token', this.user.token);
+      window.global.setCookie('uid', this.user.uid);
+      return window.global.setCookie('client', this.user.client);
     } else {
-      this.deleteCookie('access-token');
-      this.deleteCookie('uid');
-      return this.deleteCookie('client');
+      window.global.deleteCookie('access-token');
+      window.global.deleteCookie('uid');
+      return window.global.deleteCookie('client');
     }
   },
   getParameterByName: function(name, url) {
@@ -79888,12 +80097,12 @@ module.exports = {
     return decodeURIComponent(results[2].replace(/\+/g, " "));
   },
   getUrlParams: function() {
-    var j, key, len, params, query, raw_vars, ref, v, val;
+    var i, key, len, params, query, raw_vars, ref, v, val;
     query = window.location.search.substring(1);
     raw_vars = query.split("&");
     params = {};
-    for (j = 0, len = raw_vars.length; j < len; j++) {
-      v = raw_vars[j];
+    for (i = 0, len = raw_vars.length; i < len; i++) {
+      v = raw_vars[i];
       ref = v.split("="), key = ref[0], val = ref[1];
       params[key] = decodeURIComponent(val);
     }
@@ -79902,9 +80111,9 @@ module.exports = {
   getUser: function() {
     var obj;
     obj = {};
-    this.token = this.getCookie('access-token');
-    this.client = this.getCookie('client');
-    this.uid = this.getCookie('uid');
+    this.token = window.global.getCookie('access-token');
+    this.client = window.global.getCookie('client');
+    this.uid = window.global.getCookie('uid');
     if (this.token != null) {
       obj.token = this.token;
       obj.client = this.client;
@@ -79917,15 +80126,15 @@ module.exports = {
   },
   unsetUser: function() {
     window.UserStore.set(null);
-    this.deleteCookie('access-token');
-    this.deleteCookie('client');
-    return this.deleteCookie('uid');
+    window.global.deleteCookie('access-token');
+    window.global.deleteCookie('client');
+    return window.global.deleteCookie('uid');
   },
   authHeader: function() {
     return this.user = window.UserStore.getAuthHeader();
   },
   verifyUserToken: function() {
-    if (this.getCookie('access-token')) {
+    if (window.global.getCookie('access-token')) {
       return this.verifyToken();
     } else {
       return this.setState({
@@ -79938,9 +80147,9 @@ module.exports = {
     params = {
       path: "verify_token",
       path_variables: {
-        accessToken: this.getCookie('access-token'),
-        client: this.getCookie('client'),
-        uid: this.getCookie('uid')
+        accessToken: window.global.getCookie('access-token'),
+        client: window.global.getCookie('client'),
+        uid: window.global.getCookie('uid')
       },
       success: this.verifyTokenSuccess,
       error: this.verifyTokenError
@@ -79948,49 +80157,17 @@ module.exports = {
     return API.call(params);
   },
   verifyTokenSuccess: function(data) {
-    if (data.code === 200) {
-      this.setUser({
-        token: this.getCookie('access-token'),
-        client: this.getCookie('client'),
-        uid: this.getCookie('uid')
-      });
-      return window.UserStore.fetchUserData();
+    if (data) {
+      data.data.token = window.global.getCookie('access-token');
+      data.data.client = window.global.getCookie('client');
+      data.data.uid = window.global.getCookie('uid');
+      return this.setUser(data.data);
     }
   },
   verifyTokenError: function(error) {
     return this.setUser({});
   },
-  setCookie: function(name, value, days) {
-    var date, expires;
-    if (days) {
-      date = new Date();
-      date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-      expires = "; expires=" + date.toGMTString();
-    } else {
-      expires = "";
-    }
-    return document.cookie = name + "=" + value + expires + "; path=/";
-  },
-  getCookie: function(name) {
-    var c, ca, i, nameEQ;
-    nameEQ = name + "=";
-    ca = document.cookie.split(";");
-    i = 0;
-    while (i < ca.length) {
-      c = ca[i];
-      while (c.charAt(0) === " ") {
-        c = c.substring(1, c.length);
-      }
-      if (c.indexOf(nameEQ) === 0) {
-        return c.substring(nameEQ.length, c.length);
-      }
-      i++;
-    }
-    return null;
-  },
-  deleteCookie: function(name) {
-    return this.setCookie(name, "", -1);
-  }
+  updateUserHeaderInfo: function(request) {}
 };
 
 
@@ -80035,6 +80212,11 @@ module.exports = API = (function() {
       non_api: true,
       method: "DELETE"
     },
+    forgot_password: {
+      path: "auth/password",
+      non_api: true,
+      method: "POST"
+    },
     categories: {
       path: "categories",
       method: "GET"
@@ -80067,6 +80249,10 @@ module.exports = API = (function() {
       path: "claims/%claim_id%",
       method: "GET"
     },
+    claim_add_comment: {
+      path: "claims/%claim_id%/add_comment",
+      method: "POST"
+    },
     predictions: {
       path: "predictions",
       method: "GET"
@@ -80088,7 +80274,7 @@ module.exports = API = (function() {
       method: "GET"
     },
     verify_token: {
-      path: 'auth/verify_token?access-token=%accessToken%&client=%client%&uid=%uid%',
+      path: 'auth/validate_token?access-token=%accessToken%&client=%client%&uid=%uid%',
       method: "GET",
       non_api: true
     }
@@ -80130,12 +80316,11 @@ module.exports = API = (function() {
     return $.ajax({
       method: this.method(params),
       url: this.path(params),
-      headers: {
-        Authorization: UserStore.getAuthHeader()
-      },
+      headers: UserStore.getAuthHeader(),
       data: this.data(params),
       dataType: "json",
       success: function(data, status, request) {
+        UserStore.updateHeaderInfo(request);
         if (params.success != null) {
           return params.success(data, request);
         }
@@ -80154,6 +80339,51 @@ module.exports = API = (function() {
 
 
 },{}],579:[function(require,module,exports){
+var Global;
+
+module.exports = Global = (function() {
+  function Global() {}
+
+  Global.setCookie = function(name, value, days) {
+    var date, expires;
+    if (days) {
+      date = new Date();
+      date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+      expires = "; expires=" + date.toGMTString();
+    } else {
+      expires = "";
+    }
+    return document.cookie = name + "=" + value + expires + "; path=/";
+  };
+
+  Global.getCookie = function(name) {
+    var c, ca, i, nameEQ;
+    nameEQ = name + "=";
+    ca = document.cookie.split(";");
+    i = 0;
+    while (i < ca.length) {
+      c = ca[i];
+      while (c.charAt(0) === " ") {
+        c = c.substring(1, c.length);
+      }
+      if (c.indexOf(nameEQ) === 0) {
+        return c.substring(nameEQ.length, c.length);
+      }
+      i++;
+    }
+    return null;
+  };
+
+  Global.deleteCookie = function(name) {
+    return this.setCookie(name, "", -1);
+  };
+
+  return Global;
+
+})();
+
+
+},{}],580:[function(require,module,exports){
 var UserStore,
   bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
@@ -80245,27 +80475,34 @@ UserStore = (function() {
   UserStore.getAuthHeader = function() {
     this.user = this.get();
     if ((this.user != null) && (this.user.token != null)) {
-      return "Bearer " + this.user.token;
+      return {
+        "access-token": this.user.token,
+        "client": this.user.client,
+        "uid": this.user.uid
+      };
     } else {
-      return "Bearer 23";
+      return {};
     }
   };
 
   UserStore.prototype.getAuthHeader = function() {
     this.user = this.get();
     if ((this.user != null) && (this.user.token != null)) {
-      return "Bearer " + this.user.token;
+      return {
+        "access-token": this.user.token,
+        "client": this.user.client,
+        "uid": this.user.uid
+      };
     } else {
-      return 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.lXpqdZte4jlKBjYo_IK7DhuqVNYh2bQ89U7zQWR4O9w';
+      return {};
     }
   };
 
   UserStore.prototype.fetchUserData = function(navigateTarget) {
+    return;
     return $.ajax({
       type: 'GET',
-      headers: {
-        Authorization: this.getAuthHeader()
-      },
+      headers: this.getAuthHeader(),
       url: this.urls.get_user_data,
       dataType: 'json',
       success: (function(_this) {
@@ -80284,9 +80521,7 @@ UserStore = (function() {
   UserStore.prototype.fetchUserProfile = function(navigateTarget) {
     return $.ajax({
       type: 'GET',
-      headers: {
-        Authorization: this.getAuthHeader()
-      },
+      headers: this.getAuthHeader(),
       url: this.urls.get_current_user,
       dataType: 'json',
       success: (function(_this) {
@@ -80318,6 +80553,22 @@ UserStore = (function() {
     return this.data;
   };
 
+  UserStore.prototype.updateHeaderInfo = function(request) {
+    if (request.getResponseHeader('access-token') == null) {
+      return;
+    }
+    this.token = request.getResponseHeader('access-token');
+    this.uid = request.getResponseHeader('uid');
+    this.client = request.getResponseHeader('client');
+    window.global.setCookie('access-token', this.token);
+    window.global.setCookie('uid', this.uid);
+    window.global.setCookie('client', this.client);
+    this.user = this.get();
+    this.user.token = this.token;
+    this.user.uid = this.uid;
+    return this.user.client = this.client;
+  };
+
   return UserStore;
 
 })();
@@ -80327,7 +80578,7 @@ module.exports = new UserStore({
 });
 
 
-},{}],580:[function(require,module,exports){
+},{}],581:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -80348,7 +80599,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":574,"components/Header":575}],581:[function(require,module,exports){
+},{"components/Footer":574,"components/Header":575}],582:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -80413,7 +80664,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":574,"components/Header":575}],582:[function(require,module,exports){
+},{"components/Footer":574,"components/Header":575}],583:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -80467,7 +80718,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":574,"components/Header":575}],583:[function(require,module,exports){
+},{"components/Footer":574,"components/Header":575}],584:[function(require,module,exports){
 var CategoryClaims, CategoryExperts, CategoryPredictions, CategorySubHead, Footer, Header, div;
 
 div = React.DOM.div;
@@ -80554,7 +80805,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/CategoryClaims":566,"components/CategoryExperts":567,"components/CategoryPredictions":568,"components/CategorySubHead":569,"components/Footer":574,"components/Header":575}],584:[function(require,module,exports){
+},{"components/CategoryClaims":566,"components/CategoryExperts":567,"components/CategoryPredictions":568,"components/CategorySubHead":569,"components/Footer":574,"components/Header":575}],585:[function(require,module,exports){
 var CategoryClaims, CategorySubHead, Footer, Header, div;
 
 div = React.DOM.div;
@@ -80633,7 +80884,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/CategoryClaims":566,"components/CategorySubHead":569,"components/Footer":574,"components/Header":575}],585:[function(require,module,exports){
+},{"components/CategoryClaims":566,"components/CategorySubHead":569,"components/Footer":574,"components/Header":575}],586:[function(require,module,exports){
 var CategoryExperts, CategorySubHead, Footer, Header, div;
 
 div = React.DOM.div;
@@ -80712,7 +80963,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/CategoryExperts":567,"components/CategorySubHead":569,"components/Footer":574,"components/Header":575}],586:[function(require,module,exports){
+},{"components/CategoryExperts":567,"components/CategorySubHead":569,"components/Footer":574,"components/Header":575}],587:[function(require,module,exports){
 var CategoryPredictions, CategorySubHead, Footer, Header, div;
 
 div = React.DOM.div;
@@ -80791,7 +81042,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/CategoryPredictions":568,"components/CategorySubHead":569,"components/Footer":574,"components/Header":575}],587:[function(require,module,exports){
+},{"components/CategoryPredictions":568,"components/CategorySubHead":569,"components/Footer":574,"components/Header":575}],588:[function(require,module,exports){
 var ClaimExpertCard, Footer, Header, div;
 
 div = React.DOM.div;
@@ -80864,7 +81115,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ClaimExpertCard":570,"components/Footer":574,"components/Header":575}],588:[function(require,module,exports){
+},{"components/ClaimExpertCard":570,"components/Footer":574,"components/Header":575}],589:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -80918,7 +81169,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":574,"components/Header":575}],589:[function(require,module,exports){
+},{"components/Footer":574,"components/Header":575}],590:[function(require,module,exports){
 var ExpertClaimCard, ExpertPredictionCard, Footer, Header, div;
 
 div = React.DOM.div;
@@ -81008,7 +81259,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ExpertClaimCard":572,"components/ExpertPredictionCard":573,"components/Footer":574,"components/Header":575}],590:[function(require,module,exports){
+},{"components/ExpertClaimCard":572,"components/ExpertPredictionCard":573,"components/Footer":574,"components/Header":575}],591:[function(require,module,exports){
 var ExpertCard, Footer, Header, div;
 
 div = React.DOM.div;
@@ -81063,33 +81314,145 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ExpertCard":571,"components/Footer":574,"components/Header":575}],591:[function(require,module,exports){
-var Footer, Header, div;
+},{"components/ExpertCard":571,"components/Footer":574,"components/Header":575}],592:[function(require,module,exports){
+var Footer, Header, RaisedButton, RefreshIndicator, TextField, a, div, ref;
 
-div = React.DOM.div;
+ref = React.DOM, div = ref.div, a = ref.a;
 
 Header = require("components/Header");
 
 Footer = require("components/Footer");
 
+TextField = Material.TextField;
+
+RaisedButton = Material.RaisedButton;
+
+RefreshIndicator = Material.RefreshIndicator;
+
 module.exports = React.createFactory(React.createClass({
   displayName: 'Forgot Password',
+  getInitialState: function() {
+    return {
+      inputs: {
+        email: {
+          validateEmail: true,
+          value: ''
+        }
+      },
+      errors: [],
+      forgotLoading: false,
+      forgotError: false,
+      sentRecoveryEmail: false
+    };
+  },
   goToLogin: function() {
     return navigate('/login');
+  },
+  processForgotPassword: function() {
+    var params;
+    if (this.validateInputs()) {
+      this.setState({
+        errors: []
+      });
+      this.setState({
+        forgotLoading: true
+      });
+      params = {
+        path: "forgot_password",
+        data: {
+          email: this.state.inputs.email.value
+        },
+        success: this.forgotPasswordSuccess,
+        error: this.forgotPasswordError
+      };
+      return API.call(params);
+    }
+  },
+  handleEmailChange: function(event) {
+    this.inputs = this.state.inputs;
+    this.inputs.email.value = event.target.value;
+    return this.setState({
+      inputs: this.inputs
+    });
+  },
+  validateInputs: function() {
+    this.errors = [];
+    if (this.state.inputs.email.value.length < 6 || this.state.inputs.email.value.indexOf("@", 0) === -1 || this.state.inputs.email.value.indexOf(".", 0) === -1) {
+      this.errors.push({
+        id: "email",
+        text: "Valid Email Required"
+      });
+    }
+    this.setState({
+      errors: this.errors
+    });
+    if (this.errors.length === 0) {
+      return true;
+    }
+    return false;
+  },
+  getErrorText: function(key) {
+    var error, i, len, ref1;
+    ref1 = this.state.errors;
+    for (i = 0, len = ref1.length; i < len; i++) {
+      error = ref1[i];
+      if (error.id === key) {
+        return error.text;
+      }
+    }
+    return null;
+  },
+  forgotPasswordSuccess: function(data) {
+    this.setState({
+      sentRecoveryEmail: true
+    });
+    return this.setState({
+      forgotLoading: false
+    });
+  },
+  forgotPasswordError: function(error) {
+    this.setState({
+      forgotLoading: false
+    });
+    if ((error.responseJSON != null) && (error.responseJSON.errors != null)) {
+      return this.setState({
+        forgotError: error.responseJSON.errors[0]
+      });
+    }
   },
   render: function() {
     return div({}, Header({}, ''), div({
       className: "user-wrapper"
     }, div({
       className: "user-content"
-    }, "Forgot Password", div({}, "Remembered your password? ", a({
+    }, "Forgot Password", this.state.sentRecoveryEmail === false ? div({}, div({}, React.createElement(TextField, {
+      id: "forgot-email",
+      floatingLabelText: "Email",
+      value: this.state.inputs.email.value,
+      onChange: this.handleEmailChange,
+      errorText: this.getErrorText("email")
+    })), div({}, this.state.loginLoading === true ? (this.style = {
+      display: 'inline-block',
+      position: 'relative',
+      boxShadow: 'none'
+    }, React.createElement(RefreshIndicator, {
+      style: this.style,
+      size: 50,
+      left: 0,
+      top: 0,
+      status: "loading"
+    })) : React.createElement(RaisedButton, {
+      label: "Reset Password",
+      primary: true,
+      onClick: this.processForgotPassword
+    })), this.state.forgotError != null ? div({}, this.state.forgotError) : void 0, div({}, "Remembered your password? ", a({
       onClick: this.goToLogin
-    }, 'Click here to login')))), Footer({}, ''));
+    }, 'Click here to login'))) : div({}, "An email with a link to reset your password has been sent to you."))), Footer({}, ''));
   }
 }));
 
 
-},{"components/Footer":574,"components/Header":575}],592:[function(require,module,exports){
+},{"components/Footer":574,"components/Header":575}],593:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -81110,7 +81473,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":574,"components/Header":575}],593:[function(require,module,exports){
+},{"components/Footer":574,"components/Header":575}],594:[function(require,module,exports){
 var Footer, Header, RaisedButton, RefreshIndicator, SessionMixin, TextField, a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
@@ -81141,6 +81504,9 @@ module.exports = React.createFactory(React.createClass({
   },
   goToRegister: function() {
     return navigate('/register');
+  },
+  goToForgotPassword: function() {
+    return navigate('/forgot_password');
   },
   handleEmailChange: function(event) {
     return this.setState({
@@ -81258,14 +81624,16 @@ module.exports = React.createFactory(React.createClass({
       label: "Login",
       primary: true,
       onClick: this.processLogin
-    })), this.state.loginError != null ? div({}, this.state.loginError) : void 0), div({}, "Don't have an account? ", a({
+    })), this.state.loginError != null ? div({}, this.state.loginError) : void 0), div({}, a({
       onClick: this.goToRegister
-    }, 'Click here to register')))), Footer({}, ''));
+    }, 'Click here to register'), a({
+      onClick: this.goToForgotPassword
+    }, 'Forgot your password?')))), Footer({}, ''));
   }
 }));
 
 
-},{"components/Footer":574,"components/Header":575,"mixins/SessionMixin":577}],594:[function(require,module,exports){
+},{"components/Footer":574,"components/Header":575,"mixins/SessionMixin":577}],595:[function(require,module,exports){
 var Footer, Header, PredictionExpertCard, div;
 
 div = React.DOM.div;
@@ -81338,7 +81706,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":574,"components/Header":575,"components/PredictionExpertCard":576}],595:[function(require,module,exports){
+},{"components/Footer":574,"components/Header":575,"components/PredictionExpertCard":576}],596:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -81392,7 +81760,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":574,"components/Header":575}],596:[function(require,module,exports){
+},{"components/Footer":574,"components/Header":575}],597:[function(require,module,exports){
 var Footer, Header, RaisedButton, RefreshIndicator, TextField, a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
@@ -81504,11 +81872,11 @@ module.exports = React.createFactory(React.createClass({
     this.setState({
       registerLoading: false
     });
-    return navigate('/registration_successful');
+    return navigate('/register_success');
   },
   registerError: function(error) {
     this.setState({
-      loginLoading: false
+      registerLoading: false
     });
     if ((error.responseJSON != null) && (error.responseJSON.errors != null)) {
       return this.setState({
@@ -81573,7 +81941,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":574,"components/Header":575}],597:[function(require,module,exports){
+},{"components/Footer":574,"components/Header":575}],598:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -81594,7 +81962,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":574,"components/Header":575}],598:[function(require,module,exports){
+},{"components/Footer":574,"components/Header":575}],599:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -81626,7 +81994,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":574,"components/Header":575}],599:[function(require,module,exports){
+},{"components/Footer":574,"components/Header":575}],600:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;

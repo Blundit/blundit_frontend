@@ -9,6 +9,7 @@ window._ = require('lodash')
 
 window.UserStore = UserStore = require("stores/UserStore")
 window.API = require("shared/API")
+window.global = require("shared/Global")
 
 getMuiTheme = require('material-ui/styles/getMuiTheme').default
 deepOrange500 = require('material-ui/styles/colors').deepOrange500
@@ -35,7 +36,7 @@ Blundit = React.createFactory React.createClass
 
 
   componentWillMount: ->
-    # @verifyUserToken()
+    @verifyUserToken()
 
 
   componentWillUnmount: ->
@@ -49,7 +50,7 @@ Blundit = React.createFactory React.createClass
     '/users': 'users'
     '/users/:id': 'user'
     '/register': 'register'
-    '/register_successful': 'registerSuccessful'
+    '/register_success': 'registerSuccessful'
     '/login': 'login'
     '/forgot_password': 'forgotPassword'
     '/predictions': 'predictions'

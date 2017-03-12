@@ -1,20 +1,18 @@
 module.exports =
   setUser: (data, request) ->
-    @newUser = data
-
-    window.UserStore.subscribe(@handleUserChange)
+    # window.UserStore.subscribe(@handleUserChange)
     window.UserStore.set data, request
     @user = window.UserStore.get()
 
     # save cookie
     if @user? and @user.token?
-      @setCookie 'access-token', @user.token
-      @setCookie 'uid', @user.uid
-      @setCookie 'client', @user.client
+      window.global.setCookie 'access-token', @user.token
+      window.global.setCookie 'uid', @user.uid
+      window.global.setCookie 'client', @user.client
     else
-      @deleteCookie 'access-token'
-      @deleteCookie 'uid'
-      @deleteCookie 'client'
+      window.global.deleteCookie 'access-token'
+      window.global.deleteCookie 'uid'
+      window.global.deleteCookie 'client'
 
 
   getParameterByName: (name, url) ->
@@ -49,9 +47,9 @@ module.exports =
   getUser: ->
     obj = {}
 
-    @token = @getCookie 'access-token'
-    @client = @getCookie 'client'
-    @uid = @getCookie 'uid'
+    @token = window.global.getCookie 'access-token'
+    @client = window.global.getCookie 'client'
+    @uid = window.global.getCookie 'uid'
 
     if @token?
       obj.token = @token
@@ -64,9 +62,9 @@ module.exports =
 
   unsetUser: ->
     window.UserStore.set null
-    @deleteCookie 'access-token'
-    @deleteCookie 'client'
-    @deleteCookie 'uid'
+    window.global.deleteCookie 'access-token'
+    window.global.deleteCookie 'client'
+    window.global.deleteCookie 'uid'
 
 
   authHeader: ->
@@ -74,7 +72,7 @@ module.exports =
     
 
   verifyUserToken: ->
-    if @getCookie('access-token')
+    if window.global.getCookie('access-token')
       @verifyToken()
     else
       @setState verificationComplete: true
@@ -84,9 +82,9 @@ module.exports =
     params = {
       path: "verify_token"
       path_variables:
-        accessToken: @getCookie('access-token')
-        client: @getCookie('client')
-        uid: @getCookie('uid')
+        accessToken: window.global.getCookie('access-token')
+        client: window.global.getCookie('client')
+        uid: window.global.getCookie('uid')
       success: @verifyTokenSuccess
       error: @verifyTokenError
     }
@@ -95,42 +93,17 @@ module.exports =
     
 
   verifyTokenSuccess: (data) ->
-    if data.code == 200
-      @setUser {
-        token: @getCookie('access-token')
-        client: @getCookie('client')
-        uid: @getCookie('uid')
-
-      }
-      window.UserStore.fetchUserData()
+    if data
+      data.data.token = window.global.getCookie('access-token')
+      data.data.client = window.global.getCookie('client')
+      data.data.uid = window.global.getCookie('uid')
+    
+      @setUser data.data
+    #   # window.UserStore.fetchUserData()
   
       
   verifyTokenError: (error) ->
     @setUser {}
 
-
-  setCookie: (name, value, days) ->
-    if days
-      date = new Date()
-      date.setTime date.getTime() + (days * 24 * 60 * 60 * 1000)
-      expires = "; expires=" + date.toGMTString()
-    else
-      expires = ""
-    document.cookie = name + "=" + value + expires + "; path=/"
-
-
-  getCookie: (name) ->
-    nameEQ = name + "="
-    ca = document.cookie.split(";")
-    i = 0
-
-    while i < ca.length
-      c = ca[i]
-      c = c.substring(1, c.length)  while c.charAt(0) is " "
-      return c.substring(nameEQ.length, c.length)  if c.indexOf(nameEQ) is 0
-      i++
-    null
-
-
-  deleteCookie: (name) ->
-    @setCookie name, "", -1
+  
+  updateUserHeaderInfo: (request) ->

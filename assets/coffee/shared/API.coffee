@@ -31,6 +31,10 @@ module.exports = class API
       path: "auth/sign_out"
       non_api: true
       method: "DELETE"
+    forgot_password:
+      path: "auth/password"
+      non_api: true
+      method: "POST"
     categories:
       path: "categories"
       method: "GET"
@@ -55,6 +59,9 @@ module.exports = class API
     claim:
       path: "claims/%claim_id%"
       method: "GET"
+    claim_add_comment:
+      path: "claims/%claim_id%/add_comment"
+      method: "POST"
     predictions:
       path: "predictions"
       method: "GET"
@@ -71,7 +78,7 @@ module.exports = class API
       path: "user/bookmarks"
       method: "GET"
     verify_token:
-      path: 'auth/verify_token?access-token=%accessToken%&client=%client%&uid=%uid%'
+      path: 'auth/validate_token?access-token=%accessToken%&client=%client%&uid=%uid%'
       method: "GET"
       non_api: true
 
@@ -110,11 +117,11 @@ module.exports = class API
     $.ajax
       method: @method(params)
       url: @path(params)
-      headers:
-        Authorization: UserStore.getAuthHeader()
+      headers: UserStore.getAuthHeader()
       data: @data(params)
       dataType: "json"
       success: (data, status, request) ->
+        UserStore.updateHeaderInfo(request)
         params.success(data, request) if params.success?
       error: (error) ->
         params.error(error) if params.error?
