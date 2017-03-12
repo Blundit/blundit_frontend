@@ -101,7 +101,20 @@ module.exports = class API
     for key, value of params.path_variables
       @p = @p.replace '%'+key+'%', value
 
+    if @paths[params.path].method == "GET"
+      @p = @p + @dataAsGet(params.data)
+
     return @p
+
+
+  @dataAsGet = (data) ->
+    @d = "?"
+    console.log data
+
+    for key, value of data
+      @d += "#{key}=#{encodeURIComponent(value)}&"
+
+    return @d
 
 
   @data = (params) ->
