@@ -742,9 +742,10 @@ module.exports = React.createFactory(React.createClass({
         return;
       }
       return React.createElement(IconButton, {
-        onClick: this.props.goBack
+        onClick: this.props.goBack,
+        className: "pagination__arrow"
       }, React.createElement(FontIcon, {
-        className: "fa fa-angle-double-left"
+        className: "fa fa-angle-left"
       }));
     },
     drawNextArrow: function() {
@@ -752,32 +753,90 @@ module.exports = React.createFactory(React.createClass({
         return;
       }
       return React.createElement(IconButton, {
-        onClick: this.props.goNext
+        onClick: this.props.goNext,
+        className: "pagination__arrow"
       }, React.createElement(FontIcon, {
-        className: "fa fa-angle-double-right"
+        className: "fa fa-angle-right"
       }));
     },
     goToPage: function(id) {
       return this.props.goToPage(id);
     },
+    buttonStyle: function() {
+      return {
+        minWidth: "40px"
+      };
+    },
+    drawFirstPage: function() {
+      if (this.props.page <= 3) {
+        return;
+      }
+      return div({
+        className: "pagination__first"
+      }, React.createElement(FlatButton, {
+        key: "page-1",
+        label: 1,
+        style: this.buttonStyle(),
+        className: "pagination__item",
+        primary: true,
+        onClick: this.goToPage.bind(this, 1)
+      }), this.props.page >= 5 ? div({
+        className: "pagination__ellipsis"
+      }, "...") : void 0);
+    },
+    drawLastPage: function() {
+      if (this.props.page >= this.props.numberOfPages - 2) {
+        return;
+      }
+      return div({
+        className: "pagination__last"
+      }, this.props.page <= this.props.numberOfPages - 4 ? div({
+        className: "pagination__ellipsis"
+      }, "...") : void 0, React.createElement(FlatButton, {
+        key: "page-" + this.props.numberOfPages,
+        className: "pagination__item",
+        label: this.props.numberOfPages,
+        style: this.buttonStyle(),
+        primary: true,
+        onClick: this.goToPage.bind(this, this.props.numberOfPages)
+      }));
+    },
     drawPages: function() {
       var page;
+      this.leftPage = this.props.page - 2;
+      this.rightPage = this.props.page + 2;
+      if (this.props.numberOfPages <= 5) {
+        this.leftPage = 1;
+        this.rightPage = this.props.numberOfPages;
+      }
+      if (this.leftPage < 1) {
+        this.offset = this.leftPage - 1;
+        this.leftPage += Math.abs(this.offset);
+        this.rightPage += Math.abs(this.offset);
+      }
+      if (this.rightPage > this.props.numberOfPages) {
+        this.offset = this.props.numberOfPages - this.rightPage;
+        this.leftPage -= Math.abs(this.offset);
+        this.rightPage -= Math.abs(this.offset);
+      }
       return div({
         className: "pagination__pages"
       }, (function() {
-        var j, ref2, results1;
+        var j, ref2, ref3, results1;
         results1 = [];
-        for (page = j = 1, ref2 = this.props.numberOfPages; 1 <= ref2 ? j <= ref2 : j >= ref2; page = 1 <= ref2 ? ++j : --j) {
+        for (page = j = ref2 = this.leftPage, ref3 = this.rightPage; ref2 <= ref3 ? j <= ref3 : j >= ref3; page = ref2 <= ref3 ? ++j : --j) {
           if (page === this.props.page) {
             results1.push(React.createElement(FlatButton, {
               key: "page-" + page,
               label: page,
+              style: this.buttonStyle(),
               disabled: true
             }));
           } else {
             results1.push(React.createElement(FlatButton, {
               key: "page-" + page,
               label: page,
+              style: this.buttonStyle(),
               primary: true,
               onClick: this.goToPage.bind(this, page)
             }));
@@ -792,7 +851,7 @@ module.exports = React.createFactory(React.createClass({
       }
       return div({
         className: "pagination"
-      }, this.drawBackArrow(), this.drawPages(), this.drawNextArrow());
+      }, this.drawBackArrow(), this.drawFirstPage(), this.drawPages(), this.drawLastPage(), this.drawNextArrow());
     }
   }));
 
@@ -80157,9 +80216,10 @@ module.exports = React.createFactory(React.createClass({
       return;
     }
     return React.createElement(IconButton, {
-      onClick: this.props.goBack
+      onClick: this.props.goBack,
+      className: "pagination__arrow"
     }, React.createElement(FontIcon, {
-      className: "fa fa-angle-double-left"
+      className: "fa fa-angle-left"
     }));
   },
   drawNextArrow: function() {
@@ -80167,32 +80227,90 @@ module.exports = React.createFactory(React.createClass({
       return;
     }
     return React.createElement(IconButton, {
-      onClick: this.props.goNext
+      onClick: this.props.goNext,
+      className: "pagination__arrow"
     }, React.createElement(FontIcon, {
-      className: "fa fa-angle-double-right"
+      className: "fa fa-angle-right"
     }));
   },
   goToPage: function(id) {
     return this.props.goToPage(id);
   },
+  buttonStyle: function() {
+    return {
+      minWidth: "40px"
+    };
+  },
+  drawFirstPage: function() {
+    if (this.props.page <= 3) {
+      return;
+    }
+    return div({
+      className: "pagination__first"
+    }, React.createElement(FlatButton, {
+      key: "page-1",
+      label: 1,
+      style: this.buttonStyle(),
+      className: "pagination__item",
+      primary: true,
+      onClick: this.goToPage.bind(this, 1)
+    }), this.props.page >= 5 ? div({
+      className: "pagination__ellipsis"
+    }, "...") : void 0);
+  },
+  drawLastPage: function() {
+    if (this.props.page >= this.props.numberOfPages - 2) {
+      return;
+    }
+    return div({
+      className: "pagination__last"
+    }, this.props.page <= this.props.numberOfPages - 4 ? div({
+      className: "pagination__ellipsis"
+    }, "...") : void 0, React.createElement(FlatButton, {
+      key: "page-" + this.props.numberOfPages,
+      className: "pagination__item",
+      label: this.props.numberOfPages,
+      style: this.buttonStyle(),
+      primary: true,
+      onClick: this.goToPage.bind(this, this.props.numberOfPages)
+    }));
+  },
   drawPages: function() {
     var page;
+    this.leftPage = this.props.page - 2;
+    this.rightPage = this.props.page + 2;
+    if (this.props.numberOfPages <= 5) {
+      this.leftPage = 1;
+      this.rightPage = this.props.numberOfPages;
+    }
+    if (this.leftPage < 1) {
+      this.offset = this.leftPage - 1;
+      this.leftPage += Math.abs(this.offset);
+      this.rightPage += Math.abs(this.offset);
+    }
+    if (this.rightPage > this.props.numberOfPages) {
+      this.offset = this.props.numberOfPages - this.rightPage;
+      this.leftPage -= Math.abs(this.offset);
+      this.rightPage -= Math.abs(this.offset);
+    }
     return div({
       className: "pagination__pages"
     }, (function() {
-      var i, ref, results;
+      var i, ref, ref1, results;
       results = [];
-      for (page = i = 1, ref = this.props.numberOfPages; 1 <= ref ? i <= ref : i >= ref; page = 1 <= ref ? ++i : --i) {
+      for (page = i = ref = this.leftPage, ref1 = this.rightPage; ref <= ref1 ? i <= ref1 : i >= ref1; page = ref <= ref1 ? ++i : --i) {
         if (page === this.props.page) {
           results.push(React.createElement(FlatButton, {
             key: "page-" + page,
             label: page,
+            style: this.buttonStyle(),
             disabled: true
           }));
         } else {
           results.push(React.createElement(FlatButton, {
             key: "page-" + page,
             label: page,
+            style: this.buttonStyle(),
             primary: true,
             onClick: this.goToPage.bind(this, page)
           }));
@@ -80207,7 +80325,7 @@ module.exports = React.createFactory(React.createClass({
     }
     return div({
       className: "pagination"
-    }, this.drawBackArrow(), this.drawPages(), this.drawNextArrow());
+    }, this.drawBackArrow(), this.drawFirstPage(), this.drawPages(), this.drawLastPage(), this.drawNextArrow());
   }
 }));
 

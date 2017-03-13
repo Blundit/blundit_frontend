@@ -1,9 +1,14 @@
-.experts-wrapper
-  @extend %full-width
+.experts
+  &__list
+    display: inline-block
 
-.experts-content
-  @extend %margin-width
-  +clearfix
+
+  &-wrapper
+    @extend %full-width
+
+  &-content
+    @extend %margin-width
+    +clearfix
 
 .expert-card
   float: left
@@ -13,3 +18,5 @@
   @media (max-width: $tablet-breakpoint)
     width: calc(50% - 10px)
     margin: 5px
+
+  
