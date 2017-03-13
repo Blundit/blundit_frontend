@@ -1,5 +1,17 @@
-.predictions-wrapper
-  @extend %full-width
+.predictions
+  &__list
+    display: inline-block
+    width: 100%
 
-.predictions-content
-  @extend %margin-width
+  &-wrapper
+    @extend %full-width
+
+  &-content
+    @extend %margin-width
+    +clearfix
+
+.prediction-card
+  float: left
+  width: 100%
+  margin: 5px
+  

@@ -11,7 +11,6 @@ module.exports = React.createFactory React.createClass
   mixins: [PaginationMixin]
   displayName: 'Experts'
 
-
   getInitialState: ->
     experts: null
 
@@ -41,10 +40,11 @@ module.exports = React.createFactory React.createClass
     # console.log "error", error
 
   
-  goToExpert: (id) ->
-    navigate("/experts/#{id}")
+  refToSelf: ->
+    @fn = @fn.bind(@)
+    @fn
 
-  
+
   render: ->
     div {},
       Header {}, ''
@@ -56,17 +56,12 @@ module.exports = React.createFactory React.createClass
                 ExpertCard
                   expert: expert
                   key: "expert-card-#{index}"
-                # div
-                #   className: "experts__list__item"
-                #   key: "expert-#{index}"
-                #   onClick: @goToExpert.bind(@, expert.alias)
-                #   expert.name
           if @state.experts?
             Pagination
               page: @state.page
               numberOfPages: @state.numberOfPages
-              goBack: @previousPage
-              goNext: @nextPage
-              goToPage: @specificPage
+              nextPage: @nextPage
+              previousPage: @previousPage
+              specificPage: @specificPage
 
       Footer {}, ''
