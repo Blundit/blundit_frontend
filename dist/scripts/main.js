@@ -532,14 +532,54 @@ module.exports = React.createFactory(React.createClass({
 
   FlatButton = Material.FlatButton;
 
-  ref = React.DOM, div = ref.div, img = ref.img;
+  ref = React.DOM, div = ref.div, img = ref.img, a = ref.a, br = ref.br, span = ref.span;
 
   module.exports = React.createFactory(React.createClass({
     displayName: 'ClaimCard',
-    goToExpert: function() {
+    goToExpert: function(id) {
+      return navigate("/experts/" + id);
+    },
+    goToClaim: function(id) {
+      return navigate("/claims/" + id);
+    },
+    getDescription: function() {
       var claim;
       claim = this.props.claim;
-      return navigate("/claims/" + claim.alias);
+      if (claim.description != null) {
+        return claim.description;
+      }
+      return '';
+    },
+    getStatus: function() {
+      var claim;
+      claim = this.props.claim;
+      if (claim.status === 0) {
+        return "?";
+      } else if (claim.status === 1) {
+        if (claim.vote_value >= 0.5) {
+          return "Right";
+        } else {
+          return "Wrong";
+        }
+      }
+    },
+    goToCategory: function(id) {
+      return navigate("/categories/" + id);
+    },
+    claimDate: function() {
+      var claim;
+      claim = this.props.claim;
+      return claim.created_at;
+    },
+    getVoteInfo: function() {
+      var claim;
+      claim = this.props.claim;
+      return claim.votes_count + " votes";
+    },
+    getCommentInfo: function() {
+      var claim;
+      claim = this.props.claim;
+      return claim.comments_count + " comments";
     },
     render: function() {
       var claim;
@@ -548,10 +588,52 @@ module.exports = React.createFactory(React.createClass({
         className: "claim-card"
       }, React.createElement(Card, {}, React.createElement(CardHeader, {
         title: claim.title,
-        subtitle: claim.description
-      }), React.createElement(CardActions, {}, React.createElement(FlatButton, {
-        label: "View",
+        subtitle: this.getDescription()
+      }), div({
+        className: "claim-card-text"
+      }, div({
+        className: "claim-card-date"
+      }, this.claimDate()), div({
+        className: "claim-card-status"
+      }, this.getStatus()), div({
+        className: "claim-card-votes"
+      }, this.getVoteInfo()), div({
+        className: "claim-card-comments"
+      }, this.getCommentInfo()), claim.categories.length > 0 ? div({
+        className: "claim-card-categories"
+      }, claim.categories.map((function(_this) {
+        return function(category, index) {
+          return span({
+            key: "claim-card-category-" + index,
+            className: "claim-card-categories__category",
+            onClick: _this.goToCategory.bind(_this, category.id)
+          }, category.name);
+        };
+      })(this))) : void 0, claim.recent_experts.length > 0 ? div({
+        className: "claim-card-experts"
+      }, claim.recent_experts.map((function(_this) {
+        return function(expert, index) {
+          return div({
+            key: "claim-card-expert-" + index,
+            className: "claim-card-experts__expert",
+            onClick: _this.goToExpert.bind(_this, expert.alias)
+          }, div({
+            className: "claim-card-experts__expert-avatar",
+            style: {
+              backgroundImage: "url(" + expert.avatar + ")"
+            }
+          }), div({
+            className: "claim-card-experts__expert-name"
+          }, expert.name));
+        };
+      })(this))) : void 0), React.createElement(CardActions, {}, claim.status === 0 && UserStore.loggedIn() ? div({
+        className: "claim-card-vote",
         onClick: this.goToClaim
+      }, "VOTE") : claim.status === 0 && !UserStore.loggedIn() ? div({
+        className: "claim-card-vote"
+      }, "Log in to Vote") : void 0, React.createElement(FlatButton, {
+        label: "View",
+        onClick: this.goToClaim.bind(this, claim.alias)
       }))));
     }
   }));
@@ -608,10 +690,8 @@ module.exports = React.createFactory(React.createClass({
       }
       return "/images/avatars/placeholder.png";
     },
-    goToExpert: function() {
-      var expert;
-      expert = this.props.expert;
-      return navigate("/experts/" + expert.alias);
+    goToExpert: function(id) {
+      return navigate("/experts/" + id);
     },
     getExpertDescription: function() {
       if (this.props.expert.description != null) {
@@ -630,6 +710,14 @@ module.exports = React.createFactory(React.createClass({
       accuracy = this.props.expert.accuracy;
       return Math.floor(accuracy * 100) + "%";
     },
+    goToCategory: function(id) {
+      return navigate("/categories/" + id);
+    },
+    getCommentInfo: function() {
+      var expert;
+      expert = this.props.expert;
+      return expert.comments_count + " comments";
+    },
     render: function() {
       var expert;
       expert = this.props.expert;
@@ -647,20 +735,32 @@ module.exports = React.createFactory(React.createClass({
       }, div({
         className: "expert-card-meta__left"
       }, this.showAccuracy()), div({
-        classname: "expert-card-meta__right"
+        className: "expert-card-meta__right"
       }, span({
         className: "expert-card-meta__predictions"
       }, expert.number_of_predictions), span({
         className: "expert-card-meta__claims"
-      }, expert.number_of_claims))), expert.most_recent_claim.length > 0 || expert.most_recent_prediction > 0 ? div({
+      }, expert.number_of_claims))), div({
+        className: "expert-card-comments"
+      }, this.getCommentInfo()), expert.most_recent_claim.length > 0 || expert.most_recent_prediction > 0 ? div({
         className: "expert-card-links"
       }, expert.most_recent_claim.length > 0 ? div({}, "Most recent Claim: ", a({
         onClick: this.goToMostRecentClaim
-      }, expert.most_recent_claim[0].title)) : void 0, expert.most_recent_prediction.length > 0 ? (console.log(expert.most_recent_prediction), div({}, "Most recent Prediction: ", a({
+      }, expert.most_recent_claim[0].title)) : void 0, expert.most_recent_prediction.length > 0 ? div({}, "Most recent Prediction: ", a({
         onClick: this.goToMostRecentPrediction
-      }, expert.most_recent_prediction[0].title))) : void 0) : void 0, React.createElement(CardActions, {}, React.createElement(FlatButton, {
+      }, expert.most_recent_prediction[0].title)) : void 0) : void 0, expert.categories.length > 0 ? div({
+        className: "expert-card-categories"
+      }, expert.categories.map((function(_this) {
+        return function(category, index) {
+          return span({
+            key: "expert-card-category-" + index,
+            className: "expert-card-categories__category",
+            onClick: _this.goToCategory.bind(_this, category.id)
+          }, category.name);
+        };
+      })(this))) : void 0, React.createElement(CardActions, {}, React.createElement(FlatButton, {
         label: "View",
-        onClick: this.goToExpert
+        onClick: this.goToExpert.bind(this, expert.alias)
       }))));
     }
   }));
@@ -985,14 +1085,54 @@ module.exports = React.createFactory(React.createClass({
 
   FlatButton = Material.FlatButton;
 
-  ref3 = React.DOM, div = ref3.div, img = ref3.img;
+  ref3 = React.DOM, div = ref3.div, img = ref3.img, a = ref3.a, br = ref3.br, span = ref3.span;
 
   module.exports = React.createFactory(React.createClass({
-    displayName: 'PredictionCard',
-    goToPrediction: function() {
+    displayName: 'PRedictionCard',
+    goToExpert: function(id) {
+      return navigate("/experts/" + id);
+    },
+    goToPrediction: function(id) {
+      return navigate("/predictions/" + id);
+    },
+    getDescription: function() {
       var prediction;
       prediction = this.props.prediction;
-      return navigate("/predictions/" + prediction.alias);
+      if (prediction.description != null) {
+        return prediction.description;
+      }
+      return '';
+    },
+    getStatus: function() {
+      var prediction;
+      prediction = this.props.prediction;
+      if (prediction.status === 0) {
+        return "?";
+      } else if (prediction.status === 1) {
+        if (prediction.vote_value >= 0.5) {
+          return "Right";
+        } else {
+          return "Wrong";
+        }
+      }
+    },
+    getVoteInfo: function() {
+      var prediction;
+      prediction = this.props.prediction;
+      return prediction.votes_count + " votes";
+    },
+    getCommentInfo: function() {
+      var prediction;
+      prediction = this.props.prediction;
+      return prediction.comments_count + " comments";
+    },
+    goToCategory: function(id) {
+      return navigate("/categories/" + id);
+    },
+    predictionDate: function() {
+      var prediction;
+      prediction = this.props.prediction;
+      return prediction.created_at;
     },
     render: function() {
       var prediction;
@@ -1001,10 +1141,52 @@ module.exports = React.createFactory(React.createClass({
         className: "prediction-card"
       }, React.createElement(Card, {}, React.createElement(CardHeader, {
         title: prediction.title,
-        subtitle: prediction.description
-      }), React.createElement(CardActions, {}, React.createElement(FlatButton, {
-        label: "View",
+        subtitle: this.getDescription()
+      }), div({
+        className: "prediction-card-text"
+      }, div({
+        className: "prediction-card-date"
+      }, this.predictionDate()), div({
+        className: "prediction-card-status"
+      }, this.getStatus()), div({
+        className: "prediction-card-votes"
+      }, this.getVoteInfo()), div({
+        className: "prediction-card-comments"
+      }, this.getCommentInfo()), prediction.categories.length > 0 ? div({
+        className: "prediction-card-categories"
+      }, prediction.categories.map((function(_this) {
+        return function(category, index) {
+          return span({
+            key: "prediction-card-category-" + index,
+            className: "prediction-card-categories__category",
+            onClick: _this.goToCategory.bind(_this, category.id)
+          }, category.name);
+        };
+      })(this))) : void 0, prediction.recent_experts.length > 0 ? div({
+        className: "prediction-card-experts"
+      }, prediction.recent_experts.map((function(_this) {
+        return function(expert, index) {
+          return div({
+            key: "prediction-card-expert-" + index,
+            className: "prediction-card-experts__expert",
+            onClick: _this.goToExpert.bind(_this, expert.alias)
+          }, div({
+            className: "prediction-card-experts__expert-avatar",
+            style: {
+              backgroundImage: "url(" + expert.avatar + ")"
+            }
+          }), div({
+            className: "prediction-card-experts__expert-name"
+          }, expert.name));
+        };
+      })(this))) : void 0), React.createElement(CardActions, {}, prediction.status === 0 && UserStore.loggedIn() ? div({
+        className: "prediction-card-vote",
         onClick: this.goToPrediction
+      }, "VOTE") : prediction.status === 0 && !UserStore.loggedIn() ? div({
+        className: "prediction-card-vote"
+      }, "Log in to Vote") : void 0, React.createElement(FlatButton, {
+        label: "View",
+        onClick: this.goToPrediction.bind(this, prediction.alias)
       }))));
     }
   }));
@@ -80373,7 +80555,7 @@ module.exports = React.createFactory(React.createClass({
 
 
 },{}],570:[function(require,module,exports){
-var Card, CardActions, CardHeader, CardText, FlatButton, div, img, ref;
+var Card, CardActions, CardHeader, CardText, FlatButton, a, br, div, img, ref, span;
 
 Card = Material.Card;
 
@@ -80385,14 +80567,54 @@ CardActions = Material.CardActions;
 
 FlatButton = Material.FlatButton;
 
-ref = React.DOM, div = ref.div, img = ref.img;
+ref = React.DOM, div = ref.div, img = ref.img, a = ref.a, br = ref.br, span = ref.span;
 
 module.exports = React.createFactory(React.createClass({
   displayName: 'ClaimCard',
-  goToExpert: function() {
+  goToExpert: function(id) {
+    return navigate("/experts/" + id);
+  },
+  goToClaim: function(id) {
+    return navigate("/claims/" + id);
+  },
+  getDescription: function() {
     var claim;
     claim = this.props.claim;
-    return navigate("/claims/" + claim.alias);
+    if (claim.description != null) {
+      return claim.description;
+    }
+    return '';
+  },
+  getStatus: function() {
+    var claim;
+    claim = this.props.claim;
+    if (claim.status === 0) {
+      return "?";
+    } else if (claim.status === 1) {
+      if (claim.vote_value >= 0.5) {
+        return "Right";
+      } else {
+        return "Wrong";
+      }
+    }
+  },
+  goToCategory: function(id) {
+    return navigate("/categories/" + id);
+  },
+  claimDate: function() {
+    var claim;
+    claim = this.props.claim;
+    return claim.created_at;
+  },
+  getVoteInfo: function() {
+    var claim;
+    claim = this.props.claim;
+    return claim.votes_count + " votes";
+  },
+  getCommentInfo: function() {
+    var claim;
+    claim = this.props.claim;
+    return claim.comments_count + " comments";
   },
   render: function() {
     var claim;
@@ -80401,10 +80623,52 @@ module.exports = React.createFactory(React.createClass({
       className: "claim-card"
     }, React.createElement(Card, {}, React.createElement(CardHeader, {
       title: claim.title,
-      subtitle: claim.description
-    }), React.createElement(CardActions, {}, React.createElement(FlatButton, {
-      label: "View",
+      subtitle: this.getDescription()
+    }), div({
+      className: "claim-card-text"
+    }, div({
+      className: "claim-card-date"
+    }, this.claimDate()), div({
+      className: "claim-card-status"
+    }, this.getStatus()), div({
+      className: "claim-card-votes"
+    }, this.getVoteInfo()), div({
+      className: "claim-card-comments"
+    }, this.getCommentInfo()), claim.categories.length > 0 ? div({
+      className: "claim-card-categories"
+    }, claim.categories.map((function(_this) {
+      return function(category, index) {
+        return span({
+          key: "claim-card-category-" + index,
+          className: "claim-card-categories__category",
+          onClick: _this.goToCategory.bind(_this, category.id)
+        }, category.name);
+      };
+    })(this))) : void 0, claim.recent_experts.length > 0 ? div({
+      className: "claim-card-experts"
+    }, claim.recent_experts.map((function(_this) {
+      return function(expert, index) {
+        return div({
+          key: "claim-card-expert-" + index,
+          className: "claim-card-experts__expert",
+          onClick: _this.goToExpert.bind(_this, expert.alias)
+        }, div({
+          className: "claim-card-experts__expert-avatar",
+          style: {
+            backgroundImage: "url(" + expert.avatar + ")"
+          }
+        }), div({
+          className: "claim-card-experts__expert-name"
+        }, expert.name));
+      };
+    })(this))) : void 0), React.createElement(CardActions, {}, claim.status === 0 && UserStore.loggedIn() ? div({
+      className: "claim-card-vote",
       onClick: this.goToClaim
+    }, "VOTE") : claim.status === 0 && !UserStore.loggedIn() ? div({
+      className: "claim-card-vote"
+    }, "Log in to Vote") : void 0, React.createElement(FlatButton, {
+      label: "View",
+      onClick: this.goToClaim.bind(this, claim.alias)
     }))));
   }
 }));
@@ -80473,10 +80737,8 @@ module.exports = React.createFactory(React.createClass({
     }
     return "/images/avatars/placeholder.png";
   },
-  goToExpert: function() {
-    var expert;
-    expert = this.props.expert;
-    return navigate("/experts/" + expert.alias);
+  goToExpert: function(id) {
+    return navigate("/experts/" + id);
   },
   getExpertDescription: function() {
     if (this.props.expert.description != null) {
@@ -80495,6 +80757,14 @@ module.exports = React.createFactory(React.createClass({
     accuracy = this.props.expert.accuracy;
     return Math.floor(accuracy * 100) + "%";
   },
+  goToCategory: function(id) {
+    return navigate("/categories/" + id);
+  },
+  getCommentInfo: function() {
+    var expert;
+    expert = this.props.expert;
+    return expert.comments_count + " comments";
+  },
   render: function() {
     var expert;
     expert = this.props.expert;
@@ -80512,20 +80782,32 @@ module.exports = React.createFactory(React.createClass({
     }, div({
       className: "expert-card-meta__left"
     }, this.showAccuracy()), div({
-      classname: "expert-card-meta__right"
+      className: "expert-card-meta__right"
     }, span({
       className: "expert-card-meta__predictions"
     }, expert.number_of_predictions), span({
       className: "expert-card-meta__claims"
-    }, expert.number_of_claims))), expert.most_recent_claim.length > 0 || expert.most_recent_prediction > 0 ? div({
+    }, expert.number_of_claims))), div({
+      className: "expert-card-comments"
+    }, this.getCommentInfo()), expert.most_recent_claim.length > 0 || expert.most_recent_prediction > 0 ? div({
       className: "expert-card-links"
     }, expert.most_recent_claim.length > 0 ? div({}, "Most recent Claim: ", a({
       onClick: this.goToMostRecentClaim
-    }, expert.most_recent_claim[0].title)) : void 0, expert.most_recent_prediction.length > 0 ? (console.log(expert.most_recent_prediction), div({}, "Most recent Prediction: ", a({
+    }, expert.most_recent_claim[0].title)) : void 0, expert.most_recent_prediction.length > 0 ? div({}, "Most recent Prediction: ", a({
       onClick: this.goToMostRecentPrediction
-    }, expert.most_recent_prediction[0].title))) : void 0) : void 0, React.createElement(CardActions, {}, React.createElement(FlatButton, {
+    }, expert.most_recent_prediction[0].title)) : void 0) : void 0, expert.categories.length > 0 ? div({
+      className: "expert-card-categories"
+    }, expert.categories.map((function(_this) {
+      return function(category, index) {
+        return span({
+          key: "expert-card-category-" + index,
+          className: "expert-card-categories__category",
+          onClick: _this.goToCategory.bind(_this, category.id)
+        }, category.name);
+      };
+    })(this))) : void 0, React.createElement(CardActions, {}, React.createElement(FlatButton, {
       label: "View",
-      onClick: this.goToExpert
+      onClick: this.goToExpert.bind(this, expert.alias)
     }))));
   }
 }));
@@ -80736,7 +81018,7 @@ module.exports = React.createFactory(React.createClass({
 
 
 },{}],580:[function(require,module,exports){
-var Card, CardActions, CardHeader, CardText, FlatButton, div, img, ref;
+var Card, CardActions, CardHeader, CardText, FlatButton, a, br, div, img, ref, span;
 
 Card = Material.Card;
 
@@ -80748,14 +81030,54 @@ CardActions = Material.CardActions;
 
 FlatButton = Material.FlatButton;
 
-ref = React.DOM, div = ref.div, img = ref.img;
+ref = React.DOM, div = ref.div, img = ref.img, a = ref.a, br = ref.br, span = ref.span;
 
 module.exports = React.createFactory(React.createClass({
-  displayName: 'PredictionCard',
-  goToPrediction: function() {
+  displayName: 'PRedictionCard',
+  goToExpert: function(id) {
+    return navigate("/experts/" + id);
+  },
+  goToPrediction: function(id) {
+    return navigate("/predictions/" + id);
+  },
+  getDescription: function() {
     var prediction;
     prediction = this.props.prediction;
-    return navigate("/predictions/" + prediction.alias);
+    if (prediction.description != null) {
+      return prediction.description;
+    }
+    return '';
+  },
+  getStatus: function() {
+    var prediction;
+    prediction = this.props.prediction;
+    if (prediction.status === 0) {
+      return "?";
+    } else if (prediction.status === 1) {
+      if (prediction.vote_value >= 0.5) {
+        return "Right";
+      } else {
+        return "Wrong";
+      }
+    }
+  },
+  getVoteInfo: function() {
+    var prediction;
+    prediction = this.props.prediction;
+    return prediction.votes_count + " votes";
+  },
+  getCommentInfo: function() {
+    var prediction;
+    prediction = this.props.prediction;
+    return prediction.comments_count + " comments";
+  },
+  goToCategory: function(id) {
+    return navigate("/categories/" + id);
+  },
+  predictionDate: function() {
+    var prediction;
+    prediction = this.props.prediction;
+    return prediction.created_at;
   },
   render: function() {
     var prediction;
@@ -80764,10 +81086,52 @@ module.exports = React.createFactory(React.createClass({
       className: "prediction-card"
     }, React.createElement(Card, {}, React.createElement(CardHeader, {
       title: prediction.title,
-      subtitle: prediction.description
-    }), React.createElement(CardActions, {}, React.createElement(FlatButton, {
-      label: "View",
+      subtitle: this.getDescription()
+    }), div({
+      className: "prediction-card-text"
+    }, div({
+      className: "prediction-card-date"
+    }, this.predictionDate()), div({
+      className: "prediction-card-status"
+    }, this.getStatus()), div({
+      className: "prediction-card-votes"
+    }, this.getVoteInfo()), div({
+      className: "prediction-card-comments"
+    }, this.getCommentInfo()), prediction.categories.length > 0 ? div({
+      className: "prediction-card-categories"
+    }, prediction.categories.map((function(_this) {
+      return function(category, index) {
+        return span({
+          key: "prediction-card-category-" + index,
+          className: "prediction-card-categories__category",
+          onClick: _this.goToCategory.bind(_this, category.id)
+        }, category.name);
+      };
+    })(this))) : void 0, prediction.recent_experts.length > 0 ? div({
+      className: "prediction-card-experts"
+    }, prediction.recent_experts.map((function(_this) {
+      return function(expert, index) {
+        return div({
+          key: "prediction-card-expert-" + index,
+          className: "prediction-card-experts__expert",
+          onClick: _this.goToExpert.bind(_this, expert.alias)
+        }, div({
+          className: "prediction-card-experts__expert-avatar",
+          style: {
+            backgroundImage: "url(" + expert.avatar + ")"
+          }
+        }), div({
+          className: "prediction-card-experts__expert-name"
+        }, expert.name));
+      };
+    })(this))) : void 0), React.createElement(CardActions, {}, prediction.status === 0 && UserStore.loggedIn() ? div({
+      className: "prediction-card-vote",
       onClick: this.goToPrediction
+    }, "VOTE") : prediction.status === 0 && !UserStore.loggedIn() ? div({
+      className: "prediction-card-vote"
+    }, "Log in to Vote") : void 0, React.createElement(FlatButton, {
+      label: "View",
+      onClick: this.goToPrediction.bind(this, prediction.alias)
     }))));
   }
 }));

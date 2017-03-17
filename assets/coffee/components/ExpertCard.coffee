@@ -18,9 +18,8 @@ module.exports = React.createFactory React.createClass
     return "/images/avatars/placeholder.png"
 
 
-  goToExpert: ->
-    { expert } = @props
-    navigate("/experts/#{expert.alias}")
+  goToExpert: (id) ->
+    navigate("/experts/#{id}")
 
 
   getExpertDescription: ->
@@ -44,6 +43,15 @@ module.exports = React.createFactory React.createClass
     return Math.floor(accuracy*100) + "%"
 
 
+  goToCategory: (id) ->
+    navigate("/categories/#{id}")
+
+
+  getCommentInfo: ->
+    { expert } = @props
+    return "#{expert.comments_count} comments"
+
+
   render: ->
     { expert } = @props
     div { className: "expert-card" },
@@ -60,11 +68,14 @@ module.exports = React.createFactory React.createClass
         div { className: "expert-card-meta" },
           div { className: "expert-card-meta__left" },
             @showAccuracy()
-          div { classname: "expert-card-meta__right" },
+          div { className: "expert-card-meta__right" },
             span { className: "expert-card-meta__predictions" },
               expert.number_of_predictions
             span { className: "expert-card-meta__claims" },
               expert.number_of_claims
+
+        div { className: "expert-card-comments" },
+          @getCommentInfo()
         
         if expert.most_recent_claim.length > 0 or expert.most_recent_prediction > 0
           div { className: "expert-card-links"},
@@ -76,16 +87,24 @@ module.exports = React.createFactory React.createClass
                   expert.most_recent_claim[0].title
 
             if expert.most_recent_prediction.length > 0
-              console.log expert.most_recent_prediction
               div {},
                 "Most recent Prediction: "
                 a
                   onClick: @goToMostRecentPrediction
                   expert.most_recent_prediction[0].title
+        if expert.categories.length > 0
+          div { className: "expert-card-categories" },
+            expert.categories.map (category, index) =>
+              span
+                key: "expert-card-category-#{index}"
+                className: "expert-card-categories__category"
+                onClick: @goToCategory.bind(@, category.id)
+                category.name
+
 
 
 
         React.createElement(CardActions, {},
-          React.createElement(FlatButton, { label: "View", onClick: @goToExpert })
+          React.createElement(FlatButton, { label: "View", onClick: @goToExpert.bind(@, expert.alias) })
         )
       )
