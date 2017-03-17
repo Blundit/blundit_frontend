@@ -7,6 +7,7 @@ Pagination = require("components/Pagination")
 
 PaginationMixin = require("mixins/PaginationMixin")
 
+
 module.exports = React.createFactory React.createClass
   mixins: [PaginationMixin]
   displayName: 'Predictions'
@@ -41,9 +42,8 @@ module.exports = React.createFactory React.createClass
     # console.log "error", error
 
 
-  refToSelf: ->
-    @fn = @fn.bind(@)
-    @fn
+  goToNewPrediction: ->
+    navigate('/predictions/new')
 
   
   render: ->
@@ -52,6 +52,7 @@ module.exports = React.createFactory React.createClass
       Header {}, ''
       div { className: "predictions-wrapper" },
         div { className: "predictions-content" },
+          React.createElement(Material.RaisedButton, { label: "Create New Prediction", primary: true, onClick: @goToNewPrediction })
           div { className: "predictions__list" },
             if @state.predictions?
               @state.predictions.map (prediction, index) ->

@@ -7,6 +7,8 @@ Pagination = require("components/Pagination")
 
 PaginationMixin = require("mixins/PaginationMixin")
 
+RaisedButton = Material.RaisedButton
+
 module.exports = React.createFactory React.createClass
   mixins: [PaginationMixin]
   displayName: 'Claims'
@@ -40,11 +42,16 @@ module.exports = React.createFactory React.createClass
     # console.log "error", error
 
 
+  goToNewClaim: ->
+    navigate('/claims/new')
+
+
   render: ->
     div {},
       Header {}, ''
       div { className: "claims-wrapper" },
         div { className: "claims-content" },
+          React.createElement(RaisedButton, { label: "Create New Claim", primary: true, onClick: @goToNewClaim })
           div { className: "claims__list" },
             if @state.claims?
               @state.claims.map (claim, index) ->

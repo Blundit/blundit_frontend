@@ -40,9 +40,8 @@ module.exports = React.createFactory React.createClass
     # console.log "error", error
 
   
-  refToSelf: ->
-    @fn = @fn.bind(@)
-    @fn
+  goToNewExpert: ->
+    navigate('/experts/new')
 
 
   render: ->
@@ -50,6 +49,7 @@ module.exports = React.createFactory React.createClass
       Header {}, ''
       div { className: "experts-wrapper" },
         div { className: "experts-content" },
+          React.createElement(Material.RaisedButton, { label: "Create New Expert", primary: true, onClick: @goToNewExpert })
           div { className: "experts__list" },
             if @state.experts?
               @state.experts.map (expert, index) ->

@@ -55,10 +55,13 @@ Blundit = React.createFactory React.createClass
     '/forgot_password': 'forgotPassword'
     '/predictions': 'predictions'
     '/predictions/:id': 'prediction'
+    '/predictions/new': 'createPrediction'
     '/experts': 'experts'
     '/experts/:id': 'expert'
+    '/experts/new': 'createExpert'
     '/claims': 'claims'
     '/claims/:id': 'claim'
+    '/claims/new': 'createClaim'
     '/categories': 'categories'
     '/categories/:id': 'categoryAll'
     '/categories/:id/predictions': 'categoryPredictions'
@@ -123,10 +126,19 @@ Blundit = React.createFactory React.createClass
 
   
   prediction: (id) ->
+    if id != "new"
+      div {},
+        require("views/Prediction")
+          path: @state.path
+          id: id
+    else
+      @createPrediction()
+
+
+  createPrediction: ->
     div {},
-      require("views/Prediction")
+      require("views/CreatePrediction")
         path: @state.path
-        id: id
 
 
   claims: ->
@@ -136,10 +148,19 @@ Blundit = React.createFactory React.createClass
 
   
   claim: (id) ->
+    if id != "new"
+      div {},
+        require("views/Claim")
+          path: @state.path
+          id: id
+    else
+      @createClaim()
+
+
+  createClaim: ->
     div {},
-      require("views/Claim")
+      require("views/CreateClaim")
         path: @state.path
-        id: id
 
 
   experts: ->
@@ -149,10 +170,19 @@ Blundit = React.createFactory React.createClass
 
   
   expert: (id) ->
+    if id != "new"
+      div {},
+        require("views/Expert")
+          path: @state.path
+          id: id
+    else
+      @createExpert()
+
+      
+  createExpert: ->
     div {},
-      require("views/Expert")
+      require("views/CreateExpert")
         path: @state.path
-        id: id
 
 
   bookmarks: ->

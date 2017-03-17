@@ -109,7 +109,6 @@ module.exports = class API
 
   @dataAsGet = (data) ->
     @d = "?"
-    console.log data
 
     for key, value of data
       @d += "#{key}=#{encodeURIComponent(value)}&"
