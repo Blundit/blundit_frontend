@@ -81,6 +81,16 @@ module.exports = class API
       path: 'auth/validate_token?access-token=%accessToken%&client=%client%&uid=%uid%'
       method: "GET"
       non_api: true
+    expert_comments:
+      path: "experts/%expert_id%/comments"
+      method: "GET"
+    claim_comments:
+      path: "claims/%claim_id%/comments"
+      method: "GET"
+    prediction_comments:
+      path: "predictions/%prediction_id%/comments"
+      method: "GET"
+
 
 
 

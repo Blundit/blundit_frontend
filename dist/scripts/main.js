@@ -27,7 +27,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"mixins/SessionMixin":584}],2:[function(require,module,exports){
+},{"mixins/SessionMixin":585}],2:[function(require,module,exports){
 var RaisedButton, div, img, menuItems, ref;
 
 ref = React.DOM, div = ref.div, img = ref.img;
@@ -134,7 +134,7 @@ module.exports = React.createFactory(React.createClass({
 
 },{}],3:[function(require,module,exports){
 (function() {
-  var API, Blundit, Card, CardActions, CardHeader, CardMedia, CardText, CardTitle, CategoryClaims, CategoryExperts, CategoryPredictions, CategorySubHead, ClaimCard, ClaimExpertCard, ClaimFields, ExpertCard, ExpertClaimCard, ExpertFields, ExpertPredictionCard, FlatButton, FontIcon, Footer, Global, Header, IconButton, MuiThemeProvider, Pagination, PaginationMixin, PredictionCard, PredictionExpertCard, PredictionFields, RaisedButton, RefreshIndicator, RouterMixin, SessionMixin, TextField, UserStore, a, br, deepOrange500, div, getMuiTheme, img, menuItems, muiTheme, ref, ref1, ref2, ref3, ref4, ref5, ref6, span, startBlundit,
+  var API, Blundit, Card, CardActions, CardHeader, CardMedia, CardText, CardTitle, CategoryClaims, CategoryExperts, CategoryPredictions, CategorySubHead, ClaimCard, ClaimExpertCard, ClaimFields, Comments, ExpertCard, ExpertClaimCard, ExpertFields, ExpertPredictionCard, FlatButton, FontIcon, Footer, Global, Header, IconButton, MuiThemeProvider, Pagination, PaginationMixin, PredictionCard, PredictionExpertCard, PredictionFields, RaisedButton, RefreshIndicator, RouterMixin, SessionMixin, TextField, UserStore, a, br, deepOrange500, div, getMuiTheme, img, menuItems, muiTheme, ref, ref1, ref2, ref3, ref4, ref5, ref6, ref7, span, startBlundit,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   window.React = require('react');
@@ -661,6 +661,91 @@ module.exports = React.createFactory(React.createClass({
   module.exports = React.createFactory(React.createClass({
     render: function() {
       return div({}, "Claim Fields");
+    }
+  }));
+
+  div = React.DOM.div;
+
+  PaginationMixin = require("mixins/PaginationMixin");
+
+  Pagination = require("components/Pagination");
+
+  module.exports = React.createFactory(React.createClass({
+    displayName: 'Comments',
+    mixins: [PaginationMixin],
+    getInitialState: function() {
+      return {
+        comments: null
+      };
+    },
+    componentDidMount: function() {
+      return this.fetchPaginatedData();
+    },
+    fetchPaginatedData: function(id) {
+      var params;
+      if (id == null) {
+        id = this.state.page;
+      }
+      params = {
+        path: this.props.type + "_comments",
+        path_variables: {
+          expert_id: this.props.id,
+          prediction_id: this.props.id,
+          claim_id: this.props.id
+        },
+        data: {
+          page: id
+        },
+        success: this.commentsSuccess,
+        error: this.commentsError
+      };
+      return API.call(params);
+    },
+    commentsSuccess: function(data) {
+      return this.setState({
+        comments: data
+      });
+    },
+    commentsError: function(error) {},
+    formatDate: function(date) {
+      return date;
+    },
+    render: function() {
+      return div({
+        className: "comments"
+      }, "Comments: " + this.props.id, this.state.comments === null ? div({}, "Loading Comments") : this.state.comments.length === 0 ? div({}, "Currently No Comments") : void 0, this.state.comments != null ? this.state.comments.map((function(_this) {
+        return function(comment, index) {
+          if (comment.user != null) {
+            return div({
+              className: "comments__comment",
+              key: "comment-" + index
+            }, div({
+              className: "comments__comment-user"
+            }, div({
+              className: "comments__comment-user-avatar",
+              style: {
+                backgroundImage: "url(" + comment.user.avatar_file_name + ")"
+              }
+            }), div({
+              className: "comments__comment-user-name"
+            }, comment.user.first_name + " " + comment.user.last_name)), div({
+              className: "comments__comment-meta"
+            }, div({
+              className: "comments__comment-meta-text"
+            }, comment.content), div({
+              className: "comments__comment-meta-created-at"
+            }, _this.formatDate(comment.created_at))));
+          }
+        };
+      })(this)) : void 0, this.state.comments != null ? Pagination({
+        page: this.state.page,
+        numberOfPages: this.state.numberOfPages,
+        nextPage: this.nextPage,
+        previousPage: this.previousPage,
+        specificPage: this.specificPage
+      }) : void 0, (this.state.comments != null) && UserStore.loggedIn() ? div({
+        className: "comments__add-comment"
+      }, "Add comment functionality goes here.") : void 0);
     }
   }));
 
@@ -1352,224 +1437,6 @@ module.exports = React.createFactory(React.createClass({
     updateUserHeaderInfo: function(request) {}
   };
 
-
-  /*
-  API Class.
-  Usage to call is like this:
-  path is required.
-  path_variables is optional, and used for replacement in paths, like 'claims/%claim_id%/add_commment'
-  data is optional.
-  
-  params = {
-    path: "claims"
-    path_variables:
-      claim_id: 1
-    data:
-      id: "xxx"
-    success: @function
-    error: @function
-  }
-  API.call(params)
-   */
-
-  module.exports = API = (function() {
-    function API() {}
-
-    API.paths = {
-      register: {
-        path: "auth/",
-        non_api: true,
-        method: "POST"
-      },
-      login: {
-        path: "auth/sign_in",
-        non_api: true,
-        method: "POST"
-      },
-      logout: {
-        path: "auth/sign_out",
-        non_api: true,
-        method: "DELETE"
-      },
-      forgot_password: {
-        path: "auth/password",
-        non_api: true,
-        method: "POST"
-      },
-      categories: {
-        path: "categories",
-        method: "GET"
-      },
-      category: {
-        path: "categories/%category_id%",
-        method: "GET"
-      },
-      category_predictions: {
-        path: "categories/%category_id%/predictions",
-        method: "GET"
-      },
-      category_claims: {
-        path: "categories/%category_id%/claims",
-        method: "GET"
-      },
-      category_experts: {
-        path: "categories/%category_id%/experts",
-        method: "GET"
-      },
-      category_all: {
-        path: "categories/%category_id%/all",
-        method: "GET"
-      },
-      claims: {
-        path: "claims",
-        method: "GET"
-      },
-      claim: {
-        path: "claims/%claim_id%",
-        method: "GET"
-      },
-      claim_add_comment: {
-        path: "claims/%claim_id%/add_comment",
-        method: "POST"
-      },
-      predictions: {
-        path: "predictions",
-        method: "GET"
-      },
-      prediction: {
-        path: "predictions/%prediction_id%",
-        method: "GET"
-      },
-      experts: {
-        path: "experts",
-        method: "GET"
-      },
-      expert: {
-        path: "experts/%expert_id%",
-        method: "GET"
-      },
-      bookmarks: {
-        path: "user/bookmarks",
-        method: "GET"
-      },
-      verify_token: {
-        path: 'auth/validate_token?access-token=%accessToken%&client=%client%&uid=%uid%',
-        method: "GET",
-        non_api: true
-      }
-    };
-
-    API.server = function(params) {
-      if ((this.paths[params.path].non_api != null) && this.paths[params.path].non_api === true) {
-        return "http://localhost:3000/";
-      }
-      return "http://localhost:3000/api/v1/";
-    };
-
-    API.method = function(params) {
-      return this.paths[params.path].method;
-    };
-
-    API.path = function(params) {
-      var key, ref4, value;
-      this.p = this.server(params) + this.paths[params.path].path;
-      ref4 = params.path_variables;
-      for (key in ref4) {
-        value = ref4[key];
-        this.p = this.p.replace('%' + key + '%', value);
-      }
-      if (this.paths[params.path].method === "GET") {
-        this.p = this.p + this.dataAsGet(params.data);
-      }
-      return this.p;
-    };
-
-    API.dataAsGet = function(data) {
-      var key, value;
-      this.d = "?";
-      for (key in data) {
-        value = data[key];
-        this.d += key + "=" + (encodeURIComponent(value)) + "&";
-      }
-      return this.d;
-    };
-
-    API.data = function(params) {
-      var data;
-      if (params.data != null) {
-        data = params.data;
-      } else {
-        data = {};
-      }
-      return data;
-    };
-
-    API.call = function(params) {
-      return $.ajax({
-        method: this.method(params),
-        url: this.path(params),
-        headers: UserStore.getAuthHeader(),
-        data: this.data(params),
-        dataType: "json",
-        success: function(data, status, request) {
-          UserStore.updateHeaderInfo(request);
-          if (params.success != null) {
-            return params.success(data, request);
-          }
-        },
-        error: function(error) {
-          if (params.error != null) {
-            return params.error(error);
-          }
-        }
-      });
-    };
-
-    return API;
-
-  })();
-
-  module.exports = Global = (function() {
-    function Global() {}
-
-    Global.setCookie = function(name, value, days) {
-      var date, expires;
-      if (days) {
-        date = new Date();
-        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-        expires = "; expires=" + date.toGMTString();
-      } else {
-        expires = "";
-      }
-      return document.cookie = name + "=" + value + expires + "; path=/";
-    };
-
-    Global.getCookie = function(name) {
-      var c, ca, i, nameEQ;
-      nameEQ = name + "=";
-      ca = document.cookie.split(";");
-      i = 0;
-      while (i < ca.length) {
-        c = ca[i];
-        while (c.charAt(0) === " ") {
-          c = c.substring(1, c.length);
-        }
-        if (c.indexOf(nameEQ) === 0) {
-          return c.substring(nameEQ.length, c.length);
-        }
-        i++;
-      }
-      return null;
-    };
-
-    Global.deleteCookie = function(name) {
-      return this.setCookie(name, "", -1);
-    };
-
-    return Global;
-
-  })();
-
   UserStore = (function() {
     function UserStore() {
       this.get = bind(this.get, this);
@@ -1759,6 +1626,236 @@ module.exports = React.createFactory(React.createClass({
   module.exports = new UserStore({
     messagestl: 1000 * 60
   });
+
+
+  /*
+  API Class.
+  Usage to call is like this:
+  path is required.
+  path_variables is optional, and used for replacement in paths, like 'claims/%claim_id%/add_commment'
+  data is optional.
+  
+  params = {
+    path: "claims"
+    path_variables:
+      claim_id: 1
+    data:
+      id: "xxx"
+    success: @function
+    error: @function
+  }
+  API.call(params)
+   */
+
+  module.exports = API = (function() {
+    function API() {}
+
+    API.paths = {
+      register: {
+        path: "auth/",
+        non_api: true,
+        method: "POST"
+      },
+      login: {
+        path: "auth/sign_in",
+        non_api: true,
+        method: "POST"
+      },
+      logout: {
+        path: "auth/sign_out",
+        non_api: true,
+        method: "DELETE"
+      },
+      forgot_password: {
+        path: "auth/password",
+        non_api: true,
+        method: "POST"
+      },
+      categories: {
+        path: "categories",
+        method: "GET"
+      },
+      category: {
+        path: "categories/%category_id%",
+        method: "GET"
+      },
+      category_predictions: {
+        path: "categories/%category_id%/predictions",
+        method: "GET"
+      },
+      category_claims: {
+        path: "categories/%category_id%/claims",
+        method: "GET"
+      },
+      category_experts: {
+        path: "categories/%category_id%/experts",
+        method: "GET"
+      },
+      category_all: {
+        path: "categories/%category_id%/all",
+        method: "GET"
+      },
+      claims: {
+        path: "claims",
+        method: "GET"
+      },
+      claim: {
+        path: "claims/%claim_id%",
+        method: "GET"
+      },
+      claim_add_comment: {
+        path: "claims/%claim_id%/add_comment",
+        method: "POST"
+      },
+      predictions: {
+        path: "predictions",
+        method: "GET"
+      },
+      prediction: {
+        path: "predictions/%prediction_id%",
+        method: "GET"
+      },
+      experts: {
+        path: "experts",
+        method: "GET"
+      },
+      expert: {
+        path: "experts/%expert_id%",
+        method: "GET"
+      },
+      bookmarks: {
+        path: "user/bookmarks",
+        method: "GET"
+      },
+      verify_token: {
+        path: 'auth/validate_token?access-token=%accessToken%&client=%client%&uid=%uid%',
+        method: "GET",
+        non_api: true
+      },
+      expert_comments: {
+        path: "experts/%expert_id%/comments",
+        method: "GET"
+      },
+      claim_comments: {
+        path: "claims/%claim_id%/comments",
+        method: "GET"
+      },
+      prediction_comments: {
+        path: "predictions/%prediction_id%/comments",
+        method: "GET"
+      }
+    };
+
+    API.server = function(params) {
+      if ((this.paths[params.path].non_api != null) && this.paths[params.path].non_api === true) {
+        return "http://localhost:3000/";
+      }
+      return "http://localhost:3000/api/v1/";
+    };
+
+    API.method = function(params) {
+      return this.paths[params.path].method;
+    };
+
+    API.path = function(params) {
+      var key, ref4, value;
+      this.p = this.server(params) + this.paths[params.path].path;
+      ref4 = params.path_variables;
+      for (key in ref4) {
+        value = ref4[key];
+        this.p = this.p.replace('%' + key + '%', value);
+      }
+      if (this.paths[params.path].method === "GET") {
+        this.p = this.p + this.dataAsGet(params.data);
+      }
+      return this.p;
+    };
+
+    API.dataAsGet = function(data) {
+      var key, value;
+      this.d = "?";
+      for (key in data) {
+        value = data[key];
+        this.d += key + "=" + (encodeURIComponent(value)) + "&";
+      }
+      return this.d;
+    };
+
+    API.data = function(params) {
+      var data;
+      if (params.data != null) {
+        data = params.data;
+      } else {
+        data = {};
+      }
+      return data;
+    };
+
+    API.call = function(params) {
+      return $.ajax({
+        method: this.method(params),
+        url: this.path(params),
+        headers: UserStore.getAuthHeader(),
+        data: this.data(params),
+        dataType: "json",
+        success: function(data, status, request) {
+          UserStore.updateHeaderInfo(request);
+          if (params.success != null) {
+            return params.success(data, request);
+          }
+        },
+        error: function(error) {
+          if (params.error != null) {
+            return params.error(error);
+          }
+        }
+      });
+    };
+
+    return API;
+
+  })();
+
+  module.exports = Global = (function() {
+    function Global() {}
+
+    Global.setCookie = function(name, value, days) {
+      var date, expires;
+      if (days) {
+        date = new Date();
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+        expires = "; expires=" + date.toGMTString();
+      } else {
+        expires = "";
+      }
+      return document.cookie = name + "=" + value + expires + "; path=/";
+    };
+
+    Global.getCookie = function(name) {
+      var c, ca, i, nameEQ;
+      nameEQ = name + "=";
+      ca = document.cookie.split(";");
+      i = 0;
+      while (i < ca.length) {
+        c = ca[i];
+        while (c.charAt(0) === " ") {
+          c = c.substring(1, c.length);
+        }
+        if (c.indexOf(nameEQ) === 0) {
+          return c.substring(nameEQ.length, c.length);
+        }
+        i++;
+      }
+      return null;
+    };
+
+    Global.deleteCookie = function(name) {
+      return this.setCookie(name, "", -1);
+    };
+
+    return Global;
+
+  })();
 
   div = React.DOM.div;
 
@@ -2424,7 +2521,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  div = React.DOM.div;
+  ref4 = React.DOM, div = ref4.div, img = ref4.img;
 
   Header = require("components/Header");
 
@@ -2433,6 +2530,8 @@ module.exports = React.createFactory(React.createClass({
   ExpertClaimCard = require("components/ExpertClaimCard");
 
   ExpertPredictionCard = require("components/ExpertPredictionCard");
+
+  Comments = require("components/Comments");
 
   module.exports = React.createFactory(React.createClass({
     displayName: 'Experts',
@@ -2472,9 +2571,23 @@ module.exports = React.createFactory(React.createClass({
         loadError: error.responseJSON.errors
       });
     },
+    goToBonaFide: function(url) {
+      return window.open(url, '_blank');
+    },
+    goToCategory: function(id) {
+      return navigate("/categories/" + id);
+    },
+    categoryMaterialStyle: function() {
+      return {
+        margin: 4
+      };
+    },
+    showAccuracy: function(val) {
+      return Math.floor(val * 100) + "%";
+    },
     render: function() {
-      var claims, expert, predictions, ref4;
-      ref4 = this.state, expert = ref4.expert, predictions = ref4.predictions, claims = ref4.claims;
+      var claims, expert, predictions, ref5;
+      ref5 = this.state, expert = ref5.expert, predictions = ref5.predictions, claims = ref5.claims;
       return div({}, Header({}, ''), div({
         className: "experts-wrapper"
       }, div({
@@ -2484,6 +2597,53 @@ module.exports = React.createFactory(React.createClass({
       }, div({
         className: "expert__name"
       }, expert.name), div({
+        className: "expert__description"
+      }, expert.description != null ? expert.description : "This expert has no description yet."), div({
+        className: "expert__avatar"
+      }, img({
+        src: expert.avatar
+      })), div({
+        className: "expert__bona-fides"
+      }, expert.bona_fides.length === 0 ? "This expert has no bona fides listed yet." : expert.bona_fides.map((function(_this) {
+        return function(bona_fide, index) {
+          return div({
+            className: "expert__bona-fide",
+            key: "expert-bona-fide-" + index
+          }, div({
+            className: "expert__bona-fide__title"
+          }, bona_fide.title), div({
+            className: "expert__bona-fide__description"
+          }, bona_fide.description), div({
+            className: "expert__bona-fide__url",
+            onClick: _this.goToBonaFide.bind(_this, bona_fide.url)
+          }, bona_fide.url));
+        };
+      })(this))), div({
+        className: "expert__categories"
+      }, "These are the titles belonging to this expert:", expert.categories.length === 0 ? div({}, "No categories yet.") : div({}, expert.categories.map((function(_this) {
+        return function(category, index) {
+          return React.createElement(Material.Chip, {
+            onTouchTap: _this.goToCategory.bind(_this, category.id),
+            key: "expert-category-chip-" + index,
+            style: _this.categoryMaterialStyle()
+          }, category.name);
+        };
+      })(this)))), div({
+        className: "expert__accuracy"
+      }, "This expert has an overall accuracy of: " + (this.showAccuracy(expert.accuracy)), div({
+        className: "expert__accuracy-categories"
+      }, "Accuracy by Category: ", expert.category_accuracies.map((function(_this) {
+        return function(accuracy, index) {
+          return div({
+            className: "expert__accuracy-category",
+            key: "expert-accuracy-category-" + index
+          }, "" + accuracy.category_name, div({
+            className: "expert__accuracy-category__claim"
+          }, (_this.showAccuracy(accuracy.claim_accuracy)) + " (Claims: " + (accuracy.correct_claims + accuracy.incorrect_claims) + ")"), div({
+            className: "expert__accuracy-category__prediction"
+          }, (_this.showAccuracy(accuracy.prediction_accuracy)) + " (Predictions: " + (accuracy.correct_predictions + accuracy.incorrect_predictions) + ")"));
+        };
+      })(this)))), div({
         className: "expert__predictions"
       }, div({
         className: "expert__predictions-title"
@@ -2492,6 +2652,7 @@ module.exports = React.createFactory(React.createClass({
       }, predictions.length > 0 ? predictions.map(function(prediction, index) {
         return ExpertPredictionCard({
           expert: expert,
+          key: "expert-prediction-card-" + index,
           prediction: prediction
         });
       }) : "No predictions")), div({
@@ -2504,9 +2665,13 @@ module.exports = React.createFactory(React.createClass({
         return ExpertClaimCard({
           expert: expert,
           claim: claim,
-          key: "claim-expert-" + index
+          key: "expert-claim-card-" + index
         });
-      }) : "No claims"))) : div({}, this.state.loadError))), Footer({}, ''));
+      }) : "No claims")), Comments({
+        type: "expert",
+        id: expert.id,
+        num: expert.comments_count
+      })) : div({}, this.state.loadError))), Footer({}, ''));
     }
   }));
 
@@ -2589,7 +2754,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref4 = React.DOM, div = ref4.div, a = ref4.a;
+  ref5 = React.DOM, div = ref5.div, a = ref5.a;
 
   Header = require("components/Header");
 
@@ -2664,10 +2829,10 @@ module.exports = React.createFactory(React.createClass({
       return false;
     },
     getErrorText: function(key) {
-      var error, j, len, ref5;
-      ref5 = this.state.errors;
-      for (j = 0, len = ref5.length; j < len; j++) {
-        error = ref5[j];
+      var error, j, len, ref6;
+      ref6 = this.state.errors;
+      for (j = 0, len = ref6.length; j < len; j++) {
+        error = ref6[j];
         if (error.id === key) {
           return error.text;
         }
@@ -2740,7 +2905,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref5 = React.DOM, div = ref5.div, a = ref5.a;
+  ref6 = React.DOM, div = ref6.div, a = ref6.a;
 
   Header = require("components/Header");
 
@@ -2846,10 +3011,10 @@ module.exports = React.createFactory(React.createClass({
       }
     },
     getErrorText: function(key) {
-      var error, j, len, ref6;
-      ref6 = this.state.errors;
-      for (j = 0, len = ref6.length; j < len; j++) {
-        error = ref6[j];
+      var error, j, len, ref7;
+      ref7 = this.state.errors;
+      for (j = 0, len = ref7.length; j < len; j++) {
+        error = ref7[j];
         if (error.id === key) {
           return error.text;
         }
@@ -2939,8 +3104,8 @@ module.exports = React.createFactory(React.createClass({
       });
     },
     render: function() {
-      var experts, prediction, ref6;
-      ref6 = this.state, prediction = ref6.prediction, experts = ref6.experts;
+      var experts, prediction, ref7;
+      ref7 = this.state, prediction = ref7.prediction, experts = ref7.experts;
       return div({}, Header({}, ''), div({
         className: "predictions-wrapper"
       }, div({
@@ -3044,7 +3209,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref6 = React.DOM, div = ref6.div, a = ref6.a;
+  ref7 = React.DOM, div = ref7.div, a = ref7.a;
 
   Header = require("components/Header");
 
@@ -3166,10 +3331,10 @@ module.exports = React.createFactory(React.createClass({
       }
     },
     getErrorText: function(key) {
-      var error, j, len, ref7;
-      ref7 = this.state.errors;
-      for (j = 0, len = ref7.length; j < len; j++) {
-        error = ref7[j];
+      var error, j, len, ref8;
+      ref8 = this.state.errors;
+      for (j = 0, len = ref8.length; j < len; j++) {
+        error = ref8[j];
         if (error.id === key) {
           return error.text;
         }
@@ -3285,7 +3450,7 @@ module.exports = React.createFactory(React.createClass({
 
 }).call(this);
 
-},{"./components/Footer":1,"./components/Header":2,"components/CategoryClaims":566,"components/CategoryExperts":567,"components/CategoryPredictions":568,"components/CategorySubHead":569,"components/ClaimCard":570,"components/ClaimExpertCard":571,"components/ClaimFields":572,"components/ExpertCard":573,"components/ExpertClaimCard":574,"components/ExpertFields":575,"components/ExpertPredictionCard":576,"components/Footer":577,"components/Header":578,"components/Pagination":579,"components/PredictionCard":580,"components/PredictionExpertCard":581,"components/PredictionFields":582,"lodash":180,"material-ui":318,"material-ui/styles/MuiThemeProvider":337,"material-ui/styles/colors":339,"material-ui/styles/getMuiTheme":340,"mixins/PaginationMixin":583,"mixins/SessionMixin":584,"react":551,"react-dom":377,"react-mini-router":509,"react-tap-event-plugin":520,"shared/API":585,"shared/Global":586,"stores/UserStore":587,"views/404":588,"views/Bookmarks":589,"views/Categories":590,"views/CategoryAll":591,"views/CategoryClaims":592,"views/CategoryExperts":593,"views/CategoryPredictions":594,"views/Claim":595,"views/Claims":596,"views/CreateClaim":597,"views/CreateExpert":598,"views/CreatePrediction":599,"views/Expert":600,"views/Experts":601,"views/ForgotPassword":602,"views/Landing":603,"views/Login":604,"views/Prediction":605,"views/Predictions":606,"views/Register":607,"views/RegisterSuccessful":608,"views/User":609,"views/Users":610}],4:[function(require,module,exports){
+},{"./components/Footer":1,"./components/Header":2,"components/CategoryClaims":566,"components/CategoryExperts":567,"components/CategoryPredictions":568,"components/CategorySubHead":569,"components/ClaimCard":570,"components/ClaimExpertCard":571,"components/ClaimFields":572,"components/Comments":573,"components/ExpertCard":574,"components/ExpertClaimCard":575,"components/ExpertFields":576,"components/ExpertPredictionCard":577,"components/Footer":578,"components/Header":579,"components/Pagination":580,"components/PredictionCard":581,"components/PredictionExpertCard":582,"components/PredictionFields":583,"lodash":180,"material-ui":318,"material-ui/styles/MuiThemeProvider":337,"material-ui/styles/colors":339,"material-ui/styles/getMuiTheme":340,"mixins/PaginationMixin":584,"mixins/SessionMixin":585,"react":551,"react-dom":377,"react-mini-router":509,"react-tap-event-plugin":520,"shared/API":586,"shared/Global":587,"stores/UserStore":588,"views/404":589,"views/Bookmarks":590,"views/Categories":591,"views/CategoryAll":592,"views/CategoryClaims":593,"views/CategoryExperts":594,"views/CategoryPredictions":595,"views/Claim":596,"views/Claims":597,"views/CreateClaim":598,"views/CreateExpert":599,"views/CreatePrediction":600,"views/Expert":601,"views/Experts":602,"views/ForgotPassword":603,"views/Landing":604,"views/Login":605,"views/Prediction":606,"views/Predictions":607,"views/Register":608,"views/RegisterSuccessful":609,"views/User":610,"views/Users":611}],4:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/array/from"), __esModule: true };
 },{"core-js/library/fn/array/from":26}],5:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/get-iterator"), __esModule: true };
@@ -80709,6 +80874,95 @@ module.exports = React.createFactory(React.createClass({
 
 
 },{}],573:[function(require,module,exports){
+var Pagination, PaginationMixin, div;
+
+div = React.DOM.div;
+
+PaginationMixin = require("mixins/PaginationMixin");
+
+Pagination = require("components/Pagination");
+
+module.exports = React.createFactory(React.createClass({
+  displayName: 'Comments',
+  mixins: [PaginationMixin],
+  getInitialState: function() {
+    return {
+      comments: null
+    };
+  },
+  componentDidMount: function() {
+    return this.fetchPaginatedData();
+  },
+  fetchPaginatedData: function(id) {
+    var params;
+    if (id == null) {
+      id = this.state.page;
+    }
+    params = {
+      path: this.props.type + "_comments",
+      path_variables: {
+        expert_id: this.props.id,
+        prediction_id: this.props.id,
+        claim_id: this.props.id
+      },
+      data: {
+        page: id
+      },
+      success: this.commentsSuccess,
+      error: this.commentsError
+    };
+    return API.call(params);
+  },
+  commentsSuccess: function(data) {
+    return this.setState({
+      comments: data
+    });
+  },
+  commentsError: function(error) {},
+  formatDate: function(date) {
+    return date;
+  },
+  render: function() {
+    return div({
+      className: "comments"
+    }, "Comments: " + this.props.id, this.state.comments === null ? div({}, "Loading Comments") : this.state.comments.length === 0 ? div({}, "Currently No Comments") : void 0, this.state.comments != null ? this.state.comments.map((function(_this) {
+      return function(comment, index) {
+        if (comment.user != null) {
+          return div({
+            className: "comments__comment",
+            key: "comment-" + index
+          }, div({
+            className: "comments__comment-user"
+          }, div({
+            className: "comments__comment-user-avatar",
+            style: {
+              backgroundImage: "url(" + comment.user.avatar_file_name + ")"
+            }
+          }), div({
+            className: "comments__comment-user-name"
+          }, comment.user.first_name + " " + comment.user.last_name)), div({
+            className: "comments__comment-meta"
+          }, div({
+            className: "comments__comment-meta-text"
+          }, comment.content), div({
+            className: "comments__comment-meta-created-at"
+          }, _this.formatDate(comment.created_at))));
+        }
+      };
+    })(this)) : void 0, this.state.comments != null ? Pagination({
+      page: this.state.page,
+      numberOfPages: this.state.numberOfPages,
+      nextPage: this.nextPage,
+      previousPage: this.previousPage,
+      specificPage: this.specificPage
+    }) : void 0, (this.state.comments != null) && UserStore.loggedIn() ? div({
+      className: "comments__add-comment"
+    }, "Add comment functionality goes here.") : void 0);
+  }
+}));
+
+
+},{"components/Pagination":580,"mixins/PaginationMixin":584}],574:[function(require,module,exports){
 var Card, CardActions, CardHeader, CardMedia, CardText, CardTitle, FlatButton, a, br, div, img, ref, span;
 
 Card = Material.Card;
@@ -80813,7 +81067,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],574:[function(require,module,exports){
+},{}],575:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -80835,7 +81089,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],575:[function(require,module,exports){
+},{}],576:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -80847,7 +81101,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],576:[function(require,module,exports){
+},{}],577:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -80869,11 +81123,11 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],577:[function(require,module,exports){
+},{}],578:[function(require,module,exports){
 module.exports=require(1)
-},{"mixins/SessionMixin":584}],578:[function(require,module,exports){
+},{"mixins/SessionMixin":585}],579:[function(require,module,exports){
 module.exports=require(2)
-},{}],579:[function(require,module,exports){
+},{}],580:[function(require,module,exports){
 var FlatButton, FontIcon, IconButton, div;
 
 div = React.DOM.div;
@@ -81017,7 +81271,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],580:[function(require,module,exports){
+},{}],581:[function(require,module,exports){
 var Card, CardActions, CardHeader, CardText, FlatButton, a, br, div, img, ref, span;
 
 Card = Material.Card;
@@ -81137,7 +81391,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],581:[function(require,module,exports){
+},{}],582:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -81159,7 +81413,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],582:[function(require,module,exports){
+},{}],583:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -81171,7 +81425,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],583:[function(require,module,exports){
+},{}],584:[function(require,module,exports){
 module.exports = {
   getInitialState: function() {
     return {
@@ -81204,7 +81458,7 @@ module.exports = {
 };
 
 
-},{}],584:[function(require,module,exports){
+},{}],585:[function(require,module,exports){
 module.exports = {
   setUser: function(data, request) {
     window.UserStore.set(data, request);
@@ -81310,7 +81564,7 @@ module.exports = {
 };
 
 
-},{}],585:[function(require,module,exports){
+},{}],586:[function(require,module,exports){
 
 /*
 API Class.
@@ -81416,6 +81670,18 @@ module.exports = API = (function() {
       path: 'auth/validate_token?access-token=%accessToken%&client=%client%&uid=%uid%',
       method: "GET",
       non_api: true
+    },
+    expert_comments: {
+      path: "experts/%expert_id%/comments",
+      method: "GET"
+    },
+    claim_comments: {
+      path: "claims/%claim_id%/comments",
+      method: "GET"
+    },
+    prediction_comments: {
+      path: "predictions/%prediction_id%/comments",
+      method: "GET"
     }
   };
 
@@ -81490,7 +81756,7 @@ module.exports = API = (function() {
 })();
 
 
-},{}],586:[function(require,module,exports){
+},{}],587:[function(require,module,exports){
 var Global;
 
 module.exports = Global = (function() {
@@ -81535,7 +81801,7 @@ module.exports = Global = (function() {
 })();
 
 
-},{}],587:[function(require,module,exports){
+},{}],588:[function(require,module,exports){
 var UserStore,
   bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
@@ -81730,7 +81996,7 @@ module.exports = new UserStore({
 });
 
 
-},{}],588:[function(require,module,exports){
+},{}],589:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -81751,7 +82017,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":577,"components/Header":578}],589:[function(require,module,exports){
+},{"components/Footer":578,"components/Header":579}],590:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -81816,7 +82082,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":577,"components/Header":578}],590:[function(require,module,exports){
+},{"components/Footer":578,"components/Header":579}],591:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -81870,7 +82136,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":577,"components/Header":578}],591:[function(require,module,exports){
+},{"components/Footer":578,"components/Header":579}],592:[function(require,module,exports){
 var CategoryClaims, CategoryExperts, CategoryPredictions, CategorySubHead, Footer, Header, div;
 
 div = React.DOM.div;
@@ -81957,7 +82223,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/CategoryClaims":566,"components/CategoryExperts":567,"components/CategoryPredictions":568,"components/CategorySubHead":569,"components/Footer":577,"components/Header":578}],592:[function(require,module,exports){
+},{"components/CategoryClaims":566,"components/CategoryExperts":567,"components/CategoryPredictions":568,"components/CategorySubHead":569,"components/Footer":578,"components/Header":579}],593:[function(require,module,exports){
 var CategoryClaims, CategorySubHead, Footer, Header, div;
 
 div = React.DOM.div;
@@ -82036,7 +82302,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/CategoryClaims":566,"components/CategorySubHead":569,"components/Footer":577,"components/Header":578}],593:[function(require,module,exports){
+},{"components/CategoryClaims":566,"components/CategorySubHead":569,"components/Footer":578,"components/Header":579}],594:[function(require,module,exports){
 var CategoryExperts, CategorySubHead, Footer, Header, div;
 
 div = React.DOM.div;
@@ -82115,7 +82381,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/CategoryExperts":567,"components/CategorySubHead":569,"components/Footer":577,"components/Header":578}],594:[function(require,module,exports){
+},{"components/CategoryExperts":567,"components/CategorySubHead":569,"components/Footer":578,"components/Header":579}],595:[function(require,module,exports){
 var CategoryPredictions, CategorySubHead, Footer, Header, div;
 
 div = React.DOM.div;
@@ -82194,7 +82460,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/CategoryPredictions":568,"components/CategorySubHead":569,"components/Footer":577,"components/Header":578}],595:[function(require,module,exports){
+},{"components/CategoryPredictions":568,"components/CategorySubHead":569,"components/Footer":578,"components/Header":579}],596:[function(require,module,exports){
 var ClaimExpertCard, Footer, Header, div;
 
 div = React.DOM.div;
@@ -82267,7 +82533,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ClaimExpertCard":571,"components/Footer":577,"components/Header":578}],596:[function(require,module,exports){
+},{"components/ClaimExpertCard":571,"components/Footer":578,"components/Header":579}],597:[function(require,module,exports){
 var ClaimCard, Footer, Header, Pagination, PaginationMixin, RaisedButton, div;
 
 div = React.DOM.div;
@@ -82352,7 +82618,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ClaimCard":570,"components/Footer":577,"components/Header":578,"components/Pagination":579,"mixins/PaginationMixin":583}],597:[function(require,module,exports){
+},{"components/ClaimCard":570,"components/Footer":578,"components/Header":579,"components/Pagination":580,"mixins/PaginationMixin":584}],598:[function(require,module,exports){
 var ClaimFields, Footer, Header, div;
 
 div = React.DOM.div;
@@ -82382,7 +82648,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ClaimFields":572,"components/Footer":577,"components/Header":578}],598:[function(require,module,exports){
+},{"components/ClaimFields":572,"components/Footer":578,"components/Header":579}],599:[function(require,module,exports){
 var ExpertFields, Footer, Header, div;
 
 div = React.DOM.div;
@@ -82412,7 +82678,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ExpertFields":575,"components/Footer":577,"components/Header":578}],599:[function(require,module,exports){
+},{"components/ExpertFields":576,"components/Footer":578,"components/Header":579}],600:[function(require,module,exports){
 var Footer, Header, PredictionFields, div;
 
 div = React.DOM.div;
@@ -82442,10 +82708,10 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":577,"components/Header":578,"components/PredictionFields":582}],600:[function(require,module,exports){
-var ExpertClaimCard, ExpertPredictionCard, Footer, Header, div;
+},{"components/Footer":578,"components/Header":579,"components/PredictionFields":583}],601:[function(require,module,exports){
+var Comments, ExpertClaimCard, ExpertPredictionCard, Footer, Header, div, img, ref;
 
-div = React.DOM.div;
+ref = React.DOM, div = ref.div, img = ref.img;
 
 Header = require("components/Header");
 
@@ -82454,6 +82720,8 @@ Footer = require("components/Footer");
 ExpertClaimCard = require("components/ExpertClaimCard");
 
 ExpertPredictionCard = require("components/ExpertPredictionCard");
+
+Comments = require("components/Comments");
 
 module.exports = React.createFactory(React.createClass({
   displayName: 'Experts',
@@ -82493,9 +82761,23 @@ module.exports = React.createFactory(React.createClass({
       loadError: error.responseJSON.errors
     });
   },
+  goToBonaFide: function(url) {
+    return window.open(url, '_blank');
+  },
+  goToCategory: function(id) {
+    return navigate("/categories/" + id);
+  },
+  categoryMaterialStyle: function() {
+    return {
+      margin: 4
+    };
+  },
+  showAccuracy: function(val) {
+    return Math.floor(val * 100) + "%";
+  },
   render: function() {
-    var claims, expert, predictions, ref;
-    ref = this.state, expert = ref.expert, predictions = ref.predictions, claims = ref.claims;
+    var claims, expert, predictions, ref1;
+    ref1 = this.state, expert = ref1.expert, predictions = ref1.predictions, claims = ref1.claims;
     return div({}, Header({}, ''), div({
       className: "experts-wrapper"
     }, div({
@@ -82505,6 +82787,53 @@ module.exports = React.createFactory(React.createClass({
     }, div({
       className: "expert__name"
     }, expert.name), div({
+      className: "expert__description"
+    }, expert.description != null ? expert.description : "This expert has no description yet."), div({
+      className: "expert__avatar"
+    }, img({
+      src: expert.avatar
+    })), div({
+      className: "expert__bona-fides"
+    }, expert.bona_fides.length === 0 ? "This expert has no bona fides listed yet." : expert.bona_fides.map((function(_this) {
+      return function(bona_fide, index) {
+        return div({
+          className: "expert__bona-fide",
+          key: "expert-bona-fide-" + index
+        }, div({
+          className: "expert__bona-fide__title"
+        }, bona_fide.title), div({
+          className: "expert__bona-fide__description"
+        }, bona_fide.description), div({
+          className: "expert__bona-fide__url",
+          onClick: _this.goToBonaFide.bind(_this, bona_fide.url)
+        }, bona_fide.url));
+      };
+    })(this))), div({
+      className: "expert__categories"
+    }, "These are the titles belonging to this expert:", expert.categories.length === 0 ? div({}, "No categories yet.") : div({}, expert.categories.map((function(_this) {
+      return function(category, index) {
+        return React.createElement(Material.Chip, {
+          onTouchTap: _this.goToCategory.bind(_this, category.id),
+          key: "expert-category-chip-" + index,
+          style: _this.categoryMaterialStyle()
+        }, category.name);
+      };
+    })(this)))), div({
+      className: "expert__accuracy"
+    }, "This expert has an overall accuracy of: " + (this.showAccuracy(expert.accuracy)), div({
+      className: "expert__accuracy-categories"
+    }, "Accuracy by Category: ", expert.category_accuracies.map((function(_this) {
+      return function(accuracy, index) {
+        return div({
+          className: "expert__accuracy-category",
+          key: "expert-accuracy-category-" + index
+        }, "" + accuracy.category_name, div({
+          className: "expert__accuracy-category__claim"
+        }, (_this.showAccuracy(accuracy.claim_accuracy)) + " (Claims: " + (accuracy.correct_claims + accuracy.incorrect_claims) + ")"), div({
+          className: "expert__accuracy-category__prediction"
+        }, (_this.showAccuracy(accuracy.prediction_accuracy)) + " (Predictions: " + (accuracy.correct_predictions + accuracy.incorrect_predictions) + ")"));
+      };
+    })(this)))), div({
       className: "expert__predictions"
     }, div({
       className: "expert__predictions-title"
@@ -82513,6 +82842,7 @@ module.exports = React.createFactory(React.createClass({
     }, predictions.length > 0 ? predictions.map(function(prediction, index) {
       return ExpertPredictionCard({
         expert: expert,
+        key: "expert-prediction-card-" + index,
         prediction: prediction
       });
     }) : "No predictions")), div({
@@ -82525,14 +82855,18 @@ module.exports = React.createFactory(React.createClass({
       return ExpertClaimCard({
         expert: expert,
         claim: claim,
-        key: "claim-expert-" + index
+        key: "expert-claim-card-" + index
       });
-    }) : "No claims"))) : div({}, this.state.loadError))), Footer({}, ''));
+    }) : "No claims")), Comments({
+      type: "expert",
+      id: expert.id,
+      num: expert.comments_count
+    })) : div({}, this.state.loadError))), Footer({}, ''));
   }
 }));
 
 
-},{"components/ExpertClaimCard":574,"components/ExpertPredictionCard":576,"components/Footer":577,"components/Header":578}],601:[function(require,module,exports){
+},{"components/Comments":573,"components/ExpertClaimCard":575,"components/ExpertPredictionCard":577,"components/Footer":578,"components/Header":579}],602:[function(require,module,exports){
 var ExpertCard, Footer, Header, Pagination, PaginationMixin, div;
 
 div = React.DOM.div;
@@ -82615,7 +82949,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ExpertCard":573,"components/Footer":577,"components/Header":578,"components/Pagination":579,"mixins/PaginationMixin":583}],602:[function(require,module,exports){
+},{"components/ExpertCard":574,"components/Footer":578,"components/Header":579,"components/Pagination":580,"mixins/PaginationMixin":584}],603:[function(require,module,exports){
 var Footer, Header, RaisedButton, RefreshIndicator, TextField, a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
@@ -82753,7 +83087,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":577,"components/Header":578}],603:[function(require,module,exports){
+},{"components/Footer":578,"components/Header":579}],604:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -82774,7 +83108,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":577,"components/Header":578}],604:[function(require,module,exports){
+},{"components/Footer":578,"components/Header":579}],605:[function(require,module,exports){
 var Footer, Header, RaisedButton, RefreshIndicator, SessionMixin, TextField, a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
@@ -82934,7 +83268,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":577,"components/Header":578,"mixins/SessionMixin":584}],605:[function(require,module,exports){
+},{"components/Footer":578,"components/Header":579,"mixins/SessionMixin":585}],606:[function(require,module,exports){
 var Footer, Header, PredictionExpertCard, div;
 
 div = React.DOM.div;
@@ -83007,7 +83341,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":577,"components/Header":578,"components/PredictionExpertCard":581}],606:[function(require,module,exports){
+},{"components/Footer":578,"components/Header":579,"components/PredictionExpertCard":582}],607:[function(require,module,exports){
 var Footer, Header, Pagination, PaginationMixin, PredictionCard, div;
 
 div = React.DOM.div;
@@ -83090,7 +83424,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":577,"components/Header":578,"components/Pagination":579,"components/PredictionCard":580,"mixins/PaginationMixin":583}],607:[function(require,module,exports){
+},{"components/Footer":578,"components/Header":579,"components/Pagination":580,"components/PredictionCard":581,"mixins/PaginationMixin":584}],608:[function(require,module,exports){
 var Footer, Header, RaisedButton, RefreshIndicator, TextField, a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
@@ -83271,7 +83605,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":577,"components/Header":578}],608:[function(require,module,exports){
+},{"components/Footer":578,"components/Header":579}],609:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -83292,7 +83626,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":577,"components/Header":578}],609:[function(require,module,exports){
+},{"components/Footer":578,"components/Header":579}],610:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -83324,7 +83658,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":577,"components/Header":578}],610:[function(require,module,exports){
+},{"components/Footer":578,"components/Header":579}],611:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -83345,4 +83679,4 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":577,"components/Header":578}]},{},[3])
+},{"components/Footer":578,"components/Header":579}]},{},[3])
