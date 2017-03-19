@@ -10,6 +10,13 @@ module.exports = React.createFactory React.createClass
 
   getInitialState: ->
     comments: null
+    errors: []
+    commentSubmitting: false
+    commentError: null
+    inputs:
+      content:
+        val: ''
+        minLength: 10
   
 
   componentDidMount: ->
@@ -33,15 +40,81 @@ module.exports = React.createFactory React.createClass
 
   
   commentsSuccess: (data) ->
-    @setState comments: data
+    @setState comments: data.comments
+    @setState page: Number(data.page)
+    @setState numberOfPages: data.number_of_pages
+    @inputs = @state.inputs
+    @inputs.content.val = ''
+    @setState inputs: @inputs
 
 
   commentsError: (error) ->
     # console.log "ERROR"
 
+  
+  addComment: ->
+    if @validateInputs()
+      @setState commentSubmitting: true
+      @setState commentError: null
+      params = {
+        path: "#{@props.type}_add_comment"
+        path_variables:
+          expert_id: @props.id
+          prediction_id: @props.id
+          claim_id: @props.id
+        data:
+          content: @state.inputs.content.val
+        success: @addCommentSuccess
+        error: @addCommentError
+      }
+    
+      API.call(params)
+
+
+  validateInputs: ->
+    @errors = []
+    if @state.inputs.content.val.length < 3
+      @errors.push { id: "content", text: "Comment must be at least 3 characters long." }
+    
+    if @state.inputs.content.val.length > 1000
+      @errors.push { id: "content", text: "Comment can't be longer than 1000 characters." }
+
+    @setState errors: @errors
+
+    return true if @errors.length == 0
+    return false
+
+
+  addCommentSuccess: ->
+    @setState commentSubmitting: false
+    @setState page: 1
+    @fetchPaginatedData(1)
+
+  
+  addCommentError: (error) ->
+    @setState commentSubmitting: false
+    if error.responseJSON? and error.responseJSON.errors?
+      @setState commentError: error.responseJSON.errors[0]
+    else
+      @setState commentError: "There was an error."
 
   formatDate: (date) ->
     return date
+
+
+  getErrorText: (key) ->
+    for error in @state.errors
+      if error.id == key
+        return error.text
+    
+    return null
+
+
+  handleCommentContentChange: (event) ->
+    @inputs = @state.inputs
+    @inputs.content.val = event.target.value
+
+    @setState inputs: @inputs
 
 
   render: ->
@@ -84,4 +157,30 @@ module.exports = React.createFactory React.createClass
 
       if @state.comments? and UserStore.loggedIn()
         div { className: "comments__add-comment" },
-          "Add comment functionality goes here."
+          div {},
+            React.createElement(Material.TextField,
+            {
+              id: "comment-content",
+              hintText: "Add Comment",
+              floatingLabelText: "Content",
+              multiLine: true,
+              rows: 2,
+              fullWidth: true,
+              rowsMax: 4
+              value: @state.inputs.content.val,
+              onChange: @handleCommentContentChange,
+              errorText: @getErrorText("content")
+            })
+            div {},
+              if @state.commentSubmitting == true
+                @style = {
+                  display: 'inline-block'
+                  position: 'relative'
+                  boxShadow: 'none'
+                }
+                React.createElement(Material.RefreshIndicator, { style: @style, size: 50, left: 0, top: 0, status:"loading" })
+              else
+                React.createElement(Material.RaisedButton, {label: "Add Comment", primary: true, onClick: @addComment })
+            if @state.commentError?
+              div {},
+                @state.commentError

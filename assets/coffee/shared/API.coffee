@@ -68,12 +68,18 @@ module.exports = class API
     prediction:
       path: "predictions/%prediction_id%"
       method: "GET"
+    prediction_add_comment:
+      path: "predictions/%prediction_id%/add_comment"
+      method: "POST"
     experts:
       path: "experts"
       method: "GET"
     expert:
       path: "experts/%expert_id%"
       method: "GET"
+    expert_add_comment:
+      path: "experts/%expert_id%/add_comment"
+      method: "POST"
     bookmarks:
       path: "user/bookmarks"
       method: "GET"

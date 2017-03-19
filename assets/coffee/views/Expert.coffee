@@ -5,6 +5,7 @@ Footer = require("components/Footer")
 ExpertClaimCard = require("components/ExpertClaimCard")
 ExpertPredictionCard = require("components/ExpertPredictionCard")
 Comments = require("components/Comments")
+AddToExpert = require("components/AddToExpert")
 
 module.exports = React.createFactory React.createClass
   displayName: 'Experts'
@@ -17,6 +18,10 @@ module.exports = React.createFactory React.createClass
 
 
   componentDidMount: ->
+    @fetchExpert()
+
+
+  fetchExpert: ->
     params = {
       path: "expert"
       path_variables:
@@ -131,6 +136,10 @@ module.exports = React.createFactory React.createClass
                           prediction: prediction
                     else
                       "No predictions"
+                    AddToExpert
+                      expert: expert
+                      type: "prediction"
+                      refresh: @fetchExpert
                 div { className: "expert__claims" },
                   div { className: "expert__claims-title" },
                     "Claims:"
@@ -143,6 +152,12 @@ module.exports = React.createFactory React.createClass
                           key: "expert-claim-card-#{index}"
                     else
                       "No claims"
+                    AddToExpert
+                      expert: expert
+                      type: "claim"
+                      refresh: @fetchExpert
+
+                    
                 Comments
                   type: "expert"
                   id: expert.id

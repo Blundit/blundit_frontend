@@ -4,6 +4,14 @@ module.exports = React.createFactory React.createClass
   goToItem: (id) ->
     navigate("/claims/#{id}")
 
+  
+  showSubstantiation: ->
+    { claim } = @props
+    if claim.evidence_of_beliefs == 0
+      return "Unsubstantiated"
+    else
+      return "#{claim.evidence_of_beliefs} evidences"
+
 
   render: ->
     { claim } = @props
@@ -11,4 +19,4 @@ module.exports = React.createFactory React.createClass
       div
         className: "expert__claims-list-item__title"
         onClick: @goToItem.bind(@, claim.alias)
-        claim.title
+        "#{claim.title} (#{@showSubstantiation()})"

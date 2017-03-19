@@ -3,6 +3,7 @@
 Header = require("components/Header")
 Footer = require("components/Footer")
 PredictionExpertCard = require("components/PredictionExpertCard")
+Comment = require("components/Comments")
 
 module.exports = React.createFactory React.createClass
   displayName: 'Prediction'
@@ -41,21 +42,24 @@ module.exports = React.createFactory React.createClass
         div { className: "predictions-content" },
           if prediction?
             div { className: "prediction" },
-                div { className: "prediction__title" },
-                  prediction.title
-                div { className: "prediction__experts" },
-                  div { className: "prediction__experts-name" },
-                    "Experts:"
-                  div { className: "prediction__experts-list" },
-                    if experts.length > 0
-                      experts.map (expert, index) ->
-                        PredictionExpertCard
-                          expert: expert
-                          prediction: prediction
-                          key: "prediction-expert-#{index}"
-                    else
-                      "No experts"
-                
+              div { className: "prediction__title" },
+                prediction.title
+              div { className: "prediction__experts" },
+                div { className: "prediction__experts-name" },
+                  "Experts:"
+                div { className: "prediction__experts-list" },
+                  if experts.length > 0
+                    experts.map (expert, index) ->
+                      PredictionExpertCard
+                        expert: expert
+                        prediction: prediction
+                        key: "prediction-expert-#{index}"
+                  else
+                    "No experts"
+              Comments
+                type: "prediction"
+                id: prediction.id
+                num: prediction.comments_count
           else
             div {},
               @state.loadError

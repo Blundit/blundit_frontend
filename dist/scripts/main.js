@@ -27,7 +27,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"mixins/SessionMixin":585}],2:[function(require,module,exports){
+},{"mixins/SessionMixin":586}],2:[function(require,module,exports){
 var RaisedButton, div, img, menuItems, ref;
 
 ref = React.DOM, div = ref.div, img = ref.img;
@@ -134,7 +134,7 @@ module.exports = React.createFactory(React.createClass({
 
 },{}],3:[function(require,module,exports){
 (function() {
-  var API, Blundit, Card, CardActions, CardHeader, CardMedia, CardText, CardTitle, CategoryClaims, CategoryExperts, CategoryPredictions, CategorySubHead, ClaimCard, ClaimExpertCard, ClaimFields, Comments, ExpertCard, ExpertClaimCard, ExpertFields, ExpertPredictionCard, FlatButton, FontIcon, Footer, Global, Header, IconButton, MuiThemeProvider, Pagination, PaginationMixin, PredictionCard, PredictionExpertCard, PredictionFields, RaisedButton, RefreshIndicator, RouterMixin, SessionMixin, TextField, UserStore, a, br, deepOrange500, div, getMuiTheme, img, menuItems, muiTheme, ref, ref1, ref2, ref3, ref4, ref5, ref6, ref7, span, startBlundit,
+  var API, AddToExpert, Blundit, Card, CardActions, CardHeader, CardMedia, CardText, CardTitle, CategoryClaims, CategoryExperts, CategoryPredictions, CategorySubHead, ClaimCard, ClaimExpertCard, ClaimFields, Comment, Comments, ExpertCard, ExpertClaimCard, ExpertFields, ExpertPredictionCard, FlatButton, FontIcon, Footer, Global, Header, IconButton, MuiThemeProvider, Pagination, PaginationMixin, PredictionCard, PredictionExpertCard, PredictionFields, RaisedButton, RefreshIndicator, RouterMixin, SessionMixin, TextField, UserStore, a, br, deepOrange500, div, getMuiTheme, img, menuItems, muiTheme, ref, ref1, ref2, ref3, ref4, ref5, ref6, ref7, span, startBlundit,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   window.React = require('react');
@@ -373,6 +373,71 @@ module.exports = React.createFactory(React.createClass({
   } else {
     window.attachEvent('onload', startBlundit);
   }
+
+  div = React.DOM.div;
+
+  module.exports = React.createFactory(React.createClass({
+    displayName: 'AddToExpert',
+    getInitialState: function() {
+      return {
+        showItems: false,
+        items: null,
+        category: null,
+        categories: null,
+        categoriesError: false
+      };
+    },
+    componentDidMount: function() {
+      var params;
+      return params = {
+        path: "categories",
+        success: this.categoriesSuccess,
+        error: this.categoriesError
+      };
+    },
+    categoriesSuccess: function(data) {
+      return this.setState({
+        categories: data
+      });
+    },
+    categoriesError: function(error) {
+      return this.setState({
+        categoriesError: true
+      });
+    },
+    addItem: function() {},
+    handleChange: function(event, index, value) {
+      return this.setState({
+        category: value
+      });
+    },
+    doShowItems: function() {
+      return this.setState({
+        showItems: true
+      });
+    },
+    render: function() {
+      return div({
+        className: "add-to-expert"
+      }, this.state.showItems === false ? div({
+        className: "add-to-expert__button",
+        onClick: this.doShowItems
+      }, "Add " + this.props.type + " to Expert") : this.state.categories != null ? div({}, React.createElement(Material.SelectField, {
+        floatingLabelText: "Category",
+        value: this.state.category,
+        onChange: this.handleChange
+      }, this.state.categories.map(function(category, index) {
+        return React.createElement(Material.MenuItem, {
+          value: category.id,
+          primaryText: category.name,
+          key: "add-to-expert-category-" + index
+        });
+      })), div({
+        className: "add-to-expert__button",
+        onClick: this.addItem
+      }, 'Add')) : void 0);
+    }
+  }));
 
   div = React.DOM.div;
 
@@ -675,7 +740,16 @@ module.exports = React.createFactory(React.createClass({
     mixins: [PaginationMixin],
     getInitialState: function() {
       return {
-        comments: null
+        comments: null,
+        errors: [],
+        commentSubmitting: false,
+        commentError: null,
+        inputs: {
+          content: {
+            val: '',
+            minLength: 10
+          }
+        }
       };
     },
     componentDidMount: function() {
@@ -702,13 +776,112 @@ module.exports = React.createFactory(React.createClass({
       return API.call(params);
     },
     commentsSuccess: function(data) {
+      this.setState({
+        comments: data.comments
+      });
+      this.setState({
+        page: Number(data.page)
+      });
+      this.setState({
+        numberOfPages: data.number_of_pages
+      });
+      this.inputs = this.state.inputs;
+      this.inputs.content.val = '';
       return this.setState({
-        comments: data
+        inputs: this.inputs
       });
     },
     commentsError: function(error) {},
+    addComment: function() {
+      var params;
+      if (this.validateInputs()) {
+        this.setState({
+          commentSubmitting: true
+        });
+        this.setState({
+          commentError: null
+        });
+        params = {
+          path: this.props.type + "_add_comment",
+          path_variables: {
+            expert_id: this.props.id,
+            prediction_id: this.props.id,
+            claim_id: this.props.id
+          },
+          data: {
+            content: this.state.inputs.content.val
+          },
+          success: this.addCommentSuccess,
+          error: this.addCommentError
+        };
+        return API.call(params);
+      }
+    },
+    validateInputs: function() {
+      this.errors = [];
+      if (this.state.inputs.content.val.length < 3) {
+        this.errors.push({
+          id: "content",
+          text: "Comment must be at least 3 characters long."
+        });
+      }
+      if (this.state.inputs.content.val.length > 1000) {
+        this.errors.push({
+          id: "content",
+          text: "Comment can't be longer than 1000 characters."
+        });
+      }
+      this.setState({
+        errors: this.errors
+      });
+      if (this.errors.length === 0) {
+        return true;
+      }
+      return false;
+    },
+    addCommentSuccess: function() {
+      this.setState({
+        commentSubmitting: false
+      });
+      this.setState({
+        page: 1
+      });
+      return this.fetchPaginatedData(1);
+    },
+    addCommentError: function(error) {
+      this.setState({
+        commentSubmitting: false
+      });
+      if ((error.responseJSON != null) && (error.responseJSON.errors != null)) {
+        return this.setState({
+          commentError: error.responseJSON.errors[0]
+        });
+      } else {
+        return this.setState({
+          commentError: "There was an error."
+        });
+      }
+    },
     formatDate: function(date) {
       return date;
+    },
+    getErrorText: function(key) {
+      var error, j, len, ref1;
+      ref1 = this.state.errors;
+      for (j = 0, len = ref1.length; j < len; j++) {
+        error = ref1[j];
+        if (error.id === key) {
+          return error.text;
+        }
+      }
+      return null;
+    },
+    handleCommentContentChange: function(event) {
+      this.inputs = this.state.inputs;
+      this.inputs.content.val = event.target.value;
+      return this.setState({
+        inputs: this.inputs
+      });
     },
     render: function() {
       return div({
@@ -745,7 +918,32 @@ module.exports = React.createFactory(React.createClass({
         specificPage: this.specificPage
       }) : void 0, (this.state.comments != null) && UserStore.loggedIn() ? div({
         className: "comments__add-comment"
-      }, "Add comment functionality goes here.") : void 0);
+      }, div({}, React.createElement(Material.TextField, {
+        id: "comment-content",
+        hintText: "Add Comment",
+        floatingLabelText: "Content",
+        multiLine: true,
+        rows: 2,
+        fullWidth: true,
+        rowsMax: 4,
+        value: this.state.inputs.content.val,
+        onChange: this.handleCommentContentChange,
+        errorText: this.getErrorText("content")
+      }), div({}, this.state.commentSubmitting === true ? (this.style = {
+        display: 'inline-block',
+        position: 'relative',
+        boxShadow: 'none'
+      }, React.createElement(Material.RefreshIndicator, {
+        style: this.style,
+        size: 50,
+        left: 0,
+        top: 0,
+        status: "loading"
+      })) : React.createElement(Material.RaisedButton, {
+        label: "Add Comment",
+        primary: true,
+        onClick: this.addComment
+      })), this.state.commentError != null ? div({}, this.state.commentError) : void 0)) : void 0);
     }
   }));
 
@@ -856,6 +1054,15 @@ module.exports = React.createFactory(React.createClass({
     goToItem: function(id) {
       return navigate("/claims/" + id);
     },
+    showSubstantiation: function() {
+      var claim;
+      claim = this.props.claim;
+      if (claim.evidence_of_beliefs === 0) {
+        return "Unsubstantiated";
+      } else {
+        return claim.evidence_of_beliefs + " evidences";
+      }
+    },
     render: function() {
       var claim;
       claim = this.props.claim;
@@ -864,7 +1071,7 @@ module.exports = React.createFactory(React.createClass({
       }, div({
         className: "expert__claims-list-item__title",
         onClick: this.goToItem.bind(this, claim.alias)
-      }, claim.title));
+      }, claim.title + " (" + (this.showSubstantiation()) + ")"));
     }
   }));
 
@@ -882,6 +1089,15 @@ module.exports = React.createFactory(React.createClass({
     goToItem: function(id) {
       return navigate("/predictions/" + id);
     },
+    showSubstantiation: function() {
+      var prediction;
+      prediction = this.props.prediction;
+      if (prediction.evidence_of_beliefs === 0) {
+        return "Unsubstantiated";
+      } else {
+        return prediction.evidence_of_beliefs + " evidences";
+      }
+    },
     render: function() {
       var prediction;
       prediction = this.props.prediction;
@@ -890,7 +1106,7 @@ module.exports = React.createFactory(React.createClass({
       }, div({
         className: "expert__predictions-list-item__title",
         onClick: this.goToItem.bind(this, prediction.alias)
-      }, prediction.title));
+      }, prediction.title + " (" + (this.showSubstantiation()) + ")"));
     }
   }));
 
@@ -1437,6 +1653,244 @@ module.exports = React.createFactory(React.createClass({
     updateUserHeaderInfo: function(request) {}
   };
 
+
+  /*
+  API Class.
+  Usage to call is like this:
+  path is required.
+  path_variables is optional, and used for replacement in paths, like 'claims/%claim_id%/add_commment'
+  data is optional.
+  
+  params = {
+    path: "claims"
+    path_variables:
+      claim_id: 1
+    data:
+      id: "xxx"
+    success: @function
+    error: @function
+  }
+  API.call(params)
+   */
+
+  module.exports = API = (function() {
+    function API() {}
+
+    API.paths = {
+      register: {
+        path: "auth/",
+        non_api: true,
+        method: "POST"
+      },
+      login: {
+        path: "auth/sign_in",
+        non_api: true,
+        method: "POST"
+      },
+      logout: {
+        path: "auth/sign_out",
+        non_api: true,
+        method: "DELETE"
+      },
+      forgot_password: {
+        path: "auth/password",
+        non_api: true,
+        method: "POST"
+      },
+      categories: {
+        path: "categories",
+        method: "GET"
+      },
+      category: {
+        path: "categories/%category_id%",
+        method: "GET"
+      },
+      category_predictions: {
+        path: "categories/%category_id%/predictions",
+        method: "GET"
+      },
+      category_claims: {
+        path: "categories/%category_id%/claims",
+        method: "GET"
+      },
+      category_experts: {
+        path: "categories/%category_id%/experts",
+        method: "GET"
+      },
+      category_all: {
+        path: "categories/%category_id%/all",
+        method: "GET"
+      },
+      claims: {
+        path: "claims",
+        method: "GET"
+      },
+      claim: {
+        path: "claims/%claim_id%",
+        method: "GET"
+      },
+      claim_add_comment: {
+        path: "claims/%claim_id%/add_comment",
+        method: "POST"
+      },
+      predictions: {
+        path: "predictions",
+        method: "GET"
+      },
+      prediction: {
+        path: "predictions/%prediction_id%",
+        method: "GET"
+      },
+      prediction_add_comment: {
+        path: "predictions/%prediction_id%/add_comment",
+        method: "POST"
+      },
+      experts: {
+        path: "experts",
+        method: "GET"
+      },
+      expert: {
+        path: "experts/%expert_id%",
+        method: "GET"
+      },
+      expert_add_comment: {
+        path: "experts/%expert_id%/add_comment",
+        method: "POST"
+      },
+      bookmarks: {
+        path: "user/bookmarks",
+        method: "GET"
+      },
+      verify_token: {
+        path: 'auth/validate_token?access-token=%accessToken%&client=%client%&uid=%uid%',
+        method: "GET",
+        non_api: true
+      },
+      expert_comments: {
+        path: "experts/%expert_id%/comments",
+        method: "GET"
+      },
+      claim_comments: {
+        path: "claims/%claim_id%/comments",
+        method: "GET"
+      },
+      prediction_comments: {
+        path: "predictions/%prediction_id%/comments",
+        method: "GET"
+      }
+    };
+
+    API.server = function(params) {
+      if ((this.paths[params.path].non_api != null) && this.paths[params.path].non_api === true) {
+        return "http://localhost:3000/";
+      }
+      return "http://localhost:3000/api/v1/";
+    };
+
+    API.method = function(params) {
+      return this.paths[params.path].method;
+    };
+
+    API.path = function(params) {
+      var key, ref4, value;
+      this.p = this.server(params) + this.paths[params.path].path;
+      ref4 = params.path_variables;
+      for (key in ref4) {
+        value = ref4[key];
+        this.p = this.p.replace('%' + key + '%', value);
+      }
+      if (this.paths[params.path].method === "GET") {
+        this.p = this.p + this.dataAsGet(params.data);
+      }
+      return this.p;
+    };
+
+    API.dataAsGet = function(data) {
+      var key, value;
+      this.d = "?";
+      for (key in data) {
+        value = data[key];
+        this.d += key + "=" + (encodeURIComponent(value)) + "&";
+      }
+      return this.d;
+    };
+
+    API.data = function(params) {
+      var data;
+      if (params.data != null) {
+        data = params.data;
+      } else {
+        data = {};
+      }
+      return data;
+    };
+
+    API.call = function(params) {
+      return $.ajax({
+        method: this.method(params),
+        url: this.path(params),
+        headers: UserStore.getAuthHeader(),
+        data: this.data(params),
+        dataType: "json",
+        success: function(data, status, request) {
+          UserStore.updateHeaderInfo(request);
+          if (params.success != null) {
+            return params.success(data, request);
+          }
+        },
+        error: function(error) {
+          if (params.error != null) {
+            return params.error(error);
+          }
+        }
+      });
+    };
+
+    return API;
+
+  })();
+
+  module.exports = Global = (function() {
+    function Global() {}
+
+    Global.setCookie = function(name, value, days) {
+      var date, expires;
+      if (days) {
+        date = new Date();
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+        expires = "; expires=" + date.toGMTString();
+      } else {
+        expires = "";
+      }
+      return document.cookie = name + "=" + value + expires + "; path=/";
+    };
+
+    Global.getCookie = function(name) {
+      var c, ca, i, nameEQ;
+      nameEQ = name + "=";
+      ca = document.cookie.split(";");
+      i = 0;
+      while (i < ca.length) {
+        c = ca[i];
+        while (c.charAt(0) === " ") {
+          c = c.substring(1, c.length);
+        }
+        if (c.indexOf(nameEQ) === 0) {
+          return c.substring(nameEQ.length, c.length);
+        }
+        i++;
+      }
+      return null;
+    };
+
+    Global.deleteCookie = function(name) {
+      return this.setCookie(name, "", -1);
+    };
+
+    return Global;
+
+  })();
+
   UserStore = (function() {
     function UserStore() {
       this.get = bind(this.get, this);
@@ -1626,236 +2080,6 @@ module.exports = React.createFactory(React.createClass({
   module.exports = new UserStore({
     messagestl: 1000 * 60
   });
-
-
-  /*
-  API Class.
-  Usage to call is like this:
-  path is required.
-  path_variables is optional, and used for replacement in paths, like 'claims/%claim_id%/add_commment'
-  data is optional.
-  
-  params = {
-    path: "claims"
-    path_variables:
-      claim_id: 1
-    data:
-      id: "xxx"
-    success: @function
-    error: @function
-  }
-  API.call(params)
-   */
-
-  module.exports = API = (function() {
-    function API() {}
-
-    API.paths = {
-      register: {
-        path: "auth/",
-        non_api: true,
-        method: "POST"
-      },
-      login: {
-        path: "auth/sign_in",
-        non_api: true,
-        method: "POST"
-      },
-      logout: {
-        path: "auth/sign_out",
-        non_api: true,
-        method: "DELETE"
-      },
-      forgot_password: {
-        path: "auth/password",
-        non_api: true,
-        method: "POST"
-      },
-      categories: {
-        path: "categories",
-        method: "GET"
-      },
-      category: {
-        path: "categories/%category_id%",
-        method: "GET"
-      },
-      category_predictions: {
-        path: "categories/%category_id%/predictions",
-        method: "GET"
-      },
-      category_claims: {
-        path: "categories/%category_id%/claims",
-        method: "GET"
-      },
-      category_experts: {
-        path: "categories/%category_id%/experts",
-        method: "GET"
-      },
-      category_all: {
-        path: "categories/%category_id%/all",
-        method: "GET"
-      },
-      claims: {
-        path: "claims",
-        method: "GET"
-      },
-      claim: {
-        path: "claims/%claim_id%",
-        method: "GET"
-      },
-      claim_add_comment: {
-        path: "claims/%claim_id%/add_comment",
-        method: "POST"
-      },
-      predictions: {
-        path: "predictions",
-        method: "GET"
-      },
-      prediction: {
-        path: "predictions/%prediction_id%",
-        method: "GET"
-      },
-      experts: {
-        path: "experts",
-        method: "GET"
-      },
-      expert: {
-        path: "experts/%expert_id%",
-        method: "GET"
-      },
-      bookmarks: {
-        path: "user/bookmarks",
-        method: "GET"
-      },
-      verify_token: {
-        path: 'auth/validate_token?access-token=%accessToken%&client=%client%&uid=%uid%',
-        method: "GET",
-        non_api: true
-      },
-      expert_comments: {
-        path: "experts/%expert_id%/comments",
-        method: "GET"
-      },
-      claim_comments: {
-        path: "claims/%claim_id%/comments",
-        method: "GET"
-      },
-      prediction_comments: {
-        path: "predictions/%prediction_id%/comments",
-        method: "GET"
-      }
-    };
-
-    API.server = function(params) {
-      if ((this.paths[params.path].non_api != null) && this.paths[params.path].non_api === true) {
-        return "http://localhost:3000/";
-      }
-      return "http://localhost:3000/api/v1/";
-    };
-
-    API.method = function(params) {
-      return this.paths[params.path].method;
-    };
-
-    API.path = function(params) {
-      var key, ref4, value;
-      this.p = this.server(params) + this.paths[params.path].path;
-      ref4 = params.path_variables;
-      for (key in ref4) {
-        value = ref4[key];
-        this.p = this.p.replace('%' + key + '%', value);
-      }
-      if (this.paths[params.path].method === "GET") {
-        this.p = this.p + this.dataAsGet(params.data);
-      }
-      return this.p;
-    };
-
-    API.dataAsGet = function(data) {
-      var key, value;
-      this.d = "?";
-      for (key in data) {
-        value = data[key];
-        this.d += key + "=" + (encodeURIComponent(value)) + "&";
-      }
-      return this.d;
-    };
-
-    API.data = function(params) {
-      var data;
-      if (params.data != null) {
-        data = params.data;
-      } else {
-        data = {};
-      }
-      return data;
-    };
-
-    API.call = function(params) {
-      return $.ajax({
-        method: this.method(params),
-        url: this.path(params),
-        headers: UserStore.getAuthHeader(),
-        data: this.data(params),
-        dataType: "json",
-        success: function(data, status, request) {
-          UserStore.updateHeaderInfo(request);
-          if (params.success != null) {
-            return params.success(data, request);
-          }
-        },
-        error: function(error) {
-          if (params.error != null) {
-            return params.error(error);
-          }
-        }
-      });
-    };
-
-    return API;
-
-  })();
-
-  module.exports = Global = (function() {
-    function Global() {}
-
-    Global.setCookie = function(name, value, days) {
-      var date, expires;
-      if (days) {
-        date = new Date();
-        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-        expires = "; expires=" + date.toGMTString();
-      } else {
-        expires = "";
-      }
-      return document.cookie = name + "=" + value + expires + "; path=/";
-    };
-
-    Global.getCookie = function(name) {
-      var c, ca, i, nameEQ;
-      nameEQ = name + "=";
-      ca = document.cookie.split(";");
-      i = 0;
-      while (i < ca.length) {
-        c = ca[i];
-        while (c.charAt(0) === " ") {
-          c = c.substring(1, c.length);
-        }
-        if (c.indexOf(nameEQ) === 0) {
-          return c.substring(nameEQ.length, c.length);
-        }
-        i++;
-      }
-      return null;
-    };
-
-    Global.deleteCookie = function(name) {
-      return this.setCookie(name, "", -1);
-    };
-
-    return Global;
-
-  })();
 
   div = React.DOM.div;
 
@@ -2301,6 +2525,8 @@ module.exports = React.createFactory(React.createClass({
 
   ClaimExpertCard = require("components/ClaimExpertCard");
 
+  Comments = require("components/Comments");
+
   module.exports = React.createFactory(React.createClass({
     displayName: 'Landing',
     getInitialState: function() {
@@ -2358,7 +2584,11 @@ module.exports = React.createFactory(React.createClass({
           claim: claim,
           key: "claim-expert-" + index
         });
-      }) : "No experts"))) : div({}, this.state.loadError))), Footer({}, ''));
+      }) : "No experts")), Comments({
+        type: "claim",
+        id: claim.id,
+        num: claim.comments_count
+      })) : div({}, this.state.loadError))), Footer({}, ''));
     }
   }));
 
@@ -2533,6 +2763,8 @@ module.exports = React.createFactory(React.createClass({
 
   Comments = require("components/Comments");
 
+  AddToExpert = require("components/AddToExpert");
+
   module.exports = React.createFactory(React.createClass({
     displayName: 'Experts',
     getInitialState: function() {
@@ -2544,6 +2776,9 @@ module.exports = React.createFactory(React.createClass({
       };
     },
     componentDidMount: function() {
+      return this.fetchExpert();
+    },
+    fetchExpert: function() {
       var params;
       params = {
         path: "expert",
@@ -2655,7 +2890,11 @@ module.exports = React.createFactory(React.createClass({
           key: "expert-prediction-card-" + index,
           prediction: prediction
         });
-      }) : "No predictions")), div({
+      }) : "No predictions", AddToExpert({
+        expert: expert,
+        type: "prediction",
+        refresh: this.fetchExpert
+      }))), div({
         className: "expert__claims"
       }, div({
         className: "expert__claims-title"
@@ -2667,7 +2906,11 @@ module.exports = React.createFactory(React.createClass({
           claim: claim,
           key: "expert-claim-card-" + index
         });
-      }) : "No claims")), Comments({
+      }) : "No claims", AddToExpert({
+        expert: expert,
+        type: "claim",
+        refresh: this.fetchExpert
+      }))), Comments({
         type: "expert",
         id: expert.id,
         num: expert.comments_count
@@ -3069,6 +3312,8 @@ module.exports = React.createFactory(React.createClass({
 
   PredictionExpertCard = require("components/PredictionExpertCard");
 
+  Comment = require("components/Comments");
+
   module.exports = React.createFactory(React.createClass({
     displayName: 'Prediction',
     getInitialState: function() {
@@ -3126,7 +3371,11 @@ module.exports = React.createFactory(React.createClass({
           prediction: prediction,
           key: "prediction-expert-" + index
         });
-      }) : "No experts"))) : div({}, this.state.loadError))), Footer({}, ''));
+      }) : "No experts")), Comments({
+        type: "prediction",
+        id: prediction.id,
+        num: prediction.comments_count
+      })) : div({}, this.state.loadError))), Footer({}, ''));
     }
   }));
 
@@ -3450,7 +3699,7 @@ module.exports = React.createFactory(React.createClass({
 
 }).call(this);
 
-},{"./components/Footer":1,"./components/Header":2,"components/CategoryClaims":566,"components/CategoryExperts":567,"components/CategoryPredictions":568,"components/CategorySubHead":569,"components/ClaimCard":570,"components/ClaimExpertCard":571,"components/ClaimFields":572,"components/Comments":573,"components/ExpertCard":574,"components/ExpertClaimCard":575,"components/ExpertFields":576,"components/ExpertPredictionCard":577,"components/Footer":578,"components/Header":579,"components/Pagination":580,"components/PredictionCard":581,"components/PredictionExpertCard":582,"components/PredictionFields":583,"lodash":180,"material-ui":318,"material-ui/styles/MuiThemeProvider":337,"material-ui/styles/colors":339,"material-ui/styles/getMuiTheme":340,"mixins/PaginationMixin":584,"mixins/SessionMixin":585,"react":551,"react-dom":377,"react-mini-router":509,"react-tap-event-plugin":520,"shared/API":586,"shared/Global":587,"stores/UserStore":588,"views/404":589,"views/Bookmarks":590,"views/Categories":591,"views/CategoryAll":592,"views/CategoryClaims":593,"views/CategoryExperts":594,"views/CategoryPredictions":595,"views/Claim":596,"views/Claims":597,"views/CreateClaim":598,"views/CreateExpert":599,"views/CreatePrediction":600,"views/Expert":601,"views/Experts":602,"views/ForgotPassword":603,"views/Landing":604,"views/Login":605,"views/Prediction":606,"views/Predictions":607,"views/Register":608,"views/RegisterSuccessful":609,"views/User":610,"views/Users":611}],4:[function(require,module,exports){
+},{"./components/Footer":1,"./components/Header":2,"components/AddToExpert":566,"components/CategoryClaims":567,"components/CategoryExperts":568,"components/CategoryPredictions":569,"components/CategorySubHead":570,"components/ClaimCard":571,"components/ClaimExpertCard":572,"components/ClaimFields":573,"components/Comments":574,"components/ExpertCard":575,"components/ExpertClaimCard":576,"components/ExpertFields":577,"components/ExpertPredictionCard":578,"components/Footer":579,"components/Header":580,"components/Pagination":581,"components/PredictionCard":582,"components/PredictionExpertCard":583,"components/PredictionFields":584,"lodash":180,"material-ui":318,"material-ui/styles/MuiThemeProvider":337,"material-ui/styles/colors":339,"material-ui/styles/getMuiTheme":340,"mixins/PaginationMixin":585,"mixins/SessionMixin":586,"react":551,"react-dom":377,"react-mini-router":509,"react-tap-event-plugin":520,"shared/API":587,"shared/Global":588,"stores/UserStore":589,"views/404":590,"views/Bookmarks":591,"views/Categories":592,"views/CategoryAll":593,"views/CategoryClaims":594,"views/CategoryExperts":595,"views/CategoryPredictions":596,"views/Claim":597,"views/Claims":598,"views/CreateClaim":599,"views/CreateExpert":600,"views/CreatePrediction":601,"views/Expert":602,"views/Experts":603,"views/ForgotPassword":604,"views/Landing":605,"views/Login":606,"views/Prediction":607,"views/Predictions":608,"views/Register":609,"views/RegisterSuccessful":610,"views/User":611,"views/Users":612}],4:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/array/from"), __esModule: true };
 },{"core-js/library/fn/array/from":26}],5:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/get-iterator"), __esModule: true };
@@ -80561,6 +80810,75 @@ var div;
 div = React.DOM.div;
 
 module.exports = React.createFactory(React.createClass({
+  displayName: 'AddToExpert',
+  getInitialState: function() {
+    return {
+      showItems: false,
+      items: null,
+      category: null,
+      categories: null,
+      categoriesError: false
+    };
+  },
+  componentDidMount: function() {
+    var params;
+    return params = {
+      path: "categories",
+      success: this.categoriesSuccess,
+      error: this.categoriesError
+    };
+  },
+  categoriesSuccess: function(data) {
+    return this.setState({
+      categories: data
+    });
+  },
+  categoriesError: function(error) {
+    return this.setState({
+      categoriesError: true
+    });
+  },
+  addItem: function() {},
+  handleChange: function(event, index, value) {
+    return this.setState({
+      category: value
+    });
+  },
+  doShowItems: function() {
+    return this.setState({
+      showItems: true
+    });
+  },
+  render: function() {
+    return div({
+      className: "add-to-expert"
+    }, this.state.showItems === false ? div({
+      className: "add-to-expert__button",
+      onClick: this.doShowItems
+    }, "Add " + this.props.type + " to Expert") : this.state.categories != null ? div({}, React.createElement(Material.SelectField, {
+      floatingLabelText: "Category",
+      value: this.state.category,
+      onChange: this.handleChange
+    }, this.state.categories.map(function(category, index) {
+      return React.createElement(Material.MenuItem, {
+        value: category.id,
+        primaryText: category.name,
+        key: "add-to-expert-category-" + index
+      });
+    })), div({
+      className: "add-to-expert__button",
+      onClick: this.addItem
+    }, 'Add')) : void 0);
+  }
+}));
+
+
+},{}],567:[function(require,module,exports){
+var div;
+
+div = React.DOM.div;
+
+module.exports = React.createFactory(React.createClass({
   displayName: "Category Claims - Latest",
   goToClaim: function(id) {
     return navigate("/claims/" + id);
@@ -80587,7 +80905,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],567:[function(require,module,exports){
+},{}],568:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -80619,7 +80937,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],568:[function(require,module,exports){
+},{}],569:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -80651,7 +80969,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],569:[function(require,module,exports){
+},{}],570:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -80719,7 +81037,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],570:[function(require,module,exports){
+},{}],571:[function(require,module,exports){
 var Card, CardActions, CardHeader, CardText, FlatButton, a, br, div, img, ref, span;
 
 Card = Material.Card;
@@ -80839,7 +81157,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],571:[function(require,module,exports){
+},{}],572:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -80861,7 +81179,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],572:[function(require,module,exports){
+},{}],573:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -80873,7 +81191,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],573:[function(require,module,exports){
+},{}],574:[function(require,module,exports){
 var Pagination, PaginationMixin, div;
 
 div = React.DOM.div;
@@ -80887,7 +81205,16 @@ module.exports = React.createFactory(React.createClass({
   mixins: [PaginationMixin],
   getInitialState: function() {
     return {
-      comments: null
+      comments: null,
+      errors: [],
+      commentSubmitting: false,
+      commentError: null,
+      inputs: {
+        content: {
+          val: '',
+          minLength: 10
+        }
+      }
     };
   },
   componentDidMount: function() {
@@ -80914,13 +81241,112 @@ module.exports = React.createFactory(React.createClass({
     return API.call(params);
   },
   commentsSuccess: function(data) {
+    this.setState({
+      comments: data.comments
+    });
+    this.setState({
+      page: Number(data.page)
+    });
+    this.setState({
+      numberOfPages: data.number_of_pages
+    });
+    this.inputs = this.state.inputs;
+    this.inputs.content.val = '';
     return this.setState({
-      comments: data
+      inputs: this.inputs
     });
   },
   commentsError: function(error) {},
+  addComment: function() {
+    var params;
+    if (this.validateInputs()) {
+      this.setState({
+        commentSubmitting: true
+      });
+      this.setState({
+        commentError: null
+      });
+      params = {
+        path: this.props.type + "_add_comment",
+        path_variables: {
+          expert_id: this.props.id,
+          prediction_id: this.props.id,
+          claim_id: this.props.id
+        },
+        data: {
+          content: this.state.inputs.content.val
+        },
+        success: this.addCommentSuccess,
+        error: this.addCommentError
+      };
+      return API.call(params);
+    }
+  },
+  validateInputs: function() {
+    this.errors = [];
+    if (this.state.inputs.content.val.length < 3) {
+      this.errors.push({
+        id: "content",
+        text: "Comment must be at least 3 characters long."
+      });
+    }
+    if (this.state.inputs.content.val.length > 1000) {
+      this.errors.push({
+        id: "content",
+        text: "Comment can't be longer than 1000 characters."
+      });
+    }
+    this.setState({
+      errors: this.errors
+    });
+    if (this.errors.length === 0) {
+      return true;
+    }
+    return false;
+  },
+  addCommentSuccess: function() {
+    this.setState({
+      commentSubmitting: false
+    });
+    this.setState({
+      page: 1
+    });
+    return this.fetchPaginatedData(1);
+  },
+  addCommentError: function(error) {
+    this.setState({
+      commentSubmitting: false
+    });
+    if ((error.responseJSON != null) && (error.responseJSON.errors != null)) {
+      return this.setState({
+        commentError: error.responseJSON.errors[0]
+      });
+    } else {
+      return this.setState({
+        commentError: "There was an error."
+      });
+    }
+  },
   formatDate: function(date) {
     return date;
+  },
+  getErrorText: function(key) {
+    var error, i, len, ref;
+    ref = this.state.errors;
+    for (i = 0, len = ref.length; i < len; i++) {
+      error = ref[i];
+      if (error.id === key) {
+        return error.text;
+      }
+    }
+    return null;
+  },
+  handleCommentContentChange: function(event) {
+    this.inputs = this.state.inputs;
+    this.inputs.content.val = event.target.value;
+    return this.setState({
+      inputs: this.inputs
+    });
   },
   render: function() {
     return div({
@@ -80957,12 +81383,37 @@ module.exports = React.createFactory(React.createClass({
       specificPage: this.specificPage
     }) : void 0, (this.state.comments != null) && UserStore.loggedIn() ? div({
       className: "comments__add-comment"
-    }, "Add comment functionality goes here.") : void 0);
+    }, div({}, React.createElement(Material.TextField, {
+      id: "comment-content",
+      hintText: "Add Comment",
+      floatingLabelText: "Content",
+      multiLine: true,
+      rows: 2,
+      fullWidth: true,
+      rowsMax: 4,
+      value: this.state.inputs.content.val,
+      onChange: this.handleCommentContentChange,
+      errorText: this.getErrorText("content")
+    }), div({}, this.state.commentSubmitting === true ? (this.style = {
+      display: 'inline-block',
+      position: 'relative',
+      boxShadow: 'none'
+    }, React.createElement(Material.RefreshIndicator, {
+      style: this.style,
+      size: 50,
+      left: 0,
+      top: 0,
+      status: "loading"
+    })) : React.createElement(Material.RaisedButton, {
+      label: "Add Comment",
+      primary: true,
+      onClick: this.addComment
+    })), this.state.commentError != null ? div({}, this.state.commentError) : void 0)) : void 0);
   }
 }));
 
 
-},{"components/Pagination":580,"mixins/PaginationMixin":584}],574:[function(require,module,exports){
+},{"components/Pagination":581,"mixins/PaginationMixin":585}],575:[function(require,module,exports){
 var Card, CardActions, CardHeader, CardMedia, CardText, CardTitle, FlatButton, a, br, div, img, ref, span;
 
 Card = Material.Card;
@@ -81067,7 +81518,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],575:[function(require,module,exports){
+},{}],576:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -81075,6 +81526,15 @@ div = React.DOM.div;
 module.exports = React.createFactory(React.createClass({
   goToItem: function(id) {
     return navigate("/claims/" + id);
+  },
+  showSubstantiation: function() {
+    var claim;
+    claim = this.props.claim;
+    if (claim.evidence_of_beliefs === 0) {
+      return "Unsubstantiated";
+    } else {
+      return claim.evidence_of_beliefs + " evidences";
+    }
   },
   render: function() {
     var claim;
@@ -81084,12 +81544,12 @@ module.exports = React.createFactory(React.createClass({
     }, div({
       className: "expert__claims-list-item__title",
       onClick: this.goToItem.bind(this, claim.alias)
-    }, claim.title));
+    }, claim.title + " (" + (this.showSubstantiation()) + ")"));
   }
 }));
 
 
-},{}],576:[function(require,module,exports){
+},{}],577:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -81101,7 +81561,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],577:[function(require,module,exports){
+},{}],578:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -81109,6 +81569,15 @@ div = React.DOM.div;
 module.exports = React.createFactory(React.createClass({
   goToItem: function(id) {
     return navigate("/predictions/" + id);
+  },
+  showSubstantiation: function() {
+    var prediction;
+    prediction = this.props.prediction;
+    if (prediction.evidence_of_beliefs === 0) {
+      return "Unsubstantiated";
+    } else {
+      return prediction.evidence_of_beliefs + " evidences";
+    }
   },
   render: function() {
     var prediction;
@@ -81118,16 +81587,16 @@ module.exports = React.createFactory(React.createClass({
     }, div({
       className: "expert__predictions-list-item__title",
       onClick: this.goToItem.bind(this, prediction.alias)
-    }, prediction.title));
+    }, prediction.title + " (" + (this.showSubstantiation()) + ")"));
   }
 }));
 
 
-},{}],578:[function(require,module,exports){
+},{}],579:[function(require,module,exports){
 module.exports=require(1)
-},{"mixins/SessionMixin":585}],579:[function(require,module,exports){
+},{"mixins/SessionMixin":586}],580:[function(require,module,exports){
 module.exports=require(2)
-},{}],580:[function(require,module,exports){
+},{}],581:[function(require,module,exports){
 var FlatButton, FontIcon, IconButton, div;
 
 div = React.DOM.div;
@@ -81271,7 +81740,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],581:[function(require,module,exports){
+},{}],582:[function(require,module,exports){
 var Card, CardActions, CardHeader, CardText, FlatButton, a, br, div, img, ref, span;
 
 Card = Material.Card;
@@ -81391,7 +81860,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],582:[function(require,module,exports){
+},{}],583:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -81413,7 +81882,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],583:[function(require,module,exports){
+},{}],584:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -81425,7 +81894,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],584:[function(require,module,exports){
+},{}],585:[function(require,module,exports){
 module.exports = {
   getInitialState: function() {
     return {
@@ -81458,7 +81927,7 @@ module.exports = {
 };
 
 
-},{}],585:[function(require,module,exports){
+},{}],586:[function(require,module,exports){
 module.exports = {
   setUser: function(data, request) {
     window.UserStore.set(data, request);
@@ -81564,7 +82033,7 @@ module.exports = {
 };
 
 
-},{}],586:[function(require,module,exports){
+},{}],587:[function(require,module,exports){
 
 /*
 API Class.
@@ -81654,6 +82123,10 @@ module.exports = API = (function() {
       path: "predictions/%prediction_id%",
       method: "GET"
     },
+    prediction_add_comment: {
+      path: "predictions/%prediction_id%/add_comment",
+      method: "POST"
+    },
     experts: {
       path: "experts",
       method: "GET"
@@ -81661,6 +82134,10 @@ module.exports = API = (function() {
     expert: {
       path: "experts/%expert_id%",
       method: "GET"
+    },
+    expert_add_comment: {
+      path: "experts/%expert_id%/add_comment",
+      method: "POST"
     },
     bookmarks: {
       path: "user/bookmarks",
@@ -81756,7 +82233,7 @@ module.exports = API = (function() {
 })();
 
 
-},{}],587:[function(require,module,exports){
+},{}],588:[function(require,module,exports){
 var Global;
 
 module.exports = Global = (function() {
@@ -81801,7 +82278,7 @@ module.exports = Global = (function() {
 })();
 
 
-},{}],588:[function(require,module,exports){
+},{}],589:[function(require,module,exports){
 var UserStore,
   bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
@@ -81996,7 +82473,7 @@ module.exports = new UserStore({
 });
 
 
-},{}],589:[function(require,module,exports){
+},{}],590:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -82017,7 +82494,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":578,"components/Header":579}],590:[function(require,module,exports){
+},{"components/Footer":579,"components/Header":580}],591:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -82082,7 +82559,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":578,"components/Header":579}],591:[function(require,module,exports){
+},{"components/Footer":579,"components/Header":580}],592:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -82136,7 +82613,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":578,"components/Header":579}],592:[function(require,module,exports){
+},{"components/Footer":579,"components/Header":580}],593:[function(require,module,exports){
 var CategoryClaims, CategoryExperts, CategoryPredictions, CategorySubHead, Footer, Header, div;
 
 div = React.DOM.div;
@@ -82223,7 +82700,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/CategoryClaims":566,"components/CategoryExperts":567,"components/CategoryPredictions":568,"components/CategorySubHead":569,"components/Footer":578,"components/Header":579}],593:[function(require,module,exports){
+},{"components/CategoryClaims":567,"components/CategoryExperts":568,"components/CategoryPredictions":569,"components/CategorySubHead":570,"components/Footer":579,"components/Header":580}],594:[function(require,module,exports){
 var CategoryClaims, CategorySubHead, Footer, Header, div;
 
 div = React.DOM.div;
@@ -82302,7 +82779,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/CategoryClaims":566,"components/CategorySubHead":569,"components/Footer":578,"components/Header":579}],594:[function(require,module,exports){
+},{"components/CategoryClaims":567,"components/CategorySubHead":570,"components/Footer":579,"components/Header":580}],595:[function(require,module,exports){
 var CategoryExperts, CategorySubHead, Footer, Header, div;
 
 div = React.DOM.div;
@@ -82381,7 +82858,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/CategoryExperts":567,"components/CategorySubHead":569,"components/Footer":578,"components/Header":579}],595:[function(require,module,exports){
+},{"components/CategoryExperts":568,"components/CategorySubHead":570,"components/Footer":579,"components/Header":580}],596:[function(require,module,exports){
 var CategoryPredictions, CategorySubHead, Footer, Header, div;
 
 div = React.DOM.div;
@@ -82460,8 +82937,8 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/CategoryPredictions":568,"components/CategorySubHead":569,"components/Footer":578,"components/Header":579}],596:[function(require,module,exports){
-var ClaimExpertCard, Footer, Header, div;
+},{"components/CategoryPredictions":569,"components/CategorySubHead":570,"components/Footer":579,"components/Header":580}],597:[function(require,module,exports){
+var ClaimExpertCard, Comments, Footer, Header, div;
 
 div = React.DOM.div;
 
@@ -82470,6 +82947,8 @@ Header = require("components/Header");
 Footer = require("components/Footer");
 
 ClaimExpertCard = require("components/ClaimExpertCard");
+
+Comments = require("components/Comments");
 
 module.exports = React.createFactory(React.createClass({
   displayName: 'Landing',
@@ -82528,12 +83007,16 @@ module.exports = React.createFactory(React.createClass({
         claim: claim,
         key: "claim-expert-" + index
       });
-    }) : "No experts"))) : div({}, this.state.loadError))), Footer({}, ''));
+    }) : "No experts")), Comments({
+      type: "claim",
+      id: claim.id,
+      num: claim.comments_count
+    })) : div({}, this.state.loadError))), Footer({}, ''));
   }
 }));
 
 
-},{"components/ClaimExpertCard":571,"components/Footer":578,"components/Header":579}],597:[function(require,module,exports){
+},{"components/ClaimExpertCard":572,"components/Comments":574,"components/Footer":579,"components/Header":580}],598:[function(require,module,exports){
 var ClaimCard, Footer, Header, Pagination, PaginationMixin, RaisedButton, div;
 
 div = React.DOM.div;
@@ -82618,7 +83101,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ClaimCard":570,"components/Footer":578,"components/Header":579,"components/Pagination":580,"mixins/PaginationMixin":584}],598:[function(require,module,exports){
+},{"components/ClaimCard":571,"components/Footer":579,"components/Header":580,"components/Pagination":581,"mixins/PaginationMixin":585}],599:[function(require,module,exports){
 var ClaimFields, Footer, Header, div;
 
 div = React.DOM.div;
@@ -82648,7 +83131,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ClaimFields":572,"components/Footer":578,"components/Header":579}],599:[function(require,module,exports){
+},{"components/ClaimFields":573,"components/Footer":579,"components/Header":580}],600:[function(require,module,exports){
 var ExpertFields, Footer, Header, div;
 
 div = React.DOM.div;
@@ -82678,7 +83161,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ExpertFields":576,"components/Footer":578,"components/Header":579}],600:[function(require,module,exports){
+},{"components/ExpertFields":577,"components/Footer":579,"components/Header":580}],601:[function(require,module,exports){
 var Footer, Header, PredictionFields, div;
 
 div = React.DOM.div;
@@ -82708,8 +83191,8 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":578,"components/Header":579,"components/PredictionFields":583}],601:[function(require,module,exports){
-var Comments, ExpertClaimCard, ExpertPredictionCard, Footer, Header, div, img, ref;
+},{"components/Footer":579,"components/Header":580,"components/PredictionFields":584}],602:[function(require,module,exports){
+var AddToExpert, Comments, ExpertClaimCard, ExpertPredictionCard, Footer, Header, div, img, ref;
 
 ref = React.DOM, div = ref.div, img = ref.img;
 
@@ -82723,6 +83206,8 @@ ExpertPredictionCard = require("components/ExpertPredictionCard");
 
 Comments = require("components/Comments");
 
+AddToExpert = require("components/AddToExpert");
+
 module.exports = React.createFactory(React.createClass({
   displayName: 'Experts',
   getInitialState: function() {
@@ -82734,6 +83219,9 @@ module.exports = React.createFactory(React.createClass({
     };
   },
   componentDidMount: function() {
+    return this.fetchExpert();
+  },
+  fetchExpert: function() {
     var params;
     params = {
       path: "expert",
@@ -82845,7 +83333,11 @@ module.exports = React.createFactory(React.createClass({
         key: "expert-prediction-card-" + index,
         prediction: prediction
       });
-    }) : "No predictions")), div({
+    }) : "No predictions", AddToExpert({
+      expert: expert,
+      type: "prediction",
+      refresh: this.fetchExpert
+    }))), div({
       className: "expert__claims"
     }, div({
       className: "expert__claims-title"
@@ -82857,7 +83349,11 @@ module.exports = React.createFactory(React.createClass({
         claim: claim,
         key: "expert-claim-card-" + index
       });
-    }) : "No claims")), Comments({
+    }) : "No claims", AddToExpert({
+      expert: expert,
+      type: "claim",
+      refresh: this.fetchExpert
+    }))), Comments({
       type: "expert",
       id: expert.id,
       num: expert.comments_count
@@ -82866,7 +83362,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Comments":573,"components/ExpertClaimCard":575,"components/ExpertPredictionCard":577,"components/Footer":578,"components/Header":579}],602:[function(require,module,exports){
+},{"components/AddToExpert":566,"components/Comments":574,"components/ExpertClaimCard":576,"components/ExpertPredictionCard":578,"components/Footer":579,"components/Header":580}],603:[function(require,module,exports){
 var ExpertCard, Footer, Header, Pagination, PaginationMixin, div;
 
 div = React.DOM.div;
@@ -82949,7 +83445,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ExpertCard":574,"components/Footer":578,"components/Header":579,"components/Pagination":580,"mixins/PaginationMixin":584}],603:[function(require,module,exports){
+},{"components/ExpertCard":575,"components/Footer":579,"components/Header":580,"components/Pagination":581,"mixins/PaginationMixin":585}],604:[function(require,module,exports){
 var Footer, Header, RaisedButton, RefreshIndicator, TextField, a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
@@ -83087,7 +83583,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":578,"components/Header":579}],604:[function(require,module,exports){
+},{"components/Footer":579,"components/Header":580}],605:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -83108,7 +83604,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":578,"components/Header":579}],605:[function(require,module,exports){
+},{"components/Footer":579,"components/Header":580}],606:[function(require,module,exports){
 var Footer, Header, RaisedButton, RefreshIndicator, SessionMixin, TextField, a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
@@ -83268,8 +83764,8 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":578,"components/Header":579,"mixins/SessionMixin":585}],606:[function(require,module,exports){
-var Footer, Header, PredictionExpertCard, div;
+},{"components/Footer":579,"components/Header":580,"mixins/SessionMixin":586}],607:[function(require,module,exports){
+var Comment, Footer, Header, PredictionExpertCard, div;
 
 div = React.DOM.div;
 
@@ -83278,6 +83774,8 @@ Header = require("components/Header");
 Footer = require("components/Footer");
 
 PredictionExpertCard = require("components/PredictionExpertCard");
+
+Comment = require("components/Comments");
 
 module.exports = React.createFactory(React.createClass({
   displayName: 'Prediction',
@@ -83336,12 +83834,16 @@ module.exports = React.createFactory(React.createClass({
         prediction: prediction,
         key: "prediction-expert-" + index
       });
-    }) : "No experts"))) : div({}, this.state.loadError))), Footer({}, ''));
+    }) : "No experts")), Comments({
+      type: "prediction",
+      id: prediction.id,
+      num: prediction.comments_count
+    })) : div({}, this.state.loadError))), Footer({}, ''));
   }
 }));
 
 
-},{"components/Footer":578,"components/Header":579,"components/PredictionExpertCard":582}],607:[function(require,module,exports){
+},{"components/Comments":574,"components/Footer":579,"components/Header":580,"components/PredictionExpertCard":583}],608:[function(require,module,exports){
 var Footer, Header, Pagination, PaginationMixin, PredictionCard, div;
 
 div = React.DOM.div;
@@ -83424,7 +83926,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":578,"components/Header":579,"components/Pagination":580,"components/PredictionCard":581,"mixins/PaginationMixin":584}],608:[function(require,module,exports){
+},{"components/Footer":579,"components/Header":580,"components/Pagination":581,"components/PredictionCard":582,"mixins/PaginationMixin":585}],609:[function(require,module,exports){
 var Footer, Header, RaisedButton, RefreshIndicator, TextField, a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
@@ -83605,7 +84107,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":578,"components/Header":579}],609:[function(require,module,exports){
+},{"components/Footer":579,"components/Header":580}],610:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -83626,7 +84128,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":578,"components/Header":579}],610:[function(require,module,exports){
+},{"components/Footer":579,"components/Header":580}],611:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -83658,7 +84160,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":578,"components/Header":579}],611:[function(require,module,exports){
+},{"components/Footer":579,"components/Header":580}],612:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -83679,4 +84181,4 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":578,"components/Header":579}]},{},[3])
+},{"components/Footer":579,"components/Header":580}]},{},[3])

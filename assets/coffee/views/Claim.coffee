@@ -3,6 +3,7 @@
 Header = require("components/Header")
 Footer = require("components/Footer")
 ClaimExpertCard = require("components/ClaimExpertCard")
+Comments = require("components/Comments")
 
 module.exports = React.createFactory React.createClass
   displayName: 'Landing'
@@ -41,20 +42,24 @@ module.exports = React.createFactory React.createClass
         div { className: "claims-content" },
           if claim?
             div { className: "claim" },
-                div { className: "claim__title" },
-                  claim.title
-                div { className: "claim__experts" },
-                  div { className: "claim__experts-name" },
-                    "Experts:"
-                  div { className: "claim__experts-list" },
-                    if experts.length > 0
-                      experts.map (expert, index) ->
-                        ClaimExpertCard
-                          expert: expert
-                          claim: claim
-                          key: "claim-expert-#{index}"
-                    else
-                      "No experts"
+              div { className: "claim__title" },
+                claim.title
+              div { className: "claim__experts" },
+                div { className: "claim__experts-name" },
+                  "Experts:"
+                div { className: "claim__experts-list" },
+                  if experts.length > 0
+                    experts.map (expert, index) ->
+                      ClaimExpertCard
+                        expert: expert
+                        claim: claim
+                        key: "claim-expert-#{index}"
+                  else
+                    "No experts"
+              Comments
+                type: "claim"
+                id: claim.id
+                num: claim.comments_count
                 
           else
             div {},
