@@ -382,38 +382,99 @@ module.exports = React.createFactory(React.createClass({
       return {
         showItems: false,
         items: null,
-        category: null,
-        categories: null,
-        categoriesError: false
+        item: null,
+        itemList: null,
+        itemsError: false
       };
     },
     componentDidMount: function() {
       var params;
-      return params = {
-        path: "categories",
-        success: this.categoriesSuccess,
-        error: this.categoriesError
+      params = {
+        path: "all_" + this.props.type + "s",
+        success: this.itemsSuccess,
+        error: this.itemsError
       };
+      return API.call(params);
     },
-    categoriesSuccess: function(data) {
+    itemsSuccess: function(data) {
+      var existingItem, j, k, len, len1, newItem, ref;
+      this.items = [];
+      for (j = 0, len = data.length; j < len; j++) {
+        newItem = data[j];
+        this.found = false;
+        ref = this.props.items;
+        for (k = 0, len1 = ref.length; k < len1; k++) {
+          existingItem = ref[k];
+          if (Number(newItem.id) === Number(existingItem.id)) {
+            this.found = true;
+          }
+        }
+        if (this.found === false) {
+          this.items.push(newItem);
+        }
+      }
       return this.setState({
-        categories: data
+        itemList: this.items
       });
     },
-    categoriesError: function(error) {
+    itemsError: function(error) {
       return this.setState({
-        categoriesError: true
+        itemsError: true
       });
     },
-    addItem: function() {},
+    addItem: function() {
+      var params;
+      this.setState({
+        error: null
+      });
+      if (this.state.item === null) {
+        this.setState({
+          error: "Selection required"
+        });
+        return;
+      }
+      params = {
+        path: "add_" + this.props.type + "_to_expert",
+        path_variables: {
+          expert_id: this.props.expert.id
+        },
+        data: {
+          id: this.state.item
+        },
+        success: this.addSuccess,
+        error: this.addError
+      };
+      return API.call(params);
+    },
+    addSuccess: function(data) {
+      return this.props.refresh();
+    },
+    addError: function(error) {
+      return this.setState({
+        error: "Error adding " + (this.sentenceCase(this.props.type))
+      });
+    },
     handleChange: function(event, index, value) {
       return this.setState({
-        category: value
+        item: value
       });
     },
     doShowItems: function() {
       return this.setState({
         showItems: true
+      });
+    },
+    cancelAddItem: function() {
+      this.setState({
+        item: null
+      });
+      return this.setState({
+        showItems: false
+      });
+    },
+    sentenceCase: function(text) {
+      return text.replace(/\w\S*/g, function(text) {
+        return text.charAt(0).toUpperCase() + text.substr(1).toLowerCase();
       });
     },
     render: function() {
@@ -422,20 +483,23 @@ module.exports = React.createFactory(React.createClass({
       }, this.state.showItems === false ? div({
         className: "add-to-expert__button",
         onClick: this.doShowItems
-      }, "Add " + this.props.type + " to Expert") : this.state.categories != null ? div({}, React.createElement(Material.SelectField, {
-        floatingLabelText: "Category",
-        value: this.state.category,
+      }, "Add " + this.props.type + " to Expert") : this.state.itemList != null ? div({}, React.createElement(Material.SelectField, {
+        floatingLabelText: this.sentenceCase(this.props.type),
+        value: this.state.item,
         onChange: this.handleChange
-      }, this.state.categories.map(function(category, index) {
+      }, this.state.itemList.map(function(item, index) {
         return React.createElement(Material.MenuItem, {
-          value: category.id,
-          primaryText: category.name,
-          key: "add-to-expert-category-" + index
+          value: item.id,
+          primaryText: item.title,
+          key: "add-to-expert-item-" + index
         });
-      })), div({
-        className: "add-to-expert__button",
+      })), React.createElement(Material.FlatButton, {
+        label: "Add",
         onClick: this.addItem
-      }, 'Add')) : void 0);
+      }), React.createElement(Material.FlatButton, {
+        label: "Cancel",
+        onClick: this.cancelAddItem
+      }), this.state.error != null ? div({}, this.state.error) : void 0) : void 0);
     }
   }));
 
@@ -1725,6 +1789,10 @@ module.exports = React.createFactory(React.createClass({
         path: "claims",
         method: "GET"
       },
+      all_claims: {
+        path: "claims/all",
+        method: "GET"
+      },
       claim: {
         path: "claims/%claim_id%",
         method: "GET"
@@ -1735,6 +1803,10 @@ module.exports = React.createFactory(React.createClass({
       },
       predictions: {
         path: "predictions",
+        method: "GET"
+      },
+      all_predictions: {
+        path: "predictions/all",
         method: "GET"
       },
       prediction: {
@@ -1749,6 +1821,10 @@ module.exports = React.createFactory(React.createClass({
         path: "experts",
         method: "GET"
       },
+      all_experts: {
+        path: "experts/all",
+        method: "GET"
+      },
       expert: {
         path: "experts/%expert_id%",
         method: "GET"
@@ -1756,6 +1832,14 @@ module.exports = React.createFactory(React.createClass({
       expert_add_comment: {
         path: "experts/%expert_id%/add_comment",
         method: "POST"
+      },
+      add_prediction_to_expert: {
+        path: "experts/%expert_id%/add_prediction",
+        method: "POST"
+      },
+      add_claim_to_expert: {
+        path: "experts/%expert_id%/add_claim",
+        metod: "POST"
       },
       bookmarks: {
         path: "user/bookmarks",
@@ -2893,6 +2977,7 @@ module.exports = React.createFactory(React.createClass({
       }) : "No predictions", AddToExpert({
         expert: expert,
         type: "prediction",
+        items: this.state.predictions,
         refresh: this.fetchExpert
       }))), div({
         className: "expert__claims"
@@ -2909,6 +2994,7 @@ module.exports = React.createFactory(React.createClass({
       }) : "No claims", AddToExpert({
         expert: expert,
         type: "claim",
+        items: this.state.claims,
         refresh: this.fetchExpert
       }))), Comments({
         type: "expert",
@@ -80815,38 +80901,99 @@ module.exports = React.createFactory(React.createClass({
     return {
       showItems: false,
       items: null,
-      category: null,
-      categories: null,
-      categoriesError: false
+      item: null,
+      itemList: null,
+      itemsError: false
     };
   },
   componentDidMount: function() {
     var params;
-    return params = {
-      path: "categories",
-      success: this.categoriesSuccess,
-      error: this.categoriesError
+    params = {
+      path: "all_" + this.props.type + "s",
+      success: this.itemsSuccess,
+      error: this.itemsError
     };
+    return API.call(params);
   },
-  categoriesSuccess: function(data) {
+  itemsSuccess: function(data) {
+    var existingItem, i, j, len, len1, newItem, ref;
+    this.items = [];
+    for (i = 0, len = data.length; i < len; i++) {
+      newItem = data[i];
+      this.found = false;
+      ref = this.props.items;
+      for (j = 0, len1 = ref.length; j < len1; j++) {
+        existingItem = ref[j];
+        if (Number(newItem.id) === Number(existingItem.id)) {
+          this.found = true;
+        }
+      }
+      if (this.found === false) {
+        this.items.push(newItem);
+      }
+    }
     return this.setState({
-      categories: data
+      itemList: this.items
     });
   },
-  categoriesError: function(error) {
+  itemsError: function(error) {
     return this.setState({
-      categoriesError: true
+      itemsError: true
     });
   },
-  addItem: function() {},
+  addItem: function() {
+    var params;
+    this.setState({
+      error: null
+    });
+    if (this.state.item === null) {
+      this.setState({
+        error: "Selection required"
+      });
+      return;
+    }
+    params = {
+      path: "add_" + this.props.type + "_to_expert",
+      path_variables: {
+        expert_id: this.props.expert.id
+      },
+      data: {
+        id: this.state.item
+      },
+      success: this.addSuccess,
+      error: this.addError
+    };
+    return API.call(params);
+  },
+  addSuccess: function(data) {
+    return this.props.refresh();
+  },
+  addError: function(error) {
+    return this.setState({
+      error: "Error adding " + (this.sentenceCase(this.props.type))
+    });
+  },
   handleChange: function(event, index, value) {
     return this.setState({
-      category: value
+      item: value
     });
   },
   doShowItems: function() {
     return this.setState({
       showItems: true
+    });
+  },
+  cancelAddItem: function() {
+    this.setState({
+      item: null
+    });
+    return this.setState({
+      showItems: false
+    });
+  },
+  sentenceCase: function(text) {
+    return text.replace(/\w\S*/g, function(text) {
+      return text.charAt(0).toUpperCase() + text.substr(1).toLowerCase();
     });
   },
   render: function() {
@@ -80855,20 +81002,23 @@ module.exports = React.createFactory(React.createClass({
     }, this.state.showItems === false ? div({
       className: "add-to-expert__button",
       onClick: this.doShowItems
-    }, "Add " + this.props.type + " to Expert") : this.state.categories != null ? div({}, React.createElement(Material.SelectField, {
-      floatingLabelText: "Category",
-      value: this.state.category,
+    }, "Add " + this.props.type + " to Expert") : this.state.itemList != null ? div({}, React.createElement(Material.SelectField, {
+      floatingLabelText: this.sentenceCase(this.props.type),
+      value: this.state.item,
       onChange: this.handleChange
-    }, this.state.categories.map(function(category, index) {
+    }, this.state.itemList.map(function(item, index) {
       return React.createElement(Material.MenuItem, {
-        value: category.id,
-        primaryText: category.name,
-        key: "add-to-expert-category-" + index
+        value: item.id,
+        primaryText: item.title,
+        key: "add-to-expert-item-" + index
       });
-    })), div({
-      className: "add-to-expert__button",
+    })), React.createElement(Material.FlatButton, {
+      label: "Add",
       onClick: this.addItem
-    }, 'Add')) : void 0);
+    }), React.createElement(Material.FlatButton, {
+      label: "Cancel",
+      onClick: this.cancelAddItem
+    }), this.state.error != null ? div({}, this.state.error) : void 0) : void 0);
   }
 }));
 
@@ -82107,6 +82257,10 @@ module.exports = API = (function() {
       path: "claims",
       method: "GET"
     },
+    all_claims: {
+      path: "claims/all",
+      method: "GET"
+    },
     claim: {
       path: "claims/%claim_id%",
       method: "GET"
@@ -82117,6 +82271,10 @@ module.exports = API = (function() {
     },
     predictions: {
       path: "predictions",
+      method: "GET"
+    },
+    all_predictions: {
+      path: "predictions/all",
       method: "GET"
     },
     prediction: {
@@ -82131,6 +82289,10 @@ module.exports = API = (function() {
       path: "experts",
       method: "GET"
     },
+    all_experts: {
+      path: "experts/all",
+      method: "GET"
+    },
     expert: {
       path: "experts/%expert_id%",
       method: "GET"
@@ -82138,6 +82300,14 @@ module.exports = API = (function() {
     expert_add_comment: {
       path: "experts/%expert_id%/add_comment",
       method: "POST"
+    },
+    add_prediction_to_expert: {
+      path: "experts/%expert_id%/add_prediction",
+      method: "POST"
+    },
+    add_claim_to_expert: {
+      path: "experts/%expert_id%/add_claim",
+      metod: "POST"
     },
     bookmarks: {
       path: "user/bookmarks",
@@ -83336,6 +83506,7 @@ module.exports = React.createFactory(React.createClass({
     }) : "No predictions", AddToExpert({
       expert: expert,
       type: "prediction",
+      items: this.state.predictions,
       refresh: this.fetchExpert
     }))), div({
       className: "expert__claims"
@@ -83352,6 +83523,7 @@ module.exports = React.createFactory(React.createClass({
     }) : "No claims", AddToExpert({
       expert: expert,
       type: "claim",
+      items: this.state.claims,
       refresh: this.fetchExpert
     }))), Comments({
       type: "expert",

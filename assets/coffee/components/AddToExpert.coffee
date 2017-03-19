@@ -6,37 +6,89 @@ module.exports = React.createFactory React.createClass
   getInitialState: ->
     showItems: false
     items: null
-    category: null
-    categories: null
-    categoriesError: false
+    item: null
+    itemList: null
+    itemsError: false
 
 
   componentDidMount: ->
     params = {
-      path: "categories"
-      success: @categoriesSuccess
-      error: @categoriesError
+      path: "all_#{@props.type}s"
+      success: @itemsSuccess
+      error: @itemsError
     }
 
+    API.call(params)
 
-  categoriesSuccess: (data) ->
-    @setState categories: data
+
+  itemsSuccess: (data) ->
+    # prune items that the user already has
+    @items = []
+
+    for newItem in data
+      @found = false
+      for existingItem in @props.items
+        if Number(newItem.id) == Number(existingItem.id)
+          @found = true
+
+      if @found == false
+        @items.push newItem
+
+
+    @setState itemList: @items
 
   
-  categoriesError: (error) ->
-    @setState categoriesError: true
+  itemsError: (error) ->
+    @setState itemsError: true
 
 
   addItem: ->
-    # console.log
+    @setState error: null
+    if @state.item == null
+      @setState error: "Selection required"
+      return
+
+    params = {
+      path: "add_#{@props.type}_to_expert"
+      path_variables:
+        expert_id: @props.expert.id
+      data:
+        id: @state.item
+      success: @addSuccess
+      error: @addError
+    }
+
+    API.call(params)
+
+
+  addSuccess: (data) ->
+    @props.refresh()
+
+
+  addError: (error) ->
+    @setState error: "Error adding #{@sentenceCase(@props.type)}"
+    
 
 
   handleChange: (event, index, value) ->
-    @setState category: value
+    @setState item: value
 
 
   doShowItems: ->
     @setState showItems: true
+
+
+  cancelAddItem: ->
+    @setState item: null
+    @setState showItems: false
+
+
+  sentenceCase: (text) ->
+    # TODO: Add this to universal mixin/class
+    return text.replace(/\w\S*/g,
+      (text) ->
+        return text.charAt(0).toUpperCase() + text.substr(1).toLowerCase()
+    )
 
 
   render: ->
@@ -47,17 +99,18 @@ module.exports = React.createFactory React.createClass
           onClick: @doShowItems
           "Add #{@props.type} to Expert"
       else
-        if @state.categories?
+        if @state.itemList?
           div {},
             React.createElement(Material.SelectField,
-              { floatingLabelText: "Category", value: @state.category, onChange: @handleChange },
-              @state.categories.map (category, index) ->
-                React.createElement(Material.MenuItem, {value: category.id, primaryText: category.name, key: "add-to-expert-category-#{index}"})
+              { floatingLabelText: @sentenceCase(@props.type), value: @state.item, onChange: @handleChange },
+              @state.itemList.map (item, index) ->
+                React.createElement(Material.MenuItem, {value: item.id, primaryText: item.title, key: "add-to-expert-item-#{index}"})
             )
-            div
-              className: "add-to-expert__button"
-              onClick: @addItem
-              'Add'
+            React.createElement(Material.FlatButton, { label: "Add", onClick: @addItem })
+            React.createElement(Material.FlatButton, { label: "Cancel", onClick: @cancelAddItem })
+            if @state.error?
+              div {},
+                @state.error
 
 
 

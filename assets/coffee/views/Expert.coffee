@@ -139,6 +139,7 @@ module.exports = React.createFactory React.createClass
                     AddToExpert
                       expert: expert
                       type: "prediction"
+                      items: @state.predictions
                       refresh: @fetchExpert
                 div { className: "expert__claims" },
                   div { className: "expert__claims-title" },
@@ -155,6 +156,7 @@ module.exports = React.createFactory React.createClass
                     AddToExpert
                       expert: expert
                       type: "claim"
+                      items: @state.claims
                       refresh: @fetchExpert
 
                     

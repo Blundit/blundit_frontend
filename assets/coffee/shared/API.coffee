@@ -56,6 +56,9 @@ module.exports = class API
     claims:
       path: "claims"
       method: "GET"
+    all_claims:
+      path: "claims/all"
+      method: "GET"
     claim:
       path: "claims/%claim_id%"
       method: "GET"
@@ -64,6 +67,9 @@ module.exports = class API
       method: "POST"
     predictions:
       path: "predictions"
+      method: "GET"
+    all_predictions:
+      path: "predictions/all"
       method: "GET"
     prediction:
       path: "predictions/%prediction_id%"
@@ -74,12 +80,22 @@ module.exports = class API
     experts:
       path: "experts"
       method: "GET"
+    all_experts:
+      path: "experts/all"
+      method: "GET"
     expert:
       path: "experts/%expert_id%"
       method: "GET"
     expert_add_comment:
       path: "experts/%expert_id%/add_comment"
       method: "POST"
+    add_prediction_to_expert:
+      path: "experts/%expert_id%/add_prediction"
+      method: "POST"
+    add_claim_to_expert:
+      path: "experts/%expert_id%/add_claim"
+      metod: "POST"
+    
     bookmarks:
       path: "user/bookmarks"
       method: "GET"
