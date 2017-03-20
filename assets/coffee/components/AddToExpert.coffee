@@ -9,6 +9,7 @@ module.exports = React.createFactory React.createClass
     item: null
     itemList: null
     itemsError: false
+    evidenceOfBeliefUrl: ''
 
 
   componentDidMount: ->
@@ -52,6 +53,7 @@ module.exports = React.createFactory React.createClass
       path: "add_#{@props.type}_to_expert"
       path_variables:
         expert_id: @props.expert.id
+        evidence_of_belief_url: @state.evidenceOfBeliefUrl
       data:
         id: @state.item
       success: @addSuccess
@@ -62,13 +64,13 @@ module.exports = React.createFactory React.createClass
 
 
   addSuccess: (data) ->
+    @cancelAddItem()
     @props.refresh()
 
 
   addError: (error) ->
     @setState error: "Error adding #{@sentenceCase(@props.type)}"
     
-
 
   handleChange: (event, index, value) ->
     @setState item: value
@@ -90,6 +92,10 @@ module.exports = React.createFactory React.createClass
         return text.charAt(0).toUpperCase() + text.substr(1).toLowerCase()
     )
 
+  
+  changeEvidenceOfBelief: (event) ->
+    @setState evidenceOfBeliefUrl: event.target.value
+
 
   render: ->
     div { className: "add-to-expert" },
@@ -106,11 +112,16 @@ module.exports = React.createFactory React.createClass
               @state.itemList.map (item, index) ->
                 React.createElement(Material.MenuItem, {value: item.id, primaryText: item.title, key: "add-to-expert-item-#{index}"})
             )
+            React.createElement(Material.TextField,
+              {
+                value: @state.evidence_of_belief_url,
+                hintText: "Add Evidence that exptert made this #{@props.type} (optional)",
+                fullWidth: true,
+                onChange: @changeEvidenceOfBelief
+              }
+            )
             React.createElement(Material.FlatButton, { label: "Add", onClick: @addItem })
             React.createElement(Material.FlatButton, { label: "Cancel", onClick: @cancelAddItem })
             if @state.error?
               div {},
                 @state.error
-
-
-

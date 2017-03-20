@@ -384,7 +384,8 @@ module.exports = React.createFactory(React.createClass({
         items: null,
         item: null,
         itemList: null,
-        itemsError: false
+        itemsError: false,
+        evidenceOfBeliefUrl: ''
       };
     },
     componentDidMount: function() {
@@ -436,7 +437,8 @@ module.exports = React.createFactory(React.createClass({
       params = {
         path: "add_" + this.props.type + "_to_expert",
         path_variables: {
-          expert_id: this.props.expert.id
+          expert_id: this.props.expert.id,
+          evidence_of_belief_url: this.state.evidenceOfBeliefUrl
         },
         data: {
           id: this.state.item
@@ -447,6 +449,7 @@ module.exports = React.createFactory(React.createClass({
       return API.call(params);
     },
     addSuccess: function(data) {
+      this.cancelAddItem();
       return this.props.refresh();
     },
     addError: function(error) {
@@ -477,6 +480,11 @@ module.exports = React.createFactory(React.createClass({
         return text.charAt(0).toUpperCase() + text.substr(1).toLowerCase();
       });
     },
+    changeEvidenceOfBelief: function(event) {
+      return this.setState({
+        evidenceOfBeliefUrl: event.target.value
+      });
+    },
     render: function() {
       return div({
         className: "add-to-expert"
@@ -493,7 +501,12 @@ module.exports = React.createFactory(React.createClass({
           primaryText: item.title,
           key: "add-to-expert-item-" + index
         });
-      })), React.createElement(Material.FlatButton, {
+      })), React.createElement(Material.TextField, {
+        value: this.state.evidence_of_belief_url,
+        hintText: "Add Evidence that exptert made this " + this.props.type + " (optional)",
+        fullWidth: true,
+        onChange: this.changeEvidenceOfBelief
+      }), React.createElement(Material.FlatButton, {
         label: "Add",
         onClick: this.addItem
       }), React.createElement(Material.FlatButton, {
@@ -1839,7 +1852,7 @@ module.exports = React.createFactory(React.createClass({
       },
       add_claim_to_expert: {
         path: "experts/%expert_id%/add_claim",
-        metod: "POST"
+        method: "POST"
       },
       bookmarks: {
         path: "user/bookmarks",
@@ -2974,12 +2987,12 @@ module.exports = React.createFactory(React.createClass({
           key: "expert-prediction-card-" + index,
           prediction: prediction
         });
-      }) : "No predictions", AddToExpert({
+      }) : "No predictions", UserStore.loggedIn() ? AddToExpert({
         expert: expert,
         type: "prediction",
         items: this.state.predictions,
         refresh: this.fetchExpert
-      }))), div({
+      }) : void 0)), div({
         className: "expert__claims"
       }, div({
         className: "expert__claims-title"
@@ -2991,12 +3004,12 @@ module.exports = React.createFactory(React.createClass({
           claim: claim,
           key: "expert-claim-card-" + index
         });
-      }) : "No claims", AddToExpert({
+      }) : "No claims", UserStore.loggedIn() ? AddToExpert({
         expert: expert,
         type: "claim",
         items: this.state.claims,
         refresh: this.fetchExpert
-      }))), Comments({
+      }) : void 0)), Comments({
         type: "expert",
         id: expert.id,
         num: expert.comments_count
@@ -80903,7 +80916,8 @@ module.exports = React.createFactory(React.createClass({
       items: null,
       item: null,
       itemList: null,
-      itemsError: false
+      itemsError: false,
+      evidenceOfBeliefUrl: ''
     };
   },
   componentDidMount: function() {
@@ -80955,7 +80969,8 @@ module.exports = React.createFactory(React.createClass({
     params = {
       path: "add_" + this.props.type + "_to_expert",
       path_variables: {
-        expert_id: this.props.expert.id
+        expert_id: this.props.expert.id,
+        evidence_of_belief_url: this.state.evidenceOfBeliefUrl
       },
       data: {
         id: this.state.item
@@ -80966,6 +80981,7 @@ module.exports = React.createFactory(React.createClass({
     return API.call(params);
   },
   addSuccess: function(data) {
+    this.cancelAddItem();
     return this.props.refresh();
   },
   addError: function(error) {
@@ -80996,6 +81012,11 @@ module.exports = React.createFactory(React.createClass({
       return text.charAt(0).toUpperCase() + text.substr(1).toLowerCase();
     });
   },
+  changeEvidenceOfBelief: function(event) {
+    return this.setState({
+      evidenceOfBeliefUrl: event.target.value
+    });
+  },
   render: function() {
     return div({
       className: "add-to-expert"
@@ -81012,7 +81033,12 @@ module.exports = React.createFactory(React.createClass({
         primaryText: item.title,
         key: "add-to-expert-item-" + index
       });
-    })), React.createElement(Material.FlatButton, {
+    })), React.createElement(Material.TextField, {
+      value: this.state.evidence_of_belief_url,
+      hintText: "Add Evidence that exptert made this " + this.props.type + " (optional)",
+      fullWidth: true,
+      onChange: this.changeEvidenceOfBelief
+    }), React.createElement(Material.FlatButton, {
       label: "Add",
       onClick: this.addItem
     }), React.createElement(Material.FlatButton, {
@@ -82307,7 +82333,7 @@ module.exports = API = (function() {
     },
     add_claim_to_expert: {
       path: "experts/%expert_id%/add_claim",
-      metod: "POST"
+      method: "POST"
     },
     bookmarks: {
       path: "user/bookmarks",
@@ -83503,12 +83529,12 @@ module.exports = React.createFactory(React.createClass({
         key: "expert-prediction-card-" + index,
         prediction: prediction
       });
-    }) : "No predictions", AddToExpert({
+    }) : "No predictions", UserStore.loggedIn() ? AddToExpert({
       expert: expert,
       type: "prediction",
       items: this.state.predictions,
       refresh: this.fetchExpert
-    }))), div({
+    }) : void 0)), div({
       className: "expert__claims"
     }, div({
       className: "expert__claims-title"
@@ -83520,12 +83546,12 @@ module.exports = React.createFactory(React.createClass({
         claim: claim,
         key: "expert-claim-card-" + index
       });
-    }) : "No claims", AddToExpert({
+    }) : "No claims", UserStore.loggedIn() ? AddToExpert({
       expert: expert,
       type: "claim",
       items: this.state.claims,
       refresh: this.fetchExpert
-    }))), Comments({
+    }) : void 0)), Comments({
       type: "expert",
       id: expert.id,
       num: expert.comments_count
