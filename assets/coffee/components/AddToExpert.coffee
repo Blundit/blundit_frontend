@@ -53,9 +53,9 @@ module.exports = React.createFactory React.createClass
       path: "add_#{@props.type}_to_expert"
       path_variables:
         expert_id: @props.expert.id
-        evidence_of_belief_url: @state.evidenceOfBeliefUrl
       data:
         id: @state.item
+        evidence_of_belief_url: @state.evidenceOfBeliefUrl
       success: @addSuccess
       error: @addError
     }
@@ -115,7 +115,7 @@ module.exports = React.createFactory React.createClass
             React.createElement(Material.TextField,
               {
                 value: @state.evidence_of_belief_url,
-                hintText: "Add Evidence that exptert made this #{@props.type} (optional)",
+                hintText: "Add Evidence that expert made this #{@props.type} (optional)",
                 fullWidth: true,
                 onChange: @changeEvidenceOfBelief
               }

@@ -136,12 +136,12 @@ module.exports = React.createFactory React.createClass
                           prediction: prediction
                     else
                       "No predictions"
-                    if UserStore.loggedIn()
-                      AddToExpert
-                        expert: expert
-                        type: "prediction"
-                        items: @state.predictions
-                        refresh: @fetchExpert
+                    # if UserStore.loggedIn()
+                    AddToExpert
+                      expert: expert
+                      type: "prediction"
+                      items: @state.predictions
+                      refresh: @fetchExpert
                 div { className: "expert__claims" },
                   div { className: "expert__claims-title" },
                     "Claims:"
@@ -154,12 +154,12 @@ module.exports = React.createFactory React.createClass
                           key: "expert-claim-card-#{index}"
                     else
                       "No claims"
-                    if UserStore.loggedIn()
-                      AddToExpert
-                        expert: expert
-                        type: "claim"
-                        items: @state.claims
-                        refresh: @fetchExpert
+                    # if UserStore.loggedIn()
+                    AddToExpert
+                      expert: expert
+                      type: "claim"
+                      items: @state.claims
+                      refresh: @fetchExpert
 
                     
                 Comments

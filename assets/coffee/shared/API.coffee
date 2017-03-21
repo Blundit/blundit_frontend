@@ -95,7 +95,12 @@ module.exports = class API
     add_claim_to_expert:
       path: "experts/%expert_id%/add_claim"
       method: "POST"
-    
+    get_substantiations:
+      path: "experts/%expert_id%/get_substantiations"
+      method: "POST"
+    add_substantiation:
+      path: "experts/%expert_id%/add_substantiation"
+      method: "POST"
     bookmarks:
       path: "user/bookmarks"
       method: "GET"
