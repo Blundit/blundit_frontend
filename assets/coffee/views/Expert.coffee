@@ -4,6 +4,7 @@ Header = require("components/Header")
 Footer = require("components/Footer")
 ExpertClaimCard = require("components/ExpertClaimCard")
 ExpertPredictionCard = require("components/ExpertPredictionCard")
+ExpertBonaFides = require("components/ExpertBonaFides")
 Comments = require("components/Comments")
 AddToExpert = require("components/AddToExpert")
 
@@ -78,25 +79,13 @@ module.exports = React.createFactory React.createClass
                 div { className: "expert__avatar" },
                   img { src: expert.avatar }
 
-                div { className: "expert__bona-fides" },
-                  if expert.bona_fides.length == 0
-                    "This expert has no bona fides listed yet."
-                  else
-                    expert.bona_fides.map (bona_fide, index) =>
-                      div
-                        className: "expert__bona-fide"
-                        key: "expert-bona-fide-#{index}"
-                        div { className: "expert__bona-fide__title" },
-                          bona_fide.title
-                        div { className: "expert__bona-fide__description" },
-                          bona_fide.description
-                        div
-                          className: "expert__bona-fide__url"
-                          onClick: @goToBonaFide.bind(@, bona_fide.url)
-                          bona_fide.url
+                ExpertBonaFides
+                  expert: expert
+                  refresh: @fetchExpert
+
 
                 div { className: "expert__categories" },
-                  "These are the titles belonging to this expert:"
+                  "These are the categories this expert is connected to:"
                   if expert.categories.length == 0
                     div {},
                       "No categories yet."

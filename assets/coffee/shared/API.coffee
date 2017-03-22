@@ -101,6 +101,9 @@ module.exports = class API
     add_substantiation:
       path: "experts/%expert_id%/add_substantiation"
       method: "POST"
+    add_bona_fide:
+      path: "experts/%expert_id%/add_bona_fide"
+      method: "POST"
     bookmarks:
       path: "user/bookmarks"
       method: "GET"

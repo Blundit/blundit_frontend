@@ -27,7 +27,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"mixins/SessionMixin":587}],2:[function(require,module,exports){
+},{"mixins/SessionMixin":588}],2:[function(require,module,exports){
 var RaisedButton, div, img, menuItems, ref;
 
 ref = React.DOM, div = ref.div, img = ref.img;
@@ -134,7 +134,7 @@ module.exports = React.createFactory(React.createClass({
 
 },{}],3:[function(require,module,exports){
 (function() {
-  var API, AddToExpert, Blundit, Card, CardActions, CardHeader, CardMedia, CardText, CardTitle, CategoryClaims, CategoryExperts, CategoryPredictions, CategorySubHead, ClaimCard, ClaimExpertCard, ClaimFields, Comment, Comments, ExpertCard, ExpertClaimCard, ExpertFields, ExpertPredictionCard, ExpertSubstantiations, FlatButton, FontIcon, Footer, Global, Header, IconButton, MuiThemeProvider, Pagination, PaginationMixin, PredictionCard, PredictionExpertCard, PredictionFields, RaisedButton, RefreshIndicator, RouterMixin, SessionMixin, TextField, UserStore, a, br, deepOrange500, div, getMuiTheme, img, menuItems, muiTheme, ref, ref1, ref2, ref3, ref4, ref5, ref6, ref7, ref8, span, startBlundit,
+  var API, AddToExpert, Blundit, Card, CardActions, CardHeader, CardMedia, CardText, CardTitle, CategoryClaims, CategoryExperts, CategoryPredictions, CategorySubHead, ClaimCard, ClaimExpertCard, ClaimFields, Comment, Comments, ExpertBonaFides, ExpertCard, ExpertClaimCard, ExpertFields, ExpertPredictionCard, ExpertSubstantiations, FlatButton, FontIcon, Footer, Global, Header, IconButton, MuiThemeProvider, Pagination, PaginationMixin, PredictionCard, PredictionExpertCard, PredictionFields, RaisedButton, RefreshIndicator, RouterMixin, SessionMixin, TextField, UserStore, a, br, deepOrange500, div, getMuiTheme, img, menuItems, muiTheme, ref, ref1, ref2, ref3, ref4, ref5, ref6, ref7, ref8, ref9, span, startBlundit,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   window.React = require('react');
@@ -1024,6 +1024,102 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
+  ref1 = React.DOM, div = ref1.div, a = ref1.a;
+
+  module.exports = React.createFactory(React.createClass({
+    getInitialState: function() {
+      return {
+        url: '',
+        addBonaFideError: false,
+        submittingBonaFide: false
+      };
+    },
+    addBonaFide: function() {
+      var params;
+      if (this.state.url === '') {
+        this.setState({
+          addBonaFideError: "Url required"
+        });
+        return;
+      }
+      params = {
+        path: "add_bona_fide",
+        path_variables: {
+          expert_id: this.props.expert.id
+        },
+        data: {
+          url: this.state.url
+        },
+        success: this.addBonaFidesSuccess,
+        error: this.addBonaFidesError
+      };
+      return API.call(params);
+    },
+    addBonaFidesSuccess: function(data) {
+      this.setState({
+        url: ''
+      });
+      this.setState({
+        submittingBonaFide: false
+      });
+      return this.props.refresh();
+    },
+    addBonaFidesError: function(error) {
+      this.setState({
+        submittingBonaFide: false
+      });
+      if ((error.responseJSON != null) && (error.responseJSON.errors != null)) {
+        return this.setState({
+          addBonaFideError: error.responseJSON.errors[0]
+        });
+      } else {
+        return this.setState({
+          addBonaFideError: "There was an error."
+        });
+      }
+    },
+    changeURL: function(event) {
+      return this.setState({
+        url: event.target.value
+      });
+    },
+    render: function() {
+      var bona_fides;
+      this.refreshStyle = {
+        display: 'inline-block',
+        position: 'relative',
+        boxShadow: 'none'
+      };
+      bona_fides = this.props.expert.bona_fides;
+      return div({
+        className: "expert__bona-fides"
+      }, bona_fides.length === 0 ? "This expert currently has no bona fides." : bona_fides.map(function(bona_fide, index) {
+        return div({
+          className: "expert__bona-fide"
+        }, a({
+          href: bona_fide.url,
+          target: "_blank"
+        }, bona_fide.title));
+      }), UserStore.loggedIn() ? this.state.submittingBonaFide === true ? React.createElement(Material.RefreshIndicator, {
+        style: this.refreshStyle,
+        size: 50,
+        left: 0,
+        top: 0,
+        status: "loading"
+      }) : div({
+        className: "expert__bona-fide__add"
+      }, React.createElement(Material.TextField, {
+        value: this.state.url,
+        fullWidth: true,
+        onChange: this.changeURL,
+        id: "add-bonafide"
+      }), React.createElement(Material.FlatButton, {
+        label: "Add",
+        onClick: this.addBonaFide
+      })) : void 0);
+    }
+  }));
+
   Card = Material.Card;
 
   CardHeader = Material.CardHeader;
@@ -1038,7 +1134,7 @@ module.exports = React.createFactory(React.createClass({
 
   FlatButton = Material.FlatButton;
 
-  ref1 = React.DOM, div = ref1.div, img = ref1.img, br = ref1.br, span = ref1.span, a = ref1.a;
+  ref2 = React.DOM, div = ref2.div, img = ref2.img, br = ref2.br, span = ref2.span, a = ref2.a;
 
   module.exports = React.createFactory(React.createClass({
     displayName: 'ExpertCard',
@@ -1233,7 +1329,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref2 = React.DOM, div = ref2.div, a = ref2.a;
+  ref3 = React.DOM, div = ref3.div, a = ref3.a;
 
   module.exports = React.createFactory(React.createClass({
     displayName: "ExpertSubstantiations",
@@ -1292,6 +1388,9 @@ module.exports = React.createFactory(React.createClass({
       return API.call(params);
     },
     addSubstantiationsSuccess: function(data) {
+      this.setState({
+        url: ''
+      });
       return this.fetchSubstantiationData();
     },
     addSubstantiationsError: function(error) {
@@ -1311,13 +1410,13 @@ module.exports = React.createFactory(React.createClass({
       });
     },
     render: function() {
-      var expert, ref3, type;
+      var expert, ref4, type;
       this.refreshStyle = {
         display: 'inline-block',
         position: 'relative',
         boxShadow: 'none'
       };
-      ref3 = this.props, expert = ref3.expert, type = ref3.type;
+      ref4 = this.props, expert = ref4.expert, type = ref4.type;
       if (this.state.data === null) {
         return React.createElement(Material.RefreshIndicator, {
           style: this.refreshStyle,
@@ -1380,7 +1479,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref3 = React.DOM, div = ref3.div, img = ref3.img;
+  ref4 = React.DOM, div = ref4.div, img = ref4.img;
 
   RaisedButton = Material.RaisedButton;
 
@@ -1445,7 +1544,7 @@ module.exports = React.createFactory(React.createClass({
       return navigate('/login');
     },
     render: function() {
-      var ref4;
+      var ref5;
       return div({
         className: "header-wrapper"
       }, div({
@@ -1467,7 +1566,7 @@ module.exports = React.createFactory(React.createClass({
         };
       })(this))), div({
         className: "header__user"
-      }, ((ref4 = this.state.user) != null ? ref4.token : void 0) != null ? div({
+      }, ((ref5 = this.state.user) != null ? ref5.token : void 0) != null ? div({
         className: "header__user__avatar",
         onClick: this.navigateToLocation.bind(this, "/me"),
         style: {
@@ -1588,9 +1687,9 @@ module.exports = React.createFactory(React.createClass({
       return div({
         className: "pagination__pages"
       }, (function() {
-        var j, ref4, ref5, results1;
+        var j, ref5, ref6, results1;
         results1 = [];
-        for (page = j = ref4 = this.leftPage, ref5 = this.rightPage; ref4 <= ref5 ? j <= ref5 : j >= ref5; page = ref4 <= ref5 ? ++j : --j) {
+        for (page = j = ref5 = this.leftPage, ref6 = this.rightPage; ref5 <= ref6 ? j <= ref6 : j >= ref6; page = ref5 <= ref6 ? ++j : --j) {
           if (page === this.props.page) {
             results1.push(React.createElement(FlatButton, {
               key: "page-" + page,
@@ -1631,7 +1730,7 @@ module.exports = React.createFactory(React.createClass({
 
   FlatButton = Material.FlatButton;
 
-  ref4 = React.DOM, div = ref4.div, img = ref4.img, a = ref4.a, br = ref4.br, span = ref4.span;
+  ref5 = React.DOM, div = ref5.div, img = ref5.img, a = ref5.a, br = ref5.br, span = ref5.span;
 
   module.exports = React.createFactory(React.createClass({
     displayName: 'PRedictionCard',
@@ -1825,13 +1924,13 @@ module.exports = React.createFactory(React.createClass({
       return decodeURIComponent(results[2].replace(/\+/g, " "));
     },
     getUrlParams: function() {
-      var j, key, len, params, query, raw_vars, ref5, v, val;
+      var j, key, len, params, query, raw_vars, ref6, v, val;
       query = window.location.search.substring(1);
       raw_vars = query.split("&");
       params = {};
       for (j = 0, len = raw_vars.length; j < len; j++) {
         v = raw_vars[j];
-        ref5 = v.split("="), key = ref5[0], val = ref5[1];
+        ref6 = v.split("="), key = ref6[0], val = ref6[1];
         params[key] = decodeURIComponent(val);
       }
       return params;
@@ -2030,6 +2129,10 @@ module.exports = React.createFactory(React.createClass({
         path: "experts/%expert_id%/add_substantiation",
         method: "POST"
       },
+      add_bona_fide: {
+        path: "experts/%expert_id%/add_bona_fide",
+        method: "POST"
+      },
       bookmarks: {
         path: "user/bookmarks",
         method: "GET"
@@ -2065,11 +2168,11 @@ module.exports = React.createFactory(React.createClass({
     };
 
     API.path = function(params) {
-      var key, ref5, value;
+      var key, ref6, value;
       this.p = this.server(params) + this.paths[params.path].path;
-      ref5 = params.path_variables;
-      for (key in ref5) {
-        value = ref5[key];
+      ref6 = params.path_variables;
+      for (key in ref6) {
+        value = ref6[key];
         this.p = this.p.replace('%' + key + '%', value);
       }
       if (this.paths[params.path].method === "GET") {
@@ -2835,8 +2938,8 @@ module.exports = React.createFactory(React.createClass({
       });
     },
     render: function() {
-      var claim, experts, ref5;
-      ref5 = this.state, claim = ref5.claim, experts = ref5.experts;
+      var claim, experts, ref6;
+      ref6 = this.state, claim = ref6.claim, experts = ref6.experts;
       return div({}, Header({}, ''), div({
         className: "claims-wrapper"
       }, div({
@@ -3024,7 +3127,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref5 = React.DOM, div = ref5.div, img = ref5.img;
+  ref6 = React.DOM, div = ref6.div, img = ref6.img;
 
   Header = require("components/Header");
 
@@ -3033,6 +3136,8 @@ module.exports = React.createFactory(React.createClass({
   ExpertClaimCard = require("components/ExpertClaimCard");
 
   ExpertPredictionCard = require("components/ExpertPredictionCard");
+
+  ExpertBonaFides = require("components/ExpertBonaFides");
 
   Comments = require("components/Comments");
 
@@ -3094,8 +3199,8 @@ module.exports = React.createFactory(React.createClass({
       return Math.floor(val * 100) + "%";
     },
     render: function() {
-      var claims, expert, predictions, ref6;
-      ref6 = this.state, expert = ref6.expert, predictions = ref6.predictions, claims = ref6.claims;
+      var claims, expert, predictions, ref7;
+      ref7 = this.state, expert = ref7.expert, predictions = ref7.predictions, claims = ref7.claims;
       return div({}, Header({}, ''), div({
         className: "experts-wrapper"
       }, div({
@@ -3110,25 +3215,12 @@ module.exports = React.createFactory(React.createClass({
         className: "expert__avatar"
       }, img({
         src: expert.avatar
-      })), div({
-        className: "expert__bona-fides"
-      }, expert.bona_fides.length === 0 ? "This expert has no bona fides listed yet." : expert.bona_fides.map((function(_this) {
-        return function(bona_fide, index) {
-          return div({
-            className: "expert__bona-fide",
-            key: "expert-bona-fide-" + index
-          }, div({
-            className: "expert__bona-fide__title"
-          }, bona_fide.title), div({
-            className: "expert__bona-fide__description"
-          }, bona_fide.description), div({
-            className: "expert__bona-fide__url",
-            onClick: _this.goToBonaFide.bind(_this, bona_fide.url)
-          }, bona_fide.url));
-        };
-      })(this))), div({
+      })), ExpertBonaFides({
+        expert: expert,
+        refresh: this.fetchExpert
+      }), div({
         className: "expert__categories"
-      }, "These are the titles belonging to this expert:", expert.categories.length === 0 ? div({}, "No categories yet.") : div({}, expert.categories.map((function(_this) {
+      }, "These are the categories this expert is connected to:", expert.categories.length === 0 ? div({}, "No categories yet.") : div({}, expert.categories.map((function(_this) {
         return function(category, index) {
           return React.createElement(Material.Chip, {
             onTouchTap: _this.goToCategory.bind(_this, category.id),
@@ -3272,7 +3364,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref6 = React.DOM, div = ref6.div, a = ref6.a;
+  ref7 = React.DOM, div = ref7.div, a = ref7.a;
 
   Header = require("components/Header");
 
@@ -3347,10 +3439,10 @@ module.exports = React.createFactory(React.createClass({
       return false;
     },
     getErrorText: function(key) {
-      var error, j, len, ref7;
-      ref7 = this.state.errors;
-      for (j = 0, len = ref7.length; j < len; j++) {
-        error = ref7[j];
+      var error, j, len, ref8;
+      ref8 = this.state.errors;
+      for (j = 0, len = ref8.length; j < len; j++) {
+        error = ref8[j];
         if (error.id === key) {
           return error.text;
         }
@@ -3423,7 +3515,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref7 = React.DOM, div = ref7.div, a = ref7.a;
+  ref8 = React.DOM, div = ref8.div, a = ref8.a;
 
   Header = require("components/Header");
 
@@ -3529,10 +3621,10 @@ module.exports = React.createFactory(React.createClass({
       }
     },
     getErrorText: function(key) {
-      var error, j, len, ref8;
-      ref8 = this.state.errors;
-      for (j = 0, len = ref8.length; j < len; j++) {
-        error = ref8[j];
+      var error, j, len, ref9;
+      ref9 = this.state.errors;
+      for (j = 0, len = ref9.length; j < len; j++) {
+        error = ref9[j];
         if (error.id === key) {
           return error.text;
         }
@@ -3624,8 +3716,8 @@ module.exports = React.createFactory(React.createClass({
       });
     },
     render: function() {
-      var experts, prediction, ref8;
-      ref8 = this.state, prediction = ref8.prediction, experts = ref8.experts;
+      var experts, prediction, ref9;
+      ref9 = this.state, prediction = ref9.prediction, experts = ref9.experts;
       return div({}, Header({}, ''), div({
         className: "predictions-wrapper"
       }, div({
@@ -3733,7 +3825,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref8 = React.DOM, div = ref8.div, a = ref8.a;
+  ref9 = React.DOM, div = ref9.div, a = ref9.a;
 
   Header = require("components/Header");
 
@@ -3855,10 +3947,10 @@ module.exports = React.createFactory(React.createClass({
       }
     },
     getErrorText: function(key) {
-      var error, j, len, ref9;
-      ref9 = this.state.errors;
-      for (j = 0, len = ref9.length; j < len; j++) {
-        error = ref9[j];
+      var error, j, len, ref10;
+      ref10 = this.state.errors;
+      for (j = 0, len = ref10.length; j < len; j++) {
+        error = ref10[j];
         if (error.id === key) {
           return error.text;
         }
@@ -3974,7 +4066,7 @@ module.exports = React.createFactory(React.createClass({
 
 }).call(this);
 
-},{"./components/Footer":1,"./components/Header":2,"components/AddToExpert":566,"components/CategoryClaims":567,"components/CategoryExperts":568,"components/CategoryPredictions":569,"components/CategorySubHead":570,"components/ClaimCard":571,"components/ClaimExpertCard":572,"components/ClaimFields":573,"components/Comments":574,"components/ExpertCard":575,"components/ExpertClaimCard":576,"components/ExpertFields":577,"components/ExpertPredictionCard":578,"components/ExpertSubstantiations":579,"components/Footer":580,"components/Header":581,"components/Pagination":582,"components/PredictionCard":583,"components/PredictionExpertCard":584,"components/PredictionFields":585,"lodash":180,"material-ui":318,"material-ui/styles/MuiThemeProvider":337,"material-ui/styles/colors":339,"material-ui/styles/getMuiTheme":340,"mixins/PaginationMixin":586,"mixins/SessionMixin":587,"react":551,"react-dom":377,"react-mini-router":509,"react-tap-event-plugin":520,"shared/API":588,"shared/Global":589,"stores/UserStore":590,"views/404":591,"views/Bookmarks":592,"views/Categories":593,"views/CategoryAll":594,"views/CategoryClaims":595,"views/CategoryExperts":596,"views/CategoryPredictions":597,"views/Claim":598,"views/Claims":599,"views/CreateClaim":600,"views/CreateExpert":601,"views/CreatePrediction":602,"views/Expert":603,"views/Experts":604,"views/ForgotPassword":605,"views/Landing":606,"views/Login":607,"views/Prediction":608,"views/Predictions":609,"views/Register":610,"views/RegisterSuccessful":611,"views/User":612,"views/Users":613}],4:[function(require,module,exports){
+},{"./components/Footer":1,"./components/Header":2,"components/AddToExpert":566,"components/CategoryClaims":567,"components/CategoryExperts":568,"components/CategoryPredictions":569,"components/CategorySubHead":570,"components/ClaimCard":571,"components/ClaimExpertCard":572,"components/ClaimFields":573,"components/Comments":574,"components/ExpertBonaFides":575,"components/ExpertCard":576,"components/ExpertClaimCard":577,"components/ExpertFields":578,"components/ExpertPredictionCard":579,"components/ExpertSubstantiations":580,"components/Footer":581,"components/Header":582,"components/Pagination":583,"components/PredictionCard":584,"components/PredictionExpertCard":585,"components/PredictionFields":586,"lodash":180,"material-ui":318,"material-ui/styles/MuiThemeProvider":337,"material-ui/styles/colors":339,"material-ui/styles/getMuiTheme":340,"mixins/PaginationMixin":587,"mixins/SessionMixin":588,"react":551,"react-dom":377,"react-mini-router":509,"react-tap-event-plugin":520,"shared/API":589,"shared/Global":590,"stores/UserStore":591,"views/404":592,"views/Bookmarks":593,"views/Categories":594,"views/CategoryAll":595,"views/CategoryClaims":596,"views/CategoryExperts":597,"views/CategoryPredictions":598,"views/Claim":599,"views/Claims":600,"views/CreateClaim":601,"views/CreateExpert":602,"views/CreatePrediction":603,"views/Expert":604,"views/Experts":605,"views/ForgotPassword":606,"views/Landing":607,"views/Login":608,"views/Prediction":609,"views/Predictions":610,"views/Register":611,"views/RegisterSuccessful":612,"views/User":613,"views/Users":614}],4:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/array/from"), __esModule: true };
 },{"core-js/library/fn/array/from":26}],5:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/get-iterator"), __esModule: true };
@@ -81765,7 +81857,107 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Pagination":582,"mixins/PaginationMixin":586}],575:[function(require,module,exports){
+},{"components/Pagination":583,"mixins/PaginationMixin":587}],575:[function(require,module,exports){
+var a, div, ref;
+
+ref = React.DOM, div = ref.div, a = ref.a;
+
+module.exports = React.createFactory(React.createClass({
+  getInitialState: function() {
+    return {
+      url: '',
+      addBonaFideError: false,
+      submittingBonaFide: false
+    };
+  },
+  addBonaFide: function() {
+    var params;
+    if (this.state.url === '') {
+      this.setState({
+        addBonaFideError: "Url required"
+      });
+      return;
+    }
+    params = {
+      path: "add_bona_fide",
+      path_variables: {
+        expert_id: this.props.expert.id
+      },
+      data: {
+        url: this.state.url
+      },
+      success: this.addBonaFidesSuccess,
+      error: this.addBonaFidesError
+    };
+    return API.call(params);
+  },
+  addBonaFidesSuccess: function(data) {
+    this.setState({
+      url: ''
+    });
+    this.setState({
+      submittingBonaFide: false
+    });
+    return this.props.refresh();
+  },
+  addBonaFidesError: function(error) {
+    this.setState({
+      submittingBonaFide: false
+    });
+    if ((error.responseJSON != null) && (error.responseJSON.errors != null)) {
+      return this.setState({
+        addBonaFideError: error.responseJSON.errors[0]
+      });
+    } else {
+      return this.setState({
+        addBonaFideError: "There was an error."
+      });
+    }
+  },
+  changeURL: function(event) {
+    return this.setState({
+      url: event.target.value
+    });
+  },
+  render: function() {
+    var bona_fides;
+    this.refreshStyle = {
+      display: 'inline-block',
+      position: 'relative',
+      boxShadow: 'none'
+    };
+    bona_fides = this.props.expert.bona_fides;
+    return div({
+      className: "expert__bona-fides"
+    }, bona_fides.length === 0 ? "This expert currently has no bona fides." : bona_fides.map(function(bona_fide, index) {
+      return div({
+        className: "expert__bona-fide"
+      }, a({
+        href: bona_fide.url,
+        target: "_blank"
+      }, bona_fide.title));
+    }), UserStore.loggedIn() ? this.state.submittingBonaFide === true ? React.createElement(Material.RefreshIndicator, {
+      style: this.refreshStyle,
+      size: 50,
+      left: 0,
+      top: 0,
+      status: "loading"
+    }) : div({
+      className: "expert__bona-fide__add"
+    }, React.createElement(Material.TextField, {
+      value: this.state.url,
+      fullWidth: true,
+      onChange: this.changeURL,
+      id: "add-bonafide"
+    }), React.createElement(Material.FlatButton, {
+      label: "Add",
+      onClick: this.addBonaFide
+    })) : void 0);
+  }
+}));
+
+
+},{}],576:[function(require,module,exports){
 var Card, CardActions, CardHeader, CardMedia, CardText, CardTitle, FlatButton, a, br, div, img, ref, span;
 
 Card = Material.Card;
@@ -81870,7 +82062,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],576:[function(require,module,exports){
+},{}],577:[function(require,module,exports){
 var ExpertSubstantiations, div;
 
 div = React.DOM.div;
@@ -81924,7 +82116,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ExpertSubstantiations":579}],577:[function(require,module,exports){
+},{"components/ExpertSubstantiations":580}],578:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -81936,7 +82128,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],578:[function(require,module,exports){
+},{}],579:[function(require,module,exports){
 var ExpertSubstantiations, div;
 
 div = React.DOM.div;
@@ -81990,7 +82182,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ExpertSubstantiations":579}],579:[function(require,module,exports){
+},{"components/ExpertSubstantiations":580}],580:[function(require,module,exports){
 var a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
@@ -82052,6 +82244,9 @@ module.exports = React.createFactory(React.createClass({
     return API.call(params);
   },
   addSubstantiationsSuccess: function(data) {
+    this.setState({
+      url: ''
+    });
     return this.fetchSubstantiationData();
   },
   addSubstantiationsError: function(error) {
@@ -82116,11 +82311,11 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],580:[function(require,module,exports){
+},{}],581:[function(require,module,exports){
 module.exports=require(1)
-},{"mixins/SessionMixin":587}],581:[function(require,module,exports){
+},{"mixins/SessionMixin":588}],582:[function(require,module,exports){
 module.exports=require(2)
-},{}],582:[function(require,module,exports){
+},{}],583:[function(require,module,exports){
 var FlatButton, FontIcon, IconButton, div;
 
 div = React.DOM.div;
@@ -82264,7 +82459,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],583:[function(require,module,exports){
+},{}],584:[function(require,module,exports){
 var Card, CardActions, CardHeader, CardText, FlatButton, a, br, div, img, ref, span;
 
 Card = Material.Card;
@@ -82384,7 +82579,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],584:[function(require,module,exports){
+},{}],585:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -82406,7 +82601,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],585:[function(require,module,exports){
+},{}],586:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -82418,7 +82613,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],586:[function(require,module,exports){
+},{}],587:[function(require,module,exports){
 module.exports = {
   getInitialState: function() {
     return {
@@ -82451,7 +82646,7 @@ module.exports = {
 };
 
 
-},{}],587:[function(require,module,exports){
+},{}],588:[function(require,module,exports){
 module.exports = {
   setUser: function(data, request) {
     window.UserStore.set(data, request);
@@ -82557,7 +82752,7 @@ module.exports = {
 };
 
 
-},{}],588:[function(require,module,exports){
+},{}],589:[function(require,module,exports){
 
 /*
 API Class.
@@ -82691,6 +82886,10 @@ module.exports = API = (function() {
       path: "experts/%expert_id%/add_substantiation",
       method: "POST"
     },
+    add_bona_fide: {
+      path: "experts/%expert_id%/add_bona_fide",
+      method: "POST"
+    },
     bookmarks: {
       path: "user/bookmarks",
       method: "GET"
@@ -82785,7 +82984,7 @@ module.exports = API = (function() {
 })();
 
 
-},{}],589:[function(require,module,exports){
+},{}],590:[function(require,module,exports){
 var Global;
 
 module.exports = Global = (function() {
@@ -82830,7 +83029,7 @@ module.exports = Global = (function() {
 })();
 
 
-},{}],590:[function(require,module,exports){
+},{}],591:[function(require,module,exports){
 var UserStore,
   bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
@@ -83025,7 +83224,7 @@ module.exports = new UserStore({
 });
 
 
-},{}],591:[function(require,module,exports){
+},{}],592:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -83046,7 +83245,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":580,"components/Header":581}],592:[function(require,module,exports){
+},{"components/Footer":581,"components/Header":582}],593:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -83111,7 +83310,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":580,"components/Header":581}],593:[function(require,module,exports){
+},{"components/Footer":581,"components/Header":582}],594:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -83165,7 +83364,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":580,"components/Header":581}],594:[function(require,module,exports){
+},{"components/Footer":581,"components/Header":582}],595:[function(require,module,exports){
 var CategoryClaims, CategoryExperts, CategoryPredictions, CategorySubHead, Footer, Header, div;
 
 div = React.DOM.div;
@@ -83252,7 +83451,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/CategoryClaims":567,"components/CategoryExperts":568,"components/CategoryPredictions":569,"components/CategorySubHead":570,"components/Footer":580,"components/Header":581}],595:[function(require,module,exports){
+},{"components/CategoryClaims":567,"components/CategoryExperts":568,"components/CategoryPredictions":569,"components/CategorySubHead":570,"components/Footer":581,"components/Header":582}],596:[function(require,module,exports){
 var CategoryClaims, CategorySubHead, Footer, Header, div;
 
 div = React.DOM.div;
@@ -83331,7 +83530,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/CategoryClaims":567,"components/CategorySubHead":570,"components/Footer":580,"components/Header":581}],596:[function(require,module,exports){
+},{"components/CategoryClaims":567,"components/CategorySubHead":570,"components/Footer":581,"components/Header":582}],597:[function(require,module,exports){
 var CategoryExperts, CategorySubHead, Footer, Header, div;
 
 div = React.DOM.div;
@@ -83410,7 +83609,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/CategoryExperts":568,"components/CategorySubHead":570,"components/Footer":580,"components/Header":581}],597:[function(require,module,exports){
+},{"components/CategoryExperts":568,"components/CategorySubHead":570,"components/Footer":581,"components/Header":582}],598:[function(require,module,exports){
 var CategoryPredictions, CategorySubHead, Footer, Header, div;
 
 div = React.DOM.div;
@@ -83489,7 +83688,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/CategoryPredictions":569,"components/CategorySubHead":570,"components/Footer":580,"components/Header":581}],598:[function(require,module,exports){
+},{"components/CategoryPredictions":569,"components/CategorySubHead":570,"components/Footer":581,"components/Header":582}],599:[function(require,module,exports){
 var ClaimExpertCard, Comments, Footer, Header, div;
 
 div = React.DOM.div;
@@ -83568,7 +83767,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ClaimExpertCard":572,"components/Comments":574,"components/Footer":580,"components/Header":581}],599:[function(require,module,exports){
+},{"components/ClaimExpertCard":572,"components/Comments":574,"components/Footer":581,"components/Header":582}],600:[function(require,module,exports){
 var ClaimCard, Footer, Header, Pagination, PaginationMixin, RaisedButton, div;
 
 div = React.DOM.div;
@@ -83653,7 +83852,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ClaimCard":571,"components/Footer":580,"components/Header":581,"components/Pagination":582,"mixins/PaginationMixin":586}],600:[function(require,module,exports){
+},{"components/ClaimCard":571,"components/Footer":581,"components/Header":582,"components/Pagination":583,"mixins/PaginationMixin":587}],601:[function(require,module,exports){
 var ClaimFields, Footer, Header, div;
 
 div = React.DOM.div;
@@ -83683,7 +83882,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ClaimFields":573,"components/Footer":580,"components/Header":581}],601:[function(require,module,exports){
+},{"components/ClaimFields":573,"components/Footer":581,"components/Header":582}],602:[function(require,module,exports){
 var ExpertFields, Footer, Header, div;
 
 div = React.DOM.div;
@@ -83713,7 +83912,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ExpertFields":577,"components/Footer":580,"components/Header":581}],602:[function(require,module,exports){
+},{"components/ExpertFields":578,"components/Footer":581,"components/Header":582}],603:[function(require,module,exports){
 var Footer, Header, PredictionFields, div;
 
 div = React.DOM.div;
@@ -83743,8 +83942,8 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":580,"components/Header":581,"components/PredictionFields":585}],603:[function(require,module,exports){
-var AddToExpert, Comments, ExpertClaimCard, ExpertPredictionCard, Footer, Header, div, img, ref;
+},{"components/Footer":581,"components/Header":582,"components/PredictionFields":586}],604:[function(require,module,exports){
+var AddToExpert, Comments, ExpertBonaFides, ExpertClaimCard, ExpertPredictionCard, Footer, Header, div, img, ref;
 
 ref = React.DOM, div = ref.div, img = ref.img;
 
@@ -83755,6 +83954,8 @@ Footer = require("components/Footer");
 ExpertClaimCard = require("components/ExpertClaimCard");
 
 ExpertPredictionCard = require("components/ExpertPredictionCard");
+
+ExpertBonaFides = require("components/ExpertBonaFides");
 
 Comments = require("components/Comments");
 
@@ -83832,25 +84033,12 @@ module.exports = React.createFactory(React.createClass({
       className: "expert__avatar"
     }, img({
       src: expert.avatar
-    })), div({
-      className: "expert__bona-fides"
-    }, expert.bona_fides.length === 0 ? "This expert has no bona fides listed yet." : expert.bona_fides.map((function(_this) {
-      return function(bona_fide, index) {
-        return div({
-          className: "expert__bona-fide",
-          key: "expert-bona-fide-" + index
-        }, div({
-          className: "expert__bona-fide__title"
-        }, bona_fide.title), div({
-          className: "expert__bona-fide__description"
-        }, bona_fide.description), div({
-          className: "expert__bona-fide__url",
-          onClick: _this.goToBonaFide.bind(_this, bona_fide.url)
-        }, bona_fide.url));
-      };
-    })(this))), div({
+    })), ExpertBonaFides({
+      expert: expert,
+      refresh: this.fetchExpert
+    }), div({
       className: "expert__categories"
-    }, "These are the titles belonging to this expert:", expert.categories.length === 0 ? div({}, "No categories yet.") : div({}, expert.categories.map((function(_this) {
+    }, "These are the categories this expert is connected to:", expert.categories.length === 0 ? div({}, "No categories yet.") : div({}, expert.categories.map((function(_this) {
       return function(category, index) {
         return React.createElement(Material.Chip, {
           onTouchTap: _this.goToCategory.bind(_this, category.id),
@@ -83916,7 +84104,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/AddToExpert":566,"components/Comments":574,"components/ExpertClaimCard":576,"components/ExpertPredictionCard":578,"components/Footer":580,"components/Header":581}],604:[function(require,module,exports){
+},{"components/AddToExpert":566,"components/Comments":574,"components/ExpertBonaFides":575,"components/ExpertClaimCard":577,"components/ExpertPredictionCard":579,"components/Footer":581,"components/Header":582}],605:[function(require,module,exports){
 var ExpertCard, Footer, Header, Pagination, PaginationMixin, div;
 
 div = React.DOM.div;
@@ -83999,7 +84187,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ExpertCard":575,"components/Footer":580,"components/Header":581,"components/Pagination":582,"mixins/PaginationMixin":586}],605:[function(require,module,exports){
+},{"components/ExpertCard":576,"components/Footer":581,"components/Header":582,"components/Pagination":583,"mixins/PaginationMixin":587}],606:[function(require,module,exports){
 var Footer, Header, RaisedButton, RefreshIndicator, TextField, a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
@@ -84137,7 +84325,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":580,"components/Header":581}],606:[function(require,module,exports){
+},{"components/Footer":581,"components/Header":582}],607:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -84158,7 +84346,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":580,"components/Header":581}],607:[function(require,module,exports){
+},{"components/Footer":581,"components/Header":582}],608:[function(require,module,exports){
 var Footer, Header, RaisedButton, RefreshIndicator, SessionMixin, TextField, a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
@@ -84318,7 +84506,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":580,"components/Header":581,"mixins/SessionMixin":587}],608:[function(require,module,exports){
+},{"components/Footer":581,"components/Header":582,"mixins/SessionMixin":588}],609:[function(require,module,exports){
 var Comment, Footer, Header, PredictionExpertCard, div;
 
 div = React.DOM.div;
@@ -84397,7 +84585,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Comments":574,"components/Footer":580,"components/Header":581,"components/PredictionExpertCard":584}],609:[function(require,module,exports){
+},{"components/Comments":574,"components/Footer":581,"components/Header":582,"components/PredictionExpertCard":585}],610:[function(require,module,exports){
 var Footer, Header, Pagination, PaginationMixin, PredictionCard, div;
 
 div = React.DOM.div;
@@ -84480,7 +84668,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":580,"components/Header":581,"components/Pagination":582,"components/PredictionCard":583,"mixins/PaginationMixin":586}],610:[function(require,module,exports){
+},{"components/Footer":581,"components/Header":582,"components/Pagination":583,"components/PredictionCard":584,"mixins/PaginationMixin":587}],611:[function(require,module,exports){
 var Footer, Header, RaisedButton, RefreshIndicator, TextField, a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
@@ -84661,7 +84849,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":580,"components/Header":581}],611:[function(require,module,exports){
+},{"components/Footer":581,"components/Header":582}],612:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -84682,7 +84870,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":580,"components/Header":581}],612:[function(require,module,exports){
+},{"components/Footer":581,"components/Header":582}],613:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -84714,7 +84902,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":580,"components/Header":581}],613:[function(require,module,exports){
+},{"components/Footer":581,"components/Header":582}],614:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -84735,4 +84923,4 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":580,"components/Header":581}]},{},[3])
+},{"components/Footer":581,"components/Header":582}]},{},[3])
