@@ -1274,8 +1274,89 @@ module.exports = React.createFactory(React.createClass({
   div = React.DOM.div;
 
   module.exports = React.createFactory(React.createClass({
+    updateField: function(event) {
+      if ((event == null) || (event.target == null)) {
+        return;
+      }
+      return this.props.updateField(event.target.id, event.target.value);
+    },
+    getErrorText: function(key) {
+      var error, j, len, ref3;
+      ref3 = this.props.errors;
+      for (j = 0, len = ref3.length; j < len; j++) {
+        error = ref3[j];
+        if (error.id === key) {
+          return error.text;
+        }
+      }
+      return null;
+    },
     render: function() {
-      return div({}, "Expert Fields");
+      return div({}, React.createElement(Material.TextField, {
+        id: "name",
+        hintText: "Expert Name",
+        floatingLabelText: "Name",
+        multiLine: false,
+        rows: 1,
+        fullWidth: true,
+        value: this.props.expert.name,
+        onChange: this.updateField,
+        errorText: this.getErrorText("name")
+      }), React.createElement(Material.TextField, {
+        id: "description",
+        hintText: "Description",
+        floatingLabelText: "Description",
+        multiLine: true,
+        rows: 2,
+        fullWidth: true,
+        rowsMax: 4,
+        value: this.props.expert.description,
+        onChange: this.updateField,
+        errorText: this.getErrorText("description")
+      }), React.createElement(Material.TextField, {
+        id: "email",
+        hintText: "Email",
+        floatingLabelText: "Email",
+        fullWidth: true,
+        value: this.props.expert.email,
+        onChange: this.updateField,
+        errorText: this.getErrorText("email")
+      }), React.createElement(Material.TextField, {
+        id: "twitter",
+        hintText: "Twitter Handle",
+        floatingLabelText: "Twitter Handle",
+        value: this.props.expert.twitter,
+        onChange: this.updateField,
+        errorText: this.getErrorText("twitter")
+      }), React.createElement(Material.TextField, {
+        id: "facebook",
+        hintText: "Facebook",
+        floatingLabelText: "Facebook",
+        value: this.props.expert.facebook,
+        onChange: this.updateField,
+        errorText: this.getErrorText("facebook")
+      }), React.createElement(Material.TextField, {
+        id: "instagram",
+        hintText: "Instagram Handle",
+        floatingLabelText: "Instagram",
+        value: this.props.expert.instagram,
+        onChange: this.updateField,
+        errorText: this.getErrorText("instagram")
+      }), React.createElement(Material.TextField, {
+        id: "youtube",
+        hintText: "Youtube",
+        floatingLabelText: "Youtube",
+        value: this.props.expert.youtube,
+        onChange: this.updateField,
+        errorText: this.getErrorText("youtube")
+      }), React.createElement(Material.TextField, {
+        id: "tag_list",
+        hintText: "Tags",
+        floatingLabelText: "Tags",
+        value: this.props.expert.tag_list,
+        onChange: this.updateField,
+        errorText: this.getErrorText("tag_list")
+      }), "Avatar Goes Here");
     }
   }));
 
@@ -2108,6 +2189,10 @@ module.exports = React.createFactory(React.createClass({
       expert: {
         path: "experts/%expert_id%",
         method: "GET"
+      },
+      create_expert: {
+        path: "experts/",
+        method: "POST"
       },
       expert_add_comment: {
         path: "experts/%expert_id%/add_comment",
@@ -3087,17 +3172,112 @@ module.exports = React.createFactory(React.createClass({
     displayName: "Create Expert View",
     getInitialState: function() {
       return {
-        expert: {}
+        expert: {
+          name: '',
+          email: '',
+          description: '',
+          twitter: '',
+          facebook: '',
+          instagram: '',
+          youtube: '',
+          tag_list: '',
+          avatar: ''
+        },
+        errors: [],
+        submitExpertError: null,
+        submittingExpert: false
       };
+    },
+    goToExpert: function(id) {
+      return navigate("/experts/" + id);
+    },
+    updateField: function(id, val) {
+      this.expert = this.state.expert;
+      this.expert[id] = val;
+      return this.setState({
+        expert: this.expert
+      });
+    },
+    assembleExpertData: function() {
+      return this.state.expert;
+    },
+    createExpert: function() {
+      var params;
+      this.setState({
+        submitExpertError: null
+      });
+      if (this.validateInputs()) {
+        this.setState({
+          submittingExpert: true
+        });
+        params = {
+          path: "create_expert",
+          data: this.assembleExpertData,
+          success: this.createExpertSuccess,
+          error: this.createExpertError
+        };
+        return API.call(params);
+      }
+    },
+    createExpertError: function(error) {
+      if ((error.responseJSON != null) && (error.responseJSON.errors != null)) {
+        this.setState({
+          submitExpertError: error.responseJSON.errors[0]
+        });
+      } else {
+        this.setState({
+          submitExpertError: "There was an error."
+        });
+      }
+      return this.setState({
+        submittingExpert: false
+      });
+    },
+    validateInputs: function() {
+      this.errors = [];
+      if (this.state.inputs.content.val.length < 3) {
+        this.errors.push({
+          id: "content",
+          text: "Comment must be at least 3 characters long."
+        });
+      }
+      if (this.state.inputs.content.val.length > 1000) {
+        this.errors.push({
+          id: "content",
+          text: "Comment can't be longer than 1000 characters."
+        });
+      }
+      this.setState({
+        errors: this.errors
+      });
+      if (this.errors.length === 0) {
+        return true;
+      }
+      return false;
     },
     render: function() {
       return div({}, Header({}, ''), div({
         className: "expert-wrapper"
       }, div({
         className: "expert-content"
-      }, "Create Expert", ExpertFields({
-        expert: this.state.expert
-      }))), Footer({}, ''));
+      }, "Create Expert", UserStore.loggedIn() ? div({}, ExpertFields({
+        expert: this.state.expert,
+        errors: this.state.errors,
+        updateField: this.updateField
+      }), this.state.submittingExpert !== true ? React.createElement(Material.RaisedButton, {
+        label: "Create",
+        onClick: this.createExpert
+      }) : (this.style = {
+        display: 'inline-block',
+        position: 'relative',
+        boxShadow: 'none'
+      }, React.createElement(Material.RefreshIndicator, {
+        style: this.style,
+        size: 50,
+        left: 0,
+        top: 0,
+        status: "loading"
+      })), this.state.submitExpertError != null ? div({}, this.state.submitExpertError) : void 0) : div({}, "You must be logged in to add an expert to the sytem."))), Footer({}, ''));
     }
   }));
 
@@ -82122,8 +82302,89 @@ var div;
 div = React.DOM.div;
 
 module.exports = React.createFactory(React.createClass({
+  updateField: function(event) {
+    if ((event == null) || (event.target == null)) {
+      return;
+    }
+    return this.props.updateField(event.target.id, event.target.value);
+  },
+  getErrorText: function(key) {
+    var error, i, len, ref;
+    ref = this.props.errors;
+    for (i = 0, len = ref.length; i < len; i++) {
+      error = ref[i];
+      if (error.id === key) {
+        return error.text;
+      }
+    }
+    return null;
+  },
   render: function() {
-    return div({}, "Expert Fields");
+    return div({}, React.createElement(Material.TextField, {
+      id: "name",
+      hintText: "Expert Name",
+      floatingLabelText: "Name",
+      multiLine: false,
+      rows: 1,
+      fullWidth: true,
+      value: this.props.expert.name,
+      onChange: this.updateField,
+      errorText: this.getErrorText("name")
+    }), React.createElement(Material.TextField, {
+      id: "description",
+      hintText: "Description",
+      floatingLabelText: "Description",
+      multiLine: true,
+      rows: 2,
+      fullWidth: true,
+      rowsMax: 4,
+      value: this.props.expert.description,
+      onChange: this.updateField,
+      errorText: this.getErrorText("description")
+    }), React.createElement(Material.TextField, {
+      id: "email",
+      hintText: "Email",
+      floatingLabelText: "Email",
+      fullWidth: true,
+      value: this.props.expert.email,
+      onChange: this.updateField,
+      errorText: this.getErrorText("email")
+    }), React.createElement(Material.TextField, {
+      id: "twitter",
+      hintText: "Twitter Handle",
+      floatingLabelText: "Twitter Handle",
+      value: this.props.expert.twitter,
+      onChange: this.updateField,
+      errorText: this.getErrorText("twitter")
+    }), React.createElement(Material.TextField, {
+      id: "facebook",
+      hintText: "Facebook",
+      floatingLabelText: "Facebook",
+      value: this.props.expert.facebook,
+      onChange: this.updateField,
+      errorText: this.getErrorText("facebook")
+    }), React.createElement(Material.TextField, {
+      id: "instagram",
+      hintText: "Instagram Handle",
+      floatingLabelText: "Instagram",
+      value: this.props.expert.instagram,
+      onChange: this.updateField,
+      errorText: this.getErrorText("instagram")
+    }), React.createElement(Material.TextField, {
+      id: "youtube",
+      hintText: "Youtube",
+      floatingLabelText: "Youtube",
+      value: this.props.expert.youtube,
+      onChange: this.updateField,
+      errorText: this.getErrorText("youtube")
+    }), React.createElement(Material.TextField, {
+      id: "tag_list",
+      hintText: "Tags",
+      floatingLabelText: "Tags",
+      value: this.props.expert.tag_list,
+      onChange: this.updateField,
+      errorText: this.getErrorText("tag_list")
+    }), "Avatar Goes Here");
   }
 }));
 
@@ -82865,6 +83126,10 @@ module.exports = API = (function() {
     expert: {
       path: "experts/%expert_id%",
       method: "GET"
+    },
+    create_expert: {
+      path: "experts/",
+      method: "POST"
     },
     expert_add_comment: {
       path: "experts/%expert_id%/add_comment",
@@ -83897,17 +84162,112 @@ module.exports = React.createFactory(React.createClass({
   displayName: "Create Expert View",
   getInitialState: function() {
     return {
-      expert: {}
+      expert: {
+        name: '',
+        email: '',
+        description: '',
+        twitter: '',
+        facebook: '',
+        instagram: '',
+        youtube: '',
+        tag_list: '',
+        avatar: ''
+      },
+      errors: [],
+      submitExpertError: null,
+      submittingExpert: false
     };
+  },
+  goToExpert: function(id) {
+    return navigate("/experts/" + id);
+  },
+  updateField: function(id, val) {
+    this.expert = this.state.expert;
+    this.expert[id] = val;
+    return this.setState({
+      expert: this.expert
+    });
+  },
+  assembleExpertData: function() {
+    return this.state.expert;
+  },
+  createExpert: function() {
+    var params;
+    this.setState({
+      submitExpertError: null
+    });
+    if (this.validateInputs()) {
+      this.setState({
+        submittingExpert: true
+      });
+      params = {
+        path: "create_expert",
+        data: this.assembleExpertData,
+        success: this.createExpertSuccess,
+        error: this.createExpertError
+      };
+      return API.call(params);
+    }
+  },
+  createExpertError: function(error) {
+    if ((error.responseJSON != null) && (error.responseJSON.errors != null)) {
+      this.setState({
+        submitExpertError: error.responseJSON.errors[0]
+      });
+    } else {
+      this.setState({
+        submitExpertError: "There was an error."
+      });
+    }
+    return this.setState({
+      submittingExpert: false
+    });
+  },
+  validateInputs: function() {
+    this.errors = [];
+    if (this.state.inputs.content.val.length < 3) {
+      this.errors.push({
+        id: "content",
+        text: "Comment must be at least 3 characters long."
+      });
+    }
+    if (this.state.inputs.content.val.length > 1000) {
+      this.errors.push({
+        id: "content",
+        text: "Comment can't be longer than 1000 characters."
+      });
+    }
+    this.setState({
+      errors: this.errors
+    });
+    if (this.errors.length === 0) {
+      return true;
+    }
+    return false;
   },
   render: function() {
     return div({}, Header({}, ''), div({
       className: "expert-wrapper"
     }, div({
       className: "expert-content"
-    }, "Create Expert", ExpertFields({
-      expert: this.state.expert
-    }))), Footer({}, ''));
+    }, "Create Expert", UserStore.loggedIn() ? div({}, ExpertFields({
+      expert: this.state.expert,
+      errors: this.state.errors,
+      updateField: this.updateField
+    }), this.state.submittingExpert !== true ? React.createElement(Material.RaisedButton, {
+      label: "Create",
+      onClick: this.createExpert
+    }) : (this.style = {
+      display: 'inline-block',
+      position: 'relative',
+      boxShadow: 'none'
+    }, React.createElement(Material.RefreshIndicator, {
+      style: this.style,
+      size: 50,
+      left: 0,
+      top: 0,
+      status: "loading"
+    })), this.state.submitExpertError != null ? div({}, this.state.submitExpertError) : void 0) : div({}, "You must be logged in to add an expert to the sytem."))), Footer({}, ''));
   }
 }));
 

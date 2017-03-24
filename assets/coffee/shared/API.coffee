@@ -86,6 +86,9 @@ module.exports = class API
     expert:
       path: "experts/%expert_id%"
       method: "GET"
+    create_expert:
+      path: "experts/"
+      method: "POST"
     expert_add_comment:
       path: "experts/%expert_id%/add_comment"
       method: "POST"
