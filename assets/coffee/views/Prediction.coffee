@@ -3,15 +3,19 @@
 Header = require("components/Header")
 Footer = require("components/Footer")
 PredictionExpertCard = require("components/PredictionExpertCard")
-Comment = require("components/Comments")
+Comments = require("components/Comments")
+
+SessionMixin = require("mixins/SessionMixin")
 
 module.exports = React.createFactory React.createClass
+  mixins: [SessionMixin]
   displayName: 'Prediction'
 
   getInitialState: ->
     prediction: null
     experts: []
     loadError: null
+    showCreated: @doShowCreated()
 
 
   componentDidMount: ->
@@ -33,6 +37,36 @@ module.exports = React.createFactory React.createClass
   predictionError: (error) ->
     @setState loadError: error.responseJSON.errors
 
+
+  successCardStyle: ->
+    return {
+      backgroundColor: "#237a0b"
+      color: "#ffffff"
+      margin: 4
+    }
+
+  
+  removeAlert: ->
+    @setState showCreated: false
+
+  
+  doShowCreated: ->
+    if @getParameterByName("created") == 1 or @getParameterByName("created") == "1"
+      return true
+    else
+      return false
+
+  
+  showNewPredictionText: ->
+    div { className: "prediction__created" },
+      if @state.showCreated == true
+        React.createElement(Material.Chip, {
+          style: @successCardStyle(),
+          onRequestDelete: @removeAlert
+        },
+          "Success! You've added a new prediction to the system. Now you can add more information to it!"
+        )
+
   
   render: ->
     { prediction, experts } = @state
@@ -42,6 +76,7 @@ module.exports = React.createFactory React.createClass
         div { className: "predictions-content" },
           if prediction?
             div { className: "prediction" },
+              @showNewPredictionText()
               div { className: "prediction__title" },
                 prediction.title
               div { className: "prediction__experts" },

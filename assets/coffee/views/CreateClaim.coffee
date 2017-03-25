@@ -14,8 +14,8 @@ module.exports = React.createFactory React.createClass
   render: ->
     div {},
       Header {}, ''
-      div { className: "claim-wrapper" },
-        div { className: "claim-content" },
+      div { className: "claims-wrapper" },
+        div { className: "claims-content" },
           "Create Claim"
           ClaimFields
             claim: @state.claim

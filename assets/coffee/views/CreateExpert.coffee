@@ -70,7 +70,7 @@ module.exports = React.createFactory React.createClass
   createExpertSuccess: (data) ->
     @setState submittingExpert: false
     if data.expert?
-      navigate("/experts/#{data.expert.id}?created=1")
+      navigate("/experts/#{data.expert.alias}?created=1")
 
 
   validateInputs: ->
@@ -88,8 +88,8 @@ module.exports = React.createFactory React.createClass
   render: ->
     div {},
       Header {}, ''
-      div { className: "expert-wrapper" },
-        div { className: "expert-content" },
+      div { className: "experts-wrapper" },
+        div { className: "experts-content" },
           "Create Expert"
           if UserStore.loggedIn()
             div {},

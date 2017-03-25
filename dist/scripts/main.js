@@ -134,7 +134,7 @@ module.exports = React.createFactory(React.createClass({
 
 },{}],3:[function(require,module,exports){
 (function() {
-  var API, AddToExpert, Blundit, Card, CardActions, CardHeader, CardMedia, CardText, CardTitle, CategoryClaims, CategoryExperts, CategoryPredictions, CategorySubHead, ClaimCard, ClaimExpertCard, ClaimFields, Comment, Comments, ExpertBonaFides, ExpertCard, ExpertClaimCard, ExpertFields, ExpertPredictionCard, ExpertSubstantiations, FlatButton, FontIcon, Footer, Global, Header, IconButton, MuiThemeProvider, Pagination, PaginationMixin, PredictionCard, PredictionExpertCard, PredictionFields, RaisedButton, RefreshIndicator, RouterMixin, SessionMixin, TextField, UserStore, a, br, deepOrange500, div, getMuiTheme, img, menuItems, muiTheme, ref, ref1, ref2, ref3, ref4, ref5, ref6, ref7, ref8, ref9, span, startBlundit,
+  var API, AddToExpert, Blundit, Card, CardActions, CardHeader, CardMedia, CardText, CardTitle, CategoryClaims, CategoryExperts, CategoryPredictions, CategorySubHead, ClaimCard, ClaimExpertCard, ClaimFields, Comments, ExpertBonaFides, ExpertCard, ExpertClaimCard, ExpertFields, ExpertPredictionCard, ExpertSubstantiations, FlatButton, FontIcon, Footer, Global, Header, IconButton, MuiThemeProvider, Pagination, PaginationMixin, PredictionCard, PredictionExpertCard, PredictionFields, RaisedButton, RefreshIndicator, RouterMixin, SessionMixin, TextField, UserStore, a, br, deepOrange500, div, getMuiTheme, img, menuItems, muiTheme, ref, ref1, ref2, ref3, ref4, ref5, ref6, ref7, ref8, ref9, span, startBlundit,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   window.React = require('react');
@@ -1939,8 +1939,63 @@ module.exports = React.createFactory(React.createClass({
   div = React.DOM.div;
 
   module.exports = React.createFactory(React.createClass({
+    updateField: function(event) {
+      if ((event == null) || (event.target == null)) {
+        return;
+      }
+      return this.props.updateField(event.target.id, event.target.value);
+    },
+    getErrorText: function(key) {
+      var error, j, len, ref6;
+      ref6 = this.props.errors;
+      for (j = 0, len = ref6.length; j < len; j++) {
+        error = ref6[j];
+        if (error.id === key) {
+          return error.text;
+        }
+      }
+      return null;
+    },
+    updateDate: function(event, date) {
+      console.log(event, date);
+      return this.props.updateField("prediction_date", date);
+    },
     render: function() {
-      return div({}, "Prediction Fields");
+      return div({}, React.createElement(Material.TextField, {
+        id: "title",
+        hintText: "Prediction Title",
+        floatingLabelText: "Title",
+        multiLine: false,
+        rows: 1,
+        fullWidth: true,
+        value: this.props.prediction.title,
+        onChange: this.updateField,
+        errorText: this.getErrorText("title")
+      }), React.createElement(Material.TextField, {
+        id: "description",
+        hintText: "Description",
+        floatingLabelText: "Description",
+        multiLine: true,
+        rows: 2,
+        fullWidth: true,
+        rowsMax: 4,
+        value: this.props.prediction.description,
+        onChange: this.updateField,
+        errorText: this.getErrorText("description")
+      }), React.createElement(Material.DatePicker, {
+        hintText: "Prediction Date",
+        value: this.props.prediction.prediction_date,
+        onChange: this.updateDate,
+        errorText: this.getErrorText("prediction_date")
+      }), this.getErrorText("prediction_date") != null ? div({}, this.getErrorText("prediction_date")) : void 0, React.createElement(Material.TextField, {
+        id: "url",
+        hintText: "Evidence of Prediction (URL)",
+        floatingLabelText: "Evidence",
+        fullWidth: true,
+        value: this.props.prediction.url,
+        onChange: this.updateField,
+        errorText: this.getErrorText("url")
+      }), "Pic Goes Here");
     }
   }));
 
@@ -2159,6 +2214,10 @@ module.exports = React.createFactory(React.createClass({
         path: "claims/%claim_id%",
         method: "GET"
       },
+      create_claim: {
+        path: "claims/",
+        method: "POST"
+      },
       claim_add_comment: {
         path: "claims/%claim_id%/add_comment",
         method: "POST"
@@ -2174,6 +2233,10 @@ module.exports = React.createFactory(React.createClass({
       prediction: {
         path: "predictions/%prediction_id%",
         method: "GET"
+      },
+      create_prediction: {
+        path: "predictions/",
+        method: "POST"
       },
       prediction_add_comment: {
         path: "predictions/%prediction_id%/add_comment",
@@ -3152,9 +3215,9 @@ module.exports = React.createFactory(React.createClass({
     },
     render: function() {
       return div({}, Header({}, ''), div({
-        className: "claim-wrapper"
+        className: "claims-wrapper"
       }, div({
-        className: "claim-content"
+        className: "claims-content"
       }, "Create Claim", ClaimFields({
         claim: this.state.claim
       }))), Footer({}, ''));
@@ -3244,7 +3307,7 @@ module.exports = React.createFactory(React.createClass({
         submittingExpert: false
       });
       if (data.expert != null) {
-        return navigate("/experts/" + data.expert.id + "?created=1");
+        return navigate("/experts/" + data.expert.alias + "?created=1");
       }
     },
     validateInputs: function() {
@@ -3265,9 +3328,9 @@ module.exports = React.createFactory(React.createClass({
     },
     render: function() {
       return div({}, Header({}, ''), div({
-        className: "expert-wrapper"
+        className: "experts-wrapper"
       }, div({
-        className: "expert-content"
+        className: "experts-content"
       }, "Create Expert", UserStore.loggedIn() ? div({}, ExpertFields({
         expert: this.state.expert,
         errors: this.state.errors,
@@ -3301,17 +3364,123 @@ module.exports = React.createFactory(React.createClass({
     displayName: "Create Prediction View",
     getInitialState: function() {
       return {
-        prediction: {}
+        prediction: {
+          title: '',
+          description: '',
+          url: '',
+          prediction_date: null,
+          pic: ''
+        },
+        errors: [],
+        submitPredictionError: null,
+        submittingPrediction: false
       };
+    },
+    updateField: function(id, val) {
+      this.prediction = this.state.prediction;
+      this.prediction[id] = val;
+      console.log(id, val);
+      return this.setState({
+        prediction: this.prediction
+      });
+    },
+    assemblePredictionData: function() {
+      return this.state.prediction;
+    },
+    createPrediction: function() {
+      var params;
+      this.setState({
+        submitPredictionError: null
+      });
+      if (this.validateInputs()) {
+        this.setState({
+          submittingPrediction: true
+        });
+        params = {
+          path: "create_prediction",
+          data: {
+            title: this.state.prediction.title,
+            description: this.state.prediction.description,
+            url: this.state.prediction.url,
+            prediction_date: this.state.prediction.prediction_date
+          },
+          success: this.createPredictionSuccess,
+          error: this.createPredictionError
+        };
+        return API.call(params);
+      }
+    },
+    createPredictionError: function(error) {
+      console.log("ERROR");
+      console.log(error);
+      if ((error.responseJSON != null) && (error.responseJSON.errors != null)) {
+        this.setState({
+          submitPredictionError: error.responseJSON.errors[0]
+        });
+      } else {
+        this.setState({
+          submitPredictionError: "There was an error."
+        });
+      }
+      return this.setState({
+        submittingPrediction: false
+      });
+    },
+    createPredictionSuccess: function(data) {
+      this.setState({
+        submittingPrediction: false
+      });
+      console.log("SUCCESS");
+      console.log(data);
+      if (data.prediction != null) {
+        return navigate("/predictions/" + data.prediction.alias + "?created=1");
+      }
+    },
+    validateInputs: function() {
+      this.errors = [];
+      if (this.state.prediction.title.length < 3) {
+        this.errors.push({
+          id: "title",
+          text: "Title must be at least 3 characters long."
+        });
+      }
+      if (this.state.prediction.prediction_date === null) {
+        this.errors.push({
+          id: "prediction_date",
+          text: "Date required for prediction."
+        });
+      }
+      this.setState({
+        errors: this.errors
+      });
+      if (this.errors.length === 0) {
+        return true;
+      }
+      return false;
     },
     render: function() {
       return div({}, Header({}, ''), div({
-        className: "prediction-wrapper"
+        className: "predictions-wrapper"
       }, div({
-        className: "prediction-content"
-      }, "Create Prediction", PredictionFields({
-        prediction: this.state.prediction
-      }))), Footer({}, ''));
+        className: "predictions-content"
+      }, "Create Prediction", UserStore.loggedIn() ? div({}, PredictionFields({
+        prediction: this.state.prediction,
+        errors: this.state.errors,
+        updateField: this.updateField
+      }), this.state.submittingPrediction !== true ? React.createElement(Material.RaisedButton, {
+        label: "Create",
+        onClick: this.createPrediction
+      }) : (this.style = {
+        display: 'inline-block',
+        position: 'relative',
+        boxShadow: 'none'
+      }, React.createElement(Material.RefreshIndicator, {
+        style: this.style,
+        size: 50,
+        left: 0,
+        top: 0,
+        status: "loading"
+      })), this.state.submitPredictionError != null ? div({}, this.state.submitPredictionError) : void 0) : div({}, "You must be logged in to add an prediction to the sytem."))), Footer({}, ''));
     }
   }));
 
@@ -3898,15 +4067,19 @@ module.exports = React.createFactory(React.createClass({
 
   PredictionExpertCard = require("components/PredictionExpertCard");
 
-  Comment = require("components/Comments");
+  Comments = require("components/Comments");
+
+  SessionMixin = require("mixins/SessionMixin");
 
   module.exports = React.createFactory(React.createClass({
+    mixins: [SessionMixin],
     displayName: 'Prediction',
     getInitialState: function() {
       return {
         prediction: null,
         experts: [],
-        loadError: null
+        loadError: null,
+        showCreated: this.doShowCreated()
       };
     },
     componentDidMount: function() {
@@ -3934,6 +4107,33 @@ module.exports = React.createFactory(React.createClass({
         loadError: error.responseJSON.errors
       });
     },
+    successCardStyle: function() {
+      return {
+        backgroundColor: "#237a0b",
+        color: "#ffffff",
+        margin: 4
+      };
+    },
+    removeAlert: function() {
+      return this.setState({
+        showCreated: false
+      });
+    },
+    doShowCreated: function() {
+      if (this.getParameterByName("created") === 1 || this.getParameterByName("created") === "1") {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    showNewPredictionText: function() {
+      return div({
+        className: "prediction__created"
+      }, this.state.showCreated === true ? React.createElement(Material.Chip, {
+        style: this.successCardStyle(),
+        onRequestDelete: this.removeAlert
+      }, "Success! You've added a new prediction to the system. Now you can add more information to it!") : void 0);
+    },
     render: function() {
       var experts, prediction, ref9;
       ref9 = this.state, prediction = ref9.prediction, experts = ref9.experts;
@@ -3943,7 +4143,7 @@ module.exports = React.createFactory(React.createClass({
         className: "predictions-content"
       }, prediction != null ? div({
         className: "prediction"
-      }, div({
+      }, this.showNewPredictionText(), div({
         className: "prediction__title"
       }, prediction.title), div({
         className: "prediction__experts"
@@ -82908,8 +83108,63 @@ var div;
 div = React.DOM.div;
 
 module.exports = React.createFactory(React.createClass({
+  updateField: function(event) {
+    if ((event == null) || (event.target == null)) {
+      return;
+    }
+    return this.props.updateField(event.target.id, event.target.value);
+  },
+  getErrorText: function(key) {
+    var error, i, len, ref;
+    ref = this.props.errors;
+    for (i = 0, len = ref.length; i < len; i++) {
+      error = ref[i];
+      if (error.id === key) {
+        return error.text;
+      }
+    }
+    return null;
+  },
+  updateDate: function(event, date) {
+    console.log(event, date);
+    return this.props.updateField("prediction_date", date);
+  },
   render: function() {
-    return div({}, "Prediction Fields");
+    return div({}, React.createElement(Material.TextField, {
+      id: "title",
+      hintText: "Prediction Title",
+      floatingLabelText: "Title",
+      multiLine: false,
+      rows: 1,
+      fullWidth: true,
+      value: this.props.prediction.title,
+      onChange: this.updateField,
+      errorText: this.getErrorText("title")
+    }), React.createElement(Material.TextField, {
+      id: "description",
+      hintText: "Description",
+      floatingLabelText: "Description",
+      multiLine: true,
+      rows: 2,
+      fullWidth: true,
+      rowsMax: 4,
+      value: this.props.prediction.description,
+      onChange: this.updateField,
+      errorText: this.getErrorText("description")
+    }), React.createElement(Material.DatePicker, {
+      hintText: "Prediction Date",
+      value: this.props.prediction.prediction_date,
+      onChange: this.updateDate,
+      errorText: this.getErrorText("prediction_date")
+    }), this.getErrorText("prediction_date") != null ? div({}, this.getErrorText("prediction_date")) : void 0, React.createElement(Material.TextField, {
+      id: "url",
+      hintText: "Evidence of Prediction (URL)",
+      floatingLabelText: "Evidence",
+      fullWidth: true,
+      value: this.props.prediction.url,
+      onChange: this.updateField,
+      errorText: this.getErrorText("url")
+    }), "Pic Goes Here");
   }
 }));
 
@@ -83135,6 +83390,10 @@ module.exports = API = (function() {
       path: "claims/%claim_id%",
       method: "GET"
     },
+    create_claim: {
+      path: "claims/",
+      method: "POST"
+    },
     claim_add_comment: {
       path: "claims/%claim_id%/add_comment",
       method: "POST"
@@ -83150,6 +83409,10 @@ module.exports = API = (function() {
     prediction: {
       path: "predictions/%prediction_id%",
       method: "GET"
+    },
+    create_prediction: {
+      path: "predictions/",
+      method: "POST"
     },
     prediction_add_comment: {
       path: "predictions/%prediction_id%/add_comment",
@@ -84177,9 +84440,9 @@ module.exports = React.createFactory(React.createClass({
   },
   render: function() {
     return div({}, Header({}, ''), div({
-      className: "claim-wrapper"
+      className: "claims-wrapper"
     }, div({
-      className: "claim-content"
+      className: "claims-content"
     }, "Create Claim", ClaimFields({
       claim: this.state.claim
     }))), Footer({}, ''));
@@ -84273,7 +84536,7 @@ module.exports = React.createFactory(React.createClass({
       submittingExpert: false
     });
     if (data.expert != null) {
-      return navigate("/experts/" + data.expert.id + "?created=1");
+      return navigate("/experts/" + data.expert.alias + "?created=1");
     }
   },
   validateInputs: function() {
@@ -84294,9 +84557,9 @@ module.exports = React.createFactory(React.createClass({
   },
   render: function() {
     return div({}, Header({}, ''), div({
-      className: "expert-wrapper"
+      className: "experts-wrapper"
     }, div({
-      className: "expert-content"
+      className: "experts-content"
     }, "Create Expert", UserStore.loggedIn() ? div({}, ExpertFields({
       expert: this.state.expert,
       errors: this.state.errors,
@@ -84334,17 +84597,123 @@ module.exports = React.createFactory(React.createClass({
   displayName: "Create Prediction View",
   getInitialState: function() {
     return {
-      prediction: {}
+      prediction: {
+        title: '',
+        description: '',
+        url: '',
+        prediction_date: null,
+        pic: ''
+      },
+      errors: [],
+      submitPredictionError: null,
+      submittingPrediction: false
     };
+  },
+  updateField: function(id, val) {
+    this.prediction = this.state.prediction;
+    this.prediction[id] = val;
+    console.log(id, val);
+    return this.setState({
+      prediction: this.prediction
+    });
+  },
+  assemblePredictionData: function() {
+    return this.state.prediction;
+  },
+  createPrediction: function() {
+    var params;
+    this.setState({
+      submitPredictionError: null
+    });
+    if (this.validateInputs()) {
+      this.setState({
+        submittingPrediction: true
+      });
+      params = {
+        path: "create_prediction",
+        data: {
+          title: this.state.prediction.title,
+          description: this.state.prediction.description,
+          url: this.state.prediction.url,
+          prediction_date: this.state.prediction.prediction_date
+        },
+        success: this.createPredictionSuccess,
+        error: this.createPredictionError
+      };
+      return API.call(params);
+    }
+  },
+  createPredictionError: function(error) {
+    console.log("ERROR");
+    console.log(error);
+    if ((error.responseJSON != null) && (error.responseJSON.errors != null)) {
+      this.setState({
+        submitPredictionError: error.responseJSON.errors[0]
+      });
+    } else {
+      this.setState({
+        submitPredictionError: "There was an error."
+      });
+    }
+    return this.setState({
+      submittingPrediction: false
+    });
+  },
+  createPredictionSuccess: function(data) {
+    this.setState({
+      submittingPrediction: false
+    });
+    console.log("SUCCESS");
+    console.log(data);
+    if (data.prediction != null) {
+      return navigate("/predictions/" + data.prediction.alias + "?created=1");
+    }
+  },
+  validateInputs: function() {
+    this.errors = [];
+    if (this.state.prediction.title.length < 3) {
+      this.errors.push({
+        id: "title",
+        text: "Title must be at least 3 characters long."
+      });
+    }
+    if (this.state.prediction.prediction_date === null) {
+      this.errors.push({
+        id: "prediction_date",
+        text: "Date required for prediction."
+      });
+    }
+    this.setState({
+      errors: this.errors
+    });
+    if (this.errors.length === 0) {
+      return true;
+    }
+    return false;
   },
   render: function() {
     return div({}, Header({}, ''), div({
-      className: "prediction-wrapper"
+      className: "predictions-wrapper"
     }, div({
-      className: "prediction-content"
-    }, "Create Prediction", PredictionFields({
-      prediction: this.state.prediction
-    }))), Footer({}, ''));
+      className: "predictions-content"
+    }, "Create Prediction", UserStore.loggedIn() ? div({}, PredictionFields({
+      prediction: this.state.prediction,
+      errors: this.state.errors,
+      updateField: this.updateField
+    }), this.state.submittingPrediction !== true ? React.createElement(Material.RaisedButton, {
+      label: "Create",
+      onClick: this.createPrediction
+    }) : (this.style = {
+      display: 'inline-block',
+      position: 'relative',
+      boxShadow: 'none'
+    }, React.createElement(Material.RefreshIndicator, {
+      style: this.style,
+      size: 50,
+      left: 0,
+      top: 0,
+      status: "loading"
+    })), this.state.submitPredictionError != null ? div({}, this.state.submitPredictionError) : void 0) : div({}, "You must be logged in to add an prediction to the sytem."))), Footer({}, ''));
   }
 }));
 
@@ -84945,7 +85314,7 @@ module.exports = React.createFactory(React.createClass({
 
 
 },{"components/Footer":581,"components/Header":582,"mixins/SessionMixin":588}],609:[function(require,module,exports){
-var Comment, Footer, Header, PredictionExpertCard, div;
+var Comments, Footer, Header, PredictionExpertCard, SessionMixin, div;
 
 div = React.DOM.div;
 
@@ -84955,15 +85324,19 @@ Footer = require("components/Footer");
 
 PredictionExpertCard = require("components/PredictionExpertCard");
 
-Comment = require("components/Comments");
+Comments = require("components/Comments");
+
+SessionMixin = require("mixins/SessionMixin");
 
 module.exports = React.createFactory(React.createClass({
+  mixins: [SessionMixin],
   displayName: 'Prediction',
   getInitialState: function() {
     return {
       prediction: null,
       experts: [],
-      loadError: null
+      loadError: null,
+      showCreated: this.doShowCreated()
     };
   },
   componentDidMount: function() {
@@ -84991,6 +85364,33 @@ module.exports = React.createFactory(React.createClass({
       loadError: error.responseJSON.errors
     });
   },
+  successCardStyle: function() {
+    return {
+      backgroundColor: "#237a0b",
+      color: "#ffffff",
+      margin: 4
+    };
+  },
+  removeAlert: function() {
+    return this.setState({
+      showCreated: false
+    });
+  },
+  doShowCreated: function() {
+    if (this.getParameterByName("created") === 1 || this.getParameterByName("created") === "1") {
+      return true;
+    } else {
+      return false;
+    }
+  },
+  showNewPredictionText: function() {
+    return div({
+      className: "prediction__created"
+    }, this.state.showCreated === true ? React.createElement(Material.Chip, {
+      style: this.successCardStyle(),
+      onRequestDelete: this.removeAlert
+    }, "Success! You've added a new prediction to the system. Now you can add more information to it!") : void 0);
+  },
   render: function() {
     var experts, prediction, ref;
     ref = this.state, prediction = ref.prediction, experts = ref.experts;
@@ -85000,7 +85400,7 @@ module.exports = React.createFactory(React.createClass({
       className: "predictions-content"
     }, prediction != null ? div({
       className: "prediction"
-    }, div({
+    }, this.showNewPredictionText(), div({
       className: "prediction__title"
     }, prediction.title), div({
       className: "prediction__experts"
@@ -85023,7 +85423,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Comments":574,"components/Footer":581,"components/Header":582,"components/PredictionExpertCard":585}],610:[function(require,module,exports){
+},{"components/Comments":574,"components/Footer":581,"components/Header":582,"components/PredictionExpertCard":585,"mixins/SessionMixin":588}],610:[function(require,module,exports){
 var Footer, Header, Pagination, PaginationMixin, PredictionCard, div;
 
 div = React.DOM.div;
