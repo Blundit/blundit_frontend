@@ -62,6 +62,7 @@ module.exports = React.createFactory React.createClass
             a
               href: bona_fide.url
               target: "_blank"
+              key: "expert-bona-fide-#{index}"
               bona_fide.title
       if UserStore.loggedIn()
         if @state.submittingBonaFide == true

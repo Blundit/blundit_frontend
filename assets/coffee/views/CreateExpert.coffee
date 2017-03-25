@@ -23,10 +23,6 @@ module.exports = React.createFactory React.createClass
     submittingExpert: false
 
 
-  goToExpert: (id) ->
-    navigate("/experts/#{id}")
-
-
   updateField: (id, val) ->
     @expert = @state.expert
     @expert[id] = val
@@ -46,12 +42,20 @@ module.exports = React.createFactory React.createClass
 
       params = {
         path: "create_expert"
-        data: @assembleExpertData
+        data:
+          name: @state.expert.name
+          description: @state.expert.description
+          twitter: @state.expert.twitter
+          facebook: @state.expert.facebook
+          instagram: @state.expert.instagram
+          youtube: @state.expert.youtube
+          tag_list: @state.expert.tag_list
         success: @createExpertSuccess
         error: @createExpertError
       }
 
-      API.call(params)
+
+    API.call(params)
   
 
   createExpertError: (error) ->
@@ -62,13 +66,18 @@ module.exports = React.createFactory React.createClass
 
     @setState submittingExpert: false
 
+  
+  createExpertSuccess: (data) ->
+    @setState submittingExpert: false
+    if data.expert?
+      navigate("/experts/#{data.expert.id}?created=1")
+
+
   validateInputs: ->
     @errors = []
-    if @state.inputs.content.val.length < 3
-      @errors.push { id: "content", text: "Comment must be at least 3 characters long." }
+    if @state.expert.name.length < 3
+      @errors.push { id: "name", text: "Name must be at least 3 characters long." }
     
-    if @state.inputs.content.val.length > 1000
-      @errors.push { id: "content", text: "Comment can't be longer than 1000 characters." }
 
     @setState errors: @errors
 

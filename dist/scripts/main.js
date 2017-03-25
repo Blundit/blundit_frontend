@@ -1098,7 +1098,8 @@ module.exports = React.createFactory(React.createClass({
           className: "expert__bona-fide"
         }, a({
           href: bona_fide.url,
-          target: "_blank"
+          target: "_blank",
+          key: "expert-bona-fide-" + index
         }, bona_fide.title));
       }), UserStore.loggedIn() ? this.state.submittingBonaFide === true ? React.createElement(Material.RefreshIndicator, {
         style: this.refreshStyle,
@@ -3188,9 +3189,6 @@ module.exports = React.createFactory(React.createClass({
         submittingExpert: false
       };
     },
-    goToExpert: function(id) {
-      return navigate("/experts/" + id);
-    },
     updateField: function(id, val) {
       this.expert = this.state.expert;
       this.expert[id] = val;
@@ -3212,12 +3210,20 @@ module.exports = React.createFactory(React.createClass({
         });
         params = {
           path: "create_expert",
-          data: this.assembleExpertData,
+          data: {
+            name: this.state.expert.name,
+            description: this.state.expert.description,
+            twitter: this.state.expert.twitter,
+            facebook: this.state.expert.facebook,
+            instagram: this.state.expert.instagram,
+            youtube: this.state.expert.youtube,
+            tag_list: this.state.expert.tag_list
+          },
           success: this.createExpertSuccess,
           error: this.createExpertError
         };
-        return API.call(params);
       }
+      return API.call(params);
     },
     createExpertError: function(error) {
       if ((error.responseJSON != null) && (error.responseJSON.errors != null)) {
@@ -3233,18 +3239,20 @@ module.exports = React.createFactory(React.createClass({
         submittingExpert: false
       });
     },
+    createExpertSuccess: function(data) {
+      this.setState({
+        submittingExpert: false
+      });
+      if (data.expert != null) {
+        return navigate("/experts/" + data.expert.id + "?created=1");
+      }
+    },
     validateInputs: function() {
       this.errors = [];
-      if (this.state.inputs.content.val.length < 3) {
+      if (this.state.expert.name.length < 3) {
         this.errors.push({
-          id: "content",
-          text: "Comment must be at least 3 characters long."
-        });
-      }
-      if (this.state.inputs.content.val.length > 1000) {
-        this.errors.push({
-          id: "content",
-          text: "Comment can't be longer than 1000 characters."
+          id: "name",
+          text: "Name must be at least 3 characters long."
         });
       }
       this.setState({
@@ -3323,14 +3331,18 @@ module.exports = React.createFactory(React.createClass({
 
   AddToExpert = require("components/AddToExpert");
 
+  SessionMixin = require("mixins/SessionMixin");
+
   module.exports = React.createFactory(React.createClass({
+    mixins: [SessionMixin],
     displayName: 'Experts',
     getInitialState: function() {
       return {
         expert: null,
         claims: [],
         predictions: [],
-        loadError: null
+        loadError: null,
+        showCreated: this.doShowCreated()
       };
     },
     componentDidMount: function() {
@@ -3378,6 +3390,33 @@ module.exports = React.createFactory(React.createClass({
     showAccuracy: function(val) {
       return Math.floor(val * 100) + "%";
     },
+    successCardStyle: function() {
+      return {
+        backgroundColor: "#237a0b",
+        color: "#ffffff",
+        margin: 4
+      };
+    },
+    removeAlert: function() {
+      return this.setState({
+        showCreated: false
+      });
+    },
+    doShowCreated: function() {
+      if (this.getParameterByName("created") === 1 || this.getParameterByName("created") === "1") {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    showNewExpertText: function() {
+      return div({
+        className: "expert__created"
+      }, this.state.showCreated === true ? React.createElement(Material.Chip, {
+        style: this.successCardStyle(),
+        onRequestDelete: this.removeAlert
+      }, "Success! You've added a new expert to the system. Now you can add more information to them!") : void 0);
+    },
     render: function() {
       var claims, expert, predictions, ref7;
       ref7 = this.state, expert = ref7.expert, predictions = ref7.predictions, claims = ref7.claims;
@@ -3387,7 +3426,7 @@ module.exports = React.createFactory(React.createClass({
         className: "experts-content"
       }, expert != null ? div({
         className: "expert"
-      }, div({
+      }, this.showNewExpertText(), div({
         className: "expert__name"
       }, expert.name), div({
         className: "expert__description"
@@ -82114,7 +82153,8 @@ module.exports = React.createFactory(React.createClass({
         className: "expert__bona-fide"
       }, a({
         href: bona_fide.url,
-        target: "_blank"
+        target: "_blank",
+        key: "expert-bona-fide-" + index
       }, bona_fide.title));
     }), UserStore.loggedIn() ? this.state.submittingBonaFide === true ? React.createElement(Material.RefreshIndicator, {
       style: this.refreshStyle,
@@ -84178,9 +84218,6 @@ module.exports = React.createFactory(React.createClass({
       submittingExpert: false
     };
   },
-  goToExpert: function(id) {
-    return navigate("/experts/" + id);
-  },
   updateField: function(id, val) {
     this.expert = this.state.expert;
     this.expert[id] = val;
@@ -84202,12 +84239,20 @@ module.exports = React.createFactory(React.createClass({
       });
       params = {
         path: "create_expert",
-        data: this.assembleExpertData,
+        data: {
+          name: this.state.expert.name,
+          description: this.state.expert.description,
+          twitter: this.state.expert.twitter,
+          facebook: this.state.expert.facebook,
+          instagram: this.state.expert.instagram,
+          youtube: this.state.expert.youtube,
+          tag_list: this.state.expert.tag_list
+        },
         success: this.createExpertSuccess,
         error: this.createExpertError
       };
-      return API.call(params);
     }
+    return API.call(params);
   },
   createExpertError: function(error) {
     if ((error.responseJSON != null) && (error.responseJSON.errors != null)) {
@@ -84223,18 +84268,20 @@ module.exports = React.createFactory(React.createClass({
       submittingExpert: false
     });
   },
+  createExpertSuccess: function(data) {
+    this.setState({
+      submittingExpert: false
+    });
+    if (data.expert != null) {
+      return navigate("/experts/" + data.expert.id + "?created=1");
+    }
+  },
   validateInputs: function() {
     this.errors = [];
-    if (this.state.inputs.content.val.length < 3) {
+    if (this.state.expert.name.length < 3) {
       this.errors.push({
-        id: "content",
-        text: "Comment must be at least 3 characters long."
-      });
-    }
-    if (this.state.inputs.content.val.length > 1000) {
-      this.errors.push({
-        id: "content",
-        text: "Comment can't be longer than 1000 characters."
+        id: "name",
+        text: "Name must be at least 3 characters long."
       });
     }
     this.setState({
@@ -84303,7 +84350,7 @@ module.exports = React.createFactory(React.createClass({
 
 
 },{"components/Footer":581,"components/Header":582,"components/PredictionFields":586}],604:[function(require,module,exports){
-var AddToExpert, Comments, ExpertBonaFides, ExpertClaimCard, ExpertPredictionCard, Footer, Header, div, img, ref;
+var AddToExpert, Comments, ExpertBonaFides, ExpertClaimCard, ExpertPredictionCard, Footer, Header, SessionMixin, div, img, ref;
 
 ref = React.DOM, div = ref.div, img = ref.img;
 
@@ -84321,14 +84368,18 @@ Comments = require("components/Comments");
 
 AddToExpert = require("components/AddToExpert");
 
+SessionMixin = require("mixins/SessionMixin");
+
 module.exports = React.createFactory(React.createClass({
+  mixins: [SessionMixin],
   displayName: 'Experts',
   getInitialState: function() {
     return {
       expert: null,
       claims: [],
       predictions: [],
-      loadError: null
+      loadError: null,
+      showCreated: this.doShowCreated()
     };
   },
   componentDidMount: function() {
@@ -84376,6 +84427,33 @@ module.exports = React.createFactory(React.createClass({
   showAccuracy: function(val) {
     return Math.floor(val * 100) + "%";
   },
+  successCardStyle: function() {
+    return {
+      backgroundColor: "#237a0b",
+      color: "#ffffff",
+      margin: 4
+    };
+  },
+  removeAlert: function() {
+    return this.setState({
+      showCreated: false
+    });
+  },
+  doShowCreated: function() {
+    if (this.getParameterByName("created") === 1 || this.getParameterByName("created") === "1") {
+      return true;
+    } else {
+      return false;
+    }
+  },
+  showNewExpertText: function() {
+    return div({
+      className: "expert__created"
+    }, this.state.showCreated === true ? React.createElement(Material.Chip, {
+      style: this.successCardStyle(),
+      onRequestDelete: this.removeAlert
+    }, "Success! You've added a new expert to the system. Now you can add more information to them!") : void 0);
+  },
   render: function() {
     var claims, expert, predictions, ref1;
     ref1 = this.state, expert = ref1.expert, predictions = ref1.predictions, claims = ref1.claims;
@@ -84385,7 +84463,7 @@ module.exports = React.createFactory(React.createClass({
       className: "experts-content"
     }, expert != null ? div({
       className: "expert"
-    }, div({
+    }, this.showNewExpertText(), div({
       className: "expert__name"
     }, expert.name), div({
       className: "expert__description"
@@ -84464,7 +84542,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/AddToExpert":566,"components/Comments":574,"components/ExpertBonaFides":575,"components/ExpertClaimCard":577,"components/ExpertPredictionCard":579,"components/Footer":581,"components/Header":582}],605:[function(require,module,exports){
+},{"components/AddToExpert":566,"components/Comments":574,"components/ExpertBonaFides":575,"components/ExpertClaimCard":577,"components/ExpertPredictionCard":579,"components/Footer":581,"components/Header":582,"mixins/SessionMixin":588}],605:[function(require,module,exports){
 var ExpertCard, Footer, Header, Pagination, PaginationMixin, div;
 
 div = React.DOM.div;
