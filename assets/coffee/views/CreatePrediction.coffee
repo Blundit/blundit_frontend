@@ -23,8 +23,6 @@ module.exports = React.createFactory React.createClass
     @prediction = @state.prediction
     @prediction[id] = val
 
-    console.log id, val
-
     @setState prediction: @prediction
 
 
@@ -53,8 +51,6 @@ module.exports = React.createFactory React.createClass
   
 
   createPredictionError: (error) ->
-    console.log "ERROR"
-    console.log error
     if error.responseJSON? and error.responseJSON.errors?
       @setState submitPredictionError: error.responseJSON.errors[0]
     else
@@ -65,8 +61,6 @@ module.exports = React.createFactory React.createClass
   
   createPredictionSuccess: (data) ->
     @setState submittingPrediction: false
-    console.log "SUCCESS"
-    console.log data
     if data.prediction?
       navigate("/predictions/#{data.prediction.alias}?created=1")
 

@@ -801,8 +801,54 @@ module.exports = React.createFactory(React.createClass({
   div = React.DOM.div;
 
   module.exports = React.createFactory(React.createClass({
+    updateField: function(event) {
+      if ((event == null) || (event.target == null)) {
+        return;
+      }
+      return this.props.updateField(event.target.id, event.target.value);
+    },
+    getErrorText: function(key) {
+      var error, j, len, ref1;
+      ref1 = this.props.errors;
+      for (j = 0, len = ref1.length; j < len; j++) {
+        error = ref1[j];
+        if (error.id === key) {
+          return error.text;
+        }
+      }
+      return null;
+    },
     render: function() {
-      return div({}, "Claim Fields");
+      return div({}, React.createElement(Material.TextField, {
+        id: "title",
+        hintText: "Claim Title",
+        floatingLabelText: "Title",
+        multiLine: false,
+        rows: 1,
+        fullWidth: true,
+        value: this.props.claim.title,
+        onChange: this.updateField,
+        errorText: this.getErrorText("title")
+      }), React.createElement(Material.TextField, {
+        id: "description",
+        hintText: "Description",
+        floatingLabelText: "Description",
+        multiLine: true,
+        rows: 2,
+        fullWidth: true,
+        rowsMax: 4,
+        value: this.props.claim.description,
+        onChange: this.updateField,
+        errorText: this.getErrorText("description")
+      }), React.createElement(Material.TextField, {
+        id: "url",
+        hintText: "Evidence of Claim (URL)",
+        floatingLabelText: "Evidence",
+        fullWidth: true,
+        value: this.props.claim.url,
+        onChange: this.updateField,
+        errorText: this.getErrorText("url")
+      }), "Pic Goes Here");
     }
   }));
 
@@ -1957,7 +2003,6 @@ module.exports = React.createFactory(React.createClass({
       return null;
     },
     updateDate: function(event, date) {
-      console.log(event, date);
       return this.props.updateField("prediction_date", date);
     },
     render: function() {
@@ -2287,7 +2332,7 @@ module.exports = React.createFactory(React.createClass({
         method: "GET"
       },
       verify_token: {
-        path: 'auth/validate_token?access-token=%accessToken%&client=%client%&uid=%uid%',
+        path: "auth/validate_token?access-token=%accessToken%&client=%client%&uid=%uid%&",
         method: "GET",
         non_api: true
       },
@@ -3052,13 +3097,17 @@ module.exports = React.createFactory(React.createClass({
 
   Comments = require("components/Comments");
 
+  SessionMixin = require("mixins/SessionMixin");
+
   module.exports = React.createFactory(React.createClass({
+    mixins: [SessionMixin],
     displayName: 'Landing',
     getInitialState: function() {
       return {
         claim: null,
         experts: [],
-        loadError: null
+        loadError: null,
+        showCreated: this.doShowCreated()
       };
     },
     componentDidMount: function() {
@@ -3086,6 +3135,33 @@ module.exports = React.createFactory(React.createClass({
         loadError: error.responseJSON.errors
       });
     },
+    successCardStyle: function() {
+      return {
+        backgroundColor: "#237a0b",
+        color: "#ffffff",
+        margin: 4
+      };
+    },
+    removeAlert: function() {
+      return this.setState({
+        showCreated: false
+      });
+    },
+    doShowCreated: function() {
+      if (this.getParameterByName("created") === 1 || this.getParameterByName("created") === "1") {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    showNewClaimText: function() {
+      return div({
+        className: "claim__created"
+      }, this.state.showCreated === true ? React.createElement(Material.Chip, {
+        style: this.successCardStyle(),
+        onRequestDelete: this.removeAlert
+      }, "Success! You've added a new claim to the system. Now you can add more information to it!") : void 0);
+    },
     render: function() {
       var claim, experts, ref6;
       ref6 = this.state, claim = ref6.claim, experts = ref6.experts;
@@ -3095,7 +3171,7 @@ module.exports = React.createFactory(React.createClass({
         className: "claims-content"
       }, claim != null ? div({
         className: "claim"
-      }, div({
+      }, this.showNewClaimText(), div({
         className: "claim__title"
       }, claim.title), div({
         className: "claim__experts"
@@ -3210,17 +3286,110 @@ module.exports = React.createFactory(React.createClass({
     displayName: "Create Claim View",
     getInitialState: function() {
       return {
-        claim: {}
+        claim: {
+          title: '',
+          description: '',
+          url: '',
+          pic: ''
+        },
+        errors: [],
+        submitClaimError: null,
+        submittingClaim: false
       };
+    },
+    updateField: function(id, val) {
+      this.claim = this.state.claim;
+      this.claim[id] = val;
+      return this.setState({
+        claim: this.claim
+      });
+    },
+    assembleClaimData: function() {
+      return this.state.claim;
+    },
+    createClaim: function() {
+      var params;
+      this.setState({
+        submitClaimError: null
+      });
+      if (this.validateInputs()) {
+        this.setState({
+          submittingClaim: true
+        });
+        params = {
+          path: "create_claim",
+          data: {
+            title: this.state.claim.title,
+            description: this.state.claim.description,
+            url: this.state.claim.url
+          },
+          success: this.createClaimSuccess,
+          error: this.createClaimError
+        };
+        return API.call(params);
+      }
+    },
+    createClaimError: function(error) {
+      if ((error.responseJSON != null) && (error.responseJSON.errors != null)) {
+        this.setState({
+          submitClaimError: error.responseJSON.errors[0]
+        });
+      } else {
+        this.setState({
+          submitClaimError: "There was an error."
+        });
+      }
+      return this.setState({
+        submittingClaim: false
+      });
+    },
+    createClaimSuccess: function(data) {
+      this.setState({
+        submittingClaim: false
+      });
+      if (data.claim != null) {
+        return navigate("/claims/" + data.claim.alias + "?created=1");
+      }
+    },
+    validateInputs: function() {
+      this.errors = [];
+      if (this.state.claim.title.length < 3) {
+        this.errors.push({
+          id: "title",
+          text: "Title must be at least 3 characters long."
+        });
+      }
+      this.setState({
+        errors: this.errors
+      });
+      if (this.errors.length === 0) {
+        return true;
+      }
+      return false;
     },
     render: function() {
       return div({}, Header({}, ''), div({
         className: "claims-wrapper"
       }, div({
         className: "claims-content"
-      }, "Create Claim", ClaimFields({
-        claim: this.state.claim
-      }))), Footer({}, ''));
+      }, "Create Claim", UserStore.loggedIn() ? div({}, ClaimFields({
+        claim: this.state.claim,
+        errors: this.state.errors,
+        updateField: this.updateField
+      }), this.state.submittingClaim !== true ? React.createElement(Material.RaisedButton, {
+        label: "Create",
+        onClick: this.createClaim
+      }) : (this.style = {
+        display: 'inline-block',
+        position: 'relative',
+        boxShadow: 'none'
+      }, React.createElement(Material.RefreshIndicator, {
+        style: this.style,
+        size: 50,
+        left: 0,
+        top: 0,
+        status: "loading"
+      })), this.state.submitClaimError != null ? div({}, this.state.submitClaimError) : void 0) : div({}, "You must be logged in to add an claim to the sytem."))), Footer({}, ''));
     }
   }));
 
@@ -3379,7 +3548,6 @@ module.exports = React.createFactory(React.createClass({
     updateField: function(id, val) {
       this.prediction = this.state.prediction;
       this.prediction[id] = val;
-      console.log(id, val);
       return this.setState({
         prediction: this.prediction
       });
@@ -3411,8 +3579,6 @@ module.exports = React.createFactory(React.createClass({
       }
     },
     createPredictionError: function(error) {
-      console.log("ERROR");
-      console.log(error);
       if ((error.responseJSON != null) && (error.responseJSON.errors != null)) {
         this.setState({
           submitPredictionError: error.responseJSON.errors[0]
@@ -3430,8 +3596,6 @@ module.exports = React.createFactory(React.createClass({
       this.setState({
         submittingPrediction: false
       });
-      console.log("SUCCESS");
-      console.log(data);
       if (data.prediction != null) {
         return navigate("/predictions/" + data.prediction.alias + "?created=1");
       }
@@ -82048,8 +82212,54 @@ var div;
 div = React.DOM.div;
 
 module.exports = React.createFactory(React.createClass({
+  updateField: function(event) {
+    if ((event == null) || (event.target == null)) {
+      return;
+    }
+    return this.props.updateField(event.target.id, event.target.value);
+  },
+  getErrorText: function(key) {
+    var error, i, len, ref;
+    ref = this.props.errors;
+    for (i = 0, len = ref.length; i < len; i++) {
+      error = ref[i];
+      if (error.id === key) {
+        return error.text;
+      }
+    }
+    return null;
+  },
   render: function() {
-    return div({}, "Claim Fields");
+    return div({}, React.createElement(Material.TextField, {
+      id: "title",
+      hintText: "Claim Title",
+      floatingLabelText: "Title",
+      multiLine: false,
+      rows: 1,
+      fullWidth: true,
+      value: this.props.claim.title,
+      onChange: this.updateField,
+      errorText: this.getErrorText("title")
+    }), React.createElement(Material.TextField, {
+      id: "description",
+      hintText: "Description",
+      floatingLabelText: "Description",
+      multiLine: true,
+      rows: 2,
+      fullWidth: true,
+      rowsMax: 4,
+      value: this.props.claim.description,
+      onChange: this.updateField,
+      errorText: this.getErrorText("description")
+    }), React.createElement(Material.TextField, {
+      id: "url",
+      hintText: "Evidence of Claim (URL)",
+      floatingLabelText: "Evidence",
+      fullWidth: true,
+      value: this.props.claim.url,
+      onChange: this.updateField,
+      errorText: this.getErrorText("url")
+    }), "Pic Goes Here");
   }
 }));
 
@@ -83126,7 +83336,6 @@ module.exports = React.createFactory(React.createClass({
     return null;
   },
   updateDate: function(event, date) {
-    console.log(event, date);
     return this.props.updateField("prediction_date", date);
   },
   render: function() {
@@ -83463,7 +83672,7 @@ module.exports = API = (function() {
       method: "GET"
     },
     verify_token: {
-      path: 'auth/validate_token?access-token=%accessToken%&client=%client%&uid=%uid%',
+      path: "auth/validate_token?access-token=%accessToken%&client=%client%&uid=%uid%&",
       method: "GET",
       non_api: true
     },
@@ -84257,7 +84466,7 @@ module.exports = React.createFactory(React.createClass({
 
 
 },{"components/CategoryPredictions":569,"components/CategorySubHead":570,"components/Footer":581,"components/Header":582}],599:[function(require,module,exports){
-var ClaimExpertCard, Comments, Footer, Header, div;
+var ClaimExpertCard, Comments, Footer, Header, SessionMixin, div;
 
 div = React.DOM.div;
 
@@ -84269,13 +84478,17 @@ ClaimExpertCard = require("components/ClaimExpertCard");
 
 Comments = require("components/Comments");
 
+SessionMixin = require("mixins/SessionMixin");
+
 module.exports = React.createFactory(React.createClass({
+  mixins: [SessionMixin],
   displayName: 'Landing',
   getInitialState: function() {
     return {
       claim: null,
       experts: [],
-      loadError: null
+      loadError: null,
+      showCreated: this.doShowCreated()
     };
   },
   componentDidMount: function() {
@@ -84303,6 +84516,33 @@ module.exports = React.createFactory(React.createClass({
       loadError: error.responseJSON.errors
     });
   },
+  successCardStyle: function() {
+    return {
+      backgroundColor: "#237a0b",
+      color: "#ffffff",
+      margin: 4
+    };
+  },
+  removeAlert: function() {
+    return this.setState({
+      showCreated: false
+    });
+  },
+  doShowCreated: function() {
+    if (this.getParameterByName("created") === 1 || this.getParameterByName("created") === "1") {
+      return true;
+    } else {
+      return false;
+    }
+  },
+  showNewClaimText: function() {
+    return div({
+      className: "claim__created"
+    }, this.state.showCreated === true ? React.createElement(Material.Chip, {
+      style: this.successCardStyle(),
+      onRequestDelete: this.removeAlert
+    }, "Success! You've added a new claim to the system. Now you can add more information to it!") : void 0);
+  },
   render: function() {
     var claim, experts, ref;
     ref = this.state, claim = ref.claim, experts = ref.experts;
@@ -84312,7 +84552,7 @@ module.exports = React.createFactory(React.createClass({
       className: "claims-content"
     }, claim != null ? div({
       className: "claim"
-    }, div({
+    }, this.showNewClaimText(), div({
       className: "claim__title"
     }, claim.title), div({
       className: "claim__experts"
@@ -84335,7 +84575,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ClaimExpertCard":572,"components/Comments":574,"components/Footer":581,"components/Header":582}],600:[function(require,module,exports){
+},{"components/ClaimExpertCard":572,"components/Comments":574,"components/Footer":581,"components/Header":582,"mixins/SessionMixin":588}],600:[function(require,module,exports){
 var ClaimCard, Footer, Header, Pagination, PaginationMixin, RaisedButton, div;
 
 div = React.DOM.div;
@@ -84435,17 +84675,110 @@ module.exports = React.createFactory(React.createClass({
   displayName: "Create Claim View",
   getInitialState: function() {
     return {
-      claim: {}
+      claim: {
+        title: '',
+        description: '',
+        url: '',
+        pic: ''
+      },
+      errors: [],
+      submitClaimError: null,
+      submittingClaim: false
     };
+  },
+  updateField: function(id, val) {
+    this.claim = this.state.claim;
+    this.claim[id] = val;
+    return this.setState({
+      claim: this.claim
+    });
+  },
+  assembleClaimData: function() {
+    return this.state.claim;
+  },
+  createClaim: function() {
+    var params;
+    this.setState({
+      submitClaimError: null
+    });
+    if (this.validateInputs()) {
+      this.setState({
+        submittingClaim: true
+      });
+      params = {
+        path: "create_claim",
+        data: {
+          title: this.state.claim.title,
+          description: this.state.claim.description,
+          url: this.state.claim.url
+        },
+        success: this.createClaimSuccess,
+        error: this.createClaimError
+      };
+      return API.call(params);
+    }
+  },
+  createClaimError: function(error) {
+    if ((error.responseJSON != null) && (error.responseJSON.errors != null)) {
+      this.setState({
+        submitClaimError: error.responseJSON.errors[0]
+      });
+    } else {
+      this.setState({
+        submitClaimError: "There was an error."
+      });
+    }
+    return this.setState({
+      submittingClaim: false
+    });
+  },
+  createClaimSuccess: function(data) {
+    this.setState({
+      submittingClaim: false
+    });
+    if (data.claim != null) {
+      return navigate("/claims/" + data.claim.alias + "?created=1");
+    }
+  },
+  validateInputs: function() {
+    this.errors = [];
+    if (this.state.claim.title.length < 3) {
+      this.errors.push({
+        id: "title",
+        text: "Title must be at least 3 characters long."
+      });
+    }
+    this.setState({
+      errors: this.errors
+    });
+    if (this.errors.length === 0) {
+      return true;
+    }
+    return false;
   },
   render: function() {
     return div({}, Header({}, ''), div({
       className: "claims-wrapper"
     }, div({
       className: "claims-content"
-    }, "Create Claim", ClaimFields({
-      claim: this.state.claim
-    }))), Footer({}, ''));
+    }, "Create Claim", UserStore.loggedIn() ? div({}, ClaimFields({
+      claim: this.state.claim,
+      errors: this.state.errors,
+      updateField: this.updateField
+    }), this.state.submittingClaim !== true ? React.createElement(Material.RaisedButton, {
+      label: "Create",
+      onClick: this.createClaim
+    }) : (this.style = {
+      display: 'inline-block',
+      position: 'relative',
+      boxShadow: 'none'
+    }, React.createElement(Material.RefreshIndicator, {
+      style: this.style,
+      size: 50,
+      left: 0,
+      top: 0,
+      status: "loading"
+    })), this.state.submitClaimError != null ? div({}, this.state.submitClaimError) : void 0) : div({}, "You must be logged in to add an claim to the sytem."))), Footer({}, ''));
   }
 }));
 
@@ -84612,7 +84945,6 @@ module.exports = React.createFactory(React.createClass({
   updateField: function(id, val) {
     this.prediction = this.state.prediction;
     this.prediction[id] = val;
-    console.log(id, val);
     return this.setState({
       prediction: this.prediction
     });
@@ -84644,8 +84976,6 @@ module.exports = React.createFactory(React.createClass({
     }
   },
   createPredictionError: function(error) {
-    console.log("ERROR");
-    console.log(error);
     if ((error.responseJSON != null) && (error.responseJSON.errors != null)) {
       this.setState({
         submitPredictionError: error.responseJSON.errors[0]
@@ -84663,8 +84993,6 @@ module.exports = React.createFactory(React.createClass({
     this.setState({
       submittingPrediction: false
     });
-    console.log("SUCCESS");
-    console.log(data);
     if (data.prediction != null) {
       return navigate("/predictions/" + data.prediction.alias + "?created=1");
     }

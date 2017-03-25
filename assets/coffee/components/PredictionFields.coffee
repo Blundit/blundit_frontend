@@ -15,7 +15,6 @@ module.exports = React.createFactory React.createClass
 
   
   updateDate: (event, date) ->
-    console.log event, date
     @props.updateField("prediction_date", date)
 
 

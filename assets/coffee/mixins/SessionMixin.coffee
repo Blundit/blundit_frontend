@@ -1,6 +1,5 @@
 module.exports =
   setUser: (data, request) ->
-    # window.UserStore.subscribe(@handleUserChange)
     window.UserStore.set data, request
     @user = window.UserStore.get()
 
@@ -99,7 +98,6 @@ module.exports =
       data.data.uid = window.global.getCookie('uid')
     
       @setUser data.data
-    #   # window.UserStore.fetchUserData()
   
       
   verifyTokenError: (error) ->
