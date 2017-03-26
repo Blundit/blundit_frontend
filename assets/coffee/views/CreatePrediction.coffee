@@ -14,6 +14,7 @@ module.exports = React.createFactory React.createClass
       url: ''
       prediction_date: null
       pic: ''
+      category: ''
     errors: []
     submitPredictionError: null
     submittingPrediction: false
@@ -43,6 +44,7 @@ module.exports = React.createFactory React.createClass
           description: @state.prediction.description
           url: @state.prediction.url
           prediction_date: @state.prediction.prediction_date
+          category: @state.prediction.category
         success: @createPredictionSuccess
         error: @createPredictionError
       }
@@ -72,6 +74,9 @@ module.exports = React.createFactory React.createClass
 
     if @state.prediction.prediction_date == null
       @errors.push { id: "prediction_date", text: "Date required for prediction." }
+
+    if @state.prediction.category == ''
+      @errors.push { id: "category", text: "Category is required." }
     
     @setState errors: @errors
 

@@ -13,6 +13,7 @@ module.exports = React.createFactory React.createClass
       description: ''
       url: ''
       pic: ''
+      category: ''
     errors: []
     submitClaimError: null
     submittingClaim: false
@@ -41,6 +42,7 @@ module.exports = React.createFactory React.createClass
           title: @state.claim.title
           description: @state.claim.description
           url: @state.claim.url
+          category: @state.claim.category
         success: @createClaimSuccess
         error: @createClaimError
       }
@@ -67,6 +69,9 @@ module.exports = React.createFactory React.createClass
     @errors = []
     if @state.claim.title.length < 3
       @errors.push { id: "title", text: "Title must be at least 3 characters long." }
+
+    if @state.claim.category == ''
+      @errors.push { id: "category", text: "Category is required." }
 
     @setState errors: @errors
 

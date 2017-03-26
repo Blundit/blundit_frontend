@@ -801,11 +801,35 @@ module.exports = React.createFactory(React.createClass({
   div = React.DOM.div;
 
   module.exports = React.createFactory(React.createClass({
+    displayName: 'Claim Fields',
+    getInitialState: function() {
+      return {
+        categories: null
+      };
+    },
+    componentDidMount: function() {
+      var params;
+      params = {
+        path: "categories",
+        success: this.categoryListSuccess,
+        error: this.categoryListError
+      };
+      return API.call(params);
+    },
+    categoryListSuccess: function(data) {
+      return this.setState({
+        categories: data
+      });
+    },
+    categoryListError: function(error) {},
     updateField: function(event) {
       if ((event == null) || (event.target == null)) {
         return;
       }
       return this.props.updateField(event.target.id, event.target.value);
+    },
+    handleCategoryChange: function(event, index, value) {
+      return this.props.updateField("category", value);
     },
     getErrorText: function(key) {
       var error, j, len, ref1;
@@ -819,6 +843,9 @@ module.exports = React.createFactory(React.createClass({
       return null;
     },
     render: function() {
+      if (this.state.categories === null) {
+        return div({}, 'Loading...');
+      }
       return div({}, React.createElement(Material.TextField, {
         id: "title",
         hintText: "Claim Title",
@@ -829,7 +856,17 @@ module.exports = React.createFactory(React.createClass({
         value: this.props.claim.title,
         onChange: this.updateField,
         errorText: this.getErrorText("title")
-      }), React.createElement(Material.TextField, {
+      }), React.createElement(Material.SelectField, {
+        floatingLabelText: "Category",
+        value: this.props.claim.category,
+        onChange: this.handleCategoryChange
+      }, this.state.categories.map(function(item, index) {
+        return React.createElement(Material.MenuItem, {
+          value: item.id,
+          primaryText: item.name,
+          key: "claim-category-item-" + index
+        });
+      })), this.getErrorText("category") ? div({}, this.getErrorText("category")) : void 0, React.createElement(Material.TextField, {
         id: "description",
         hintText: "Description",
         floatingLabelText: "Description",
@@ -1321,11 +1358,35 @@ module.exports = React.createFactory(React.createClass({
   div = React.DOM.div;
 
   module.exports = React.createFactory(React.createClass({
+    displayName: 'Expert Fields',
+    getInitialState: function() {
+      return {
+        categories: null
+      };
+    },
+    componentDidMount: function() {
+      var params;
+      params = {
+        path: "categories",
+        success: this.categoryListSuccess,
+        error: this.categoryListError
+      };
+      return API.call(params);
+    },
+    categoryListSuccess: function(data) {
+      return this.setState({
+        categories: data
+      });
+    },
+    categoryListError: function(error) {},
     updateField: function(event) {
       if ((event == null) || (event.target == null)) {
         return;
       }
       return this.props.updateField(event.target.id, event.target.value);
+    },
+    handleCategoryChange: function(event, index, value) {
+      return this.props.updateField("category", value);
     },
     getErrorText: function(key) {
       var error, j, len, ref3;
@@ -1339,6 +1400,9 @@ module.exports = React.createFactory(React.createClass({
       return null;
     },
     render: function() {
+      if (this.state.categories === null) {
+        return div({}, 'Loading...');
+      }
       return div({}, React.createElement(Material.TextField, {
         id: "name",
         hintText: "Expert Name",
@@ -1349,7 +1413,17 @@ module.exports = React.createFactory(React.createClass({
         value: this.props.expert.name,
         onChange: this.updateField,
         errorText: this.getErrorText("name")
-      }), React.createElement(Material.TextField, {
+      }), React.createElement(Material.SelectField, {
+        floatingLabelText: "Category",
+        value: this.props.expert.category,
+        onChange: this.handleCategoryChange
+      }, this.state.categories.map(function(item, index) {
+        return React.createElement(Material.MenuItem, {
+          value: item.id,
+          primaryText: item.name,
+          key: "expert-category-item-" + index
+        });
+      })), this.getErrorText("category") ? div({}, this.getErrorText("category")) : void 0, React.createElement(Material.TextField, {
         id: "description",
         hintText: "Description",
         floatingLabelText: "Description",
@@ -1985,11 +2059,35 @@ module.exports = React.createFactory(React.createClass({
   div = React.DOM.div;
 
   module.exports = React.createFactory(React.createClass({
+    displayName: 'Prediction Fields',
+    getInitialState: function() {
+      return {
+        categories: null
+      };
+    },
+    componentDidMount: function() {
+      var params;
+      params = {
+        path: "categories",
+        success: this.categoryListSuccess,
+        error: this.categoryListError
+      };
+      return API.call(params);
+    },
+    categoryListSuccess: function(data) {
+      return this.setState({
+        categories: data
+      });
+    },
+    categoryListError: function(error) {},
     updateField: function(event) {
       if ((event == null) || (event.target == null)) {
         return;
       }
       return this.props.updateField(event.target.id, event.target.value);
+    },
+    handleCategoryChange: function(event, index, value) {
+      return this.props.updateField("category", value);
     },
     getErrorText: function(key) {
       var error, j, len, ref6;
@@ -2006,6 +2104,9 @@ module.exports = React.createFactory(React.createClass({
       return this.props.updateField("prediction_date", date);
     },
     render: function() {
+      if (this.state.categories === null) {
+        return div({}, 'Loading...');
+      }
       return div({}, React.createElement(Material.TextField, {
         id: "title",
         hintText: "Prediction Title",
@@ -2016,7 +2117,17 @@ module.exports = React.createFactory(React.createClass({
         value: this.props.prediction.title,
         onChange: this.updateField,
         errorText: this.getErrorText("title")
-      }), React.createElement(Material.TextField, {
+      }), React.createElement(Material.SelectField, {
+        floatingLabelText: "Category",
+        value: this.props.prediction.category,
+        onChange: this.handleCategoryChange
+      }, this.state.categories.map(function(item, index) {
+        return React.createElement(Material.MenuItem, {
+          value: item.id,
+          primaryText: item.name,
+          key: "prediction-category-item-" + index
+        });
+      })), this.getErrorText("category") ? div({}, this.getErrorText("category")) : void 0, React.createElement(Material.TextField, {
         id: "description",
         hintText: "Description",
         floatingLabelText: "Description",
@@ -2032,7 +2143,7 @@ module.exports = React.createFactory(React.createClass({
         value: this.props.prediction.prediction_date,
         onChange: this.updateDate,
         errorText: this.getErrorText("prediction_date")
-      }), this.getErrorText("prediction_date") != null ? div({}, this.getErrorText("prediction_date")) : void 0, React.createElement(Material.TextField, {
+      }), React.createElement(Material.TextField, {
         id: "url",
         hintText: "Evidence of Prediction (URL)",
         floatingLabelText: "Evidence",
@@ -3290,7 +3401,8 @@ module.exports = React.createFactory(React.createClass({
           title: '',
           description: '',
           url: '',
-          pic: ''
+          pic: '',
+          category: ''
         },
         errors: [],
         submitClaimError: null,
@@ -3321,7 +3433,8 @@ module.exports = React.createFactory(React.createClass({
           data: {
             title: this.state.claim.title,
             description: this.state.claim.description,
-            url: this.state.claim.url
+            url: this.state.claim.url,
+            category: this.state.claim.category
           },
           success: this.createClaimSuccess,
           error: this.createClaimError
@@ -3357,6 +3470,12 @@ module.exports = React.createFactory(React.createClass({
         this.errors.push({
           id: "title",
           text: "Title must be at least 3 characters long."
+        });
+      }
+      if (this.state.claim.category === '') {
+        this.errors.push({
+          id: "category",
+          text: "Category is required."
         });
       }
       this.setState({
@@ -3414,7 +3533,8 @@ module.exports = React.createFactory(React.createClass({
           instagram: '',
           youtube: '',
           tag_list: '',
-          avatar: ''
+          avatar: '',
+          category: ''
         },
         errors: [],
         submitExpertError: null,
@@ -3449,13 +3569,14 @@ module.exports = React.createFactory(React.createClass({
             facebook: this.state.expert.facebook,
             instagram: this.state.expert.instagram,
             youtube: this.state.expert.youtube,
-            tag_list: this.state.expert.tag_list
+            tag_list: this.state.expert.tag_list,
+            category: this.state.expert.category
           },
           success: this.createExpertSuccess,
           error: this.createExpertError
         };
+        return API.call(params);
       }
-      return API.call(params);
     },
     createExpertError: function(error) {
       if ((error.responseJSON != null) && (error.responseJSON.errors != null)) {
@@ -3485,6 +3606,12 @@ module.exports = React.createFactory(React.createClass({
         this.errors.push({
           id: "name",
           text: "Name must be at least 3 characters long."
+        });
+      }
+      if (this.state.expert.category === '') {
+        this.errors.push({
+          id: "category",
+          text: "Category is required."
         });
       }
       this.setState({
@@ -3538,7 +3665,8 @@ module.exports = React.createFactory(React.createClass({
           description: '',
           url: '',
           prediction_date: null,
-          pic: ''
+          pic: '',
+          category: ''
         },
         errors: [],
         submitPredictionError: null,
@@ -3570,7 +3698,8 @@ module.exports = React.createFactory(React.createClass({
             title: this.state.prediction.title,
             description: this.state.prediction.description,
             url: this.state.prediction.url,
-            prediction_date: this.state.prediction.prediction_date
+            prediction_date: this.state.prediction.prediction_date,
+            category: this.state.prediction.category
           },
           success: this.createPredictionSuccess,
           error: this.createPredictionError
@@ -3612,6 +3741,12 @@ module.exports = React.createFactory(React.createClass({
         this.errors.push({
           id: "prediction_date",
           text: "Date required for prediction."
+        });
+      }
+      if (this.state.prediction.category === '') {
+        this.errors.push({
+          id: "category",
+          text: "Category is required."
         });
       }
       this.setState({
@@ -82212,11 +82347,35 @@ var div;
 div = React.DOM.div;
 
 module.exports = React.createFactory(React.createClass({
+  displayName: 'Claim Fields',
+  getInitialState: function() {
+    return {
+      categories: null
+    };
+  },
+  componentDidMount: function() {
+    var params;
+    params = {
+      path: "categories",
+      success: this.categoryListSuccess,
+      error: this.categoryListError
+    };
+    return API.call(params);
+  },
+  categoryListSuccess: function(data) {
+    return this.setState({
+      categories: data
+    });
+  },
+  categoryListError: function(error) {},
   updateField: function(event) {
     if ((event == null) || (event.target == null)) {
       return;
     }
     return this.props.updateField(event.target.id, event.target.value);
+  },
+  handleCategoryChange: function(event, index, value) {
+    return this.props.updateField("category", value);
   },
   getErrorText: function(key) {
     var error, i, len, ref;
@@ -82230,6 +82389,9 @@ module.exports = React.createFactory(React.createClass({
     return null;
   },
   render: function() {
+    if (this.state.categories === null) {
+      return div({}, 'Loading...');
+    }
     return div({}, React.createElement(Material.TextField, {
       id: "title",
       hintText: "Claim Title",
@@ -82240,7 +82402,17 @@ module.exports = React.createFactory(React.createClass({
       value: this.props.claim.title,
       onChange: this.updateField,
       errorText: this.getErrorText("title")
-    }), React.createElement(Material.TextField, {
+    }), React.createElement(Material.SelectField, {
+      floatingLabelText: "Category",
+      value: this.props.claim.category,
+      onChange: this.handleCategoryChange
+    }, this.state.categories.map(function(item, index) {
+      return React.createElement(Material.MenuItem, {
+        value: item.id,
+        primaryText: item.name,
+        key: "claim-category-item-" + index
+      });
+    })), this.getErrorText("category") ? div({}, this.getErrorText("category")) : void 0, React.createElement(Material.TextField, {
       id: "description",
       hintText: "Description",
       floatingLabelText: "Description",
@@ -82752,11 +82924,35 @@ var div;
 div = React.DOM.div;
 
 module.exports = React.createFactory(React.createClass({
+  displayName: 'Expert Fields',
+  getInitialState: function() {
+    return {
+      categories: null
+    };
+  },
+  componentDidMount: function() {
+    var params;
+    params = {
+      path: "categories",
+      success: this.categoryListSuccess,
+      error: this.categoryListError
+    };
+    return API.call(params);
+  },
+  categoryListSuccess: function(data) {
+    return this.setState({
+      categories: data
+    });
+  },
+  categoryListError: function(error) {},
   updateField: function(event) {
     if ((event == null) || (event.target == null)) {
       return;
     }
     return this.props.updateField(event.target.id, event.target.value);
+  },
+  handleCategoryChange: function(event, index, value) {
+    return this.props.updateField("category", value);
   },
   getErrorText: function(key) {
     var error, i, len, ref;
@@ -82770,6 +82966,9 @@ module.exports = React.createFactory(React.createClass({
     return null;
   },
   render: function() {
+    if (this.state.categories === null) {
+      return div({}, 'Loading...');
+    }
     return div({}, React.createElement(Material.TextField, {
       id: "name",
       hintText: "Expert Name",
@@ -82780,7 +82979,17 @@ module.exports = React.createFactory(React.createClass({
       value: this.props.expert.name,
       onChange: this.updateField,
       errorText: this.getErrorText("name")
-    }), React.createElement(Material.TextField, {
+    }), React.createElement(Material.SelectField, {
+      floatingLabelText: "Category",
+      value: this.props.expert.category,
+      onChange: this.handleCategoryChange
+    }, this.state.categories.map(function(item, index) {
+      return React.createElement(Material.MenuItem, {
+        value: item.id,
+        primaryText: item.name,
+        key: "expert-category-item-" + index
+      });
+    })), this.getErrorText("category") ? div({}, this.getErrorText("category")) : void 0, React.createElement(Material.TextField, {
       id: "description",
       hintText: "Description",
       floatingLabelText: "Description",
@@ -83318,11 +83527,35 @@ var div;
 div = React.DOM.div;
 
 module.exports = React.createFactory(React.createClass({
+  displayName: 'Prediction Fields',
+  getInitialState: function() {
+    return {
+      categories: null
+    };
+  },
+  componentDidMount: function() {
+    var params;
+    params = {
+      path: "categories",
+      success: this.categoryListSuccess,
+      error: this.categoryListError
+    };
+    return API.call(params);
+  },
+  categoryListSuccess: function(data) {
+    return this.setState({
+      categories: data
+    });
+  },
+  categoryListError: function(error) {},
   updateField: function(event) {
     if ((event == null) || (event.target == null)) {
       return;
     }
     return this.props.updateField(event.target.id, event.target.value);
+  },
+  handleCategoryChange: function(event, index, value) {
+    return this.props.updateField("category", value);
   },
   getErrorText: function(key) {
     var error, i, len, ref;
@@ -83339,6 +83572,9 @@ module.exports = React.createFactory(React.createClass({
     return this.props.updateField("prediction_date", date);
   },
   render: function() {
+    if (this.state.categories === null) {
+      return div({}, 'Loading...');
+    }
     return div({}, React.createElement(Material.TextField, {
       id: "title",
       hintText: "Prediction Title",
@@ -83349,7 +83585,17 @@ module.exports = React.createFactory(React.createClass({
       value: this.props.prediction.title,
       onChange: this.updateField,
       errorText: this.getErrorText("title")
-    }), React.createElement(Material.TextField, {
+    }), React.createElement(Material.SelectField, {
+      floatingLabelText: "Category",
+      value: this.props.prediction.category,
+      onChange: this.handleCategoryChange
+    }, this.state.categories.map(function(item, index) {
+      return React.createElement(Material.MenuItem, {
+        value: item.id,
+        primaryText: item.name,
+        key: "prediction-category-item-" + index
+      });
+    })), this.getErrorText("category") ? div({}, this.getErrorText("category")) : void 0, React.createElement(Material.TextField, {
       id: "description",
       hintText: "Description",
       floatingLabelText: "Description",
@@ -83365,7 +83611,7 @@ module.exports = React.createFactory(React.createClass({
       value: this.props.prediction.prediction_date,
       onChange: this.updateDate,
       errorText: this.getErrorText("prediction_date")
-    }), this.getErrorText("prediction_date") != null ? div({}, this.getErrorText("prediction_date")) : void 0, React.createElement(Material.TextField, {
+    }), React.createElement(Material.TextField, {
       id: "url",
       hintText: "Evidence of Prediction (URL)",
       floatingLabelText: "Evidence",
@@ -84679,7 +84925,8 @@ module.exports = React.createFactory(React.createClass({
         title: '',
         description: '',
         url: '',
-        pic: ''
+        pic: '',
+        category: ''
       },
       errors: [],
       submitClaimError: null,
@@ -84710,7 +84957,8 @@ module.exports = React.createFactory(React.createClass({
         data: {
           title: this.state.claim.title,
           description: this.state.claim.description,
-          url: this.state.claim.url
+          url: this.state.claim.url,
+          category: this.state.claim.category
         },
         success: this.createClaimSuccess,
         error: this.createClaimError
@@ -84746,6 +84994,12 @@ module.exports = React.createFactory(React.createClass({
       this.errors.push({
         id: "title",
         text: "Title must be at least 3 characters long."
+      });
+    }
+    if (this.state.claim.category === '') {
+      this.errors.push({
+        id: "category",
+        text: "Category is required."
       });
     }
     this.setState({
@@ -84807,7 +85061,8 @@ module.exports = React.createFactory(React.createClass({
         instagram: '',
         youtube: '',
         tag_list: '',
-        avatar: ''
+        avatar: '',
+        category: ''
       },
       errors: [],
       submitExpertError: null,
@@ -84842,13 +85097,14 @@ module.exports = React.createFactory(React.createClass({
           facebook: this.state.expert.facebook,
           instagram: this.state.expert.instagram,
           youtube: this.state.expert.youtube,
-          tag_list: this.state.expert.tag_list
+          tag_list: this.state.expert.tag_list,
+          category: this.state.expert.category
         },
         success: this.createExpertSuccess,
         error: this.createExpertError
       };
+      return API.call(params);
     }
-    return API.call(params);
   },
   createExpertError: function(error) {
     if ((error.responseJSON != null) && (error.responseJSON.errors != null)) {
@@ -84878,6 +85134,12 @@ module.exports = React.createFactory(React.createClass({
       this.errors.push({
         id: "name",
         text: "Name must be at least 3 characters long."
+      });
+    }
+    if (this.state.expert.category === '') {
+      this.errors.push({
+        id: "category",
+        text: "Category is required."
       });
     }
     this.setState({
@@ -84935,7 +85197,8 @@ module.exports = React.createFactory(React.createClass({
         description: '',
         url: '',
         prediction_date: null,
-        pic: ''
+        pic: '',
+        category: ''
       },
       errors: [],
       submitPredictionError: null,
@@ -84967,7 +85230,8 @@ module.exports = React.createFactory(React.createClass({
           title: this.state.prediction.title,
           description: this.state.prediction.description,
           url: this.state.prediction.url,
-          prediction_date: this.state.prediction.prediction_date
+          prediction_date: this.state.prediction.prediction_date,
+          category: this.state.prediction.category
         },
         success: this.createPredictionSuccess,
         error: this.createPredictionError
@@ -85009,6 +85273,12 @@ module.exports = React.createFactory(React.createClass({
       this.errors.push({
         id: "prediction_date",
         text: "Date required for prediction."
+      });
+    }
+    if (this.state.prediction.category === '') {
+      this.errors.push({
+        id: "category",
+        text: "Category is required."
       });
     }
     this.setState({

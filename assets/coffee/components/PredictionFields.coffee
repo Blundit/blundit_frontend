@@ -1,9 +1,36 @@
 { div } = React.DOM
 
 module.exports = React.createFactory React.createClass
+  displayName: 'Prediction Fields'
+
+  getInitialState: ->
+    categories: null
+
+
+  componentDidMount: ->
+    params = {
+      path: "categories"
+      success: @categoryListSuccess
+      error: @categoryListError
+    }
+    API.call(params)
+
+
+  categoryListSuccess: (data) ->
+    @setState categories: data
+
+
+  categoryListError: (error) ->
+    #console.log "error", error
+
+
   updateField: (event) ->
     return if !event? or !event.target?
     @props.updateField(event.target.id, event.target.value)
+
+  
+  handleCategoryChange: (event, index, value) ->
+    @props.updateField("category", value)
 
 
   getErrorText: (key) ->
@@ -19,6 +46,8 @@ module.exports = React.createFactory React.createClass
 
 
   render: ->
+    if @state.categories == null
+      return div {}, 'Loading...'
     div {},
       React.createElement(Material.TextField,
         {
@@ -32,6 +61,14 @@ module.exports = React.createFactory React.createClass
           onChange: @updateField,
           errorText: @getErrorText("title")
         })
+      React.createElement(Material.SelectField,
+        { floatingLabelText: "Category", value: @props.prediction.category, onChange: @handleCategoryChange },
+        @state.categories.map (item, index) ->
+          React.createElement(Material.MenuItem, {value: item.id, primaryText: item.name, key: "prediction-category-item-#{index}"})
+      )
+      if @getErrorText("category")
+        div {},
+          @getErrorText("category")
       React.createElement(Material.TextField,
         {
           id: "description",
@@ -52,10 +89,6 @@ module.exports = React.createFactory React.createClass
           onChange: @updateDate
           errorText: @getErrorText("prediction_date")
         })
-      if @getErrorText("prediction_date")?
-        div {},
-          @getErrorText("prediction_date")
-
       React.createElement(Material.TextField,
         {
           id: "url",

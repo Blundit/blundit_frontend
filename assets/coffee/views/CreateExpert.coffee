@@ -18,6 +18,7 @@ module.exports = React.createFactory React.createClass
       youtube: ''
       tag_list: ''
       avatar: ''
+      category: ''
     errors: []
     submitExpertError: null
     submittingExpert: false
@@ -50,12 +51,12 @@ module.exports = React.createFactory React.createClass
           instagram: @state.expert.instagram
           youtube: @state.expert.youtube
           tag_list: @state.expert.tag_list
+          category: @state.expert.category
         success: @createExpertSuccess
         error: @createExpertError
       }
 
-
-    API.call(params)
+      API.call(params)
   
 
   createExpertError: (error) ->
@@ -77,6 +78,9 @@ module.exports = React.createFactory React.createClass
     @errors = []
     if @state.expert.name.length < 3
       @errors.push { id: "name", text: "Name must be at least 3 characters long." }
+
+    if @state.expert.category == ''
+      @errors.push { id: "category", text: "Category is required." }
     
 
     @setState errors: @errors
