@@ -1,5 +1,6 @@
 class UserStore
   data: {}
+  votes: []
   subscribers: 0
   changeEvent: 'blundit:user'
   fetchMessagesTimeout: null
@@ -116,6 +117,8 @@ class UserStore
       dataType: 'json'
       success: (data) =>
         @setUserProfile data
+
+    
 
 
   setUserProfile: (data) ->

@@ -4,6 +4,7 @@ Header = require("components/Header")
 Footer = require("components/Footer")
 PredictionExpertCard = require("components/PredictionExpertCard")
 Comments = require("components/Comments")
+Votes = require("components/Votes")
 
 SessionMixin = require("mixins/SessionMixin")
 
@@ -16,6 +17,8 @@ module.exports = React.createFactory React.createClass
     experts: []
     loadError: null
     showCreated: @doShowCreated()
+    voteSubmitted: null
+    voteSubmitting: false
 
 
   componentDidMount: ->
@@ -67,6 +70,33 @@ module.exports = React.createFactory React.createClass
           "Success! You've added a new prediction to the system. Now you can add more information to it!"
         )
 
+
+  vote: (v) ->
+    { prediction } = @state
+    @setState voteSubmitting: true
+
+    params = {
+      path: "vote_for_prediction"
+      path_variables:
+        prediction_id: prediction.id
+      data:
+        value: v
+      success: @voteSuccess
+      error: @voteError
+    }
+
+    API.call(params)
+
+  
+  voteSuccess: (data) ->
+    @setState voteSubmitting: false
+    @setState voteSubmitted: true
+
+  
+  voteError: (error) ->
+    @setState voteSubmitting: false
+    @setState voteSubmitted: false
+
   
   render: ->
     { prediction, experts } = @state
@@ -91,6 +121,12 @@ module.exports = React.createFactory React.createClass
                         key: "prediction-expert-#{index}"
                   else
                     "No experts"
+              Votes
+                type: "prediction"
+                item: prediction
+                vote: @vote
+                submitting: @state.voteSubmitting
+                submitted: @state.voteSubmitted
               Comments
                 type: "prediction"
                 id: prediction.id

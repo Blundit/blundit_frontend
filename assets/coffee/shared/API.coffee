@@ -68,6 +68,9 @@ module.exports = class API
     claim_add_comment:
       path: "claims/%claim_id%/add_comment"
       method: "POST"
+    vote_for_claim:
+      path: "claims/%claim_id%/vote"
+      method: "POST"
     predictions:
       path: "predictions"
       method: "GET"
@@ -82,6 +85,9 @@ module.exports = class API
       method: "POST"
     prediction_add_comment:
       path: "predictions/%prediction_id%/add_comment"
+      method: "POST"
+    vote_for_prediction:
+      path: "predictions/%prediction_id%/vote"
       method: "POST"
     experts:
       path: "experts"
