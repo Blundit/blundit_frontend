@@ -28,7 +28,7 @@ module.exports = React.createFactory React.createClass
 
 
   render: ->
-    { prediction } = @props
+    { prediction, expert } = @props
     div { className: "expert__predictions-list-item" },
       div
         className: "expert__predictions-list-item__title"
@@ -40,6 +40,6 @@ module.exports = React.createFactory React.createClass
         @showSubstantiation()
       if @state.showSubstantiation == true
         ExpertSubstantiations
-          expert: @props.expert
+          expert: expert
           id: prediction.id
           type: "prediction"

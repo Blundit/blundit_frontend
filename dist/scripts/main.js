@@ -374,6 +374,141 @@ module.exports = React.createFactory(React.createClass({
     window.attachEvent('onload', startBlundit);
   }
 
+  module.exports = {
+    getInitialState: function() {
+      return {
+        page: 1,
+        numberOfPages: 1
+      };
+    },
+    nextPage: function() {
+      if (this.state.page < this.state.numberOfPages) {
+        this.setState({
+          page: this.state.page + 1
+        });
+      }
+      return this.fetchPaginatedData(this.state.page + 1);
+    },
+    previousPage: function() {
+      if (this.state.page > 1) {
+        this.setState({
+          page: this.state.page - 1
+        });
+      }
+      return this.fetchPaginatedData(this.state.page - 1);
+    },
+    specificPage: function(page) {
+      this.setState({
+        page: page
+      });
+      return this.fetchPaginatedData(page);
+    }
+  };
+
+  module.exports = {
+    setUser: function(data, request) {
+      window.UserStore.set(data, request);
+      this.user = window.UserStore.get();
+      if ((this.user != null) && (this.user.token != null)) {
+        window.global.setCookie('access-token', this.user.token);
+        window.global.setCookie('uid', this.user.uid);
+        return window.global.setCookie('client', this.user.client);
+      } else {
+        window.global.deleteCookie('access-token');
+        window.global.deleteCookie('uid');
+        return window.global.deleteCookie('client');
+      }
+    },
+    getParameterByName: function(name, url) {
+      var regex, results;
+      if (!url) {
+        url = window.location.href;
+      }
+      name = name.replace(/[\[\]]/g, "\\$&");
+      regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
+      results = regex.exec(url);
+      if (!results) {
+        return null;
+      }
+      if (!results[2]) {
+        return '';
+      }
+      return decodeURIComponent(results[2].replace(/\+/g, " "));
+    },
+    getUrlParams: function() {
+      var j, key, len, params, query, raw_vars, ref, v, val;
+      query = window.location.search.substring(1);
+      raw_vars = query.split("&");
+      params = {};
+      for (j = 0, len = raw_vars.length; j < len; j++) {
+        v = raw_vars[j];
+        ref = v.split("="), key = ref[0], val = ref[1];
+        params[key] = decodeURIComponent(val);
+      }
+      return params;
+    },
+    getUser: function() {
+      var obj;
+      obj = {};
+      this.token = window.global.getCookie('access-token');
+      this.client = window.global.getCookie('client');
+      this.uid = window.global.getCookie('uid');
+      if (this.token != null) {
+        obj.token = this.token;
+        obj.client = this.client;
+        obj.uid = this.uid;
+      }
+      if (obj === {}) {
+        return false;
+      }
+      return obj;
+    },
+    unsetUser: function() {
+      window.UserStore.set(null);
+      window.global.deleteCookie('access-token');
+      window.global.deleteCookie('client');
+      return window.global.deleteCookie('uid');
+    },
+    authHeader: function() {
+      return this.user = window.UserStore.getAuthHeader();
+    },
+    verifyUserToken: function() {
+      if (window.global.getCookie('access-token')) {
+        return this.verifyToken();
+      } else {
+        return this.setState({
+          verificationComplete: true
+        });
+      }
+    },
+    verifyToken: function() {
+      var params;
+      params = {
+        path: "verify_token",
+        path_variables: {
+          accessToken: window.global.getCookie('access-token'),
+          client: window.global.getCookie('client'),
+          uid: window.global.getCookie('uid')
+        },
+        success: this.verifyTokenSuccess,
+        error: this.verifyTokenError
+      };
+      return API.call(params);
+    },
+    verifyTokenSuccess: function(data) {
+      if (data) {
+        data.data.token = window.global.getCookie('access-token');
+        data.data.client = window.global.getCookie('client');
+        data.data.uid = window.global.getCookie('uid');
+        return this.setUser(data.data);
+      }
+    },
+    verifyTokenError: function(error) {
+      return this.setUser({});
+    },
+    updateUserHeaderInfo: function(request) {}
+  };
+
   div = React.DOM.div;
 
   module.exports = React.createFactory(React.createClass({
@@ -2267,141 +2402,6 @@ module.exports = React.createFactory(React.createClass({
       }, this.notOpenYet() ? "This " + type + " isn't open yet. Come back later to vote on it." : "This " + type + " is closed, and can't be voted on."));
     }
   }));
-
-  module.exports = {
-    getInitialState: function() {
-      return {
-        page: 1,
-        numberOfPages: 1
-      };
-    },
-    nextPage: function() {
-      if (this.state.page < this.state.numberOfPages) {
-        this.setState({
-          page: this.state.page + 1
-        });
-      }
-      return this.fetchPaginatedData(this.state.page + 1);
-    },
-    previousPage: function() {
-      if (this.state.page > 1) {
-        this.setState({
-          page: this.state.page - 1
-        });
-      }
-      return this.fetchPaginatedData(this.state.page - 1);
-    },
-    specificPage: function(page) {
-      this.setState({
-        page: page
-      });
-      return this.fetchPaginatedData(page);
-    }
-  };
-
-  module.exports = {
-    setUser: function(data, request) {
-      window.UserStore.set(data, request);
-      this.user = window.UserStore.get();
-      if ((this.user != null) && (this.user.token != null)) {
-        window.global.setCookie('access-token', this.user.token);
-        window.global.setCookie('uid', this.user.uid);
-        return window.global.setCookie('client', this.user.client);
-      } else {
-        window.global.deleteCookie('access-token');
-        window.global.deleteCookie('uid');
-        return window.global.deleteCookie('client');
-      }
-    },
-    getParameterByName: function(name, url) {
-      var regex, results;
-      if (!url) {
-        url = window.location.href;
-      }
-      name = name.replace(/[\[\]]/g, "\\$&");
-      regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
-      results = regex.exec(url);
-      if (!results) {
-        return null;
-      }
-      if (!results[2]) {
-        return '';
-      }
-      return decodeURIComponent(results[2].replace(/\+/g, " "));
-    },
-    getUrlParams: function() {
-      var j, key, len, params, query, raw_vars, ref6, v, val;
-      query = window.location.search.substring(1);
-      raw_vars = query.split("&");
-      params = {};
-      for (j = 0, len = raw_vars.length; j < len; j++) {
-        v = raw_vars[j];
-        ref6 = v.split("="), key = ref6[0], val = ref6[1];
-        params[key] = decodeURIComponent(val);
-      }
-      return params;
-    },
-    getUser: function() {
-      var obj;
-      obj = {};
-      this.token = window.global.getCookie('access-token');
-      this.client = window.global.getCookie('client');
-      this.uid = window.global.getCookie('uid');
-      if (this.token != null) {
-        obj.token = this.token;
-        obj.client = this.client;
-        obj.uid = this.uid;
-      }
-      if (obj === {}) {
-        return false;
-      }
-      return obj;
-    },
-    unsetUser: function() {
-      window.UserStore.set(null);
-      window.global.deleteCookie('access-token');
-      window.global.deleteCookie('client');
-      return window.global.deleteCookie('uid');
-    },
-    authHeader: function() {
-      return this.user = window.UserStore.getAuthHeader();
-    },
-    verifyUserToken: function() {
-      if (window.global.getCookie('access-token')) {
-        return this.verifyToken();
-      } else {
-        return this.setState({
-          verificationComplete: true
-        });
-      }
-    },
-    verifyToken: function() {
-      var params;
-      params = {
-        path: "verify_token",
-        path_variables: {
-          accessToken: window.global.getCookie('access-token'),
-          client: window.global.getCookie('client'),
-          uid: window.global.getCookie('uid')
-        },
-        success: this.verifyTokenSuccess,
-        error: this.verifyTokenError
-      };
-      return API.call(params);
-    },
-    verifyTokenSuccess: function(data) {
-      if (data) {
-        data.data.token = window.global.getCookie('access-token');
-        data.data.client = window.global.getCookie('client');
-        data.data.uid = window.global.getCookie('uid');
-        return this.setUser(data.data);
-      }
-    },
-    verifyTokenError: function(error) {
-      return this.setUser({});
-    },
-    updateUserHeaderInfo: function(request) {}
-  };
 
 
   /*
