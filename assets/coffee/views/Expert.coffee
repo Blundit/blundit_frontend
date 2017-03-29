@@ -56,15 +56,15 @@ module.exports = React.createFactory React.createClass
 
 
   categoryMaterialStyle: ->
-    return { margin: 4 }
+    { margin: 4 }
 
 
   showAccuracy: (val) ->
-    return Math.floor(val*100)+"%"
+    Math.floor(val*100)+"%"
 
   
   successCardStyle: ->
-    return {
+    {
       backgroundColor: "#237a0b"
       color: "#ffffff"
       margin: 4

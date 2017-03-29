@@ -134,7 +134,7 @@ module.exports = React.createFactory(React.createClass({
 
 },{}],3:[function(require,module,exports){
 (function() {
-  var API, AddToExpert, Blundit, Card, CardActions, CardHeader, CardMedia, CardText, CardTitle, CategoryClaims, CategoryExperts, CategoryPredictions, CategorySubHead, ClaimCard, ClaimExpertCard, ClaimFields, Comments, ExpertBonaFides, ExpertCard, ExpertClaimCard, ExpertFields, ExpertPredictionCard, ExpertSubstantiations, FlatButton, FontIcon, Footer, Global, Header, IconButton, MuiThemeProvider, Pagination, PaginationMixin, PredictionCard, PredictionExpertCard, PredictionFields, RaisedButton, RefreshIndicator, RouterMixin, SessionMixin, TextField, UserStore, Votes, a, br, deepOrange500, div, getMuiTheme, img, menuItems, muiTheme, ref, ref1, ref2, ref3, ref4, ref5, ref6, ref7, ref8, ref9, span, startBlundit,
+  var API, AddToExpert, Blundit, Card, CardActions, CardHeader, CardMedia, CardText, CardTitle, CategoryClaims, CategoryExperts, CategoryPredictions, CategorySubHead, ClaimCard, ClaimExpertCard, ClaimFields, Comments, ExpertBonaFides, ExpertCard, ExpertClaimCard, ExpertFields, ExpertPredictionCard, ExpertSubstantiations, FlatButton, FontIcon, Footer, Global, Header, IconButton, MuiThemeProvider, Pagination, PaginationMixin, PredictionCard, PredictionExpertCard, PredictionFields, RaisedButton, RefreshIndicator, RouterMixin, SessionMixin, TextField, UserStore, Votes, a, br, deepOrange500, div, getMuiTheme, img, menuItems, muiTheme, ref, ref1, ref10, ref2, ref3, ref4, ref5, ref6, ref7, ref8, ref9, span, startBlundit,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   window.React = require('react');
@@ -373,141 +373,6 @@ module.exports = React.createFactory(React.createClass({
   } else {
     window.attachEvent('onload', startBlundit);
   }
-
-  module.exports = {
-    getInitialState: function() {
-      return {
-        page: 1,
-        numberOfPages: 1
-      };
-    },
-    nextPage: function() {
-      if (this.state.page < this.state.numberOfPages) {
-        this.setState({
-          page: this.state.page + 1
-        });
-      }
-      return this.fetchPaginatedData(this.state.page + 1);
-    },
-    previousPage: function() {
-      if (this.state.page > 1) {
-        this.setState({
-          page: this.state.page - 1
-        });
-      }
-      return this.fetchPaginatedData(this.state.page - 1);
-    },
-    specificPage: function(page) {
-      this.setState({
-        page: page
-      });
-      return this.fetchPaginatedData(page);
-    }
-  };
-
-  module.exports = {
-    setUser: function(data, request) {
-      window.UserStore.set(data, request);
-      this.user = window.UserStore.get();
-      if ((this.user != null) && (this.user.token != null)) {
-        window.global.setCookie('access-token', this.user.token);
-        window.global.setCookie('uid', this.user.uid);
-        return window.global.setCookie('client', this.user.client);
-      } else {
-        window.global.deleteCookie('access-token');
-        window.global.deleteCookie('uid');
-        return window.global.deleteCookie('client');
-      }
-    },
-    getParameterByName: function(name, url) {
-      var regex, results;
-      if (!url) {
-        url = window.location.href;
-      }
-      name = name.replace(/[\[\]]/g, "\\$&");
-      regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
-      results = regex.exec(url);
-      if (!results) {
-        return null;
-      }
-      if (!results[2]) {
-        return '';
-      }
-      return decodeURIComponent(results[2].replace(/\+/g, " "));
-    },
-    getUrlParams: function() {
-      var j, key, len, params, query, raw_vars, ref, v, val;
-      query = window.location.search.substring(1);
-      raw_vars = query.split("&");
-      params = {};
-      for (j = 0, len = raw_vars.length; j < len; j++) {
-        v = raw_vars[j];
-        ref = v.split("="), key = ref[0], val = ref[1];
-        params[key] = decodeURIComponent(val);
-      }
-      return params;
-    },
-    getUser: function() {
-      var obj;
-      obj = {};
-      this.token = window.global.getCookie('access-token');
-      this.client = window.global.getCookie('client');
-      this.uid = window.global.getCookie('uid');
-      if (this.token != null) {
-        obj.token = this.token;
-        obj.client = this.client;
-        obj.uid = this.uid;
-      }
-      if (obj === {}) {
-        return false;
-      }
-      return obj;
-    },
-    unsetUser: function() {
-      window.UserStore.set(null);
-      window.global.deleteCookie('access-token');
-      window.global.deleteCookie('client');
-      return window.global.deleteCookie('uid');
-    },
-    authHeader: function() {
-      return this.user = window.UserStore.getAuthHeader();
-    },
-    verifyUserToken: function() {
-      if (window.global.getCookie('access-token')) {
-        return this.verifyToken();
-      } else {
-        return this.setState({
-          verificationComplete: true
-        });
-      }
-    },
-    verifyToken: function() {
-      var params;
-      params = {
-        path: "verify_token",
-        path_variables: {
-          accessToken: window.global.getCookie('access-token'),
-          client: window.global.getCookie('client'),
-          uid: window.global.getCookie('uid')
-        },
-        success: this.verifyTokenSuccess,
-        error: this.verifyTokenError
-      };
-      return API.call(params);
-    },
-    verifyTokenSuccess: function(data) {
-      if (data) {
-        data.data.token = window.global.getCookie('access-token');
-        data.data.client = window.global.getCookie('client');
-        data.data.uid = window.global.getCookie('uid');
-        return this.setUser(data.data);
-      }
-    },
-    verifyTokenError: function(error) {
-      return this.setUser({});
-    },
-    updateUserHeaderInfo: function(request) {}
-  };
 
   div = React.DOM.div;
 
@@ -2175,19 +2040,51 @@ module.exports = React.createFactory(React.createClass({
 
   div = React.DOM.div;
 
+  ExpertSubstantiations = require("components/ExpertSubstantiations");
+
   module.exports = React.createFactory(React.createClass({
+    displayName: "PredictioNExpertCard",
+    getInitialState: function() {
+      return {
+        showSubstantiation: false
+      };
+    },
     goToItem: function(id) {
       return navigate("/experts/" + id);
     },
-    render: function() {
+    showSubstantiation: function() {
       var expert;
       expert = this.props.expert;
+      if (this.state.showSubstantiation === true) {
+        return "X";
+      }
+      if (expert.evidence_of_beliefs === 0) {
+        return "Unsubstantiated";
+      } else {
+        return expert.evidence_of_beliefs + " evidences";
+      }
+    },
+    toggleSubstantiation: function() {
+      return this.setState({
+        showSubstantiation: !this.state.showSubstantiation
+      });
+    },
+    render: function() {
+      var expert, prediction, ref6;
+      ref6 = this.props, expert = ref6.expert, prediction = ref6.prediction;
       return div({
-        className: "claim__predictions-list-item"
+        className: "prediction__experts-list-item"
       }, div({
-        className: "claim__predictions-list-item__title",
+        className: "prediction__experts-list-item__title",
         onClick: this.goToItem.bind(this, expert.alias)
-      }, expert.name));
+      }, expert.name), div({
+        className: "prediction__experts-list-item__substantiations",
+        onClick: this.toggleSubstantiation
+      }, this.showSubstantiation()), this.state.showSubstantiation === true ? ExpertSubstantiations({
+        expert: expert,
+        id: prediction.id,
+        type: "prediction"
+      }) : void 0);
     }
   }));
 
@@ -2370,6 +2267,141 @@ module.exports = React.createFactory(React.createClass({
       }, this.notOpenYet() ? "This " + type + " isn't open yet. Come back later to vote on it." : "This " + type + " is closed, and can't be voted on."));
     }
   }));
+
+  module.exports = {
+    getInitialState: function() {
+      return {
+        page: 1,
+        numberOfPages: 1
+      };
+    },
+    nextPage: function() {
+      if (this.state.page < this.state.numberOfPages) {
+        this.setState({
+          page: this.state.page + 1
+        });
+      }
+      return this.fetchPaginatedData(this.state.page + 1);
+    },
+    previousPage: function() {
+      if (this.state.page > 1) {
+        this.setState({
+          page: this.state.page - 1
+        });
+      }
+      return this.fetchPaginatedData(this.state.page - 1);
+    },
+    specificPage: function(page) {
+      this.setState({
+        page: page
+      });
+      return this.fetchPaginatedData(page);
+    }
+  };
+
+  module.exports = {
+    setUser: function(data, request) {
+      window.UserStore.set(data, request);
+      this.user = window.UserStore.get();
+      if ((this.user != null) && (this.user.token != null)) {
+        window.global.setCookie('access-token', this.user.token);
+        window.global.setCookie('uid', this.user.uid);
+        return window.global.setCookie('client', this.user.client);
+      } else {
+        window.global.deleteCookie('access-token');
+        window.global.deleteCookie('uid');
+        return window.global.deleteCookie('client');
+      }
+    },
+    getParameterByName: function(name, url) {
+      var regex, results;
+      if (!url) {
+        url = window.location.href;
+      }
+      name = name.replace(/[\[\]]/g, "\\$&");
+      regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
+      results = regex.exec(url);
+      if (!results) {
+        return null;
+      }
+      if (!results[2]) {
+        return '';
+      }
+      return decodeURIComponent(results[2].replace(/\+/g, " "));
+    },
+    getUrlParams: function() {
+      var j, key, len, params, query, raw_vars, ref6, v, val;
+      query = window.location.search.substring(1);
+      raw_vars = query.split("&");
+      params = {};
+      for (j = 0, len = raw_vars.length; j < len; j++) {
+        v = raw_vars[j];
+        ref6 = v.split("="), key = ref6[0], val = ref6[1];
+        params[key] = decodeURIComponent(val);
+      }
+      return params;
+    },
+    getUser: function() {
+      var obj;
+      obj = {};
+      this.token = window.global.getCookie('access-token');
+      this.client = window.global.getCookie('client');
+      this.uid = window.global.getCookie('uid');
+      if (this.token != null) {
+        obj.token = this.token;
+        obj.client = this.client;
+        obj.uid = this.uid;
+      }
+      if (obj === {}) {
+        return false;
+      }
+      return obj;
+    },
+    unsetUser: function() {
+      window.UserStore.set(null);
+      window.global.deleteCookie('access-token');
+      window.global.deleteCookie('client');
+      return window.global.deleteCookie('uid');
+    },
+    authHeader: function() {
+      return this.user = window.UserStore.getAuthHeader();
+    },
+    verifyUserToken: function() {
+      if (window.global.getCookie('access-token')) {
+        return this.verifyToken();
+      } else {
+        return this.setState({
+          verificationComplete: true
+        });
+      }
+    },
+    verifyToken: function() {
+      var params;
+      params = {
+        path: "verify_token",
+        path_variables: {
+          accessToken: window.global.getCookie('access-token'),
+          client: window.global.getCookie('client'),
+          uid: window.global.getCookie('uid')
+        },
+        success: this.verifyTokenSuccess,
+        error: this.verifyTokenError
+      };
+      return API.call(params);
+    },
+    verifyTokenSuccess: function(data) {
+      if (data) {
+        data.data.token = window.global.getCookie('access-token');
+        data.data.client = window.global.getCookie('client');
+        data.data.uid = window.global.getCookie('uid');
+        return this.setUser(data.data);
+      }
+    },
+    verifyTokenError: function(error) {
+      return this.setUser({});
+    },
+    updateUserHeaderInfo: function(request) {}
+  };
 
 
   /*
@@ -4449,7 +4481,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  div = React.DOM.div;
+  ref9 = React.DOM, div = ref9.div, img = ref9.img;
 
   Header = require("components/Header");
 
@@ -4563,9 +4595,46 @@ module.exports = React.createFactory(React.createClass({
         voteSubmitted: false
       });
     },
+    goToCategory: function(id) {
+      return navigate("/categories/" + id);
+    },
+    categoryMaterialStyle: function() {
+      return {
+        margin: 4
+      };
+    },
+    showAccuracy: function(val) {
+      if (val === null) {
+        return "Unknown";
+      } else {
+        if (val >= 0.5) {
+          return "Correct";
+        } else {
+          return "Incorrect";
+        }
+      }
+    },
+    showStatus: function() {
+      var prediction;
+      prediction = this.state.prediction;
+      if (prediction != null) {
+        if (prediction.open === false) {
+          return "Not Yet Open";
+        } else if (prediction.open === true) {
+          return "Open";
+        } else if (prediction.status === 1) {
+          return "Closed";
+        }
+      } else {
+        return "Unknown";
+      }
+    },
+    formatDate: function(date) {
+      return date;
+    },
     render: function() {
-      var experts, prediction, ref9;
-      ref9 = this.state, prediction = ref9.prediction, experts = ref9.experts;
+      var experts, prediction, ref10;
+      ref10 = this.state, prediction = ref10.prediction, experts = ref10.experts;
       return div({}, Header({}, ''), div({
         className: "predictions-wrapper"
       }, div({
@@ -4575,6 +4644,30 @@ module.exports = React.createFactory(React.createClass({
       }, this.showNewPredictionText(), div({
         className: "prediction__title"
       }, prediction.title), div({
+        className: "prediction__image"
+      }, img({
+        src: prediction.pic
+      })), div({
+        className: "prediction__meta"
+      }, div({
+        className: "prediction__meta-date"
+      }, "This prediction will happen by " + (this.formatDate(prediction.prediction_date))), div({
+        className: "prediction__meta-status"
+      }, "This prediction is " + (this.showStatus()))), div({
+        className: "prediction__description"
+      }, prediction.description), div({
+        className: "prediction__categories"
+      }, "These are the categories this prediction is connected to:", prediction.categories.length === 0 ? div({}, "No categories yet.") : div({}, prediction.categories.map((function(_this) {
+        return function(category, index) {
+          return React.createElement(Material.Chip, {
+            onTouchTap: _this.goToCategory.bind(_this, category.id),
+            key: "prediction-category-chip-" + index,
+            style: _this.categoryMaterialStyle()
+          }, category.name);
+        };
+      })(this)))), div({
+        className: "prediction__accuracy"
+      }, "This prediction is marked: " + (this.showAccuracy(prediction.vote_value))), div({
         className: "prediction__experts"
       }, div({
         className: "prediction__experts-name"
@@ -4679,7 +4772,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref9 = React.DOM, div = ref9.div, a = ref9.a;
+  ref10 = React.DOM, div = ref10.div, a = ref10.a;
 
   Header = require("components/Header");
 
@@ -4801,10 +4894,10 @@ module.exports = React.createFactory(React.createClass({
       }
     },
     getErrorText: function(key) {
-      var error, j, len, ref10;
-      ref10 = this.state.errors;
-      for (j = 0, len = ref10.length; j < len; j++) {
-        error = ref10[j];
+      var error, j, len, ref11;
+      ref11 = this.state.errors;
+      for (j = 0, len = ref11.length; j < len; j++) {
+        error = ref11[j];
         if (error.id === key) {
           return error.text;
         }
@@ -83636,28 +83729,60 @@ module.exports = React.createFactory(React.createClass({
 
 
 },{}],585:[function(require,module,exports){
-var div;
+var ExpertSubstantiations, div;
 
 div = React.DOM.div;
 
+ExpertSubstantiations = require("components/ExpertSubstantiations");
+
 module.exports = React.createFactory(React.createClass({
+  displayName: "PredictioNExpertCard",
+  getInitialState: function() {
+    return {
+      showSubstantiation: false
+    };
+  },
   goToItem: function(id) {
     return navigate("/experts/" + id);
   },
-  render: function() {
+  showSubstantiation: function() {
     var expert;
     expert = this.props.expert;
+    if (this.state.showSubstantiation === true) {
+      return "X";
+    }
+    if (expert.evidence_of_beliefs === 0) {
+      return "Unsubstantiated";
+    } else {
+      return expert.evidence_of_beliefs + " evidences";
+    }
+  },
+  toggleSubstantiation: function() {
+    return this.setState({
+      showSubstantiation: !this.state.showSubstantiation
+    });
+  },
+  render: function() {
+    var expert, prediction, ref;
+    ref = this.props, expert = ref.expert, prediction = ref.prediction;
     return div({
-      className: "claim__predictions-list-item"
+      className: "prediction__experts-list-item"
     }, div({
-      className: "claim__predictions-list-item__title",
+      className: "prediction__experts-list-item__title",
       onClick: this.goToItem.bind(this, expert.alias)
-    }, expert.name));
+    }, expert.name), div({
+      className: "prediction__experts-list-item__substantiations",
+      onClick: this.toggleSubstantiation
+    }, this.showSubstantiation()), this.state.showSubstantiation === true ? ExpertSubstantiations({
+      expert: expert,
+      id: prediction.id,
+      type: "prediction"
+    }) : void 0);
   }
 }));
 
 
-},{}],586:[function(require,module,exports){
+},{"components/ExpertSubstantiations":580}],586:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -86143,9 +86268,9 @@ module.exports = React.createFactory(React.createClass({
 
 
 },{"components/Footer":581,"components/Header":582,"mixins/SessionMixin":589}],610:[function(require,module,exports){
-var Comments, Footer, Header, PredictionExpertCard, SessionMixin, Votes, div;
+var Comments, Footer, Header, PredictionExpertCard, SessionMixin, Votes, div, img, ref;
 
-div = React.DOM.div;
+ref = React.DOM, div = ref.div, img = ref.img;
 
 Header = require("components/Header");
 
@@ -86259,9 +86384,46 @@ module.exports = React.createFactory(React.createClass({
       voteSubmitted: false
     });
   },
+  goToCategory: function(id) {
+    return navigate("/categories/" + id);
+  },
+  categoryMaterialStyle: function() {
+    return {
+      margin: 4
+    };
+  },
+  showAccuracy: function(val) {
+    if (val === null) {
+      return "Unknown";
+    } else {
+      if (val >= 0.5) {
+        return "Correct";
+      } else {
+        return "Incorrect";
+      }
+    }
+  },
+  showStatus: function() {
+    var prediction;
+    prediction = this.state.prediction;
+    if (prediction != null) {
+      if (prediction.open === false) {
+        return "Not Yet Open";
+      } else if (prediction.open === true) {
+        return "Open";
+      } else if (prediction.status === 1) {
+        return "Closed";
+      }
+    } else {
+      return "Unknown";
+    }
+  },
+  formatDate: function(date) {
+    return date;
+  },
   render: function() {
-    var experts, prediction, ref;
-    ref = this.state, prediction = ref.prediction, experts = ref.experts;
+    var experts, prediction, ref1;
+    ref1 = this.state, prediction = ref1.prediction, experts = ref1.experts;
     return div({}, Header({}, ''), div({
       className: "predictions-wrapper"
     }, div({
@@ -86271,6 +86433,30 @@ module.exports = React.createFactory(React.createClass({
     }, this.showNewPredictionText(), div({
       className: "prediction__title"
     }, prediction.title), div({
+      className: "prediction__image"
+    }, img({
+      src: prediction.pic
+    })), div({
+      className: "prediction__meta"
+    }, div({
+      className: "prediction__meta-date"
+    }, "This prediction will happen by " + (this.formatDate(prediction.prediction_date))), div({
+      className: "prediction__meta-status"
+    }, "This prediction is " + (this.showStatus()))), div({
+      className: "prediction__description"
+    }, prediction.description), div({
+      className: "prediction__categories"
+    }, "These are the categories this prediction is connected to:", prediction.categories.length === 0 ? div({}, "No categories yet.") : div({}, prediction.categories.map((function(_this) {
+      return function(category, index) {
+        return React.createElement(Material.Chip, {
+          onTouchTap: _this.goToCategory.bind(_this, category.id),
+          key: "prediction-category-chip-" + index,
+          style: _this.categoryMaterialStyle()
+        }, category.name);
+      };
+    })(this)))), div({
+      className: "prediction__accuracy"
+    }, "This prediction is marked: " + (this.showAccuracy(prediction.vote_value))), div({
       className: "prediction__experts"
     }, div({
       className: "prediction__experts-name"

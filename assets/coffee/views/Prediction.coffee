@@ -1,4 +1,4 @@
-{ div } = React.DOM
+{ div, img } = React.DOM
 
 Header = require("components/Header")
 Footer = require("components/Footer")
@@ -98,6 +98,43 @@ module.exports = React.createFactory React.createClass
     @setState voteSubmitted: false
 
   
+  goToCategory: (id) ->
+    navigate("/categories/#{id}")
+
+
+  categoryMaterialStyle: ->
+    { margin: 4 }
+
+
+  showAccuracy: (val) ->
+    if val == null
+      return "Unknown"
+    else
+      if val >= 0.5
+        return "Correct"
+      else
+        return "Incorrect"
+
+    
+  showStatus: ->
+    { prediction } = @state
+
+    if prediction?
+      if prediction.open == false
+        return "Not Yet Open"
+      else if prediction.open == true
+        return "Open"
+      else if prediction.status == 1
+        return "Closed"
+
+    else
+      return "Unknown"
+
+
+  formatDate: (date) ->
+    return date
+
+  
   render: ->
     { prediction, experts } = @state
     div {},
@@ -109,6 +146,29 @@ module.exports = React.createFactory React.createClass
               @showNewPredictionText()
               div { className: "prediction__title" },
                 prediction.title
+              div { className: "prediction__image" },
+                img { src: prediction.pic }
+              div { className: "prediction__meta" },
+                div { className: "prediction__meta-date" },
+                  "This prediction will happen by #{@formatDate(prediction.prediction_date)}"
+                div { className: "prediction__meta-status" },
+                  "This prediction is #{@showStatus()}"
+              div { className: "prediction__description" },
+                prediction.description
+              div { className: "prediction__categories" },
+                "These are the categories this prediction is connected to:"
+                if prediction.categories.length == 0
+                  div {},
+                    "No categories yet."
+                else
+                  div {},
+                    prediction.categories.map (category, index) =>
+                      React.createElement( Material.Chip,
+                        { onTouchTap: @goToCategory.bind(@, category.id), key: "prediction-category-chip-#{index}", style: @categoryMaterialStyle() },
+                        category.name
+                      )
+              div { className: "prediction__accuracy" },
+                "This prediction is marked: #{@showAccuracy(prediction.vote_value)}"
               div { className: "prediction__experts" },
                 div { className: "prediction__experts-name" },
                   "Experts:"
