@@ -5,6 +5,8 @@ Footer = require("components/Footer")
 PredictionExpertCard = require("components/PredictionExpertCard")
 Comments = require("components/Comments")
 Votes = require("components/Votes")
+AddToPrediction = require("components/AddToPrediction")
+PredictionEvidences = require("components/PredictionEvidences")
 
 SessionMixin = require("mixins/SessionMixin")
 
@@ -22,6 +24,10 @@ module.exports = React.createFactory React.createClass
 
 
   componentDidMount: ->
+    @fetchPrediction()
+
+  
+  fetchPrediction: ->
     params = {
       path: "prediction"
       path_variables:
@@ -181,6 +187,16 @@ module.exports = React.createFactory React.createClass
                         key: "prediction-expert-#{index}"
                   else
                     "No experts"
+                if UserStore.loggedIn()
+                  AddToPrediction
+                    prediction: prediction
+                    type: "prediction"
+                    items: experts
+                    refresh: @fetchPrediction
+              PredictionEvidences
+                evidences: prediction.evidences
+                prediction: prediction
+                refresh: @fetchPrediction
               Votes
                 type: "prediction"
                 item: prediction

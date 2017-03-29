@@ -20,7 +20,7 @@ module.exports = React.createFactory React.createClass
     if claim.evidence_of_beliefs == 0
       return "Unsubstantiated"
     else
-      return "#{claim.evidence_of_beliefs} evidences"
+      return "#{claim.evidence_of_beliefs} substantiations"
 
 
   toggleSubstantiation: ->

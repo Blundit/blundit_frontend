@@ -80,6 +80,9 @@ module.exports = class API
     prediction:
       path: "predictions/%prediction_id%"
       method: "GET"
+    add_evidence_to_prediction:
+      path: "predictions/%prediction_id%/add_evidence"
+      method: "POST"
     create_prediction:
       path: "predictions/"
       method: "POST"
@@ -109,6 +112,12 @@ module.exports = class API
       method: "POST"
     add_claim_to_expert:
       path: "experts/%expert_id%/add_claim"
+      method: "POST"
+    add_expert_to_prediction:
+      path: "predictions/%prediction_id%/add_expert"
+      method: "POST"
+    add_expert_to_claim:
+      path: "claims/%claim_id%/add_expert"
       method: "POST"
     get_substantiations:
       path: "experts/%expert_id%/get_substantiations"

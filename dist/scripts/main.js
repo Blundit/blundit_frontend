@@ -27,7 +27,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"mixins/SessionMixin":589}],2:[function(require,module,exports){
+},{"mixins/SessionMixin":591}],2:[function(require,module,exports){
 var RaisedButton, div, img, menuItems, ref;
 
 ref = React.DOM, div = ref.div, img = ref.img;
@@ -134,7 +134,7 @@ module.exports = React.createFactory(React.createClass({
 
 },{}],3:[function(require,module,exports){
 (function() {
-  var API, AddToExpert, Blundit, Card, CardActions, CardHeader, CardMedia, CardText, CardTitle, CategoryClaims, CategoryExperts, CategoryPredictions, CategorySubHead, ClaimCard, ClaimExpertCard, ClaimFields, Comments, ExpertBonaFides, ExpertCard, ExpertClaimCard, ExpertFields, ExpertPredictionCard, ExpertSubstantiations, FlatButton, FontIcon, Footer, Global, Header, IconButton, MuiThemeProvider, Pagination, PaginationMixin, PredictionCard, PredictionExpertCard, PredictionFields, RaisedButton, RefreshIndicator, RouterMixin, SessionMixin, TextField, UserStore, Votes, a, br, deepOrange500, div, getMuiTheme, img, menuItems, muiTheme, ref, ref1, ref10, ref2, ref3, ref4, ref5, ref6, ref7, ref8, ref9, span, startBlundit,
+  var API, AddToExpert, AddToPrediction, Blundit, Card, CardActions, CardHeader, CardMedia, CardText, CardTitle, CategoryClaims, CategoryExperts, CategoryPredictions, CategorySubHead, ClaimCard, ClaimExpertCard, ClaimFields, Comments, ExpertBonaFides, ExpertCard, ExpertClaimCard, ExpertFields, ExpertPredictionCard, ExpertSubstantiations, FlatButton, FontIcon, Footer, Global, Header, IconButton, MuiThemeProvider, Pagination, PaginationMixin, PredictionCard, PredictionEvidences, PredictionExpertCard, PredictionFields, RaisedButton, RefreshIndicator, RouterMixin, SessionMixin, TextField, UserStore, Votes, a, br, deepOrange500, div, getMuiTheme, img, menuItems, muiTheme, ref, ref1, ref10, ref11, ref2, ref3, ref4, ref5, ref6, ref7, ref8, ref9, span, startBlundit,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   window.React = require('react');
@@ -642,6 +642,137 @@ module.exports = React.createFactory(React.createClass({
         fullWidth: true,
         onChange: this.changeEvidenceOfBelief
       }), React.createElement(Material.FlatButton, {
+        label: "Add",
+        onClick: this.addItem
+      }), React.createElement(Material.FlatButton, {
+        label: "Cancel",
+        onClick: this.cancelAddItem
+      }), this.state.error != null ? div({}, this.state.error) : void 0) : void 0);
+    }
+  }));
+
+  div = React.DOM.div;
+
+  module.exports = React.createFactory(React.createClass({
+    displayName: 'AddToPrediction',
+    getInitialState: function() {
+      return {
+        showItems: false,
+        items: null,
+        item: null,
+        itemList: null,
+        itemsError: false,
+        evidenceOfBeliefUrl: ''
+      };
+    },
+    componentDidMount: function() {
+      var params;
+      params = {
+        path: "all_experts",
+        success: this.itemsSuccess,
+        error: this.itemsError
+      };
+      return API.call(params);
+    },
+    itemsSuccess: function(data) {
+      var existingItem, j, k, len, len1, newItem, ref;
+      this.items = [];
+      for (j = 0, len = data.length; j < len; j++) {
+        newItem = data[j];
+        this.found = false;
+        ref = this.props.items;
+        for (k = 0, len1 = ref.length; k < len1; k++) {
+          existingItem = ref[k];
+          if (Number(newItem.id) === Number(existingItem.id)) {
+            this.found = true;
+          }
+        }
+        if (this.found === false) {
+          this.items.push(newItem);
+        }
+      }
+      return this.setState({
+        itemList: this.items
+      });
+    },
+    itemsError: function(error) {
+      return this.setState({
+        itemsError: true
+      });
+    },
+    addItem: function() {
+      var params;
+      this.setState({
+        error: null
+      });
+      if (this.state.item === null) {
+        this.setState({
+          error: "Selection required"
+        });
+        return;
+      }
+      params = {
+        path: "add_expert_to_prediction",
+        path_variables: {
+          prediction_id: this.props.prediction.id
+        },
+        data: {
+          id: this.state.item
+        },
+        success: this.addSuccess,
+        error: this.addError
+      };
+      return API.call(params);
+    },
+    addSuccess: function(data) {
+      this.cancelAddItem();
+      return this.props.refresh();
+    },
+    addError: function(error) {
+      return this.setState({
+        error: "Error adding Expert"
+      });
+    },
+    handleChange: function(event, index, value) {
+      return this.setState({
+        item: value
+      });
+    },
+    doShowItems: function() {
+      return this.setState({
+        showItems: true
+      });
+    },
+    cancelAddItem: function() {
+      this.setState({
+        item: null
+      });
+      return this.setState({
+        showItems: false
+      });
+    },
+    sentenceCase: function(text) {
+      return text.replace(/\w\S*/g, function(text) {
+        return text.charAt(0).toUpperCase() + text.substr(1).toLowerCase();
+      });
+    },
+    render: function() {
+      return div({
+        className: "add-to-prediction"
+      }, this.state.showItems === false ? div({
+        className: "add-to-prediction__button",
+        onClick: this.doShowItems
+      }, "Add Expert to Prediction") : this.state.itemList != null ? div({}, React.createElement(Material.SelectField, {
+        floatingLabelText: "Expert",
+        value: this.state.item,
+        onChange: this.handleChange
+      }, this.state.itemList.map(function(item, index) {
+        return React.createElement(Material.MenuItem, {
+          value: item.id,
+          primaryText: item.title,
+          key: "add-to-prediction-item-" + index
+        });
+      })), React.createElement(Material.FlatButton, {
         label: "Add",
         onClick: this.addItem
       }), React.createElement(Material.FlatButton, {
@@ -1463,7 +1594,7 @@ module.exports = React.createFactory(React.createClass({
       if (claim.evidence_of_beliefs === 0) {
         return "Unsubstantiated";
       } else {
-        return claim.evidence_of_beliefs + " evidences";
+        return claim.evidence_of_beliefs + " substantiations";
       }
     },
     toggleSubstantiation: function() {
@@ -1639,7 +1770,7 @@ module.exports = React.createFactory(React.createClass({
       if (prediction.evidence_of_beliefs === 0) {
         return "Unsubstantiated";
       } else {
-        return prediction.evidence_of_beliefs + " evidences";
+        return prediction.evidence_of_beliefs + " substantiations";
       }
     },
     toggleSubstantiation: function() {
@@ -1648,8 +1779,8 @@ module.exports = React.createFactory(React.createClass({
       });
     },
     render: function() {
-      var prediction;
-      prediction = this.props.prediction;
+      var expert, prediction, ref3;
+      ref3 = this.props, prediction = ref3.prediction, expert = ref3.expert;
       return div({
         className: "expert__predictions-list-item"
       }, div({
@@ -1659,7 +1790,7 @@ module.exports = React.createFactory(React.createClass({
         className: "expert__predictions-list-item__substatiations",
         onClick: this.toggleSubstantiation
       }, this.showSubstantiation()), this.state.showSubstantiation === true ? ExpertSubstantiations({
-        expert: this.props.expert,
+        expert: expert,
         id: prediction.id,
         type: "prediction"
       }) : void 0);
@@ -2173,6 +2304,91 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
+  ref6 = React.DOM, div = ref6.div, a = ref6.a;
+
+  module.exports = React.createFactory(React.createClass({
+    displayName: "PredictionEvidences",
+    getInitialState: function() {
+      return {
+        evidenceURL: ''
+      };
+    },
+    addItem: function() {
+      var params;
+      if (this.state.evidenceUrl === '') {
+        this.setState({
+          error: 'URL Required'
+        });
+        return false;
+      }
+      this.setState({
+        error: null
+      });
+      params = {
+        path: "add_evidence_to_prediction",
+        path_variables: {
+          prediction_id: this.props.prediction.id
+        },
+        data: {
+          url: this.state.evidenceURL
+        },
+        success: this.addSuccess,
+        error: this.addError
+      };
+      return API.call(params);
+    },
+    addSuccess: function(data) {
+      this.setState({
+        evidenceUrl: ''
+      });
+      return this.props.refresh();
+    },
+    addError: function(error) {
+      return this.setState({
+        error: "Error adding Evidence"
+      });
+    },
+    handleChange: function(event, index, value) {
+      return this.setState({
+        item: value
+      });
+    },
+    cancelAddItem: function() {
+      this.setState({
+        item: null
+      });
+      return this.setState({
+        showItems: false
+      });
+    },
+    changeEvidence: function(event) {
+      return this.setState({
+        evidenceURL: event.target.value
+      });
+    },
+    render: function() {
+      return div({
+        className: "prediction__evidences"
+      }, this.props.evidences.map(function(evidence, index) {
+        return div({
+          className: "prediction__evidence",
+          key: "prediction-evidence-" + index
+        }, a({
+          target: "_blank",
+          href: evidence.url
+        }, evidence.title));
+      }), div({}, React.createElement(Material.TextField, {
+        value: this.state.evidenceURL,
+        hintText: "Add Evidence that supports this prediction",
+        fullWidth: true,
+        onChange: this.changeEvidence
+      }), React.createElement(Material.FlatButton, {
+        label: "Add",
+        onClick: this.addItem
+      }), this.state.error != null ? div({}, this.state.error) : void 0));
+    }
+  }));
+
   div = React.DOM.div;
 
   ExpertSubstantiations = require("components/ExpertSubstantiations");
@@ -2196,7 +2412,7 @@ module.exports = React.createFactory(React.createClass({
       if (expert.evidence_of_beliefs === 0) {
         return "Unsubstantiated";
       } else {
-        return expert.evidence_of_beliefs + " evidences";
+        return expert.evidence_of_beliefs + " substantiations";
       }
     },
     toggleSubstantiation: function() {
@@ -2205,8 +2421,8 @@ module.exports = React.createFactory(React.createClass({
       });
     },
     render: function() {
-      var expert, prediction, ref6;
-      ref6 = this.props, expert = ref6.expert, prediction = ref6.prediction;
+      var expert, prediction, ref7;
+      ref7 = this.props, expert = ref7.expert, prediction = ref7.prediction;
       return div({
         className: "prediction__experts-list-item"
       }, div({
@@ -2257,10 +2473,10 @@ module.exports = React.createFactory(React.createClass({
       return this.props.updateField("category", value);
     },
     getErrorText: function(key) {
-      var error, j, len, ref6;
-      ref6 = this.props.errors;
-      for (j = 0, len = ref6.length; j < len; j++) {
-        error = ref6[j];
+      var error, j, len, ref7;
+      ref7 = this.props.errors;
+      for (j = 0, len = ref7.length; j < len; j++) {
+        error = ref7[j];
         if (error.id === key) {
           return error.text;
         }
@@ -2327,10 +2543,10 @@ module.exports = React.createFactory(React.createClass({
   module.exports = React.createFactory(React.createClass({
     displayName: 'Votes',
     getVoteValText: function() {
-      var item, ref6;
+      var item, ref7;
       item = this.props.item;
       if (item.user_vote != null) {
-        return (ref6 = item.user_vote.vote === 1) != null ? ref6 : {
+        return (ref7 = item.user_vote.vote === 1) != null ? ref7 : {
           "True": "False"
         };
       } else {
@@ -2338,16 +2554,14 @@ module.exports = React.createFactory(React.createClass({
       }
     },
     voteYes: function() {
-      console.log("vote yes");
       return this.props.vote(1);
     },
     voteNo: function() {
-      console.log("vote no");
       return this.props.vote(0);
     },
     notOpenYet: function() {
-      var d1, d2, item, ref6, type;
-      ref6 = this.props, item = ref6.item, type = ref6.type;
+      var d1, d2, item, ref7, type;
+      ref7 = this.props, item = ref7.item, type = ref7.type;
       if (type !== "prediction") {
         return false;
       } else {
@@ -2368,9 +2582,8 @@ module.exports = React.createFactory(React.createClass({
       };
     },
     render: function() {
-      var item, ref6, submitted, submitting, type;
-      ref6 = this.props, type = ref6.type, item = ref6.item, submitting = ref6.submitting, submitted = ref6.submitted;
-      console.log(submitting);
+      var item, ref7, submitted, submitting, type;
+      ref7 = this.props, type = ref7.type, item = ref7.item, submitting = ref7.submitting, submitted = ref7.submitted;
       return div({
         className: type + "__vote"
       }, div({
@@ -2507,6 +2720,10 @@ module.exports = React.createFactory(React.createClass({
         path: "predictions/%prediction_id%",
         method: "GET"
       },
+      add_evidence_to_prediction: {
+        path: "predictions/%prediction_id%/add_evidence",
+        method: "POST"
+      },
       create_prediction: {
         path: "predictions/",
         method: "POST"
@@ -2545,6 +2762,14 @@ module.exports = React.createFactory(React.createClass({
       },
       add_claim_to_expert: {
         path: "experts/%expert_id%/add_claim",
+        method: "POST"
+      },
+      add_expert_to_prediction: {
+        path: "predictions/%prediction_id%/add_expert",
+        method: "POST"
+      },
+      add_expert_to_claim: {
+        path: "claims/%claim_id%/add_expert",
         method: "POST"
       },
       get_substantiations: {
@@ -2594,11 +2819,11 @@ module.exports = React.createFactory(React.createClass({
     };
 
     API.path = function(params) {
-      var key, ref6, value;
+      var key, ref7, value;
       this.p = this.server(params) + this.paths[params.path].path;
-      ref6 = params.path_variables;
-      for (key in ref6) {
-        value = ref6[key];
+      ref7 = params.path_variables;
+      for (key in ref7) {
+        value = ref7[key];
         this.p = this.p.replace('%' + key + '%', value);
       }
       if (this.paths[params.path].method === "GET") {
@@ -3397,8 +3622,8 @@ module.exports = React.createFactory(React.createClass({
       }, "Success! You've added a new claim to the system. Now you can add more information to it!") : void 0);
     },
     render: function() {
-      var claim, experts, ref6;
-      ref6 = this.state, claim = ref6.claim, experts = ref6.experts;
+      var claim, experts, ref7;
+      ref7 = this.state, claim = ref7.claim, experts = ref7.experts;
       return div({}, Header({}, ''), div({
         className: "claims-wrapper"
       }, div({
@@ -3906,7 +4131,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref6 = React.DOM, div = ref6.div, img = ref6.img;
+  ref7 = React.DOM, div = ref7.div, img = ref7.img;
 
   Header = require("components/Header");
 
@@ -4009,8 +4234,8 @@ module.exports = React.createFactory(React.createClass({
       }, "Success! You've added a new expert to the system. Now you can add more information to them!") : void 0);
     },
     render: function() {
-      var claims, expert, predictions, ref7;
-      ref7 = this.state, expert = ref7.expert, predictions = ref7.predictions, claims = ref7.claims;
+      var claims, expert, predictions, ref8;
+      ref8 = this.state, expert = ref8.expert, predictions = ref8.predictions, claims = ref8.claims;
       return div({}, Header({}, ''), div({
         className: "experts-wrapper"
       }, div({
@@ -4082,12 +4307,12 @@ module.exports = React.createFactory(React.createClass({
           claim: claim,
           key: "expert-claim-card-" + index
         });
-      }) : "No claims", AddToExpert({
+      }) : "No claims", UserStore.loggedIn() ? AddToExpert({
         expert: expert,
         type: "claim",
         items: this.state.claims,
         refresh: this.fetchExpert
-      }))), Comments({
+      }) : void 0)), Comments({
         type: "expert",
         id: expert.id,
         num: expert.comments_count
@@ -4174,7 +4399,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref7 = React.DOM, div = ref7.div, a = ref7.a;
+  ref8 = React.DOM, div = ref8.div, a = ref8.a;
 
   Header = require("components/Header");
 
@@ -4249,10 +4474,10 @@ module.exports = React.createFactory(React.createClass({
       return false;
     },
     getErrorText: function(key) {
-      var error, j, len, ref8;
-      ref8 = this.state.errors;
-      for (j = 0, len = ref8.length; j < len; j++) {
-        error = ref8[j];
+      var error, j, len, ref9;
+      ref9 = this.state.errors;
+      for (j = 0, len = ref9.length; j < len; j++) {
+        error = ref9[j];
         if (error.id === key) {
           return error.text;
         }
@@ -4325,7 +4550,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref8 = React.DOM, div = ref8.div, a = ref8.a;
+  ref9 = React.DOM, div = ref9.div, a = ref9.a;
 
   Header = require("components/Header");
 
@@ -4431,10 +4656,10 @@ module.exports = React.createFactory(React.createClass({
       }
     },
     getErrorText: function(key) {
-      var error, j, len, ref9;
-      ref9 = this.state.errors;
-      for (j = 0, len = ref9.length; j < len; j++) {
-        error = ref9[j];
+      var error, j, len, ref10;
+      ref10 = this.state.errors;
+      for (j = 0, len = ref10.length; j < len; j++) {
+        error = ref10[j];
         if (error.id === key) {
           return error.text;
         }
@@ -4481,7 +4706,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref9 = React.DOM, div = ref9.div, img = ref9.img;
+  ref10 = React.DOM, div = ref10.div, img = ref10.img;
 
   Header = require("components/Header");
 
@@ -4492,6 +4717,10 @@ module.exports = React.createFactory(React.createClass({
   Comments = require("components/Comments");
 
   Votes = require("components/Votes");
+
+  AddToPrediction = require("components/AddToPrediction");
+
+  PredictionEvidences = require("components/PredictionEvidences");
 
   SessionMixin = require("mixins/SessionMixin");
 
@@ -4509,6 +4738,9 @@ module.exports = React.createFactory(React.createClass({
       };
     },
     componentDidMount: function() {
+      return this.fetchPrediction();
+    },
+    fetchPrediction: function() {
       var params;
       params = {
         path: "prediction",
@@ -4633,8 +4865,8 @@ module.exports = React.createFactory(React.createClass({
       return date;
     },
     render: function() {
-      var experts, prediction, ref10;
-      ref10 = this.state, prediction = ref10.prediction, experts = ref10.experts;
+      var experts, prediction, ref11;
+      ref11 = this.state, prediction = ref11.prediction, experts = ref11.experts;
       return div({}, Header({}, ''), div({
         className: "predictions-wrapper"
       }, div({
@@ -4679,7 +4911,16 @@ module.exports = React.createFactory(React.createClass({
           prediction: prediction,
           key: "prediction-expert-" + index
         });
-      }) : "No experts")), Votes({
+      }) : "No experts"), UserStore.loggedIn() ? AddToPrediction({
+        prediction: prediction,
+        type: "prediction",
+        items: experts,
+        refresh: this.fetchPrediction
+      }) : void 0), PredictionEvidences({
+        evidences: prediction.evidences,
+        prediction: prediction,
+        refresh: this.fetchPrediction
+      }), Votes({
         type: "prediction",
         item: prediction,
         vote: this.vote,
@@ -4772,7 +5013,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref10 = React.DOM, div = ref10.div, a = ref10.a;
+  ref11 = React.DOM, div = ref11.div, a = ref11.a;
 
   Header = require("components/Header");
 
@@ -4894,10 +5135,10 @@ module.exports = React.createFactory(React.createClass({
       }
     },
     getErrorText: function(key) {
-      var error, j, len, ref11;
-      ref11 = this.state.errors;
-      for (j = 0, len = ref11.length; j < len; j++) {
-        error = ref11[j];
+      var error, j, len, ref12;
+      ref12 = this.state.errors;
+      for (j = 0, len = ref12.length; j < len; j++) {
+        error = ref12[j];
         if (error.id === key) {
           return error.text;
         }
@@ -5013,7 +5254,7 @@ module.exports = React.createFactory(React.createClass({
 
 }).call(this);
 
-},{"./components/Footer":1,"./components/Header":2,"components/AddToExpert":566,"components/CategoryClaims":567,"components/CategoryExperts":568,"components/CategoryPredictions":569,"components/CategorySubHead":570,"components/ClaimCard":571,"components/ClaimExpertCard":572,"components/ClaimFields":573,"components/Comments":574,"components/ExpertBonaFides":575,"components/ExpertCard":576,"components/ExpertClaimCard":577,"components/ExpertFields":578,"components/ExpertPredictionCard":579,"components/ExpertSubstantiations":580,"components/Footer":581,"components/Header":582,"components/Pagination":583,"components/PredictionCard":584,"components/PredictionExpertCard":585,"components/PredictionFields":586,"components/Votes":587,"lodash":180,"material-ui":318,"material-ui/styles/MuiThemeProvider":337,"material-ui/styles/colors":339,"material-ui/styles/getMuiTheme":340,"mixins/PaginationMixin":588,"mixins/SessionMixin":589,"react":551,"react-dom":377,"react-mini-router":509,"react-tap-event-plugin":520,"shared/API":590,"shared/Global":591,"stores/UserStore":592,"views/404":593,"views/Bookmarks":594,"views/Categories":595,"views/CategoryAll":596,"views/CategoryClaims":597,"views/CategoryExperts":598,"views/CategoryPredictions":599,"views/Claim":600,"views/Claims":601,"views/CreateClaim":602,"views/CreateExpert":603,"views/CreatePrediction":604,"views/Expert":605,"views/Experts":606,"views/ForgotPassword":607,"views/Landing":608,"views/Login":609,"views/Prediction":610,"views/Predictions":611,"views/Register":612,"views/RegisterSuccessful":613,"views/User":614,"views/Users":615}],4:[function(require,module,exports){
+},{"./components/Footer":1,"./components/Header":2,"components/AddToExpert":566,"components/AddToPrediction":567,"components/CategoryClaims":568,"components/CategoryExperts":569,"components/CategoryPredictions":570,"components/CategorySubHead":571,"components/ClaimCard":572,"components/ClaimExpertCard":573,"components/ClaimFields":574,"components/Comments":575,"components/ExpertBonaFides":576,"components/ExpertCard":577,"components/ExpertClaimCard":578,"components/ExpertFields":579,"components/ExpertPredictionCard":580,"components/ExpertSubstantiations":581,"components/Footer":582,"components/Header":583,"components/Pagination":584,"components/PredictionCard":585,"components/PredictionEvidences":586,"components/PredictionExpertCard":587,"components/PredictionFields":588,"components/Votes":589,"lodash":180,"material-ui":318,"material-ui/styles/MuiThemeProvider":337,"material-ui/styles/colors":339,"material-ui/styles/getMuiTheme":340,"mixins/PaginationMixin":590,"mixins/SessionMixin":591,"react":551,"react-dom":377,"react-mini-router":509,"react-tap-event-plugin":520,"shared/API":592,"shared/Global":593,"stores/UserStore":594,"views/404":595,"views/Bookmarks":596,"views/Categories":597,"views/CategoryAll":598,"views/CategoryClaims":599,"views/CategoryExperts":600,"views/CategoryPredictions":601,"views/Claim":602,"views/Claims":603,"views/CreateClaim":604,"views/CreateExpert":605,"views/CreatePrediction":606,"views/Expert":607,"views/Experts":608,"views/ForgotPassword":609,"views/Landing":610,"views/Login":611,"views/Prediction":612,"views/Predictions":613,"views/Register":614,"views/RegisterSuccessful":615,"views/User":616,"views/Users":617}],4:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/array/from"), __esModule: true };
 },{"core-js/library/fn/array/from":26}],5:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/get-iterator"), __esModule: true };
@@ -82270,6 +82511,141 @@ var div;
 div = React.DOM.div;
 
 module.exports = React.createFactory(React.createClass({
+  displayName: 'AddToPrediction',
+  getInitialState: function() {
+    return {
+      showItems: false,
+      items: null,
+      item: null,
+      itemList: null,
+      itemsError: false,
+      evidenceOfBeliefUrl: ''
+    };
+  },
+  componentDidMount: function() {
+    var params;
+    params = {
+      path: "all_experts",
+      success: this.itemsSuccess,
+      error: this.itemsError
+    };
+    return API.call(params);
+  },
+  itemsSuccess: function(data) {
+    var existingItem, i, j, len, len1, newItem, ref;
+    this.items = [];
+    for (i = 0, len = data.length; i < len; i++) {
+      newItem = data[i];
+      this.found = false;
+      ref = this.props.items;
+      for (j = 0, len1 = ref.length; j < len1; j++) {
+        existingItem = ref[j];
+        if (Number(newItem.id) === Number(existingItem.id)) {
+          this.found = true;
+        }
+      }
+      if (this.found === false) {
+        this.items.push(newItem);
+      }
+    }
+    return this.setState({
+      itemList: this.items
+    });
+  },
+  itemsError: function(error) {
+    return this.setState({
+      itemsError: true
+    });
+  },
+  addItem: function() {
+    var params;
+    this.setState({
+      error: null
+    });
+    if (this.state.item === null) {
+      this.setState({
+        error: "Selection required"
+      });
+      return;
+    }
+    params = {
+      path: "add_expert_to_prediction",
+      path_variables: {
+        prediction_id: this.props.prediction.id
+      },
+      data: {
+        id: this.state.item
+      },
+      success: this.addSuccess,
+      error: this.addError
+    };
+    return API.call(params);
+  },
+  addSuccess: function(data) {
+    this.cancelAddItem();
+    return this.props.refresh();
+  },
+  addError: function(error) {
+    return this.setState({
+      error: "Error adding Expert"
+    });
+  },
+  handleChange: function(event, index, value) {
+    return this.setState({
+      item: value
+    });
+  },
+  doShowItems: function() {
+    return this.setState({
+      showItems: true
+    });
+  },
+  cancelAddItem: function() {
+    this.setState({
+      item: null
+    });
+    return this.setState({
+      showItems: false
+    });
+  },
+  sentenceCase: function(text) {
+    return text.replace(/\w\S*/g, function(text) {
+      return text.charAt(0).toUpperCase() + text.substr(1).toLowerCase();
+    });
+  },
+  render: function() {
+    return div({
+      className: "add-to-prediction"
+    }, this.state.showItems === false ? div({
+      className: "add-to-prediction__button",
+      onClick: this.doShowItems
+    }, "Add Expert to Prediction") : this.state.itemList != null ? div({}, React.createElement(Material.SelectField, {
+      floatingLabelText: "Expert",
+      value: this.state.item,
+      onChange: this.handleChange
+    }, this.state.itemList.map(function(item, index) {
+      return React.createElement(Material.MenuItem, {
+        value: item.id,
+        primaryText: item.title,
+        key: "add-to-prediction-item-" + index
+      });
+    })), React.createElement(Material.FlatButton, {
+      label: "Add",
+      onClick: this.addItem
+    }), React.createElement(Material.FlatButton, {
+      label: "Cancel",
+      onClick: this.cancelAddItem
+    }), this.state.error != null ? div({}, this.state.error) : void 0) : void 0);
+  }
+}));
+
+
+},{}],568:[function(require,module,exports){
+var div;
+
+div = React.DOM.div;
+
+module.exports = React.createFactory(React.createClass({
   displayName: "Category Claims - Latest",
   goToClaim: function(id) {
     return navigate("/claims/" + id);
@@ -82296,7 +82672,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],568:[function(require,module,exports){
+},{}],569:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -82328,7 +82704,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],569:[function(require,module,exports){
+},{}],570:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -82360,7 +82736,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],570:[function(require,module,exports){
+},{}],571:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -82428,7 +82804,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],571:[function(require,module,exports){
+},{}],572:[function(require,module,exports){
 var Card, CardActions, CardHeader, CardText, FlatButton, a, br, div, img, ref, span;
 
 Card = Material.Card;
@@ -82548,7 +82924,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],572:[function(require,module,exports){
+},{}],573:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -82570,7 +82946,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],573:[function(require,module,exports){
+},{}],574:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -82665,7 +83041,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],574:[function(require,module,exports){
+},{}],575:[function(require,module,exports){
 var Pagination, PaginationMixin, div;
 
 div = React.DOM.div;
@@ -82887,7 +83263,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Pagination":583,"mixins/PaginationMixin":588}],575:[function(require,module,exports){
+},{"components/Pagination":584,"mixins/PaginationMixin":590}],576:[function(require,module,exports){
 var a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
@@ -82988,7 +83364,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],576:[function(require,module,exports){
+},{}],577:[function(require,module,exports){
 var Card, CardActions, CardHeader, CardMedia, CardText, CardTitle, FlatButton, a, br, div, img, ref, span;
 
 Card = Material.Card;
@@ -83093,7 +83469,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],577:[function(require,module,exports){
+},{}],578:[function(require,module,exports){
 var ExpertSubstantiations, div;
 
 div = React.DOM.div;
@@ -83119,7 +83495,7 @@ module.exports = React.createFactory(React.createClass({
     if (claim.evidence_of_beliefs === 0) {
       return "Unsubstantiated";
     } else {
-      return claim.evidence_of_beliefs + " evidences";
+      return claim.evidence_of_beliefs + " substantiations";
     }
   },
   toggleSubstantiation: function() {
@@ -83147,7 +83523,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ExpertSubstantiations":580}],578:[function(require,module,exports){
+},{"components/ExpertSubstantiations":581}],579:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -83277,7 +83653,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],579:[function(require,module,exports){
+},{}],580:[function(require,module,exports){
 var ExpertSubstantiations, div;
 
 div = React.DOM.div;
@@ -83303,7 +83679,7 @@ module.exports = React.createFactory(React.createClass({
     if (prediction.evidence_of_beliefs === 0) {
       return "Unsubstantiated";
     } else {
-      return prediction.evidence_of_beliefs + " evidences";
+      return prediction.evidence_of_beliefs + " substantiations";
     }
   },
   toggleSubstantiation: function() {
@@ -83312,8 +83688,8 @@ module.exports = React.createFactory(React.createClass({
     });
   },
   render: function() {
-    var prediction;
-    prediction = this.props.prediction;
+    var expert, prediction, ref;
+    ref = this.props, prediction = ref.prediction, expert = ref.expert;
     return div({
       className: "expert__predictions-list-item"
     }, div({
@@ -83323,7 +83699,7 @@ module.exports = React.createFactory(React.createClass({
       className: "expert__predictions-list-item__substatiations",
       onClick: this.toggleSubstantiation
     }, this.showSubstantiation()), this.state.showSubstantiation === true ? ExpertSubstantiations({
-      expert: this.props.expert,
+      expert: expert,
       id: prediction.id,
       type: "prediction"
     }) : void 0);
@@ -83331,7 +83707,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ExpertSubstantiations":580}],580:[function(require,module,exports){
+},{"components/ExpertSubstantiations":581}],581:[function(require,module,exports){
 var a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
@@ -83460,11 +83836,11 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],581:[function(require,module,exports){
+},{}],582:[function(require,module,exports){
 module.exports=require(1)
-},{"mixins/SessionMixin":589}],582:[function(require,module,exports){
+},{"mixins/SessionMixin":591}],583:[function(require,module,exports){
 module.exports=require(2)
-},{}],583:[function(require,module,exports){
+},{}],584:[function(require,module,exports){
 var FlatButton, FontIcon, IconButton, div;
 
 div = React.DOM.div;
@@ -83608,7 +83984,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],584:[function(require,module,exports){
+},{}],585:[function(require,module,exports){
 var Card, CardActions, CardHeader, CardText, FlatButton, a, br, div, img, ref, span;
 
 Card = Material.Card;
@@ -83728,7 +84104,96 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],585:[function(require,module,exports){
+},{}],586:[function(require,module,exports){
+var a, div, ref;
+
+ref = React.DOM, div = ref.div, a = ref.a;
+
+module.exports = React.createFactory(React.createClass({
+  displayName: "PredictionEvidences",
+  getInitialState: function() {
+    return {
+      evidenceURL: ''
+    };
+  },
+  addItem: function() {
+    var params;
+    if (this.state.evidenceUrl === '') {
+      this.setState({
+        error: 'URL Required'
+      });
+      return false;
+    }
+    this.setState({
+      error: null
+    });
+    params = {
+      path: "add_evidence_to_prediction",
+      path_variables: {
+        prediction_id: this.props.prediction.id
+      },
+      data: {
+        url: this.state.evidenceURL
+      },
+      success: this.addSuccess,
+      error: this.addError
+    };
+    return API.call(params);
+  },
+  addSuccess: function(data) {
+    this.setState({
+      evidenceUrl: ''
+    });
+    return this.props.refresh();
+  },
+  addError: function(error) {
+    return this.setState({
+      error: "Error adding Evidence"
+    });
+  },
+  handleChange: function(event, index, value) {
+    return this.setState({
+      item: value
+    });
+  },
+  cancelAddItem: function() {
+    this.setState({
+      item: null
+    });
+    return this.setState({
+      showItems: false
+    });
+  },
+  changeEvidence: function(event) {
+    return this.setState({
+      evidenceURL: event.target.value
+    });
+  },
+  render: function() {
+    return div({
+      className: "prediction__evidences"
+    }, this.props.evidences.map(function(evidence, index) {
+      return div({
+        className: "prediction__evidence",
+        key: "prediction-evidence-" + index
+      }, a({
+        target: "_blank",
+        href: evidence.url
+      }, evidence.title));
+    }), div({}, React.createElement(Material.TextField, {
+      value: this.state.evidenceURL,
+      hintText: "Add Evidence that supports this prediction",
+      fullWidth: true,
+      onChange: this.changeEvidence
+    }), React.createElement(Material.FlatButton, {
+      label: "Add",
+      onClick: this.addItem
+    }), this.state.error != null ? div({}, this.state.error) : void 0));
+  }
+}));
+
+
+},{}],587:[function(require,module,exports){
 var ExpertSubstantiations, div;
 
 div = React.DOM.div;
@@ -83754,7 +84219,7 @@ module.exports = React.createFactory(React.createClass({
     if (expert.evidence_of_beliefs === 0) {
       return "Unsubstantiated";
     } else {
-      return expert.evidence_of_beliefs + " evidences";
+      return expert.evidence_of_beliefs + " substantiations";
     }
   },
   toggleSubstantiation: function() {
@@ -83782,7 +84247,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ExpertSubstantiations":580}],586:[function(require,module,exports){
+},{"components/ExpertSubstantiations":581}],588:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -83885,7 +84350,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],587:[function(require,module,exports){
+},{}],589:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -83904,11 +84369,9 @@ module.exports = React.createFactory(React.createClass({
     }
   },
   voteYes: function() {
-    console.log("vote yes");
     return this.props.vote(1);
   },
   voteNo: function() {
-    console.log("vote no");
     return this.props.vote(0);
   },
   notOpenYet: function() {
@@ -83936,7 +84399,6 @@ module.exports = React.createFactory(React.createClass({
   render: function() {
     var item, ref, submitted, submitting, type;
     ref = this.props, type = ref.type, item = ref.item, submitting = ref.submitting, submitted = ref.submitted;
-    console.log(submitting);
     return div({
       className: type + "__vote"
     }, div({
@@ -83970,7 +84432,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],588:[function(require,module,exports){
+},{}],590:[function(require,module,exports){
 module.exports = {
   getInitialState: function() {
     return {
@@ -84003,7 +84465,7 @@ module.exports = {
 };
 
 
-},{}],589:[function(require,module,exports){
+},{}],591:[function(require,module,exports){
 module.exports = {
   setUser: function(data, request) {
     window.UserStore.set(data, request);
@@ -84109,7 +84571,7 @@ module.exports = {
 };
 
 
-},{}],590:[function(require,module,exports){
+},{}],592:[function(require,module,exports){
 
 /*
 API Class.
@@ -84215,6 +84677,10 @@ module.exports = API = (function() {
       path: "predictions/%prediction_id%",
       method: "GET"
     },
+    add_evidence_to_prediction: {
+      path: "predictions/%prediction_id%/add_evidence",
+      method: "POST"
+    },
     create_prediction: {
       path: "predictions/",
       method: "POST"
@@ -84253,6 +84719,14 @@ module.exports = API = (function() {
     },
     add_claim_to_expert: {
       path: "experts/%expert_id%/add_claim",
+      method: "POST"
+    },
+    add_expert_to_prediction: {
+      path: "predictions/%prediction_id%/add_expert",
+      method: "POST"
+    },
+    add_expert_to_claim: {
+      path: "claims/%claim_id%/add_expert",
       method: "POST"
     },
     get_substantiations: {
@@ -84361,7 +84835,7 @@ module.exports = API = (function() {
 })();
 
 
-},{}],591:[function(require,module,exports){
+},{}],593:[function(require,module,exports){
 var Global;
 
 module.exports = Global = (function() {
@@ -84406,7 +84880,7 @@ module.exports = Global = (function() {
 })();
 
 
-},{}],592:[function(require,module,exports){
+},{}],594:[function(require,module,exports){
 var UserStore,
   bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
@@ -84603,7 +85077,7 @@ module.exports = new UserStore({
 });
 
 
-},{}],593:[function(require,module,exports){
+},{}],595:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -84624,7 +85098,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":581,"components/Header":582}],594:[function(require,module,exports){
+},{"components/Footer":582,"components/Header":583}],596:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -84689,7 +85163,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":581,"components/Header":582}],595:[function(require,module,exports){
+},{"components/Footer":582,"components/Header":583}],597:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -84743,7 +85217,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":581,"components/Header":582}],596:[function(require,module,exports){
+},{"components/Footer":582,"components/Header":583}],598:[function(require,module,exports){
 var CategoryClaims, CategoryExperts, CategoryPredictions, CategorySubHead, Footer, Header, div;
 
 div = React.DOM.div;
@@ -84830,7 +85304,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/CategoryClaims":567,"components/CategoryExperts":568,"components/CategoryPredictions":569,"components/CategorySubHead":570,"components/Footer":581,"components/Header":582}],597:[function(require,module,exports){
+},{"components/CategoryClaims":568,"components/CategoryExperts":569,"components/CategoryPredictions":570,"components/CategorySubHead":571,"components/Footer":582,"components/Header":583}],599:[function(require,module,exports){
 var CategoryClaims, CategorySubHead, Footer, Header, div;
 
 div = React.DOM.div;
@@ -84909,7 +85383,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/CategoryClaims":567,"components/CategorySubHead":570,"components/Footer":581,"components/Header":582}],598:[function(require,module,exports){
+},{"components/CategoryClaims":568,"components/CategorySubHead":571,"components/Footer":582,"components/Header":583}],600:[function(require,module,exports){
 var CategoryExperts, CategorySubHead, Footer, Header, div;
 
 div = React.DOM.div;
@@ -84988,7 +85462,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/CategoryExperts":568,"components/CategorySubHead":570,"components/Footer":581,"components/Header":582}],599:[function(require,module,exports){
+},{"components/CategoryExperts":569,"components/CategorySubHead":571,"components/Footer":582,"components/Header":583}],601:[function(require,module,exports){
 var CategoryPredictions, CategorySubHead, Footer, Header, div;
 
 div = React.DOM.div;
@@ -85067,7 +85541,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/CategoryPredictions":569,"components/CategorySubHead":570,"components/Footer":581,"components/Header":582}],600:[function(require,module,exports){
+},{"components/CategoryPredictions":570,"components/CategorySubHead":571,"components/Footer":582,"components/Header":583}],602:[function(require,module,exports){
 var ClaimExpertCard, Comments, Footer, Header, SessionMixin, div;
 
 div = React.DOM.div;
@@ -85177,7 +85651,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ClaimExpertCard":572,"components/Comments":574,"components/Footer":581,"components/Header":582,"mixins/SessionMixin":589}],601:[function(require,module,exports){
+},{"components/ClaimExpertCard":573,"components/Comments":575,"components/Footer":582,"components/Header":583,"mixins/SessionMixin":591}],603:[function(require,module,exports){
 var ClaimCard, Footer, Header, Pagination, PaginationMixin, RaisedButton, div;
 
 div = React.DOM.div;
@@ -85262,7 +85736,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ClaimCard":571,"components/Footer":581,"components/Header":582,"components/Pagination":583,"mixins/PaginationMixin":588}],602:[function(require,module,exports){
+},{"components/ClaimCard":572,"components/Footer":582,"components/Header":583,"components/Pagination":584,"mixins/PaginationMixin":590}],604:[function(require,module,exports){
 var ClaimFields, Footer, Header, div;
 
 div = React.DOM.div;
@@ -85393,7 +85867,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ClaimFields":573,"components/Footer":581,"components/Header":582}],603:[function(require,module,exports){
+},{"components/ClaimFields":574,"components/Footer":582,"components/Header":583}],605:[function(require,module,exports){
 var ExpertFields, Footer, Header, div;
 
 div = React.DOM.div;
@@ -85533,7 +86007,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ExpertFields":578,"components/Footer":581,"components/Header":582}],604:[function(require,module,exports){
+},{"components/ExpertFields":579,"components/Footer":582,"components/Header":583}],606:[function(require,module,exports){
 var Footer, Header, PredictionFields, div;
 
 div = React.DOM.div;
@@ -85672,7 +86146,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":581,"components/Header":582,"components/PredictionFields":586}],605:[function(require,module,exports){
+},{"components/Footer":582,"components/Header":583,"components/PredictionFields":588}],607:[function(require,module,exports){
 var AddToExpert, Comments, ExpertBonaFides, ExpertClaimCard, ExpertPredictionCard, Footer, Header, SessionMixin, div, img, ref;
 
 ref = React.DOM, div = ref.div, img = ref.img;
@@ -85851,12 +86325,12 @@ module.exports = React.createFactory(React.createClass({
         claim: claim,
         key: "expert-claim-card-" + index
       });
-    }) : "No claims", AddToExpert({
+    }) : "No claims", UserStore.loggedIn() ? AddToExpert({
       expert: expert,
       type: "claim",
       items: this.state.claims,
       refresh: this.fetchExpert
-    }))), Comments({
+    }) : void 0)), Comments({
       type: "expert",
       id: expert.id,
       num: expert.comments_count
@@ -85865,7 +86339,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/AddToExpert":566,"components/Comments":574,"components/ExpertBonaFides":575,"components/ExpertClaimCard":577,"components/ExpertPredictionCard":579,"components/Footer":581,"components/Header":582,"mixins/SessionMixin":589}],606:[function(require,module,exports){
+},{"components/AddToExpert":566,"components/Comments":575,"components/ExpertBonaFides":576,"components/ExpertClaimCard":578,"components/ExpertPredictionCard":580,"components/Footer":582,"components/Header":583,"mixins/SessionMixin":591}],608:[function(require,module,exports){
 var ExpertCard, Footer, Header, Pagination, PaginationMixin, div;
 
 div = React.DOM.div;
@@ -85948,7 +86422,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ExpertCard":576,"components/Footer":581,"components/Header":582,"components/Pagination":583,"mixins/PaginationMixin":588}],607:[function(require,module,exports){
+},{"components/ExpertCard":577,"components/Footer":582,"components/Header":583,"components/Pagination":584,"mixins/PaginationMixin":590}],609:[function(require,module,exports){
 var Footer, Header, RaisedButton, RefreshIndicator, TextField, a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
@@ -86086,7 +86560,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":581,"components/Header":582}],608:[function(require,module,exports){
+},{"components/Footer":582,"components/Header":583}],610:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -86107,7 +86581,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":581,"components/Header":582}],609:[function(require,module,exports){
+},{"components/Footer":582,"components/Header":583}],611:[function(require,module,exports){
 var Footer, Header, RaisedButton, RefreshIndicator, SessionMixin, TextField, a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
@@ -86267,8 +86741,8 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":581,"components/Header":582,"mixins/SessionMixin":589}],610:[function(require,module,exports){
-var Comments, Footer, Header, PredictionExpertCard, SessionMixin, Votes, div, img, ref;
+},{"components/Footer":582,"components/Header":583,"mixins/SessionMixin":591}],612:[function(require,module,exports){
+var AddToPrediction, Comments, Footer, Header, PredictionEvidences, PredictionExpertCard, SessionMixin, Votes, div, img, ref;
 
 ref = React.DOM, div = ref.div, img = ref.img;
 
@@ -86281,6 +86755,10 @@ PredictionExpertCard = require("components/PredictionExpertCard");
 Comments = require("components/Comments");
 
 Votes = require("components/Votes");
+
+AddToPrediction = require("components/AddToPrediction");
+
+PredictionEvidences = require("components/PredictionEvidences");
 
 SessionMixin = require("mixins/SessionMixin");
 
@@ -86298,6 +86776,9 @@ module.exports = React.createFactory(React.createClass({
     };
   },
   componentDidMount: function() {
+    return this.fetchPrediction();
+  },
+  fetchPrediction: function() {
     var params;
     params = {
       path: "prediction",
@@ -86468,7 +86949,16 @@ module.exports = React.createFactory(React.createClass({
         prediction: prediction,
         key: "prediction-expert-" + index
       });
-    }) : "No experts")), Votes({
+    }) : "No experts"), UserStore.loggedIn() ? AddToPrediction({
+      prediction: prediction,
+      type: "prediction",
+      items: experts,
+      refresh: this.fetchPrediction
+    }) : void 0), PredictionEvidences({
+      evidences: prediction.evidences,
+      prediction: prediction,
+      refresh: this.fetchPrediction
+    }), Votes({
       type: "prediction",
       item: prediction,
       vote: this.vote,
@@ -86483,7 +86973,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Comments":574,"components/Footer":581,"components/Header":582,"components/PredictionExpertCard":585,"components/Votes":587,"mixins/SessionMixin":589}],611:[function(require,module,exports){
+},{"components/AddToPrediction":567,"components/Comments":575,"components/Footer":582,"components/Header":583,"components/PredictionEvidences":586,"components/PredictionExpertCard":587,"components/Votes":589,"mixins/SessionMixin":591}],613:[function(require,module,exports){
 var Footer, Header, Pagination, PaginationMixin, PredictionCard, div;
 
 div = React.DOM.div;
@@ -86566,7 +87056,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":581,"components/Header":582,"components/Pagination":583,"components/PredictionCard":584,"mixins/PaginationMixin":588}],612:[function(require,module,exports){
+},{"components/Footer":582,"components/Header":583,"components/Pagination":584,"components/PredictionCard":585,"mixins/PaginationMixin":590}],614:[function(require,module,exports){
 var Footer, Header, RaisedButton, RefreshIndicator, TextField, a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
@@ -86747,7 +87237,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":581,"components/Header":582}],613:[function(require,module,exports){
+},{"components/Footer":582,"components/Header":583}],615:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -86768,7 +87258,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":581,"components/Header":582}],614:[function(require,module,exports){
+},{"components/Footer":582,"components/Header":583}],616:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -86800,7 +87290,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":581,"components/Header":582}],615:[function(require,module,exports){
+},{"components/Footer":582,"components/Header":583}],617:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -86821,4 +87311,4 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":581,"components/Header":582}]},{},[3])
+},{"components/Footer":582,"components/Header":583}]},{},[3])

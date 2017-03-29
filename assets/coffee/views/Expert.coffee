@@ -176,14 +176,12 @@ module.exports = React.createFactory React.createClass
                         key: "expert-claim-card-#{index}"
                   else
                     "No claims"
-                  # if UserStore.loggedIn()
-                  AddToExpert
-                    expert: expert
-                    type: "claim"
-                    items: @state.claims
-                    refresh: @fetchExpert
-
-                  
+                  if UserStore.loggedIn()
+                    AddToExpert
+                      expert: expert
+                      type: "claim"
+                      items: @state.claims
+                      refresh: @fetchExpert
               Comments
                 type: "expert"
                 id: expert.id

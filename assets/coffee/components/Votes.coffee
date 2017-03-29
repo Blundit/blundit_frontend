@@ -11,12 +11,10 @@ module.exports = React.createFactory React.createClass
       return "N/A"
 
   voteYes: ->
-    console.log "vote yes"
     @props.vote(1)
 
   
   voteNo: ->
-    console.log "vote no"
     @props.vote(0)
 
 
@@ -45,7 +43,6 @@ module.exports = React.createFactory React.createClass
 
   render: ->
     { type, item, submitting, submitted } = @props
-    console.log submitting
 
     div { className: "#{type}__vote" },
       div { className: "#{type}__vote__meta" },
