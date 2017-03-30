@@ -73,6 +73,11 @@ module.exports = React.createFactory React.createClass
     @setState url: event.target.value
 
 
+  getSubstantiationTitle: (sub) ->
+    return sub.title if sub.title > ''
+    return sub.url if sub.title == ''
+
+
   render: ->
     @refreshStyle = {
       display: 'inline-block'
@@ -94,7 +99,7 @@ module.exports = React.createFactory React.createClass
                 className: "substantiation-list__item-link"
                 href: substantiation.url
                 target: "_blank"
-                substantiation.title
+                @getSubstantiationTitle(substantiation)
               div { className: "substantiation-list__item-description" },
                 substantiation.description
         else

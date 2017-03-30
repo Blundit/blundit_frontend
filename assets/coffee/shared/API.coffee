@@ -83,6 +83,9 @@ module.exports = class API
     add_evidence_to_prediction:
       path: "predictions/%prediction_id%/add_evidence"
       method: "POST"
+    add_evidence_to_claim:
+      path: "claims/%claim_id%/add_evidence"
+      method: "POST"
     create_prediction:
       path: "predictions/"
       method: "POST"
