@@ -134,7 +134,7 @@ module.exports = React.createFactory(React.createClass({
 
 },{}],3:[function(require,module,exports){
 (function() {
-  var API, AddToClaim, AddToExpert, AddToPrediction, Blundit, Card, CardActions, CardHeader, CardMedia, CardText, CardTitle, CategoryClaims, CategoryExperts, CategoryPredictions, CategorySubHead, ClaimCard, ClaimEvidences, ClaimExpertCard, ClaimFields, Comments, ExpertBonaFides, ExpertCard, ExpertClaimCard, ExpertFields, ExpertPredictionCard, ExpertSubstantiations, FlatButton, FontIcon, Footer, Global, Header, IconButton, MuiThemeProvider, Pagination, PaginationMixin, PredictionCard, PredictionEvidences, PredictionExpertCard, PredictionFields, RaisedButton, RefreshIndicator, RouterMixin, SessionMixin, TextField, UserStore, Votes, a, br, deepOrange500, div, getMuiTheme, img, menuItems, muiTheme, ref, ref1, ref10, ref11, ref12, ref13, ref2, ref3, ref4, ref5, ref6, ref7, ref8, ref9, span, startBlundit,
+  var API, AddToClaim, AddToExpert, AddToPrediction, Blundit, Card, CardActions, CardHeader, CardMedia, CardText, CardTitle, CategoryClaims, CategoryExperts, CategoryPredictions, CategorySubHead, ClaimCard, ClaimEvidences, ClaimExpertCard, ClaimFields, Comments, ExpertBonaFides, ExpertCard, ExpertClaimCard, ExpertFields, ExpertPredictionCard, ExpertSubstantiations, FlatButton, FontIcon, Footer, Global, Header, IconButton, MuiThemeProvider, Pagination, PaginationMixin, PredictionCard, PredictionEvidences, PredictionExpertCard, PredictionFields, RaisedButton, RefreshIndicator, RouterMixin, SessionMixin, TextField, UserStore, Votes, a, br, deepOrange500, div, getMuiTheme, img, menuItems, muiTheme, ref, ref1, ref10, ref11, ref12, ref13, ref14, ref2, ref3, ref4, ref5, ref6, ref7, ref8, ref9, span, startBlundit,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   window.React = require('react');
@@ -3064,6 +3064,14 @@ module.exports = React.createFactory(React.createClass({
       prediction_comments: {
         path: "predictions/%prediction_id%/comments",
         method: "GET"
+      },
+      update_bookmark: {
+        path: "user/update_bookmark/%bookmark_id%",
+        method: "POST"
+      },
+      remove_bookmark: {
+        path: "user/remove_bookmark/%bookmark_id%",
+        method: "POST"
       }
     };
 
@@ -3387,7 +3395,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  div = React.DOM.div;
+  ref8 = React.DOM, div = ref8.div, span = ref8.span;
 
   Header = require("components/Header");
 
@@ -3401,6 +3409,9 @@ module.exports = React.createFactory(React.createClass({
       };
     },
     componentDidMount: function() {
+      return this.fetchBookmarks();
+    },
+    fetchBookmarks: function() {
       var params;
       params = {
         path: "bookmarks",
@@ -3417,13 +3428,71 @@ module.exports = React.createFactory(React.createClass({
     getBookmarksError: function(error) {},
     showBookmarkNewStatus: function(status) {
       if (status === true) {
-        return "!";
+        return span({
+          className: "fa fa-asterisk"
+        }, '');
       } else {
         return "";
       }
     },
     goToItem: function(bookmark) {
-      return navigate("/" + bookmark.type + "s/" + bookmark.id);
+      return navigate("/" + bookmark.type + "s/" + bookmark.alias);
+    },
+    sentenceCase: function(text) {
+      return text.replace(/\w\S*/g, function(text) {
+        return text.charAt(0).toUpperCase() + text.substr(1).toLowerCase();
+      });
+    },
+    changeNotificationSettings: function(bookmark) {
+      var params;
+      this.notify = !bookmark.notify;
+      params = {
+        path: "update_bookmark",
+        path_variables: {
+          bookmark_id: bookmark.id
+        },
+        data: {
+          notify: this.notify
+        },
+        success: this.changeNotificationSuccess,
+        error: this.changeNotificationError
+      };
+      return API.call(params);
+    },
+    changeNotificationSuccess: function(data) {
+      return this.fetchBookmarks();
+    },
+    changeNotificationError: function(error) {
+      return console.log(error);
+    },
+    showNotificationSettings: function(bookmark) {
+      if (bookmark.notify === true) {
+        return span({
+          className: "fa fa-envelope"
+        }, '');
+      } else {
+        return span({
+          className: "fa fa-envelope-o"
+        }, '');
+      }
+    },
+    removeBookmark: function(bookmark) {
+      var params;
+      params = {
+        path: "remove_bookmark",
+        path_variables: {
+          bookmark_id: bookmark.id
+        },
+        success: this.removeBookmarkSuccess,
+        error: this.removeBookmarkError
+      };
+      return API.call(params);
+    },
+    removeBookmarkSuccess: function(data) {
+      return this.fetchBookmarks();
+    },
+    removeBookmarkError: function(error) {
+      return console.log(error);
     },
     render: function() {
       return div({}, Header({}, ''), div({
@@ -3437,12 +3506,22 @@ module.exports = React.createFactory(React.createClass({
           return div({
             className: "bookmarks__list__item",
             key: "bookmark-" + index
-          }, div({
+          }, div({}, div({
+            className: "bookmarks__list__item-type"
+          }, _this.sentenceCase(bookmark.type) + ": "), div({
             className: "bookmarks__list__item-title",
             onClick: _this.goToItem.bind(_this, bookmark)
           }, bookmark.title), div({
             className: "bookmarks__list__item-new"
-          }, _this.showBookmarkNewStatus(bookmark["new"])));
+          }, _this.showBookmarkNewStatus(bookmark["new"]))), div({}, div({
+            className: "bookmarks__list__item-notify",
+            onClick: _this.changeNotificationSettings.bind(_this, bookmark)
+          }, _this.showNotificationSettings(bookmark)), div({
+            className: "bookmarks__list__item-remove",
+            onClick: _this.removeBookmark.bind(_this, bookmark)
+          }, span({
+            className: "fa fa-remove"
+          }, ''))));
         };
       })(this)) : void 0))), Footer({}, ''));
     }
@@ -3806,7 +3885,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref8 = React.DOM, div = ref8.div, img = ref8.img;
+  ref9 = React.DOM, div = ref9.div, img = ref9.img;
 
   Header = require("components/Header");
 
@@ -3962,8 +4041,8 @@ module.exports = React.createFactory(React.createClass({
       }
     },
     render: function() {
-      var claim, experts, ref9;
-      ref9 = this.state, claim = ref9.claim, experts = ref9.experts;
+      var claim, experts, ref10;
+      ref10 = this.state, claim = ref10.claim, experts = ref10.experts;
       return div({}, Header({}, ''), div({
         className: "claims-wrapper"
       }, div({
@@ -4508,7 +4587,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref9 = React.DOM, div = ref9.div, img = ref9.img;
+  ref10 = React.DOM, div = ref10.div, img = ref10.img;
 
   Header = require("components/Header");
 
@@ -4611,8 +4690,8 @@ module.exports = React.createFactory(React.createClass({
       }, "Success! You've added a new expert to the system. Now you can add more information to them!") : void 0);
     },
     render: function() {
-      var claims, expert, predictions, ref10;
-      ref10 = this.state, expert = ref10.expert, predictions = ref10.predictions, claims = ref10.claims;
+      var claims, expert, predictions, ref11;
+      ref11 = this.state, expert = ref11.expert, predictions = ref11.predictions, claims = ref11.claims;
       return div({}, Header({}, ''), div({
         className: "experts-wrapper"
       }, div({
@@ -4776,7 +4855,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref10 = React.DOM, div = ref10.div, a = ref10.a;
+  ref11 = React.DOM, div = ref11.div, a = ref11.a;
 
   Header = require("components/Header");
 
@@ -4851,10 +4930,10 @@ module.exports = React.createFactory(React.createClass({
       return false;
     },
     getErrorText: function(key) {
-      var error, j, len, ref11;
-      ref11 = this.state.errors;
-      for (j = 0, len = ref11.length; j < len; j++) {
-        error = ref11[j];
+      var error, j, len, ref12;
+      ref12 = this.state.errors;
+      for (j = 0, len = ref12.length; j < len; j++) {
+        error = ref12[j];
         if (error.id === key) {
           return error.text;
         }
@@ -4927,7 +5006,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref11 = React.DOM, div = ref11.div, a = ref11.a;
+  ref12 = React.DOM, div = ref12.div, a = ref12.a;
 
   Header = require("components/Header");
 
@@ -5033,10 +5112,10 @@ module.exports = React.createFactory(React.createClass({
       }
     },
     getErrorText: function(key) {
-      var error, j, len, ref12;
-      ref12 = this.state.errors;
-      for (j = 0, len = ref12.length; j < len; j++) {
-        error = ref12[j];
+      var error, j, len, ref13;
+      ref13 = this.state.errors;
+      for (j = 0, len = ref13.length; j < len; j++) {
+        error = ref13[j];
         if (error.id === key) {
           return error.text;
         }
@@ -5083,7 +5162,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref12 = React.DOM, div = ref12.div, img = ref12.img;
+  ref13 = React.DOM, div = ref13.div, img = ref13.img;
 
   Header = require("components/Header");
 
@@ -5242,8 +5321,8 @@ module.exports = React.createFactory(React.createClass({
       return date;
     },
     render: function() {
-      var experts, prediction, ref13;
-      ref13 = this.state, prediction = ref13.prediction, experts = ref13.experts;
+      var experts, prediction, ref14;
+      ref14 = this.state, prediction = ref14.prediction, experts = ref14.experts;
       return div({}, Header({}, ''), div({
         className: "predictions-wrapper"
       }, div({
@@ -5390,7 +5469,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref13 = React.DOM, div = ref13.div, a = ref13.a;
+  ref14 = React.DOM, div = ref14.div, a = ref14.a;
 
   Header = require("components/Header");
 
@@ -5512,10 +5591,10 @@ module.exports = React.createFactory(React.createClass({
       }
     },
     getErrorText: function(key) {
-      var error, j, len, ref14;
-      ref14 = this.state.errors;
-      for (j = 0, len = ref14.length; j < len; j++) {
-        error = ref14[j];
+      var error, j, len, ref15;
+      ref15 = this.state.errors;
+      for (j = 0, len = ref15.length; j < len; j++) {
+        error = ref15[j];
         if (error.id === key) {
           return error.text;
         }
@@ -85406,6 +85485,14 @@ module.exports = API = (function() {
     prediction_comments: {
       path: "predictions/%prediction_id%/comments",
       method: "GET"
+    },
+    update_bookmark: {
+      path: "user/update_bookmark/%bookmark_id%",
+      method: "POST"
+    },
+    remove_bookmark: {
+      path: "user/remove_bookmark/%bookmark_id%",
+      method: "POST"
     }
   };
 
@@ -85744,9 +85831,9 @@ module.exports = React.createFactory(React.createClass({
 
 
 },{"components/Footer":584,"components/Header":585}],598:[function(require,module,exports){
-var Footer, Header, div;
+var Footer, Header, div, ref, span;
 
-div = React.DOM.div;
+ref = React.DOM, div = ref.div, span = ref.span;
 
 Header = require("components/Header");
 
@@ -85760,6 +85847,9 @@ module.exports = React.createFactory(React.createClass({
     };
   },
   componentDidMount: function() {
+    return this.fetchBookmarks();
+  },
+  fetchBookmarks: function() {
     var params;
     params = {
       path: "bookmarks",
@@ -85776,13 +85866,71 @@ module.exports = React.createFactory(React.createClass({
   getBookmarksError: function(error) {},
   showBookmarkNewStatus: function(status) {
     if (status === true) {
-      return "!";
+      return span({
+        className: "fa fa-asterisk"
+      }, '');
     } else {
       return "";
     }
   },
   goToItem: function(bookmark) {
-    return navigate("/" + bookmark.type + "s/" + bookmark.id);
+    return navigate("/" + bookmark.type + "s/" + bookmark.alias);
+  },
+  sentenceCase: function(text) {
+    return text.replace(/\w\S*/g, function(text) {
+      return text.charAt(0).toUpperCase() + text.substr(1).toLowerCase();
+    });
+  },
+  changeNotificationSettings: function(bookmark) {
+    var params;
+    this.notify = !bookmark.notify;
+    params = {
+      path: "update_bookmark",
+      path_variables: {
+        bookmark_id: bookmark.id
+      },
+      data: {
+        notify: this.notify
+      },
+      success: this.changeNotificationSuccess,
+      error: this.changeNotificationError
+    };
+    return API.call(params);
+  },
+  changeNotificationSuccess: function(data) {
+    return this.fetchBookmarks();
+  },
+  changeNotificationError: function(error) {
+    return console.log(error);
+  },
+  showNotificationSettings: function(bookmark) {
+    if (bookmark.notify === true) {
+      return span({
+        className: "fa fa-envelope"
+      }, '');
+    } else {
+      return span({
+        className: "fa fa-envelope-o"
+      }, '');
+    }
+  },
+  removeBookmark: function(bookmark) {
+    var params;
+    params = {
+      path: "remove_bookmark",
+      path_variables: {
+        bookmark_id: bookmark.id
+      },
+      success: this.removeBookmarkSuccess,
+      error: this.removeBookmarkError
+    };
+    return API.call(params);
+  },
+  removeBookmarkSuccess: function(data) {
+    return this.fetchBookmarks();
+  },
+  removeBookmarkError: function(error) {
+    return console.log(error);
   },
   render: function() {
     return div({}, Header({}, ''), div({
@@ -85796,12 +85944,22 @@ module.exports = React.createFactory(React.createClass({
         return div({
           className: "bookmarks__list__item",
           key: "bookmark-" + index
-        }, div({
+        }, div({}, div({
+          className: "bookmarks__list__item-type"
+        }, _this.sentenceCase(bookmark.type) + ": "), div({
           className: "bookmarks__list__item-title",
           onClick: _this.goToItem.bind(_this, bookmark)
         }, bookmark.title), div({
           className: "bookmarks__list__item-new"
-        }, _this.showBookmarkNewStatus(bookmark["new"])));
+        }, _this.showBookmarkNewStatus(bookmark["new"]))), div({}, div({
+          className: "bookmarks__list__item-notify",
+          onClick: _this.changeNotificationSettings.bind(_this, bookmark)
+        }, _this.showNotificationSettings(bookmark)), div({
+          className: "bookmarks__list__item-remove",
+          onClick: _this.removeBookmark.bind(_this, bookmark)
+        }, span({
+          className: "fa fa-remove"
+        }, ''))));
       };
     })(this)) : void 0))), Footer({}, ''));
   }

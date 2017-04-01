@@ -147,6 +147,12 @@ module.exports = class API
     prediction_comments:
       path: "predictions/%prediction_id%/comments"
       method: "GET"
+    update_bookmark:
+      path: "user/update_bookmark/%bookmark_id%"
+      method: "POST"
+    remove_bookmark:
+      path: "user/remove_bookmark/%bookmark_id%"
+      method: "POST"
 
 
 
