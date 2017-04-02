@@ -28,7 +28,7 @@ module.exports = React.createFactory React.createClass
 
   
   getBookmarksError: (error) ->
-    #console.log "error"
+    # console.log "error"
 
 
   showBookmarkNewStatus: (status) ->
@@ -71,7 +71,7 @@ module.exports = React.createFactory React.createClass
 
 
   changeNotificationError: (error) ->
-    console.log error
+    # console.log error
 
 
   showNotificationSettings: (bookmark) ->
@@ -99,7 +99,7 @@ module.exports = React.createFactory React.createClass
 
   
   removeBookmarkError: (error) ->
-    console.log error
+    # console.log error
 
   
   render: ->

@@ -7,6 +7,7 @@ Comments = require("components/Comments")
 Votes = require("components/Votes")
 AddToClaim = require("components/AddToClaim")
 ClaimEvidences = require("components/ClaimEvidences")
+BookmarkIndicator = require("components/BookmarkIndicator")
 
 SessionMixin = require("mixins/SessionMixin")
 
@@ -45,6 +46,12 @@ module.exports = React.createFactory React.createClass
 
   claimError: (error) ->
     @setState loadError: error.responseJSON.errors
+
+  
+  updateBookmark: (data) ->
+    @claim = @state.claim
+    @claim.bookmark = data
+    @setState claim: @claim
 
 
   successCardStyle: ->
@@ -151,6 +158,13 @@ module.exports = React.createFactory React.createClass
               div { className: "claim__image" },
                 img { src: claim.pic }
               div { className: "claim__meta" },
+                if UserStore.loggedIn()
+                  div { className: "claim__meta-bookmark" },
+                    BookmarkIndicator
+                      bookmark: @state.claim.bookmark
+                      type: "claim"
+                      id: @state.claim.id
+                      updateBookmark: @updateBookmark
                 div { className: "claim__meta-status" },
                   "This claim is #{@showStatus()}"
               div { className: "claim__description" },

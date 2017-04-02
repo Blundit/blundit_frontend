@@ -7,6 +7,8 @@ Comments = require("components/Comments")
 Votes = require("components/Votes")
 AddToPrediction = require("components/AddToPrediction")
 PredictionEvidences = require("components/PredictionEvidences")
+BookmarkIndicator = require("components/BookmarkIndicator")
+
 
 SessionMixin = require("mixins/SessionMixin")
 
@@ -45,6 +47,12 @@ module.exports = React.createFactory React.createClass
 
   predictionError: (error) ->
     @setState loadError: error.responseJSON.errors
+
+  
+  updateBookmark: (data) ->
+    @prediction = @state.prediction
+    @prediction.bookmark = data
+    @setState prediction: @prediction
 
 
   successCardStyle: ->
@@ -155,6 +163,14 @@ module.exports = React.createFactory React.createClass
               div { className: "prediction__image" },
                 img { src: prediction.pic }
               div { className: "prediction__meta" },
+                if UserStore.loggedIn()
+                  div { className: "prediction__meta-bookmark" },
+                    BookmarkIndicator
+                      bookmark: @state.prediction.bookmark
+                      type: "prediction"
+                      id: @state.prediction.id
+                      updateBookmark: @updateBookmark
+                      
                 div { className: "prediction__meta-date" },
                   "This prediction will happen by #{@formatDate(prediction.prediction_date)}"
                 div { className: "prediction__meta-status" },

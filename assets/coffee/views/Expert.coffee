@@ -7,6 +7,7 @@ ExpertPredictionCard = require("components/ExpertPredictionCard")
 ExpertBonaFides = require("components/ExpertBonaFides")
 Comments = require("components/Comments")
 AddToExpert = require("components/AddToExpert")
+BookmarkIndicator = require("components/BookmarkIndicator")
 
 SessionMixin = require("mixins/SessionMixin")
 
@@ -45,6 +46,12 @@ module.exports = React.createFactory React.createClass
 
   expertError: (error) ->
     @setState loadError: error.responseJSON.errors
+
+  
+  updateBookmark: (data) ->
+    @expert = @state.expert
+    @expert.bookmark = data
+    @setState expert: @expert
 
   
   goToBonaFide: (url) ->
@@ -115,6 +122,15 @@ module.exports = React.createFactory React.createClass
               ExpertBonaFides
                 expert: expert
                 refresh: @fetchExpert
+              
+              div { className: "expert__meta" },
+                if UserStore.loggedIn()
+                  div { className: "expert__meta-bookmark" },
+                    BookmarkIndicator
+                      bookmark: @state.expert.bookmark
+                      type: "expert"
+                      id: @state.expert.id
+                      updateBookmark: @updateBookmark
 
 
               div { className: "expert__categories" },

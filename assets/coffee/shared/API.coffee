@@ -153,6 +153,9 @@ module.exports = class API
     remove_bookmark:
       path: "user/remove_bookmark/%bookmark_id%"
       method: "POST"
+    add_bookmark:
+      path: "user/add_bookmark"
+      method: "POST"
 
 
 
