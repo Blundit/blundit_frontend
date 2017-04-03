@@ -1,10 +1,10 @@
 { div } = React.DOM
 
+LinksMixin = require("mixins/LinksMixin")
+
 module.exports = React.createFactory React.createClass
   displayName: "Category Predictions - Latest"
-
-  goToPredictions: (id) ->
-    navigate("/predictions/#{id}")
+  mixins: [LinksMixin]
 
 
   render: ->
@@ -18,7 +18,7 @@ module.exports = React.createFactory React.createClass
             key: "category-predictions-#{index}"
             div
               className: "categories__predictions__prediction-title"
-              onClick: @goToPredictions.bind(@, prediction.id)
+              onClick: @goToPrediction.bind(@, prediction.id)
               prediction.title
       else
         div { className: "categories__predictions--empty" },

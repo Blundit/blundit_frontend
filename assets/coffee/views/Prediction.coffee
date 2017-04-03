@@ -9,11 +9,11 @@ AddToPrediction = require("components/AddToPrediction")
 PredictionEvidences = require("components/PredictionEvidences")
 BookmarkIndicator = require("components/BookmarkIndicator")
 
-
 SessionMixin = require("mixins/SessionMixin")
+LinksMixin = require("mixins/LinksMixin")
 
 module.exports = React.createFactory React.createClass
-  mixins: [SessionMixin]
+  mixins: [SessionMixin, LinksMixin]
   displayName: 'Prediction'
 
   getInitialState: ->
@@ -112,10 +112,6 @@ module.exports = React.createFactory React.createClass
     @setState voteSubmitted: false
 
   
-  goToCategory: (id) ->
-    navigate("/categories/#{id}")
-
-
   categoryMaterialStyle: ->
     { margin: 4 }
 

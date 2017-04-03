@@ -3,8 +3,11 @@
 Header = require("components/Header")
 Footer = require("components/Footer")
 
+LinksMixin = require("mixins/LinksMixin")
+
 module.exports = React.createFactory React.createClass
   displayName: 'Categories'
+  mixins: [LinksMixin]
 
   getInitialState: ->
     categories: null
@@ -27,10 +30,6 @@ module.exports = React.createFactory React.createClass
     #console.log "error", error
 
 
-  goToCategory: (id) ->
-    navigate("/categories/#{id}")
-
-  
   render: ->
     div {},
       Header {}, ''

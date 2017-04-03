@@ -2,15 +2,14 @@
 
 ExpertSubstantiations = require("components/ExpertSubstantiations")
 
+LinksMixin = require("mixins/LinksMixin")
+
 module.exports = React.createFactory React.createClass
   displayName: "ExpertPredictionCard"
+  mixins: [LinksMixin]
 
   getInitialState: ->
     showSubstantiation: false
-
-
-  goToItem: (id) ->
-    navigate("/predictions/#{id}")
 
 
   showSubstantiation: ->
@@ -32,7 +31,7 @@ module.exports = React.createFactory React.createClass
     div { className: "expert__predictions-list-item" },
       div
         className: "expert__predictions-list-item__title"
-        onClick: @goToItem.bind(@, prediction.alias)
+        onClick: @goToPrediction.bind(@, prediction.alias)
         prediction.title
       div
         className: "expert__predictions-list-item__substatiations"

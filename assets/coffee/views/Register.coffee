@@ -3,12 +3,11 @@
 Header = require("components/Header")
 Footer = require("components/Footer")
 
-TextField = Material.TextField
-RaisedButton = Material.RaisedButton
-RefreshIndicator = Material.RefreshIndicator
+LinksMixin = require("mixins/LinksMixin")
 
 module.exports = React.createFactory React.createClass
   displayName: 'Register'
+  mixins: [LinksMixin]
 
   getInitialState: ->
     email: ''
@@ -17,10 +16,6 @@ module.exports = React.createFactory React.createClass
     errors: []
     registerError: null
     registerLoading: false
-
-
-  goToLogin: ->
-    navigate('/login')
 
 
   handleEmailChange: (event) ->
@@ -103,11 +98,11 @@ module.exports = React.createFactory React.createClass
 
           div {},
             div {},
-              React.createElement(TextField, { id: "register-email", floatingLabelText: "Email", value: @state.email, onChange: @handleEmailChange, errorText: @getErrorText("email") })
+              React.createElement(Material.TextField, { id: "register-email", floatingLabelText: "Email", value: @state.email, onChange: @handleEmailChange, errorText: @getErrorText("email") })
             div {},
-              React.createElement(TextField, {id: "register-password", floatingLabelText: "Password", type: "password", value: @state.password, onChange: @handlePasswordChange, errorText: @getErrorText("password") })
+              React.createElement(Material.TextField, {id: "register-password", floatingLabelText: "Password", type: "password", value: @state.password, onChange: @handlePasswordChange, errorText: @getErrorText("password") })
             div {},
-              React.createElement(TextField, {id: "register-password-confirmation", floatingLabelText: "Confirm", type: "password", value: @state.password_confirmation, onChange: @handlePasswordConfirmationChange, errorText: @getErrorText("password_confirmation") })
+              React.createElement(Material.TextField, {id: "register-password-confirmation", floatingLabelText: "Confirm", type: "password", value: @state.password_confirmation, onChange: @handlePasswordConfirmationChange, errorText: @getErrorText("password_confirmation") })
             div {},
               if @state.registerLoading == true
                 @style = {
@@ -115,10 +110,10 @@ module.exports = React.createFactory React.createClass
                   position: 'relative'
                   boxShadow: 'none'
                 }
-                React.createElement(RefreshIndicator, { style: @style, size: 50, left: 0, top: 0, status:"loading" })
+                React.createElement(Material.RefreshIndicator, { style: @style, size: 50, left: 0, top: 0, status:"loading" })
 
               else
-                React.createElement(RaisedButton, {label: "Register", primary: true, onClick: @processRegister })
+                React.createElement(Material.RaisedButton, {label: "Register", primary: true, onClick: @processRegister })
             if @state.registerError?
               div {},
                 @state.registerError

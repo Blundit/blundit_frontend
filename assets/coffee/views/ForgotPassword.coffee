@@ -1,17 +1,13 @@
 { div, a } = React.DOM
 
-# InputsMixin = require("mixins/InputsMixin")
-
 Header = require("components/Header")
 Footer = require("components/Footer")
 
-TextField = Material.TextField
-RaisedButton = Material.RaisedButton
-RefreshIndicator = Material.RefreshIndicator
+LinksMixin = require("mixins/LinksMixin")
 
 module.exports = React.createFactory React.createClass
   displayName: 'Forgot Password'
-  # mixins: [InputsMixin]
+  mixins: [LinksMixin]
 
   getInitialState: ->
     inputs:
@@ -22,10 +18,6 @@ module.exports = React.createFactory React.createClass
     forgotLoading: false
     forgotError: false
     sentRecoveryEmail: false
-
-
-  goToLogin: ->
-    navigate('/login')
 
 
   processForgotPassword: ->
@@ -90,7 +82,7 @@ module.exports = React.createFactory React.createClass
           if @state.sentRecoveryEmail == false
             div {},
               div {},
-                React.createElement(TextField, { id: "forgot-email", floatingLabelText: "Email", value: @state.inputs.email.value, onChange: @handleEmailChange, errorText: @getErrorText("email") })
+                React.createElement(Material.TextField, { id: "forgot-email", floatingLabelText: "Email", value: @state.inputs.email.value, onChange: @handleEmailChange, errorText: @getErrorText("email") })
               div {},
                 if @state.loginLoading == true
                   @style = {
@@ -98,10 +90,10 @@ module.exports = React.createFactory React.createClass
                     position: 'relative'
                     boxShadow: 'none'
                   }
-                  React.createElement(RefreshIndicator, { style: @style, size: 50, left: 0, top: 0, status:"loading" })
+                  React.createElement(Material.RefreshIndicator, { style: @style, size: 50, left: 0, top: 0, status:"loading" })
 
                 else
-                  React.createElement(RaisedButton, {label: "Reset Password", primary: true, onClick: @processForgotPassword })
+                  React.createElement(Material.RaisedButton, {label: "Reset Password", primary: true, onClick: @processForgotPassword })
               if @state.forgotError?
                 div {},
                   @state.forgotError

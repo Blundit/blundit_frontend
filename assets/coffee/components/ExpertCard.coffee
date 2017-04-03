@@ -1,15 +1,10 @@
-Card = Material.Card
-CardHeader = Material.CardHeader
-CardMedia = Material.CardMedia
-CardText = Material.CardText
-CardTitle = Material.CardTitle
-CardActions = Material.CardActions
-FlatButton = Material.FlatButton
-
 { div, img, br, span, a } = React.DOM
+
+LinksMixin = require("mixins/LinksMixin")
 
 module.exports = React.createFactory React.createClass
   displayName: 'ExpertCard'
+  mixins: [LinksMixin]
 
   avatar: ->
     { expert } = @props
@@ -17,9 +12,6 @@ module.exports = React.createFactory React.createClass
       return expert.avatar
     return "/images/avatars/placeholder.png"
 
-
-  goToExpert: (id) ->
-    navigate("/experts/#{id}")
 
 
   getExpertDescription: ->
@@ -29,22 +21,10 @@ module.exports = React.createFactory React.createClass
     return ''
 
   
-  goToMostRecentClaim: ->
-    navigate("/claims/#{@props.expert.most_recent_claim[0].alias}")
-
-
-  goToMostRecentPrediction: ->
-    navigate("/predictions/#{@props.expert.most_recent_prediction[0].alias}")
-
-
   showAccuracy: ->
     accuracy = @props.expert.accuracy
 
     return Math.floor(accuracy*100) + "%"
-
-
-  goToCategory: (id) ->
-    navigate("/categories/#{id}")
 
 
   getCommentInfo: ->
@@ -55,15 +35,15 @@ module.exports = React.createFactory React.createClass
   render: ->
     { expert } = @props
     div { className: "expert-card" },
-      React.createElement(Card, {},
-        React.createElement(CardMedia,
+      React.createElement(Material.Card, {},
+        React.createElement(Material.CardMedia,
           {
-            overlay: React.createElement(CardTitle, { title: expert.name, subtitle: @getExpertDescription() })
+            overlay: React.createElement(Material.CardTitle, { title: expert.name, subtitle: @getExpertDescription() })
           },
           img {src: @avatar() }
         )
        
-        React.createElement(CardText, {}, @getAccuracy)
+        React.createElement(Material.CardText, {}, @getAccuracy)
 
         div { className: "expert-card-meta" },
           div { className: "expert-card-meta__left" },
@@ -104,7 +84,7 @@ module.exports = React.createFactory React.createClass
 
 
 
-        React.createElement(CardActions, {},
-          React.createElement(FlatButton, { label: "View", onClick: @goToExpert.bind(@, expert.alias) })
+        React.createElement(Material.CardActions, {},
+          React.createElement(Material.FlatButton, { label: "View", onClick: @goToExpert.bind(@, expert.alias) })
         )
       )

@@ -1,11 +1,10 @@
 { div } = React.DOM
 
+LinksMixin = require("mixins/LinksMixin")
+
 module.exports = React.createFactory React.createClass
   displayName: "Category Experts - Latest"
-
-  goToExpert: (id) ->
-    navigate("/experts/#{id}")
-
+  mixins: [LinksMixin]
 
   render: ->
     div { className: "categories__experts" },

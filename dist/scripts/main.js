@@ -27,12 +27,10 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"mixins/SessionMixin":594}],2:[function(require,module,exports){
-var RaisedButton, div, img, menuItems, ref;
+},{"mixins/SessionMixin":595}],2:[function(require,module,exports){
+var LinksMixin, div, img, menuItems, ref;
 
 ref = React.DOM, div = ref.div, img = ref.img;
-
-RaisedButton = Material.RaisedButton;
 
 menuItems = [
   {
@@ -51,10 +49,16 @@ menuItems = [
   }, {
     label: "Experts",
     path: "/experts"
+  }, {
+    label: "Search",
+    path: "/search"
   }
 ];
 
+LinksMixin = require("mixins/LinksMixin");
+
 module.exports = React.createFactory(React.createClass({
+  mixins: [LinksMixin],
   getInitialState: function() {
     return {
       user: null
@@ -91,9 +95,6 @@ module.exports = React.createFactory(React.createClass({
     }
     return this["class"];
   },
-  goToLogin: function() {
-    return navigate('/login');
-  },
   render: function() {
     var ref1;
     return div({
@@ -123,7 +124,7 @@ module.exports = React.createFactory(React.createClass({
       style: {
         backgroundImage: this.getUserAvatar()
       }
-    }) : div({}, React.createElement(RaisedButton, {
+    }) : div({}, React.createElement(Material.RaisedButton, {
       label: "Login/Signup",
       primary: true,
       onClick: this.goToLogin
@@ -132,9 +133,9 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],3:[function(require,module,exports){
+},{"mixins/LinksMixin":593}],3:[function(require,module,exports){
 (function() {
-  var API, AddToClaim, AddToExpert, AddToPrediction, Blundit, BookmarkIndicator, Card, CardActions, CardHeader, CardMedia, CardText, CardTitle, CategoryClaims, CategoryExperts, CategoryPredictions, CategorySubHead, ClaimCard, ClaimEvidences, ClaimExpertCard, ClaimFields, Comments, ExpertBonaFides, ExpertCard, ExpertClaimCard, ExpertFields, ExpertPredictionCard, ExpertSubstantiations, FlatButton, FontIcon, Footer, Global, Header, IconButton, MuiThemeProvider, Pagination, PaginationMixin, PredictionCard, PredictionEvidences, PredictionExpertCard, PredictionFields, RaisedButton, RefreshIndicator, RouterMixin, SessionMixin, TextField, UserStore, Votes, a, br, deepOrange500, div, getMuiTheme, img, menuItems, muiTheme, ref, ref1, ref10, ref11, ref12, ref13, ref14, ref15, ref2, ref3, ref4, ref5, ref6, ref7, ref8, ref9, span, startBlundit,
+  var API, AddToClaim, AddToExpert, AddToPrediction, Blundit, BookmarkIndicator, Card, CardActions, CardHeader, CardText, CategoryClaims, CategoryExperts, CategoryPredictions, CategorySubHead, ClaimCard, ClaimEvidences, ClaimExpertCard, ClaimFields, Comments, ExpertBonaFides, ExpertCard, ExpertClaimCard, ExpertFields, ExpertPredictionCard, ExpertSubstantiations, FlatButton, FontIcon, Footer, Global, Header, IconButton, LinksMixin, MuiThemeProvider, Pagination, PaginationMixin, PredictionCard, PredictionEvidences, PredictionExpertCard, PredictionFields, RaisedButton, RefreshIndicator, RouterMixin, SessionMixin, TextField, UserStore, Votes, a, br, deepOrange500, div, getMuiTheme, img, menuItems, muiTheme, ref, ref1, ref10, ref11, ref12, ref13, ref14, ref15, ref2, ref3, ref4, ref5, ref6, ref7, ref8, ref9, span, startBlundit,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   window.React = require('react');
@@ -373,6 +374,165 @@ module.exports = React.createFactory(React.createClass({
   } else {
     window.attachEvent('onload', startBlundit);
   }
+
+  module.exports = {
+    goToClaim: function(id) {
+      return navigate("/claims/" + id);
+    },
+    goToExpert: function(id) {
+      return navigate("/experts/" + id);
+    },
+    goToPrediction: function(id) {
+      return navigate("/predictions/" + id);
+    },
+    goToCategory: function(id) {
+      return navigate("/categories/" + id);
+    },
+    goToMostRecentClaim: function() {
+      return navigate("/claims/" + this.props.expert.most_recent_claim[0].alias);
+    },
+    goToMostRecentPrediction: function() {
+      return navigate("/predictions/" + this.props.expert.most_recent_prediction[0].alias);
+    },
+    goToLogin: function() {
+      return navigate('/login');
+    }
+  };
+
+  module.exports = {
+    getInitialState: function() {
+      return {
+        page: 1,
+        numberOfPages: 1
+      };
+    },
+    nextPage: function() {
+      if (this.state.page < this.state.numberOfPages) {
+        this.setState({
+          page: this.state.page + 1
+        });
+      }
+      return this.fetchPaginatedData(this.state.page + 1);
+    },
+    previousPage: function() {
+      if (this.state.page > 1) {
+        this.setState({
+          page: this.state.page - 1
+        });
+      }
+      return this.fetchPaginatedData(this.state.page - 1);
+    },
+    specificPage: function(page) {
+      this.setState({
+        page: page
+      });
+      return this.fetchPaginatedData(page);
+    }
+  };
+
+  module.exports = {
+    setUser: function(data, request) {
+      window.UserStore.set(data, request);
+      this.user = window.UserStore.get();
+      if ((this.user != null) && (this.user.token != null)) {
+        window.global.setCookie('access-token', this.user.token);
+        window.global.setCookie('uid', this.user.uid);
+        return window.global.setCookie('client', this.user.client);
+      } else {
+        window.global.deleteCookie('access-token');
+        window.global.deleteCookie('uid');
+        return window.global.deleteCookie('client');
+      }
+    },
+    getParameterByName: function(name, url) {
+      var regex, results;
+      if (!url) {
+        url = window.location.href;
+      }
+      name = name.replace(/[\[\]]/g, "\\$&");
+      regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
+      results = regex.exec(url);
+      if (!results) {
+        return null;
+      }
+      if (!results[2]) {
+        return '';
+      }
+      return decodeURIComponent(results[2].replace(/\+/g, " "));
+    },
+    getUrlParams: function() {
+      var j, key, len, params, query, raw_vars, ref, v, val;
+      query = window.location.search.substring(1);
+      raw_vars = query.split("&");
+      params = {};
+      for (j = 0, len = raw_vars.length; j < len; j++) {
+        v = raw_vars[j];
+        ref = v.split("="), key = ref[0], val = ref[1];
+        params[key] = decodeURIComponent(val);
+      }
+      return params;
+    },
+    getUser: function() {
+      var obj;
+      obj = {};
+      this.token = window.global.getCookie('access-token');
+      this.client = window.global.getCookie('client');
+      this.uid = window.global.getCookie('uid');
+      if (this.token != null) {
+        obj.token = this.token;
+        obj.client = this.client;
+        obj.uid = this.uid;
+      }
+      if (obj === {}) {
+        return false;
+      }
+      return obj;
+    },
+    unsetUser: function() {
+      window.UserStore.set(null);
+      window.global.deleteCookie('access-token');
+      window.global.deleteCookie('client');
+      return window.global.deleteCookie('uid');
+    },
+    authHeader: function() {
+      return this.user = window.UserStore.getAuthHeader();
+    },
+    verifyUserToken: function() {
+      if (window.global.getCookie('access-token')) {
+        return this.verifyToken();
+      } else {
+        return this.setState({
+          verificationComplete: true
+        });
+      }
+    },
+    verifyToken: function() {
+      var params;
+      params = {
+        path: "verify_token",
+        path_variables: {
+          accessToken: window.global.getCookie('access-token'),
+          client: window.global.getCookie('client'),
+          uid: window.global.getCookie('uid')
+        },
+        success: this.verifyTokenSuccess,
+        error: this.verifyTokenError
+      };
+      return API.call(params);
+    },
+    verifyTokenSuccess: function(data) {
+      if (data) {
+        data.data.token = window.global.getCookie('access-token');
+        data.data.client = window.global.getCookie('client');
+        data.data.uid = window.global.getCookie('uid');
+        return this.setUser(data.data);
+      }
+    },
+    verifyTokenError: function(error) {
+      return this.setUser({});
+    },
+    updateUserHeaderInfo: function(request) {}
+  };
 
   div = React.DOM.div;
 
@@ -827,11 +987,11 @@ module.exports = React.createFactory(React.createClass({
 
   div = React.DOM.div;
 
+  LinksMixin = require("mixins/LinksMixin");
+
   module.exports = React.createFactory(React.createClass({
     displayName: "Category Claims - Latest",
-    goToClaim: function(id) {
-      return navigate("/claims/" + id);
-    },
+    mixins: [LinksMixin],
     render: function() {
       return div({
         className: "categories__claims"
@@ -855,11 +1015,11 @@ module.exports = React.createFactory(React.createClass({
 
   div = React.DOM.div;
 
+  LinksMixin = require("mixins/LinksMixin");
+
   module.exports = React.createFactory(React.createClass({
     displayName: "Category Experts - Latest",
-    goToExpert: function(id) {
-      return navigate("/experts/" + id);
-    },
+    mixins: [LinksMixin],
     render: function() {
       return div({
         className: "categories__experts"
@@ -883,11 +1043,11 @@ module.exports = React.createFactory(React.createClass({
 
   div = React.DOM.div;
 
+  LinksMixin = require("mixins/LinksMixin");
+
   module.exports = React.createFactory(React.createClass({
     displayName: "Category Predictions - Latest",
-    goToPredictions: function(id) {
-      return navigate("/predictions/" + id);
-    },
+    mixins: [LinksMixin],
     render: function() {
       return div({
         className: "categories__predictions"
@@ -900,7 +1060,7 @@ module.exports = React.createFactory(React.createClass({
             key: "category-predictions-" + index
           }, div({
             className: "categories__predictions__prediction-title",
-            onClick: _this.goToPredictions.bind(_this, prediction.id)
+            onClick: _this.goToPrediction.bind(_this, prediction.id)
           }, prediction.title));
         };
       })(this)) : div({
@@ -973,26 +1133,13 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  Card = Material.Card;
-
-  CardHeader = Material.CardHeader;
-
-  CardText = Material.CardText;
-
-  CardActions = Material.CardActions;
-
-  FlatButton = Material.FlatButton;
-
   ref1 = React.DOM, div = ref1.div, img = ref1.img, a = ref1.a, br = ref1.br, span = ref1.span;
+
+  LinksMixin = require("mixins/LinksMixin");
 
   module.exports = React.createFactory(React.createClass({
     displayName: 'ClaimCard',
-    goToExpert: function(id) {
-      return navigate("/experts/" + id);
-    },
-    goToClaim: function(id) {
-      return navigate("/claims/" + id);
-    },
+    mixins: [LinksMixin],
     getDescription: function() {
       var claim;
       claim = this.props.claim;
@@ -1014,9 +1161,6 @@ module.exports = React.createFactory(React.createClass({
         }
       }
     },
-    goToCategory: function(id) {
-      return navigate("/categories/" + id);
-    },
     claimDate: function() {
       var claim;
       claim = this.props.claim;
@@ -1037,7 +1181,7 @@ module.exports = React.createFactory(React.createClass({
       claim = this.props.claim;
       return div({
         className: "claim-card"
-      }, React.createElement(Card, {}, React.createElement(CardHeader, {
+      }, React.createElement(Material.Card, {}, React.createElement(Material.CardHeader, {
         title: claim.title,
         subtitle: this.getDescription()
       }), div({
@@ -1077,12 +1221,12 @@ module.exports = React.createFactory(React.createClass({
             className: "claim-card-experts__expert-name"
           }, expert.name));
         };
-      })(this))) : void 0), React.createElement(CardActions, {}, claim.status === 0 && UserStore.loggedIn() ? div({
+      })(this))) : void 0), React.createElement(Material.CardActions, {}, claim.status === 0 && UserStore.loggedIn() ? div({
         className: "claim-card-vote",
         onClick: this.goToClaim
       }, "VOTE") : claim.status === 0 && !UserStore.loggedIn() ? div({
         className: "claim-card-vote"
-      }, "Log in to Vote") : void 0, React.createElement(FlatButton, {
+      }, "Log in to Vote") : void 0, React.createElement(Material.FlatButton, {
         label: "View",
         onClick: this.goToClaim.bind(this, claim.alias)
       }))));
@@ -1178,15 +1322,15 @@ module.exports = React.createFactory(React.createClass({
 
   ExpertSubstantiations = require("components/ExpertSubstantiations");
 
+  LinksMixin = require("mixins/LinksMixin");
+
   module.exports = React.createFactory(React.createClass({
     displayName: "ClaimExpertCard",
+    mixins: [LinksMixin],
     getInitialState: function() {
       return {
         showSubstantiation: false
       };
-    },
-    goToItem: function(id) {
-      return navigate("/experts/" + id);
     },
     showSubstantiation: function() {
       var expert;
@@ -1212,7 +1356,7 @@ module.exports = React.createFactory(React.createClass({
         className: "claim__experts-list-item"
       }, div({
         className: "claim__experts-list-item__title",
-        onClick: this.goToItem.bind(this, expert.alias)
+        onClick: this.goToExpert.bind(this, expert.alias)
       }, expert.name), div({
         className: "claim__experts-list-item__substantiations",
         onClick: this.toggleSubstantiation
@@ -1630,24 +1774,13 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  Card = Material.Card;
-
-  CardHeader = Material.CardHeader;
-
-  CardMedia = Material.CardMedia;
-
-  CardText = Material.CardText;
-
-  CardTitle = Material.CardTitle;
-
-  CardActions = Material.CardActions;
-
-  FlatButton = Material.FlatButton;
-
   ref4 = React.DOM, div = ref4.div, img = ref4.img, br = ref4.br, span = ref4.span, a = ref4.a;
+
+  LinksMixin = require("mixins/LinksMixin");
 
   module.exports = React.createFactory(React.createClass({
     displayName: 'ExpertCard',
+    mixins: [LinksMixin],
     avatar: function() {
       var expert;
       expert = this.props.expert;
@@ -1656,28 +1789,16 @@ module.exports = React.createFactory(React.createClass({
       }
       return "/images/avatars/placeholder.png";
     },
-    goToExpert: function(id) {
-      return navigate("/experts/" + id);
-    },
     getExpertDescription: function() {
       if (this.props.expert.description != null) {
         return this.props.expert.description;
       }
       return '';
     },
-    goToMostRecentClaim: function() {
-      return navigate("/claims/" + this.props.expert.most_recent_claim[0].alias);
-    },
-    goToMostRecentPrediction: function() {
-      return navigate("/predictions/" + this.props.expert.most_recent_prediction[0].alias);
-    },
     showAccuracy: function() {
       var accuracy;
       accuracy = this.props.expert.accuracy;
       return Math.floor(accuracy * 100) + "%";
-    },
-    goToCategory: function(id) {
-      return navigate("/categories/" + id);
     },
     getCommentInfo: function() {
       var expert;
@@ -1689,14 +1810,14 @@ module.exports = React.createFactory(React.createClass({
       expert = this.props.expert;
       return div({
         className: "expert-card"
-      }, React.createElement(Card, {}, React.createElement(CardMedia, {
-        overlay: React.createElement(CardTitle, {
+      }, React.createElement(Material.Card, {}, React.createElement(Material.CardMedia, {
+        overlay: React.createElement(Material.CardTitle, {
           title: expert.name,
           subtitle: this.getExpertDescription()
         })
       }, img({
         src: this.avatar()
-      })), React.createElement(CardText, {}, this.getAccuracy), div({
+      })), React.createElement(Material.CardText, {}, this.getAccuracy), div({
         className: "expert-card-meta"
       }, div({
         className: "expert-card-meta__left"
@@ -1724,7 +1845,7 @@ module.exports = React.createFactory(React.createClass({
             onClick: _this.goToCategory.bind(_this, category.id)
           }, category.name);
         };
-      })(this))) : void 0, React.createElement(CardActions, {}, React.createElement(FlatButton, {
+      })(this))) : void 0, React.createElement(Material.CardActions, {}, React.createElement(Material.FlatButton, {
         label: "View",
         onClick: this.goToExpert.bind(this, expert.alias)
       }))));
@@ -1735,15 +1856,15 @@ module.exports = React.createFactory(React.createClass({
 
   ExpertSubstantiations = require("components/ExpertSubstantiations");
 
+  LinksMixin = require("mixins/LinksMixin");
+
   module.exports = React.createFactory(React.createClass({
     displayName: "ExpertClaimCard",
+    mixins: [LinksMixin],
     getInitialState: function() {
       return {
         showSubstantiation: false
       };
-    },
-    goToItem: function(id) {
-      return navigate("/claims/" + id);
     },
     showSubstantiation: function() {
       var claim;
@@ -1769,7 +1890,7 @@ module.exports = React.createFactory(React.createClass({
         className: "expert__claims-list-item"
       }, div({
         className: "expert__claims-list-item__title",
-        onClick: this.goToItem.bind(this, claim.alias)
+        onClick: this.goToClaim.bind(this, claim.alias)
       }, claim.title), div({
         className: "expert__claims-list-item__substantiations",
         onClick: this.toggleSubstantiation
@@ -1911,15 +2032,15 @@ module.exports = React.createFactory(React.createClass({
 
   ExpertSubstantiations = require("components/ExpertSubstantiations");
 
+  LinksMixin = require("mixins/LinksMixin");
+
   module.exports = React.createFactory(React.createClass({
     displayName: "ExpertPredictionCard",
+    mixins: [LinksMixin],
     getInitialState: function() {
       return {
         showSubstantiation: false
       };
-    },
-    goToItem: function(id) {
-      return navigate("/predictions/" + id);
     },
     showSubstantiation: function() {
       var prediction;
@@ -1945,7 +2066,7 @@ module.exports = React.createFactory(React.createClass({
         className: "expert__predictions-list-item"
       }, div({
         className: "expert__predictions-list-item__title",
-        onClick: this.goToItem.bind(this, prediction.alias)
+        onClick: this.goToPrediction.bind(this, prediction.alias)
       }, prediction.title), div({
         className: "expert__predictions-list-item__substatiations",
         onClick: this.toggleSubstantiation
@@ -2117,8 +2238,6 @@ module.exports = React.createFactory(React.createClass({
 
   ref6 = React.DOM, div = ref6.div, img = ref6.img;
 
-  RaisedButton = Material.RaisedButton;
-
   menuItems = [
     {
       label: "My Bookmarks",
@@ -2136,10 +2255,16 @@ module.exports = React.createFactory(React.createClass({
     }, {
       label: "Experts",
       path: "/experts"
+    }, {
+      label: "Search",
+      path: "/search"
     }
   ];
 
+  LinksMixin = require("mixins/LinksMixin");
+
   module.exports = React.createFactory(React.createClass({
+    mixins: [LinksMixin],
     getInitialState: function() {
       return {
         user: null
@@ -2176,9 +2301,6 @@ module.exports = React.createFactory(React.createClass({
       }
       return this["class"];
     },
-    goToLogin: function() {
-      return navigate('/login');
-    },
     render: function() {
       var ref7;
       return div({
@@ -2208,7 +2330,7 @@ module.exports = React.createFactory(React.createClass({
         style: {
           backgroundImage: this.getUserAvatar()
         }
-      }) : div({}, React.createElement(RaisedButton, {
+      }) : div({}, React.createElement(Material.RaisedButton, {
         label: "Login/Signup",
         primary: true,
         onClick: this.goToLogin
@@ -2368,14 +2490,11 @@ module.exports = React.createFactory(React.createClass({
 
   ref7 = React.DOM, div = ref7.div, img = ref7.img, a = ref7.a, br = ref7.br, span = ref7.span;
 
+  LinksMixin = require("mixins/LinksMixin");
+
   module.exports = React.createFactory(React.createClass({
-    displayName: 'PRedictionCard',
-    goToExpert: function(id) {
-      return navigate("/experts/" + id);
-    },
-    goToPrediction: function(id) {
-      return navigate("/predictions/" + id);
-    },
+    displayName: 'PredictionCard',
+    mixins: [LinksMixin],
     getDescription: function() {
       var prediction;
       prediction = this.props.prediction;
@@ -2406,9 +2525,6 @@ module.exports = React.createFactory(React.createClass({
       var prediction;
       prediction = this.props.prediction;
       return prediction.comments_count + " comments";
-    },
-    goToCategory: function(id) {
-      return navigate("/categories/" + id);
     },
     predictionDate: function() {
       var prediction;
@@ -2561,15 +2677,15 @@ module.exports = React.createFactory(React.createClass({
 
   ExpertSubstantiations = require("components/ExpertSubstantiations");
 
+  LinksMixin = require("mixins/LinksMixin");
+
   module.exports = React.createFactory(React.createClass({
     displayName: "PredictioNExpertCard",
+    mixins: [LinksMixin],
     getInitialState: function() {
       return {
         showSubstantiation: false
       };
-    },
-    goToItem: function(id) {
-      return navigate("/experts/" + id);
     },
     showSubstantiation: function() {
       var expert;
@@ -2595,7 +2711,7 @@ module.exports = React.createFactory(React.createClass({
         className: "prediction__experts-list-item"
       }, div({
         className: "prediction__experts-list-item__title",
-        onClick: this.goToItem.bind(this, expert.alias)
+        onClick: this.goToExpert.bind(this, expert.alias)
       }, expert.name), div({
         className: "prediction__experts-list-item__substantiations",
         onClick: this.toggleSubstantiation
@@ -2783,333 +2899,6 @@ module.exports = React.createFactory(React.createClass({
       }, this.notOpenYet() ? "This " + type + " isn't open yet. Come back later to vote on it." : "This " + type + " is closed, and can't be voted on."));
     }
   }));
-
-  module.exports = {
-    getInitialState: function() {
-      return {
-        page: 1,
-        numberOfPages: 1
-      };
-    },
-    nextPage: function() {
-      if (this.state.page < this.state.numberOfPages) {
-        this.setState({
-          page: this.state.page + 1
-        });
-      }
-      return this.fetchPaginatedData(this.state.page + 1);
-    },
-    previousPage: function() {
-      if (this.state.page > 1) {
-        this.setState({
-          page: this.state.page - 1
-        });
-      }
-      return this.fetchPaginatedData(this.state.page - 1);
-    },
-    specificPage: function(page) {
-      this.setState({
-        page: page
-      });
-      return this.fetchPaginatedData(page);
-    }
-  };
-
-  module.exports = {
-    setUser: function(data, request) {
-      window.UserStore.set(data, request);
-      this.user = window.UserStore.get();
-      if ((this.user != null) && (this.user.token != null)) {
-        window.global.setCookie('access-token', this.user.token);
-        window.global.setCookie('uid', this.user.uid);
-        return window.global.setCookie('client', this.user.client);
-      } else {
-        window.global.deleteCookie('access-token');
-        window.global.deleteCookie('uid');
-        return window.global.deleteCookie('client');
-      }
-    },
-    getParameterByName: function(name, url) {
-      var regex, results;
-      if (!url) {
-        url = window.location.href;
-      }
-      name = name.replace(/[\[\]]/g, "\\$&");
-      regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
-      results = regex.exec(url);
-      if (!results) {
-        return null;
-      }
-      if (!results[2]) {
-        return '';
-      }
-      return decodeURIComponent(results[2].replace(/\+/g, " "));
-    },
-    getUrlParams: function() {
-      var j, key, len, params, query, raw_vars, ref9, v, val;
-      query = window.location.search.substring(1);
-      raw_vars = query.split("&");
-      params = {};
-      for (j = 0, len = raw_vars.length; j < len; j++) {
-        v = raw_vars[j];
-        ref9 = v.split("="), key = ref9[0], val = ref9[1];
-        params[key] = decodeURIComponent(val);
-      }
-      return params;
-    },
-    getUser: function() {
-      var obj;
-      obj = {};
-      this.token = window.global.getCookie('access-token');
-      this.client = window.global.getCookie('client');
-      this.uid = window.global.getCookie('uid');
-      if (this.token != null) {
-        obj.token = this.token;
-        obj.client = this.client;
-        obj.uid = this.uid;
-      }
-      if (obj === {}) {
-        return false;
-      }
-      return obj;
-    },
-    unsetUser: function() {
-      window.UserStore.set(null);
-      window.global.deleteCookie('access-token');
-      window.global.deleteCookie('client');
-      return window.global.deleteCookie('uid');
-    },
-    authHeader: function() {
-      return this.user = window.UserStore.getAuthHeader();
-    },
-    verifyUserToken: function() {
-      if (window.global.getCookie('access-token')) {
-        return this.verifyToken();
-      } else {
-        return this.setState({
-          verificationComplete: true
-        });
-      }
-    },
-    verifyToken: function() {
-      var params;
-      params = {
-        path: "verify_token",
-        path_variables: {
-          accessToken: window.global.getCookie('access-token'),
-          client: window.global.getCookie('client'),
-          uid: window.global.getCookie('uid')
-        },
-        success: this.verifyTokenSuccess,
-        error: this.verifyTokenError
-      };
-      return API.call(params);
-    },
-    verifyTokenSuccess: function(data) {
-      if (data) {
-        data.data.token = window.global.getCookie('access-token');
-        data.data.client = window.global.getCookie('client');
-        data.data.uid = window.global.getCookie('uid');
-        return this.setUser(data.data);
-      }
-    },
-    verifyTokenError: function(error) {
-      return this.setUser({});
-    },
-    updateUserHeaderInfo: function(request) {}
-  };
-
-  UserStore = (function() {
-    function UserStore() {
-      this.get = bind(this.get, this);
-      this.set = bind(this.set, this);
-      this.emitChange = bind(this.emitChange, this);
-      this.unsubscribe = bind(this.unsubscribe, this);
-      this.subscribe = bind(this.subscribe, this);
-      this.dequeueMessagesFetch = bind(this.dequeueMessagesFetch, this);
-    }
-
-    UserStore.prototype.data = {};
-
-    UserStore.prototype.votes = [];
-
-    UserStore.prototype.subscribers = 0;
-
-    UserStore.prototype.changeEvent = 'blundit:user';
-
-    UserStore.prototype.fetchMessagesTimeout = null;
-
-    UserStore.prototype.lastMessagesFetch = null;
-
-    UserStore.prototype.messagesTtl = 60000;
-
-    UserStore.prototype.loggedIn = function() {
-      if (this.data && (this.data.token != null)) {
-        return true;
-      }
-      return false;
-    };
-
-    UserStore.prototype.dequeueMessagesFetch = function() {
-      clearTimeout(this.fetchMessagesTimeout);
-      return this.fetchMessagesTimeout = null;
-    };
-
-    UserStore.prototype.subscribe = function(callback) {
-      addEventListener(this.changeEvent, callback, false);
-      this.subscribers++;
-      if (this.data != null) {
-        return this.emitChange();
-      }
-    };
-
-    UserStore.prototype.unsubscribe = function(callback) {
-      removeEventListener(this.changeEvent, callback);
-      this.subscribers--;
-      if (!(this.subscribers > 0)) {
-        return this.dequeueMessagesFetch();
-      }
-    };
-
-    UserStore.prototype.emitChange = function() {
-      var event;
-      event = document.createEvent('Event');
-      event.initEvent(this.changeEvent, true, true);
-      return dispatchEvent(event);
-    };
-
-    UserStore.prototype.set = function(data, request) {
-      this.data = data;
-      if (request != null) {
-        this.data.token = request.getResponseHeader('access-token');
-        this.data.uid = request.getResponseHeader('uid');
-        this.data.client = request.getResponseHeader('client');
-      }
-      return this.emitChange();
-    };
-
-    UserStore.prototype.logout = function() {
-      var params;
-      params = {
-        path: "logout",
-        success: this.logoutSuccess,
-        error: this.logoutError
-      };
-      return API.call(params);
-    };
-
-    UserStore.prototype.logoutSuccess = function() {};
-
-    UserStore.prototype.logoutError = function() {};
-
-    UserStore.prototype.setToken = function(token) {
-      return this.data.token = token;
-    };
-
-    UserStore.getAuthHeader = function() {
-      this.user = this.get();
-      if ((this.user != null) && (this.user.token != null)) {
-        return {
-          "access-token": this.user.token,
-          "client": this.user.client,
-          "uid": this.user.uid
-        };
-      } else {
-        return {};
-      }
-    };
-
-    UserStore.prototype.getAuthHeader = function() {
-      this.user = this.get();
-      if ((this.user != null) && (this.user.token != null)) {
-        return {
-          "access-token": this.user.token,
-          "client": this.user.client,
-          "uid": this.user.uid
-        };
-      } else {
-        return {};
-      }
-    };
-
-    UserStore.prototype.fetchUserData = function(navigateTarget) {
-      return;
-      return $.ajax({
-        type: 'GET',
-        headers: this.getAuthHeader(),
-        url: this.urls.get_user_data,
-        dataType: 'json',
-        success: (function(_this) {
-          return function(data) {
-            _this.setUserAccounts(_this.fixDates(data));
-            _this.doQueueMessages();
-            _this.fetchUserProfile();
-            if (navigateTarget != null) {
-              return window.navigate(navigateTarget);
-            }
-          };
-        })(this)
-      });
-    };
-
-    UserStore.prototype.fetchUserProfile = function(navigateTarget) {
-      return $.ajax({
-        type: 'GET',
-        headers: this.getAuthHeader(),
-        url: this.urls.get_current_user,
-        dataType: 'json',
-        success: (function(_this) {
-          return function(data) {
-            return _this.setUserProfile(data);
-          };
-        })(this)
-      });
-    };
-
-    UserStore.prototype.setUserProfile = function(data) {
-      this.data.profile = data;
-      return this.emitChange();
-    };
-
-    UserStore.prototype.doQueueMessages = function() {
-      if (this.subscribers > 0) {
-        return this.queueMessagesFetch();
-      } else {
-        return this.dequeueMessagesFetch();
-      }
-    };
-
-    UserStore.get = function() {
-      return UserStore.data;
-    };
-
-    UserStore.prototype.get = function() {
-      return this.data;
-    };
-
-    UserStore.prototype.updateHeaderInfo = function(request) {
-      if (request.getResponseHeader('access-token') == null) {
-        return;
-      }
-      this.token = request.getResponseHeader('access-token');
-      this.uid = request.getResponseHeader('uid');
-      this.client = request.getResponseHeader('client');
-      window.global.setCookie('access-token', this.token);
-      window.global.setCookie('uid', this.uid);
-      window.global.setCookie('client', this.client);
-      this.user = this.get();
-      this.user.token = this.token;
-      this.user.uid = this.uid;
-      return this.user.client = this.client;
-    };
-
-    return UserStore;
-
-  })();
-
-  module.exports = new UserStore({
-    messagestl: 1000 * 60
-  });
 
 
   /*
@@ -3433,6 +3222,198 @@ module.exports = React.createFactory(React.createClass({
 
   })();
 
+  UserStore = (function() {
+    function UserStore() {
+      this.get = bind(this.get, this);
+      this.set = bind(this.set, this);
+      this.emitChange = bind(this.emitChange, this);
+      this.unsubscribe = bind(this.unsubscribe, this);
+      this.subscribe = bind(this.subscribe, this);
+      this.dequeueMessagesFetch = bind(this.dequeueMessagesFetch, this);
+    }
+
+    UserStore.prototype.data = {};
+
+    UserStore.prototype.votes = [];
+
+    UserStore.prototype.subscribers = 0;
+
+    UserStore.prototype.changeEvent = 'blundit:user';
+
+    UserStore.prototype.fetchMessagesTimeout = null;
+
+    UserStore.prototype.lastMessagesFetch = null;
+
+    UserStore.prototype.messagesTtl = 60000;
+
+    UserStore.prototype.loggedIn = function() {
+      if (this.data && (this.data.token != null)) {
+        return true;
+      }
+      return false;
+    };
+
+    UserStore.prototype.dequeueMessagesFetch = function() {
+      clearTimeout(this.fetchMessagesTimeout);
+      return this.fetchMessagesTimeout = null;
+    };
+
+    UserStore.prototype.subscribe = function(callback) {
+      addEventListener(this.changeEvent, callback, false);
+      this.subscribers++;
+      if (this.data != null) {
+        return this.emitChange();
+      }
+    };
+
+    UserStore.prototype.unsubscribe = function(callback) {
+      removeEventListener(this.changeEvent, callback);
+      this.subscribers--;
+      if (!(this.subscribers > 0)) {
+        return this.dequeueMessagesFetch();
+      }
+    };
+
+    UserStore.prototype.emitChange = function() {
+      var event;
+      event = document.createEvent('Event');
+      event.initEvent(this.changeEvent, true, true);
+      return dispatchEvent(event);
+    };
+
+    UserStore.prototype.set = function(data, request) {
+      this.data = data;
+      if (request != null) {
+        this.data.token = request.getResponseHeader('access-token');
+        this.data.uid = request.getResponseHeader('uid');
+        this.data.client = request.getResponseHeader('client');
+      }
+      return this.emitChange();
+    };
+
+    UserStore.prototype.logout = function() {
+      var params;
+      params = {
+        path: "logout",
+        success: this.logoutSuccess,
+        error: this.logoutError
+      };
+      return API.call(params);
+    };
+
+    UserStore.prototype.logoutSuccess = function() {};
+
+    UserStore.prototype.logoutError = function() {};
+
+    UserStore.prototype.setToken = function(token) {
+      return this.data.token = token;
+    };
+
+    UserStore.getAuthHeader = function() {
+      this.user = this.get();
+      if ((this.user != null) && (this.user.token != null)) {
+        return {
+          "access-token": this.user.token,
+          "client": this.user.client,
+          "uid": this.user.uid
+        };
+      } else {
+        return {};
+      }
+    };
+
+    UserStore.prototype.getAuthHeader = function() {
+      this.user = this.get();
+      if ((this.user != null) && (this.user.token != null)) {
+        return {
+          "access-token": this.user.token,
+          "client": this.user.client,
+          "uid": this.user.uid
+        };
+      } else {
+        return {};
+      }
+    };
+
+    UserStore.prototype.fetchUserData = function(navigateTarget) {
+      return;
+      return $.ajax({
+        type: 'GET',
+        headers: this.getAuthHeader(),
+        url: this.urls.get_user_data,
+        dataType: 'json',
+        success: (function(_this) {
+          return function(data) {
+            _this.setUserAccounts(_this.fixDates(data));
+            _this.doQueueMessages();
+            _this.fetchUserProfile();
+            if (navigateTarget != null) {
+              return window.navigate(navigateTarget);
+            }
+          };
+        })(this)
+      });
+    };
+
+    UserStore.prototype.fetchUserProfile = function(navigateTarget) {
+      return $.ajax({
+        type: 'GET',
+        headers: this.getAuthHeader(),
+        url: this.urls.get_current_user,
+        dataType: 'json',
+        success: (function(_this) {
+          return function(data) {
+            return _this.setUserProfile(data);
+          };
+        })(this)
+      });
+    };
+
+    UserStore.prototype.setUserProfile = function(data) {
+      this.data.profile = data;
+      return this.emitChange();
+    };
+
+    UserStore.prototype.doQueueMessages = function() {
+      if (this.subscribers > 0) {
+        return this.queueMessagesFetch();
+      } else {
+        return this.dequeueMessagesFetch();
+      }
+    };
+
+    UserStore.get = function() {
+      return UserStore.data;
+    };
+
+    UserStore.prototype.get = function() {
+      return this.data;
+    };
+
+    UserStore.prototype.updateHeaderInfo = function(request) {
+      if (request.getResponseHeader('access-token') == null) {
+        return;
+      }
+      this.token = request.getResponseHeader('access-token');
+      this.uid = request.getResponseHeader('uid');
+      this.client = request.getResponseHeader('client');
+      window.global.setCookie('access-token', this.token);
+      window.global.setCookie('uid', this.uid);
+      window.global.setCookie('client', this.client);
+      this.user = this.get();
+      this.user.token = this.token;
+      this.user.uid = this.uid;
+      return this.user.client = this.client;
+    };
+
+    return UserStore;
+
+  })();
+
+  module.exports = new UserStore({
+    messagestl: 1000 * 60
+  });
+
   div = React.DOM.div;
 
   Header = require("components/Header");
@@ -3490,7 +3471,7 @@ module.exports = React.createFactory(React.createClass({
         return "";
       }
     },
-    goToItem: function(bookmark) {
+    goToBookmarkItem: function(bookmark) {
       return navigate("/" + bookmark.type + "s/" + bookmark.alias);
     },
     sentenceCase: function(text) {
@@ -3561,7 +3542,7 @@ module.exports = React.createFactory(React.createClass({
             className: "bookmarks__list__item-type"
           }, _this.sentenceCase(bookmark.type) + ": "), div({
             className: "bookmarks__list__item-title",
-            onClick: _this.goToItem.bind(_this, bookmark)
+            onClick: _this.goToBookmarkItem.bind(_this, bookmark)
           }, bookmark.title), div({
             className: "bookmarks__list__item-new"
           }, _this.showBookmarkNewStatus(bookmark["new"]))), div({}, div({
@@ -3584,8 +3565,11 @@ module.exports = React.createFactory(React.createClass({
 
   Footer = require("components/Footer");
 
+  LinksMixin = require("mixins/LinksMixin");
+
   module.exports = React.createFactory(React.createClass({
     displayName: 'Categories',
+    mixins: [LinksMixin],
     getInitialState: function() {
       return {
         categories: null
@@ -3606,9 +3590,6 @@ module.exports = React.createFactory(React.createClass({
       });
     },
     categoryListError: function(error) {},
-    goToCategory: function(id) {
-      return navigate("/categories/" + id);
-    },
     render: function() {
       return div({}, Header({}, ''), div({
         className: "categories-wrapper"
@@ -3956,8 +3937,10 @@ module.exports = React.createFactory(React.createClass({
 
   SessionMixin = require("mixins/SessionMixin");
 
+  LinksMixin = require("mixins/LinksMixin");
+
   module.exports = React.createFactory(React.createClass({
-    mixins: [SessionMixin],
+    mixins: [SessionMixin, LinksMixin],
     displayName: 'Claim',
     getInitialState: function() {
       return {
@@ -4065,9 +4048,6 @@ module.exports = React.createFactory(React.createClass({
       return this.setState({
         voteSubmitted: false
       });
-    },
-    goToCategory: function(id) {
-      return navigate("/categories/" + id);
     },
     categoryMaterialStyle: function() {
       return {
@@ -4674,8 +4654,10 @@ module.exports = React.createFactory(React.createClass({
 
   SessionMixin = require("mixins/SessionMixin");
 
+  LinksMixin = require("mixins/LinksMixin");
+
   module.exports = React.createFactory(React.createClass({
-    mixins: [SessionMixin],
+    mixins: [SessionMixin, LinksMixin],
     displayName: 'Experts',
     getInitialState: function() {
       return {
@@ -4726,9 +4708,6 @@ module.exports = React.createFactory(React.createClass({
     },
     goToBonaFide: function(url) {
       return window.open(url, '_blank');
-    },
-    goToCategory: function(id) {
-      return navigate("/categories/" + id);
     },
     categoryMaterialStyle: function() {
       return {
@@ -4946,14 +4925,11 @@ module.exports = React.createFactory(React.createClass({
 
   Footer = require("components/Footer");
 
-  TextField = Material.TextField;
-
-  RaisedButton = Material.RaisedButton;
-
-  RefreshIndicator = Material.RefreshIndicator;
+  LinksMixin = require("mixins/LinksMixin");
 
   module.exports = React.createFactory(React.createClass({
     displayName: 'Forgot Password',
+    mixins: [LinksMixin],
     getInitialState: function() {
       return {
         inputs: {
@@ -4967,9 +4943,6 @@ module.exports = React.createFactory(React.createClass({
         forgotError: false,
         sentRecoveryEmail: false
       };
-    },
-    goToLogin: function() {
-      return navigate('/login');
     },
     processForgotPassword: function() {
       var params;
@@ -5048,7 +5021,7 @@ module.exports = React.createFactory(React.createClass({
         className: "user-wrapper"
       }, div({
         className: "user-content"
-      }, "Forgot Password", this.state.sentRecoveryEmail === false ? div({}, div({}, React.createElement(TextField, {
+      }, "Forgot Password", this.state.sentRecoveryEmail === false ? div({}, div({}, React.createElement(Material.TextField, {
         id: "forgot-email",
         floatingLabelText: "Email",
         value: this.state.inputs.email.value,
@@ -5058,13 +5031,13 @@ module.exports = React.createFactory(React.createClass({
         display: 'inline-block',
         position: 'relative',
         boxShadow: 'none'
-      }, React.createElement(RefreshIndicator, {
+      }, React.createElement(Material.RefreshIndicator, {
         style: this.style,
         size: 50,
         left: 0,
         top: 0,
         status: "loading"
-      })) : React.createElement(RaisedButton, {
+      })) : React.createElement(Material.RaisedButton, {
         label: "Reset Password",
         primary: true,
         onClick: this.processForgotPassword
@@ -5366,8 +5339,10 @@ module.exports = React.createFactory(React.createClass({
 
   SessionMixin = require("mixins/SessionMixin");
 
+  LinksMixin = require("mixins/LinksMixin");
+
   module.exports = React.createFactory(React.createClass({
-    mixins: [SessionMixin],
+    mixins: [SessionMixin, LinksMixin],
     displayName: 'Prediction',
     getInitialState: function() {
       return {
@@ -5475,9 +5450,6 @@ module.exports = React.createFactory(React.createClass({
       return this.setState({
         voteSubmitted: false
       });
-    },
-    goToCategory: function(id) {
-      return navigate("/categories/" + id);
     },
     categoryMaterialStyle: function() {
       return {
@@ -5675,14 +5647,11 @@ module.exports = React.createFactory(React.createClass({
 
   Footer = require("components/Footer");
 
-  TextField = Material.TextField;
-
-  RaisedButton = Material.RaisedButton;
-
-  RefreshIndicator = Material.RefreshIndicator;
+  LinksMixin = require("mixins/LinksMixin");
 
   module.exports = React.createFactory(React.createClass({
     displayName: 'Register',
+    mixins: [LinksMixin],
     getInitialState: function() {
       return {
         email: '',
@@ -5692,9 +5661,6 @@ module.exports = React.createFactory(React.createClass({
         registerError: null,
         registerLoading: false
       };
-    },
-    goToLogin: function() {
-      return navigate('/login');
     },
     handleEmailChange: function(event) {
       return this.setState({
@@ -5806,20 +5772,20 @@ module.exports = React.createFactory(React.createClass({
         className: "user-wrapper"
       }, div({
         className: "user-content"
-      }, "Register", div({}, div({}, React.createElement(TextField, {
+      }, "Register", div({}, div({}, React.createElement(Material.TextField, {
         id: "register-email",
         floatingLabelText: "Email",
         value: this.state.email,
         onChange: this.handleEmailChange,
         errorText: this.getErrorText("email")
-      })), div({}, React.createElement(TextField, {
+      })), div({}, React.createElement(Material.TextField, {
         id: "register-password",
         floatingLabelText: "Password",
         type: "password",
         value: this.state.password,
         onChange: this.handlePasswordChange,
         errorText: this.getErrorText("password")
-      })), div({}, React.createElement(TextField, {
+      })), div({}, React.createElement(Material.TextField, {
         id: "register-password-confirmation",
         floatingLabelText: "Confirm",
         type: "password",
@@ -5830,13 +5796,13 @@ module.exports = React.createFactory(React.createClass({
         display: 'inline-block',
         position: 'relative',
         boxShadow: 'none'
-      }, React.createElement(RefreshIndicator, {
+      }, React.createElement(Material.RefreshIndicator, {
         style: this.style,
         size: 50,
         left: 0,
         top: 0,
         status: "loading"
-      })) : React.createElement(RaisedButton, {
+      })) : React.createElement(Material.RaisedButton, {
         label: "Register",
         primary: true,
         onClick: this.processRegister
@@ -5910,7 +5876,7 @@ module.exports = React.createFactory(React.createClass({
 
 }).call(this);
 
-},{"./components/Footer":1,"./components/Header":2,"components/AddToClaim":566,"components/AddToExpert":567,"components/AddToPrediction":568,"components/BookmarkIndicator":569,"components/CategoryClaims":570,"components/CategoryExperts":571,"components/CategoryPredictions":572,"components/CategorySubHead":573,"components/ClaimCard":574,"components/ClaimEvidences":575,"components/ClaimExpertCard":576,"components/ClaimFields":577,"components/Comments":578,"components/ExpertBonaFides":579,"components/ExpertCard":580,"components/ExpertClaimCard":581,"components/ExpertFields":582,"components/ExpertPredictionCard":583,"components/ExpertSubstantiations":584,"components/Footer":585,"components/Header":586,"components/Pagination":587,"components/PredictionCard":588,"components/PredictionEvidences":589,"components/PredictionExpertCard":590,"components/PredictionFields":591,"components/Votes":592,"lodash":180,"material-ui":318,"material-ui/styles/MuiThemeProvider":337,"material-ui/styles/colors":339,"material-ui/styles/getMuiTheme":340,"mixins/PaginationMixin":593,"mixins/SessionMixin":594,"react":551,"react-dom":377,"react-mini-router":509,"react-tap-event-plugin":520,"shared/API":595,"shared/Global":596,"stores/UserStore":597,"views/404":598,"views/Bookmarks":599,"views/Categories":600,"views/CategoryAll":601,"views/CategoryClaims":602,"views/CategoryExperts":603,"views/CategoryPredictions":604,"views/Claim":605,"views/Claims":606,"views/CreateClaim":607,"views/CreateExpert":608,"views/CreatePrediction":609,"views/Expert":610,"views/Experts":611,"views/ForgotPassword":612,"views/Landing":613,"views/Login":614,"views/Prediction":615,"views/Predictions":616,"views/Register":617,"views/RegisterSuccessful":618,"views/User":619,"views/Users":620}],4:[function(require,module,exports){
+},{"./components/Footer":1,"./components/Header":2,"components/AddToClaim":566,"components/AddToExpert":567,"components/AddToPrediction":568,"components/BookmarkIndicator":569,"components/CategoryClaims":570,"components/CategoryExperts":571,"components/CategoryPredictions":572,"components/CategorySubHead":573,"components/ClaimCard":574,"components/ClaimEvidences":575,"components/ClaimExpertCard":576,"components/ClaimFields":577,"components/Comments":578,"components/ExpertBonaFides":579,"components/ExpertCard":580,"components/ExpertClaimCard":581,"components/ExpertFields":582,"components/ExpertPredictionCard":583,"components/ExpertSubstantiations":584,"components/Footer":585,"components/Header":586,"components/Pagination":587,"components/PredictionCard":588,"components/PredictionEvidences":589,"components/PredictionExpertCard":590,"components/PredictionFields":591,"components/Votes":592,"lodash":180,"material-ui":318,"material-ui/styles/MuiThemeProvider":337,"material-ui/styles/colors":339,"material-ui/styles/getMuiTheme":340,"mixins/LinksMixin":593,"mixins/PaginationMixin":594,"mixins/SessionMixin":595,"react":551,"react-dom":377,"react-mini-router":509,"react-tap-event-plugin":520,"shared/API":596,"shared/Global":597,"stores/UserStore":598,"views/404":599,"views/Bookmarks":600,"views/Categories":601,"views/CategoryAll":602,"views/CategoryClaims":603,"views/CategoryExperts":604,"views/CategoryPredictions":605,"views/Claim":606,"views/Claims":607,"views/CreateClaim":608,"views/CreateExpert":609,"views/CreatePrediction":610,"views/Expert":611,"views/Experts":612,"views/ForgotPassword":613,"views/Landing":614,"views/Login":615,"views/Prediction":616,"views/Predictions":617,"views/Register":618,"views/RegisterSuccessful":619,"views/User":620,"views/Users":621}],4:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/array/from"), __esModule: true };
 },{"core-js/library/fn/array/from":26}],5:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/get-iterator"), __esModule: true };
@@ -83483,15 +83449,15 @@ module.exports = React.createFactory(React.createClass({
 
 
 },{}],570:[function(require,module,exports){
-var div;
+var LinksMixin, div;
 
 div = React.DOM.div;
 
+LinksMixin = require("mixins/LinksMixin");
+
 module.exports = React.createFactory(React.createClass({
   displayName: "Category Claims - Latest",
-  goToClaim: function(id) {
-    return navigate("/claims/" + id);
-  },
+  mixins: [LinksMixin],
   render: function() {
     return div({
       className: "categories__claims"
@@ -83514,16 +83480,16 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],571:[function(require,module,exports){
-var div;
+},{"mixins/LinksMixin":593}],571:[function(require,module,exports){
+var LinksMixin, div;
 
 div = React.DOM.div;
 
+LinksMixin = require("mixins/LinksMixin");
+
 module.exports = React.createFactory(React.createClass({
   displayName: "Category Experts - Latest",
-  goToExpert: function(id) {
-    return navigate("/experts/" + id);
-  },
+  mixins: [LinksMixin],
   render: function() {
     return div({
       className: "categories__experts"
@@ -83546,16 +83512,16 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],572:[function(require,module,exports){
-var div;
+},{"mixins/LinksMixin":593}],572:[function(require,module,exports){
+var LinksMixin, div;
 
 div = React.DOM.div;
 
+LinksMixin = require("mixins/LinksMixin");
+
 module.exports = React.createFactory(React.createClass({
   displayName: "Category Predictions - Latest",
-  goToPredictions: function(id) {
-    return navigate("/predictions/" + id);
-  },
+  mixins: [LinksMixin],
   render: function() {
     return div({
       className: "categories__predictions"
@@ -83568,7 +83534,7 @@ module.exports = React.createFactory(React.createClass({
           key: "category-predictions-" + index
         }, div({
           className: "categories__predictions__prediction-title",
-          onClick: _this.goToPredictions.bind(_this, prediction.id)
+          onClick: _this.goToPrediction.bind(_this, prediction.id)
         }, prediction.title));
       };
     })(this)) : div({
@@ -83578,7 +83544,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],573:[function(require,module,exports){
+},{"mixins/LinksMixin":593}],573:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -83647,28 +83613,15 @@ module.exports = React.createFactory(React.createClass({
 
 
 },{}],574:[function(require,module,exports){
-var Card, CardActions, CardHeader, CardText, FlatButton, a, br, div, img, ref, span;
-
-Card = Material.Card;
-
-CardHeader = Material.CardHeader;
-
-CardText = Material.CardText;
-
-CardActions = Material.CardActions;
-
-FlatButton = Material.FlatButton;
+var LinksMixin, a, br, div, img, ref, span;
 
 ref = React.DOM, div = ref.div, img = ref.img, a = ref.a, br = ref.br, span = ref.span;
 
+LinksMixin = require("mixins/LinksMixin");
+
 module.exports = React.createFactory(React.createClass({
   displayName: 'ClaimCard',
-  goToExpert: function(id) {
-    return navigate("/experts/" + id);
-  },
-  goToClaim: function(id) {
-    return navigate("/claims/" + id);
-  },
+  mixins: [LinksMixin],
   getDescription: function() {
     var claim;
     claim = this.props.claim;
@@ -83690,9 +83643,6 @@ module.exports = React.createFactory(React.createClass({
       }
     }
   },
-  goToCategory: function(id) {
-    return navigate("/categories/" + id);
-  },
   claimDate: function() {
     var claim;
     claim = this.props.claim;
@@ -83713,7 +83663,7 @@ module.exports = React.createFactory(React.createClass({
     claim = this.props.claim;
     return div({
       className: "claim-card"
-    }, React.createElement(Card, {}, React.createElement(CardHeader, {
+    }, React.createElement(Material.Card, {}, React.createElement(Material.CardHeader, {
       title: claim.title,
       subtitle: this.getDescription()
     }), div({
@@ -83753,12 +83703,12 @@ module.exports = React.createFactory(React.createClass({
           className: "claim-card-experts__expert-name"
         }, expert.name));
       };
-    })(this))) : void 0), React.createElement(CardActions, {}, claim.status === 0 && UserStore.loggedIn() ? div({
+    })(this))) : void 0), React.createElement(Material.CardActions, {}, claim.status === 0 && UserStore.loggedIn() ? div({
       className: "claim-card-vote",
       onClick: this.goToClaim
     }, "VOTE") : claim.status === 0 && !UserStore.loggedIn() ? div({
       className: "claim-card-vote"
-    }, "Log in to Vote") : void 0, React.createElement(FlatButton, {
+    }, "Log in to Vote") : void 0, React.createElement(Material.FlatButton, {
       label: "View",
       onClick: this.goToClaim.bind(this, claim.alias)
     }))));
@@ -83766,7 +83716,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],575:[function(require,module,exports){
+},{"mixins/LinksMixin":593}],575:[function(require,module,exports){
 var a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
@@ -83856,21 +83806,21 @@ module.exports = React.createFactory(React.createClass({
 
 
 },{}],576:[function(require,module,exports){
-var ExpertSubstantiations, div;
+var ExpertSubstantiations, LinksMixin, div;
 
 div = React.DOM.div;
 
 ExpertSubstantiations = require("components/ExpertSubstantiations");
 
+LinksMixin = require("mixins/LinksMixin");
+
 module.exports = React.createFactory(React.createClass({
   displayName: "ClaimExpertCard",
+  mixins: [LinksMixin],
   getInitialState: function() {
     return {
       showSubstantiation: false
     };
-  },
-  goToItem: function(id) {
-    return navigate("/experts/" + id);
   },
   showSubstantiation: function() {
     var expert;
@@ -83896,7 +83846,7 @@ module.exports = React.createFactory(React.createClass({
       className: "claim__experts-list-item"
     }, div({
       className: "claim__experts-list-item__title",
-      onClick: this.goToItem.bind(this, expert.alias)
+      onClick: this.goToExpert.bind(this, expert.alias)
     }, expert.name), div({
       className: "claim__experts-list-item__substantiations",
       onClick: this.toggleSubstantiation
@@ -83909,7 +83859,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ExpertSubstantiations":584}],577:[function(require,module,exports){
+},{"components/ExpertSubstantiations":584,"mixins/LinksMixin":593}],577:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -84226,7 +84176,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Pagination":587,"mixins/PaginationMixin":593}],579:[function(require,module,exports){
+},{"components/Pagination":587,"mixins/PaginationMixin":594}],579:[function(require,module,exports){
 var a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
@@ -84328,26 +84278,15 @@ module.exports = React.createFactory(React.createClass({
 
 
 },{}],580:[function(require,module,exports){
-var Card, CardActions, CardHeader, CardMedia, CardText, CardTitle, FlatButton, a, br, div, img, ref, span;
-
-Card = Material.Card;
-
-CardHeader = Material.CardHeader;
-
-CardMedia = Material.CardMedia;
-
-CardText = Material.CardText;
-
-CardTitle = Material.CardTitle;
-
-CardActions = Material.CardActions;
-
-FlatButton = Material.FlatButton;
+var LinksMixin, a, br, div, img, ref, span;
 
 ref = React.DOM, div = ref.div, img = ref.img, br = ref.br, span = ref.span, a = ref.a;
 
+LinksMixin = require("mixins/LinksMixin");
+
 module.exports = React.createFactory(React.createClass({
   displayName: 'ExpertCard',
+  mixins: [LinksMixin],
   avatar: function() {
     var expert;
     expert = this.props.expert;
@@ -84356,28 +84295,16 @@ module.exports = React.createFactory(React.createClass({
     }
     return "/images/avatars/placeholder.png";
   },
-  goToExpert: function(id) {
-    return navigate("/experts/" + id);
-  },
   getExpertDescription: function() {
     if (this.props.expert.description != null) {
       return this.props.expert.description;
     }
     return '';
   },
-  goToMostRecentClaim: function() {
-    return navigate("/claims/" + this.props.expert.most_recent_claim[0].alias);
-  },
-  goToMostRecentPrediction: function() {
-    return navigate("/predictions/" + this.props.expert.most_recent_prediction[0].alias);
-  },
   showAccuracy: function() {
     var accuracy;
     accuracy = this.props.expert.accuracy;
     return Math.floor(accuracy * 100) + "%";
-  },
-  goToCategory: function(id) {
-    return navigate("/categories/" + id);
   },
   getCommentInfo: function() {
     var expert;
@@ -84389,14 +84316,14 @@ module.exports = React.createFactory(React.createClass({
     expert = this.props.expert;
     return div({
       className: "expert-card"
-    }, React.createElement(Card, {}, React.createElement(CardMedia, {
-      overlay: React.createElement(CardTitle, {
+    }, React.createElement(Material.Card, {}, React.createElement(Material.CardMedia, {
+      overlay: React.createElement(Material.CardTitle, {
         title: expert.name,
         subtitle: this.getExpertDescription()
       })
     }, img({
       src: this.avatar()
-    })), React.createElement(CardText, {}, this.getAccuracy), div({
+    })), React.createElement(Material.CardText, {}, this.getAccuracy), div({
       className: "expert-card-meta"
     }, div({
       className: "expert-card-meta__left"
@@ -84424,7 +84351,7 @@ module.exports = React.createFactory(React.createClass({
           onClick: _this.goToCategory.bind(_this, category.id)
         }, category.name);
       };
-    })(this))) : void 0, React.createElement(CardActions, {}, React.createElement(FlatButton, {
+    })(this))) : void 0, React.createElement(Material.CardActions, {}, React.createElement(Material.FlatButton, {
       label: "View",
       onClick: this.goToExpert.bind(this, expert.alias)
     }))));
@@ -84432,22 +84359,22 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],581:[function(require,module,exports){
-var ExpertSubstantiations, div;
+},{"mixins/LinksMixin":593}],581:[function(require,module,exports){
+var ExpertSubstantiations, LinksMixin, div;
 
 div = React.DOM.div;
 
 ExpertSubstantiations = require("components/ExpertSubstantiations");
 
+LinksMixin = require("mixins/LinksMixin");
+
 module.exports = React.createFactory(React.createClass({
   displayName: "ExpertClaimCard",
+  mixins: [LinksMixin],
   getInitialState: function() {
     return {
       showSubstantiation: false
     };
-  },
-  goToItem: function(id) {
-    return navigate("/claims/" + id);
   },
   showSubstantiation: function() {
     var claim;
@@ -84473,7 +84400,7 @@ module.exports = React.createFactory(React.createClass({
       className: "expert__claims-list-item"
     }, div({
       className: "expert__claims-list-item__title",
-      onClick: this.goToItem.bind(this, claim.alias)
+      onClick: this.goToClaim.bind(this, claim.alias)
     }, claim.title), div({
       className: "expert__claims-list-item__substantiations",
       onClick: this.toggleSubstantiation
@@ -84486,7 +84413,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ExpertSubstantiations":584}],582:[function(require,module,exports){
+},{"components/ExpertSubstantiations":584,"mixins/LinksMixin":593}],582:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -84617,21 +84544,21 @@ module.exports = React.createFactory(React.createClass({
 
 
 },{}],583:[function(require,module,exports){
-var ExpertSubstantiations, div;
+var ExpertSubstantiations, LinksMixin, div;
 
 div = React.DOM.div;
 
 ExpertSubstantiations = require("components/ExpertSubstantiations");
 
+LinksMixin = require("mixins/LinksMixin");
+
 module.exports = React.createFactory(React.createClass({
   displayName: "ExpertPredictionCard",
+  mixins: [LinksMixin],
   getInitialState: function() {
     return {
       showSubstantiation: false
     };
-  },
-  goToItem: function(id) {
-    return navigate("/predictions/" + id);
   },
   showSubstantiation: function() {
     var prediction;
@@ -84657,7 +84584,7 @@ module.exports = React.createFactory(React.createClass({
       className: "expert__predictions-list-item"
     }, div({
       className: "expert__predictions-list-item__title",
-      onClick: this.goToItem.bind(this, prediction.alias)
+      onClick: this.goToPrediction.bind(this, prediction.alias)
     }, prediction.title), div({
       className: "expert__predictions-list-item__substatiations",
       onClick: this.toggleSubstantiation
@@ -84670,7 +84597,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ExpertSubstantiations":584}],584:[function(require,module,exports){
+},{"components/ExpertSubstantiations":584,"mixins/LinksMixin":593}],584:[function(require,module,exports){
 var a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
@@ -84809,9 +84736,9 @@ module.exports = React.createFactory(React.createClass({
 
 },{}],585:[function(require,module,exports){
 module.exports=require(1)
-},{"mixins/SessionMixin":594}],586:[function(require,module,exports){
+},{"mixins/SessionMixin":595}],586:[function(require,module,exports){
 module.exports=require(2)
-},{}],587:[function(require,module,exports){
+},{"mixins/LinksMixin":593}],587:[function(require,module,exports){
 var FlatButton, FontIcon, IconButton, div;
 
 div = React.DOM.div;
@@ -84956,7 +84883,7 @@ module.exports = React.createFactory(React.createClass({
 
 
 },{}],588:[function(require,module,exports){
-var Card, CardActions, CardHeader, CardText, FlatButton, a, br, div, img, ref, span;
+var Card, CardActions, CardHeader, CardText, FlatButton, LinksMixin, a, br, div, img, ref, span;
 
 Card = Material.Card;
 
@@ -84970,14 +84897,11 @@ FlatButton = Material.FlatButton;
 
 ref = React.DOM, div = ref.div, img = ref.img, a = ref.a, br = ref.br, span = ref.span;
 
+LinksMixin = require("mixins/LinksMixin");
+
 module.exports = React.createFactory(React.createClass({
-  displayName: 'PRedictionCard',
-  goToExpert: function(id) {
-    return navigate("/experts/" + id);
-  },
-  goToPrediction: function(id) {
-    return navigate("/predictions/" + id);
-  },
+  displayName: 'PredictionCard',
+  mixins: [LinksMixin],
   getDescription: function() {
     var prediction;
     prediction = this.props.prediction;
@@ -85008,9 +84932,6 @@ module.exports = React.createFactory(React.createClass({
     var prediction;
     prediction = this.props.prediction;
     return prediction.comments_count + " comments";
-  },
-  goToCategory: function(id) {
-    return navigate("/categories/" + id);
   },
   predictionDate: function() {
     var prediction;
@@ -85075,7 +84996,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],589:[function(require,module,exports){
+},{"mixins/LinksMixin":593}],589:[function(require,module,exports){
 var a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
@@ -85165,21 +85086,21 @@ module.exports = React.createFactory(React.createClass({
 
 
 },{}],590:[function(require,module,exports){
-var ExpertSubstantiations, div;
+var ExpertSubstantiations, LinksMixin, div;
 
 div = React.DOM.div;
 
 ExpertSubstantiations = require("components/ExpertSubstantiations");
 
+LinksMixin = require("mixins/LinksMixin");
+
 module.exports = React.createFactory(React.createClass({
   displayName: "PredictioNExpertCard",
+  mixins: [LinksMixin],
   getInitialState: function() {
     return {
       showSubstantiation: false
     };
-  },
-  goToItem: function(id) {
-    return navigate("/experts/" + id);
   },
   showSubstantiation: function() {
     var expert;
@@ -85205,7 +85126,7 @@ module.exports = React.createFactory(React.createClass({
       className: "prediction__experts-list-item"
     }, div({
       className: "prediction__experts-list-item__title",
-      onClick: this.goToItem.bind(this, expert.alias)
+      onClick: this.goToExpert.bind(this, expert.alias)
     }, expert.name), div({
       className: "prediction__experts-list-item__substantiations",
       onClick: this.toggleSubstantiation
@@ -85218,7 +85139,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ExpertSubstantiations":584}],591:[function(require,module,exports){
+},{"components/ExpertSubstantiations":584,"mixins/LinksMixin":593}],591:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -85405,6 +85326,32 @@ module.exports = React.createFactory(React.createClass({
 
 },{}],593:[function(require,module,exports){
 module.exports = {
+  goToClaim: function(id) {
+    return navigate("/claims/" + id);
+  },
+  goToExpert: function(id) {
+    return navigate("/experts/" + id);
+  },
+  goToPrediction: function(id) {
+    return navigate("/predictions/" + id);
+  },
+  goToCategory: function(id) {
+    return navigate("/categories/" + id);
+  },
+  goToMostRecentClaim: function() {
+    return navigate("/claims/" + this.props.expert.most_recent_claim[0].alias);
+  },
+  goToMostRecentPrediction: function() {
+    return navigate("/predictions/" + this.props.expert.most_recent_prediction[0].alias);
+  },
+  goToLogin: function() {
+    return navigate('/login');
+  }
+};
+
+
+},{}],594:[function(require,module,exports){
+module.exports = {
   getInitialState: function() {
     return {
       page: 1,
@@ -85436,7 +85383,7 @@ module.exports = {
 };
 
 
-},{}],594:[function(require,module,exports){
+},{}],595:[function(require,module,exports){
 module.exports = {
   setUser: function(data, request) {
     window.UserStore.set(data, request);
@@ -85542,7 +85489,7 @@ module.exports = {
 };
 
 
-},{}],595:[function(require,module,exports){
+},{}],596:[function(require,module,exports){
 
 /*
 API Class.
@@ -85826,7 +85773,7 @@ module.exports = API = (function() {
 })();
 
 
-},{}],596:[function(require,module,exports){
+},{}],597:[function(require,module,exports){
 var Global;
 
 module.exports = Global = (function() {
@@ -85871,7 +85818,7 @@ module.exports = Global = (function() {
 })();
 
 
-},{}],597:[function(require,module,exports){
+},{}],598:[function(require,module,exports){
 var UserStore,
   bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
@@ -86068,7 +86015,7 @@ module.exports = new UserStore({
 });
 
 
-},{}],598:[function(require,module,exports){
+},{}],599:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -86089,7 +86036,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":585,"components/Header":586}],599:[function(require,module,exports){
+},{"components/Footer":585,"components/Header":586}],600:[function(require,module,exports){
 var Footer, Header, div, ref, span;
 
 ref = React.DOM, div = ref.div, span = ref.span;
@@ -86132,7 +86079,7 @@ module.exports = React.createFactory(React.createClass({
       return "";
     }
   },
-  goToItem: function(bookmark) {
+  goToBookmarkItem: function(bookmark) {
     return navigate("/" + bookmark.type + "s/" + bookmark.alias);
   },
   sentenceCase: function(text) {
@@ -86203,7 +86150,7 @@ module.exports = React.createFactory(React.createClass({
           className: "bookmarks__list__item-type"
         }, _this.sentenceCase(bookmark.type) + ": "), div({
           className: "bookmarks__list__item-title",
-          onClick: _this.goToItem.bind(_this, bookmark)
+          onClick: _this.goToBookmarkItem.bind(_this, bookmark)
         }, bookmark.title), div({
           className: "bookmarks__list__item-new"
         }, _this.showBookmarkNewStatus(bookmark["new"]))), div({}, div({
@@ -86221,8 +86168,8 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":585,"components/Header":586}],600:[function(require,module,exports){
-var Footer, Header, div;
+},{"components/Footer":585,"components/Header":586}],601:[function(require,module,exports){
+var Footer, Header, LinksMixin, div;
 
 div = React.DOM.div;
 
@@ -86230,8 +86177,11 @@ Header = require("components/Header");
 
 Footer = require("components/Footer");
 
+LinksMixin = require("mixins/LinksMixin");
+
 module.exports = React.createFactory(React.createClass({
   displayName: 'Categories',
+  mixins: [LinksMixin],
   getInitialState: function() {
     return {
       categories: null
@@ -86252,9 +86202,6 @@ module.exports = React.createFactory(React.createClass({
     });
   },
   categoryListError: function(error) {},
-  goToCategory: function(id) {
-    return navigate("/categories/" + id);
-  },
   render: function() {
     return div({}, Header({}, ''), div({
       className: "categories-wrapper"
@@ -86275,7 +86222,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":585,"components/Header":586}],601:[function(require,module,exports){
+},{"components/Footer":585,"components/Header":586,"mixins/LinksMixin":593}],602:[function(require,module,exports){
 var CategoryClaims, CategoryExperts, CategoryPredictions, CategorySubHead, Footer, Header, div;
 
 div = React.DOM.div;
@@ -86362,7 +86309,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/CategoryClaims":570,"components/CategoryExperts":571,"components/CategoryPredictions":572,"components/CategorySubHead":573,"components/Footer":585,"components/Header":586}],602:[function(require,module,exports){
+},{"components/CategoryClaims":570,"components/CategoryExperts":571,"components/CategoryPredictions":572,"components/CategorySubHead":573,"components/Footer":585,"components/Header":586}],603:[function(require,module,exports){
 var CategoryClaims, CategorySubHead, Footer, Header, div;
 
 div = React.DOM.div;
@@ -86441,7 +86388,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/CategoryClaims":570,"components/CategorySubHead":573,"components/Footer":585,"components/Header":586}],603:[function(require,module,exports){
+},{"components/CategoryClaims":570,"components/CategorySubHead":573,"components/Footer":585,"components/Header":586}],604:[function(require,module,exports){
 var CategoryExperts, CategorySubHead, Footer, Header, div;
 
 div = React.DOM.div;
@@ -86520,7 +86467,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/CategoryExperts":571,"components/CategorySubHead":573,"components/Footer":585,"components/Header":586}],604:[function(require,module,exports){
+},{"components/CategoryExperts":571,"components/CategorySubHead":573,"components/Footer":585,"components/Header":586}],605:[function(require,module,exports){
 var CategoryPredictions, CategorySubHead, Footer, Header, div;
 
 div = React.DOM.div;
@@ -86599,8 +86546,8 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/CategoryPredictions":572,"components/CategorySubHead":573,"components/Footer":585,"components/Header":586}],605:[function(require,module,exports){
-var AddToClaim, BookmarkIndicator, ClaimEvidences, ClaimExpertCard, Comments, Footer, Header, SessionMixin, Votes, div, img, ref;
+},{"components/CategoryPredictions":572,"components/CategorySubHead":573,"components/Footer":585,"components/Header":586}],606:[function(require,module,exports){
+var AddToClaim, BookmarkIndicator, ClaimEvidences, ClaimExpertCard, Comments, Footer, Header, LinksMixin, SessionMixin, Votes, div, img, ref;
 
 ref = React.DOM, div = ref.div, img = ref.img;
 
@@ -86622,8 +86569,10 @@ BookmarkIndicator = require("components/BookmarkIndicator");
 
 SessionMixin = require("mixins/SessionMixin");
 
+LinksMixin = require("mixins/LinksMixin");
+
 module.exports = React.createFactory(React.createClass({
-  mixins: [SessionMixin],
+  mixins: [SessionMixin, LinksMixin],
   displayName: 'Claim',
   getInitialState: function() {
     return {
@@ -86732,9 +86681,6 @@ module.exports = React.createFactory(React.createClass({
       voteSubmitted: false
     });
   },
-  goToCategory: function(id) {
-    return navigate("/categories/" + id);
-  },
   categoryMaterialStyle: function() {
     return {
       margin: 4
@@ -86842,7 +86788,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/AddToClaim":566,"components/BookmarkIndicator":569,"components/ClaimEvidences":575,"components/ClaimExpertCard":576,"components/Comments":578,"components/Footer":585,"components/Header":586,"components/Votes":592,"mixins/SessionMixin":594}],606:[function(require,module,exports){
+},{"components/AddToClaim":566,"components/BookmarkIndicator":569,"components/ClaimEvidences":575,"components/ClaimExpertCard":576,"components/Comments":578,"components/Footer":585,"components/Header":586,"components/Votes":592,"mixins/LinksMixin":593,"mixins/SessionMixin":595}],607:[function(require,module,exports){
 var ClaimCard, Footer, Header, Pagination, PaginationMixin, RaisedButton, div;
 
 div = React.DOM.div;
@@ -86927,7 +86873,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ClaimCard":574,"components/Footer":585,"components/Header":586,"components/Pagination":587,"mixins/PaginationMixin":593}],607:[function(require,module,exports){
+},{"components/ClaimCard":574,"components/Footer":585,"components/Header":586,"components/Pagination":587,"mixins/PaginationMixin":594}],608:[function(require,module,exports){
 var ClaimFields, Footer, Header, div;
 
 div = React.DOM.div;
@@ -87058,7 +87004,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ClaimFields":577,"components/Footer":585,"components/Header":586}],608:[function(require,module,exports){
+},{"components/ClaimFields":577,"components/Footer":585,"components/Header":586}],609:[function(require,module,exports){
 var ExpertFields, Footer, Header, div;
 
 div = React.DOM.div;
@@ -87198,7 +87144,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ExpertFields":582,"components/Footer":585,"components/Header":586}],609:[function(require,module,exports){
+},{"components/ExpertFields":582,"components/Footer":585,"components/Header":586}],610:[function(require,module,exports){
 var Footer, Header, PredictionFields, div;
 
 div = React.DOM.div;
@@ -87337,8 +87283,8 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":585,"components/Header":586,"components/PredictionFields":591}],610:[function(require,module,exports){
-var AddToExpert, BookmarkIndicator, Comments, ExpertBonaFides, ExpertClaimCard, ExpertPredictionCard, Footer, Header, SessionMixin, div, img, ref;
+},{"components/Footer":585,"components/Header":586,"components/PredictionFields":591}],611:[function(require,module,exports){
+var AddToExpert, BookmarkIndicator, Comments, ExpertBonaFides, ExpertClaimCard, ExpertPredictionCard, Footer, Header, LinksMixin, SessionMixin, div, img, ref;
 
 ref = React.DOM, div = ref.div, img = ref.img;
 
@@ -87360,8 +87306,10 @@ BookmarkIndicator = require("components/BookmarkIndicator");
 
 SessionMixin = require("mixins/SessionMixin");
 
+LinksMixin = require("mixins/LinksMixin");
+
 module.exports = React.createFactory(React.createClass({
-  mixins: [SessionMixin],
+  mixins: [SessionMixin, LinksMixin],
   displayName: 'Experts',
   getInitialState: function() {
     return {
@@ -87412,9 +87360,6 @@ module.exports = React.createFactory(React.createClass({
   },
   goToBonaFide: function(url) {
     return window.open(url, '_blank');
-  },
-  goToCategory: function(id) {
-    return navigate("/categories/" + id);
   },
   categoryMaterialStyle: function() {
     return {
@@ -87548,7 +87493,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/AddToExpert":567,"components/BookmarkIndicator":569,"components/Comments":578,"components/ExpertBonaFides":579,"components/ExpertClaimCard":581,"components/ExpertPredictionCard":583,"components/Footer":585,"components/Header":586,"mixins/SessionMixin":594}],611:[function(require,module,exports){
+},{"components/AddToExpert":567,"components/BookmarkIndicator":569,"components/Comments":578,"components/ExpertBonaFides":579,"components/ExpertClaimCard":581,"components/ExpertPredictionCard":583,"components/Footer":585,"components/Header":586,"mixins/LinksMixin":593,"mixins/SessionMixin":595}],612:[function(require,module,exports){
 var ExpertCard, Footer, Header, Pagination, PaginationMixin, div;
 
 div = React.DOM.div;
@@ -87631,8 +87576,8 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ExpertCard":580,"components/Footer":585,"components/Header":586,"components/Pagination":587,"mixins/PaginationMixin":593}],612:[function(require,module,exports){
-var Footer, Header, RaisedButton, RefreshIndicator, TextField, a, div, ref;
+},{"components/ExpertCard":580,"components/Footer":585,"components/Header":586,"components/Pagination":587,"mixins/PaginationMixin":594}],613:[function(require,module,exports){
+var Footer, Header, LinksMixin, a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
 
@@ -87640,14 +87585,11 @@ Header = require("components/Header");
 
 Footer = require("components/Footer");
 
-TextField = Material.TextField;
-
-RaisedButton = Material.RaisedButton;
-
-RefreshIndicator = Material.RefreshIndicator;
+LinksMixin = require("mixins/LinksMixin");
 
 module.exports = React.createFactory(React.createClass({
   displayName: 'Forgot Password',
+  mixins: [LinksMixin],
   getInitialState: function() {
     return {
       inputs: {
@@ -87661,9 +87603,6 @@ module.exports = React.createFactory(React.createClass({
       forgotError: false,
       sentRecoveryEmail: false
     };
-  },
-  goToLogin: function() {
-    return navigate('/login');
   },
   processForgotPassword: function() {
     var params;
@@ -87742,7 +87681,7 @@ module.exports = React.createFactory(React.createClass({
       className: "user-wrapper"
     }, div({
       className: "user-content"
-    }, "Forgot Password", this.state.sentRecoveryEmail === false ? div({}, div({}, React.createElement(TextField, {
+    }, "Forgot Password", this.state.sentRecoveryEmail === false ? div({}, div({}, React.createElement(Material.TextField, {
       id: "forgot-email",
       floatingLabelText: "Email",
       value: this.state.inputs.email.value,
@@ -87752,13 +87691,13 @@ module.exports = React.createFactory(React.createClass({
       display: 'inline-block',
       position: 'relative',
       boxShadow: 'none'
-    }, React.createElement(RefreshIndicator, {
+    }, React.createElement(Material.RefreshIndicator, {
       style: this.style,
       size: 50,
       left: 0,
       top: 0,
       status: "loading"
-    })) : React.createElement(RaisedButton, {
+    })) : React.createElement(Material.RaisedButton, {
       label: "Reset Password",
       primary: true,
       onClick: this.processForgotPassword
@@ -87769,7 +87708,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":585,"components/Header":586}],613:[function(require,module,exports){
+},{"components/Footer":585,"components/Header":586,"mixins/LinksMixin":593}],614:[function(require,module,exports){
 var ClaimCard, ExpertCard, Footer, Header, PredictionCard, div;
 
 div = React.DOM.div;
@@ -87889,7 +87828,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ClaimCard":574,"components/ExpertCard":580,"components/Footer":585,"components/Header":586,"components/PredictionCard":588}],614:[function(require,module,exports){
+},{"components/ClaimCard":574,"components/ExpertCard":580,"components/Footer":585,"components/Header":586,"components/PredictionCard":588}],615:[function(require,module,exports){
 var Footer, Header, RaisedButton, RefreshIndicator, SessionMixin, TextField, a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
@@ -88049,8 +87988,8 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":585,"components/Header":586,"mixins/SessionMixin":594}],615:[function(require,module,exports){
-var AddToPrediction, BookmarkIndicator, Comments, Footer, Header, PredictionEvidences, PredictionExpertCard, SessionMixin, Votes, div, img, ref;
+},{"components/Footer":585,"components/Header":586,"mixins/SessionMixin":595}],616:[function(require,module,exports){
+var AddToPrediction, BookmarkIndicator, Comments, Footer, Header, LinksMixin, PredictionEvidences, PredictionExpertCard, SessionMixin, Votes, div, img, ref;
 
 ref = React.DOM, div = ref.div, img = ref.img;
 
@@ -88072,8 +88011,10 @@ BookmarkIndicator = require("components/BookmarkIndicator");
 
 SessionMixin = require("mixins/SessionMixin");
 
+LinksMixin = require("mixins/LinksMixin");
+
 module.exports = React.createFactory(React.createClass({
-  mixins: [SessionMixin],
+  mixins: [SessionMixin, LinksMixin],
   displayName: 'Prediction',
   getInitialState: function() {
     return {
@@ -88181,9 +88122,6 @@ module.exports = React.createFactory(React.createClass({
     return this.setState({
       voteSubmitted: false
     });
-  },
-  goToCategory: function(id) {
-    return navigate("/categories/" + id);
   },
   categoryMaterialStyle: function() {
     return {
@@ -88297,7 +88235,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/AddToPrediction":568,"components/BookmarkIndicator":569,"components/Comments":578,"components/Footer":585,"components/Header":586,"components/PredictionEvidences":589,"components/PredictionExpertCard":590,"components/Votes":592,"mixins/SessionMixin":594}],616:[function(require,module,exports){
+},{"components/AddToPrediction":568,"components/BookmarkIndicator":569,"components/Comments":578,"components/Footer":585,"components/Header":586,"components/PredictionEvidences":589,"components/PredictionExpertCard":590,"components/Votes":592,"mixins/LinksMixin":593,"mixins/SessionMixin":595}],617:[function(require,module,exports){
 var Footer, Header, Pagination, PaginationMixin, PredictionCard, div;
 
 div = React.DOM.div;
@@ -88380,8 +88318,8 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":585,"components/Header":586,"components/Pagination":587,"components/PredictionCard":588,"mixins/PaginationMixin":593}],617:[function(require,module,exports){
-var Footer, Header, RaisedButton, RefreshIndicator, TextField, a, div, ref;
+},{"components/Footer":585,"components/Header":586,"components/Pagination":587,"components/PredictionCard":588,"mixins/PaginationMixin":594}],618:[function(require,module,exports){
+var Footer, Header, LinksMixin, a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
 
@@ -88389,14 +88327,11 @@ Header = require("components/Header");
 
 Footer = require("components/Footer");
 
-TextField = Material.TextField;
-
-RaisedButton = Material.RaisedButton;
-
-RefreshIndicator = Material.RefreshIndicator;
+LinksMixin = require("mixins/LinksMixin");
 
 module.exports = React.createFactory(React.createClass({
   displayName: 'Register',
+  mixins: [LinksMixin],
   getInitialState: function() {
     return {
       email: '',
@@ -88406,9 +88341,6 @@ module.exports = React.createFactory(React.createClass({
       registerError: null,
       registerLoading: false
     };
-  },
-  goToLogin: function() {
-    return navigate('/login');
   },
   handleEmailChange: function(event) {
     return this.setState({
@@ -88520,20 +88452,20 @@ module.exports = React.createFactory(React.createClass({
       className: "user-wrapper"
     }, div({
       className: "user-content"
-    }, "Register", div({}, div({}, React.createElement(TextField, {
+    }, "Register", div({}, div({}, React.createElement(Material.TextField, {
       id: "register-email",
       floatingLabelText: "Email",
       value: this.state.email,
       onChange: this.handleEmailChange,
       errorText: this.getErrorText("email")
-    })), div({}, React.createElement(TextField, {
+    })), div({}, React.createElement(Material.TextField, {
       id: "register-password",
       floatingLabelText: "Password",
       type: "password",
       value: this.state.password,
       onChange: this.handlePasswordChange,
       errorText: this.getErrorText("password")
-    })), div({}, React.createElement(TextField, {
+    })), div({}, React.createElement(Material.TextField, {
       id: "register-password-confirmation",
       floatingLabelText: "Confirm",
       type: "password",
@@ -88544,13 +88476,13 @@ module.exports = React.createFactory(React.createClass({
       display: 'inline-block',
       position: 'relative',
       boxShadow: 'none'
-    }, React.createElement(RefreshIndicator, {
+    }, React.createElement(Material.RefreshIndicator, {
       style: this.style,
       size: 50,
       left: 0,
       top: 0,
       status: "loading"
-    })) : React.createElement(RaisedButton, {
+    })) : React.createElement(Material.RaisedButton, {
       label: "Register",
       primary: true,
       onClick: this.processRegister
@@ -88561,7 +88493,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":585,"components/Header":586}],618:[function(require,module,exports){
+},{"components/Footer":585,"components/Header":586,"mixins/LinksMixin":593}],619:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -88582,7 +88514,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":585,"components/Header":586}],619:[function(require,module,exports){
+},{"components/Footer":585,"components/Header":586}],620:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -88614,7 +88546,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":585,"components/Header":586}],620:[function(require,module,exports){
+},{"components/Footer":585,"components/Header":586}],621:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;

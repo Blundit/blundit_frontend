@@ -38,7 +38,7 @@ module.exports = React.createFactory React.createClass
       return ""
 
   
-  goToItem: (bookmark) ->
+  goToBookmarkItem: (bookmark) ->
     navigate("/#{bookmark.type}s/#{bookmark.alias}")
 
   
@@ -118,7 +118,7 @@ module.exports = React.createFactory React.createClass
                       @sentenceCase(bookmark.type) + ": "
                     div
                       className: "bookmarks__list__item-title"
-                      onClick: @goToItem.bind(@, bookmark)
+                      onClick: @goToBookmarkItem.bind(@, bookmark)
                       bookmark.title
                     div
                       className: "bookmarks__list__item-new"

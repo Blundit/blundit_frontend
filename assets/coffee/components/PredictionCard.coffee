@@ -6,15 +6,11 @@ FlatButton = Material.FlatButton
 
 { div, img, a, br, span } = React.DOM
 
+LinksMixin = require("mixins/LinksMixin")
+
 module.exports = React.createFactory React.createClass
-  displayName: 'PRedictionCard'
-
-  goToExpert: (id) ->
-    navigate("/experts/#{id}")
-
-
-  goToPrediction: (id) ->
-    navigate("/predictions/#{id}")
+  displayName: 'PredictionCard'
+  mixins: [LinksMixin]
 
 
   getDescription: ->
@@ -46,10 +42,6 @@ module.exports = React.createFactory React.createClass
     return "#{prediction.comments_count} comments"
 
 
-  goToCategory: (id) ->
-    navigate("/categories/#{id}")
-
-  
   predictionDate: ->
     { prediction } = @props
     return prediction.created_at

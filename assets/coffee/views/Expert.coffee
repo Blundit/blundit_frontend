@@ -10,9 +10,10 @@ AddToExpert = require("components/AddToExpert")
 BookmarkIndicator = require("components/BookmarkIndicator")
 
 SessionMixin = require("mixins/SessionMixin")
+LinksMixin = require("mixins/LinksMixin")
 
 module.exports = React.createFactory React.createClass
-  mixins: [SessionMixin]
+  mixins: [SessionMixin, LinksMixin]
   displayName: 'Experts'
 
   getInitialState: ->
@@ -58,10 +59,6 @@ module.exports = React.createFactory React.createClass
     window.open url, '_blank'
 
   
-  goToCategory: (id) ->
-    navigate("/categories/#{id}")
-
-
   categoryMaterialStyle: ->
     { margin: 4 }
 

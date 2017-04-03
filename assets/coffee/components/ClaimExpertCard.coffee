@@ -1,18 +1,16 @@
 { div } = React.DOM
 
 ExpertSubstantiations = require("components/ExpertSubstantiations")
+LinksMixin = require("mixins/LinksMixin")
 
 module.exports = React.createFactory React.createClass
   displayName: "ClaimExpertCard"
+  mixins: [LinksMixin]
 
   getInitialState: ->
     showSubstantiation: false
 
 
-  goToItem: (id) ->
-    navigate("/experts/#{id}")
-
-  
   showSubstantiation: ->
     { expert } = @props
     return "X" if @state.showSubstantiation == true
@@ -32,7 +30,7 @@ module.exports = React.createFactory React.createClass
     div { className: "claim__experts-list-item" },
       div
         className: "claim__experts-list-item__title"
-        onClick: @goToItem.bind(@, expert.alias)
+        onClick: @goToExpert.bind(@, expert.alias)
         expert.name
       div
         className: "claim__experts-list-item__substantiations"

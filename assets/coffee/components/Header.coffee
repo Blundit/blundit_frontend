@@ -1,16 +1,18 @@
 { div, img } = React.DOM
 
-RaisedButton = Material.RaisedButton
-
 menuItems = [
   { label: "My Bookmarks", path: "/bookmarks", logged: true }
   { label: "Categories", path: "/categories" },
   { label: "Claims", path: "/claims" },
   { label: "Predictions", path: "/predictions" },
   { label: "Experts", path: "/experts" },
+  { label: "Search", path: "/search" }
 ]
 
+LinksMixin = require("mixins/LinksMixin")
+
 module.exports = React.createFactory React.createClass
+  mixins: [LinksMixin]
   getInitialState: ->
     user: null
 
@@ -48,10 +50,6 @@ module.exports = React.createFactory React.createClass
 
     return @class
 
-  
-  goToLogin: ->
-    navigate('/login')
-
 
   render: ->
     div { className: "header-wrapper" },
@@ -78,5 +76,5 @@ module.exports = React.createFactory React.createClass
                 backgroundImage: @getUserAvatar()
           else
             div {},
-              React.createElement(RaisedButton, { label: "Login/Signup", primary: true, onClick: @goToLogin })
+              React.createElement(Material.RaisedButton, { label: "Login/Signup", primary: true, onClick: @goToLogin })
 

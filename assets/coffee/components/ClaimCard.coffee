@@ -1,21 +1,10 @@
-Card = Material.Card
-CardHeader = Material.CardHeader
-CardText = Material.CardText
-CardActions = Material.CardActions
-FlatButton = Material.FlatButton
-
 { div, img, a, br, span } = React.DOM
+
+LinksMixin = require("mixins/LinksMixin")
 
 module.exports = React.createFactory React.createClass
   displayName: 'ClaimCard'
-
-  goToExpert: (id) ->
-    navigate("/experts/#{id}")
-
-
-  goToClaim: (id) ->
-    navigate("/claims/#{id}")
-
+  mixins: [LinksMixin]
 
   getDescription: ->
     { claim } = @props
@@ -34,10 +23,6 @@ module.exports = React.createFactory React.createClass
         return "Right"
       else
         return "Wrong"
-
-
-  goToCategory: (id) ->
-    navigate("/categories/#{id}")
 
   
   claimDate: ->
@@ -58,8 +43,8 @@ module.exports = React.createFactory React.createClass
   render: ->
     { claim } = @props
     div { className: "claim-card" },
-      React.createElement(Card, {},
-        React.createElement(CardHeader,
+      React.createElement(Material.Card, {},
+        React.createElement(Material.CardHeader,
           {
             title: claim.title
             subtitle: @getDescription()
@@ -98,7 +83,7 @@ module.exports = React.createFactory React.createClass
                     expert.name
           
 
-        React.createElement(CardActions, {},
+        React.createElement(Material.CardActions, {},
           if claim.status == 0 and UserStore.loggedIn()
             # also add check here to see if user has already voted
             # and add vote buttons
@@ -111,6 +96,6 @@ module.exports = React.createFactory React.createClass
               "Log in to Vote"
 
 
-          React.createElement(FlatButton, { label: "View", onClick: @goToClaim.bind(@, claim.alias) })
+          React.createElement(Material.FlatButton, { label: "View", onClick: @goToClaim.bind(@, claim.alias) })
         )
       )
