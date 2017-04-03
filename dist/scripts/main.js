@@ -2919,6 +2919,198 @@ module.exports = React.createFactory(React.createClass({
     updateUserHeaderInfo: function(request) {}
   };
 
+  UserStore = (function() {
+    function UserStore() {
+      this.get = bind(this.get, this);
+      this.set = bind(this.set, this);
+      this.emitChange = bind(this.emitChange, this);
+      this.unsubscribe = bind(this.unsubscribe, this);
+      this.subscribe = bind(this.subscribe, this);
+      this.dequeueMessagesFetch = bind(this.dequeueMessagesFetch, this);
+    }
+
+    UserStore.prototype.data = {};
+
+    UserStore.prototype.votes = [];
+
+    UserStore.prototype.subscribers = 0;
+
+    UserStore.prototype.changeEvent = 'blundit:user';
+
+    UserStore.prototype.fetchMessagesTimeout = null;
+
+    UserStore.prototype.lastMessagesFetch = null;
+
+    UserStore.prototype.messagesTtl = 60000;
+
+    UserStore.prototype.loggedIn = function() {
+      if (this.data && (this.data.token != null)) {
+        return true;
+      }
+      return false;
+    };
+
+    UserStore.prototype.dequeueMessagesFetch = function() {
+      clearTimeout(this.fetchMessagesTimeout);
+      return this.fetchMessagesTimeout = null;
+    };
+
+    UserStore.prototype.subscribe = function(callback) {
+      addEventListener(this.changeEvent, callback, false);
+      this.subscribers++;
+      if (this.data != null) {
+        return this.emitChange();
+      }
+    };
+
+    UserStore.prototype.unsubscribe = function(callback) {
+      removeEventListener(this.changeEvent, callback);
+      this.subscribers--;
+      if (!(this.subscribers > 0)) {
+        return this.dequeueMessagesFetch();
+      }
+    };
+
+    UserStore.prototype.emitChange = function() {
+      var event;
+      event = document.createEvent('Event');
+      event.initEvent(this.changeEvent, true, true);
+      return dispatchEvent(event);
+    };
+
+    UserStore.prototype.set = function(data, request) {
+      this.data = data;
+      if (request != null) {
+        this.data.token = request.getResponseHeader('access-token');
+        this.data.uid = request.getResponseHeader('uid');
+        this.data.client = request.getResponseHeader('client');
+      }
+      return this.emitChange();
+    };
+
+    UserStore.prototype.logout = function() {
+      var params;
+      params = {
+        path: "logout",
+        success: this.logoutSuccess,
+        error: this.logoutError
+      };
+      return API.call(params);
+    };
+
+    UserStore.prototype.logoutSuccess = function() {};
+
+    UserStore.prototype.logoutError = function() {};
+
+    UserStore.prototype.setToken = function(token) {
+      return this.data.token = token;
+    };
+
+    UserStore.getAuthHeader = function() {
+      this.user = this.get();
+      if ((this.user != null) && (this.user.token != null)) {
+        return {
+          "access-token": this.user.token,
+          "client": this.user.client,
+          "uid": this.user.uid
+        };
+      } else {
+        return {};
+      }
+    };
+
+    UserStore.prototype.getAuthHeader = function() {
+      this.user = this.get();
+      if ((this.user != null) && (this.user.token != null)) {
+        return {
+          "access-token": this.user.token,
+          "client": this.user.client,
+          "uid": this.user.uid
+        };
+      } else {
+        return {};
+      }
+    };
+
+    UserStore.prototype.fetchUserData = function(navigateTarget) {
+      return;
+      return $.ajax({
+        type: 'GET',
+        headers: this.getAuthHeader(),
+        url: this.urls.get_user_data,
+        dataType: 'json',
+        success: (function(_this) {
+          return function(data) {
+            _this.setUserAccounts(_this.fixDates(data));
+            _this.doQueueMessages();
+            _this.fetchUserProfile();
+            if (navigateTarget != null) {
+              return window.navigate(navigateTarget);
+            }
+          };
+        })(this)
+      });
+    };
+
+    UserStore.prototype.fetchUserProfile = function(navigateTarget) {
+      return $.ajax({
+        type: 'GET',
+        headers: this.getAuthHeader(),
+        url: this.urls.get_current_user,
+        dataType: 'json',
+        success: (function(_this) {
+          return function(data) {
+            return _this.setUserProfile(data);
+          };
+        })(this)
+      });
+    };
+
+    UserStore.prototype.setUserProfile = function(data) {
+      this.data.profile = data;
+      return this.emitChange();
+    };
+
+    UserStore.prototype.doQueueMessages = function() {
+      if (this.subscribers > 0) {
+        return this.queueMessagesFetch();
+      } else {
+        return this.dequeueMessagesFetch();
+      }
+    };
+
+    UserStore.get = function() {
+      return UserStore.data;
+    };
+
+    UserStore.prototype.get = function() {
+      return this.data;
+    };
+
+    UserStore.prototype.updateHeaderInfo = function(request) {
+      if (request.getResponseHeader('access-token') == null) {
+        return;
+      }
+      this.token = request.getResponseHeader('access-token');
+      this.uid = request.getResponseHeader('uid');
+      this.client = request.getResponseHeader('client');
+      window.global.setCookie('access-token', this.token);
+      window.global.setCookie('uid', this.uid);
+      window.global.setCookie('client', this.client);
+      this.user = this.get();
+      this.user.token = this.token;
+      this.user.uid = this.uid;
+      return this.user.client = this.client;
+    };
+
+    return UserStore;
+
+  })();
+
+  module.exports = new UserStore({
+    messagestl: 1000 * 60
+  });
+
 
   /*
   API Class.
@@ -3123,6 +3315,10 @@ module.exports = React.createFactory(React.createClass({
       add_bookmark: {
         path: "user/add_bookmark",
         method: "POST"
+      },
+      homepage: {
+        path: "home/homepage",
+        method: "GET"
       }
     };
 
@@ -3236,198 +3432,6 @@ module.exports = React.createFactory(React.createClass({
     return Global;
 
   })();
-
-  UserStore = (function() {
-    function UserStore() {
-      this.get = bind(this.get, this);
-      this.set = bind(this.set, this);
-      this.emitChange = bind(this.emitChange, this);
-      this.unsubscribe = bind(this.unsubscribe, this);
-      this.subscribe = bind(this.subscribe, this);
-      this.dequeueMessagesFetch = bind(this.dequeueMessagesFetch, this);
-    }
-
-    UserStore.prototype.data = {};
-
-    UserStore.prototype.votes = [];
-
-    UserStore.prototype.subscribers = 0;
-
-    UserStore.prototype.changeEvent = 'blundit:user';
-
-    UserStore.prototype.fetchMessagesTimeout = null;
-
-    UserStore.prototype.lastMessagesFetch = null;
-
-    UserStore.prototype.messagesTtl = 60000;
-
-    UserStore.prototype.loggedIn = function() {
-      if (this.data && (this.data.token != null)) {
-        return true;
-      }
-      return false;
-    };
-
-    UserStore.prototype.dequeueMessagesFetch = function() {
-      clearTimeout(this.fetchMessagesTimeout);
-      return this.fetchMessagesTimeout = null;
-    };
-
-    UserStore.prototype.subscribe = function(callback) {
-      addEventListener(this.changeEvent, callback, false);
-      this.subscribers++;
-      if (this.data != null) {
-        return this.emitChange();
-      }
-    };
-
-    UserStore.prototype.unsubscribe = function(callback) {
-      removeEventListener(this.changeEvent, callback);
-      this.subscribers--;
-      if (!(this.subscribers > 0)) {
-        return this.dequeueMessagesFetch();
-      }
-    };
-
-    UserStore.prototype.emitChange = function() {
-      var event;
-      event = document.createEvent('Event');
-      event.initEvent(this.changeEvent, true, true);
-      return dispatchEvent(event);
-    };
-
-    UserStore.prototype.set = function(data, request) {
-      this.data = data;
-      if (request != null) {
-        this.data.token = request.getResponseHeader('access-token');
-        this.data.uid = request.getResponseHeader('uid');
-        this.data.client = request.getResponseHeader('client');
-      }
-      return this.emitChange();
-    };
-
-    UserStore.prototype.logout = function() {
-      var params;
-      params = {
-        path: "logout",
-        success: this.logoutSuccess,
-        error: this.logoutError
-      };
-      return API.call(params);
-    };
-
-    UserStore.prototype.logoutSuccess = function() {};
-
-    UserStore.prototype.logoutError = function() {};
-
-    UserStore.prototype.setToken = function(token) {
-      return this.data.token = token;
-    };
-
-    UserStore.getAuthHeader = function() {
-      this.user = this.get();
-      if ((this.user != null) && (this.user.token != null)) {
-        return {
-          "access-token": this.user.token,
-          "client": this.user.client,
-          "uid": this.user.uid
-        };
-      } else {
-        return {};
-      }
-    };
-
-    UserStore.prototype.getAuthHeader = function() {
-      this.user = this.get();
-      if ((this.user != null) && (this.user.token != null)) {
-        return {
-          "access-token": this.user.token,
-          "client": this.user.client,
-          "uid": this.user.uid
-        };
-      } else {
-        return {};
-      }
-    };
-
-    UserStore.prototype.fetchUserData = function(navigateTarget) {
-      return;
-      return $.ajax({
-        type: 'GET',
-        headers: this.getAuthHeader(),
-        url: this.urls.get_user_data,
-        dataType: 'json',
-        success: (function(_this) {
-          return function(data) {
-            _this.setUserAccounts(_this.fixDates(data));
-            _this.doQueueMessages();
-            _this.fetchUserProfile();
-            if (navigateTarget != null) {
-              return window.navigate(navigateTarget);
-            }
-          };
-        })(this)
-      });
-    };
-
-    UserStore.prototype.fetchUserProfile = function(navigateTarget) {
-      return $.ajax({
-        type: 'GET',
-        headers: this.getAuthHeader(),
-        url: this.urls.get_current_user,
-        dataType: 'json',
-        success: (function(_this) {
-          return function(data) {
-            return _this.setUserProfile(data);
-          };
-        })(this)
-      });
-    };
-
-    UserStore.prototype.setUserProfile = function(data) {
-      this.data.profile = data;
-      return this.emitChange();
-    };
-
-    UserStore.prototype.doQueueMessages = function() {
-      if (this.subscribers > 0) {
-        return this.queueMessagesFetch();
-      } else {
-        return this.dequeueMessagesFetch();
-      }
-    };
-
-    UserStore.get = function() {
-      return UserStore.data;
-    };
-
-    UserStore.prototype.get = function() {
-      return this.data;
-    };
-
-    UserStore.prototype.updateHeaderInfo = function(request) {
-      if (request.getResponseHeader('access-token') == null) {
-        return;
-      }
-      this.token = request.getResponseHeader('access-token');
-      this.uid = request.getResponseHeader('uid');
-      this.client = request.getResponseHeader('client');
-      window.global.setCookie('access-token', this.token);
-      window.global.setCookie('uid', this.uid);
-      window.global.setCookie('client', this.client);
-      this.user = this.get();
-      this.user.token = this.token;
-      this.user.uid = this.uid;
-      return this.user.client = this.client;
-    };
-
-    return UserStore;
-
-  })();
-
-  module.exports = new UserStore({
-    messagestl: 1000 * 60
-  });
 
   div = React.DOM.div;
 
@@ -5076,14 +5080,113 @@ module.exports = React.createFactory(React.createClass({
 
   Footer = require("components/Footer");
 
+  PredictionCard = require("components/PredictionCard");
+
+  ExpertCard = require("components/ExpertCard");
+
+  ClaimCard = require("components/ClaimCard");
+
   module.exports = React.createFactory(React.createClass({
     displayName: 'Landing',
+    getInitialState: function() {
+      return {
+        data: null,
+        homepageError: false
+      };
+    },
+    componentWillMount: function() {
+      var params;
+      params = {
+        path: "homepage",
+        success: this.homepageSuccess,
+        error: this.homepageError
+      };
+      return API.call(params);
+    },
+    homepageSuccess: function(data) {
+      this.setState({
+        data: data
+      });
+      console.log(data);
+      return this.setState({
+        homepageError: false
+      });
+    },
+    homepageError: function(error) {
+      if ((error.responseJSON != null) && (error.responseJSON.errors != null)) {
+        return this.setState({
+          homepageError: error.responseJSON.errors[0]
+        });
+      } else {
+        return this.setState({
+          homepageError: "There was an error."
+        });
+      }
+    },
     render: function() {
       return div({}, Header({}, ''), div({
         className: "landing-wrapper"
       }, div({
         className: "landing-content"
-      }, "Landing")), Footer({}, ''));
+      }, this.state.data != null ? div({}, div({
+        className: "landing__predictions__recent-active"
+      }, "Recent Active Predictions:", this.state.data.most_recent_active_predictions.map(function(prediction, index) {
+        return PredictionCard({
+          prediction: prediction,
+          key: "most-recent-active-predictions-" + index
+        });
+      })), div({
+        className: "landing__predictions__recent-settled"
+      }, "Recent Settled Predictions:", this.state.data.most_recent_settled_predictions.map(function(prediction, index) {
+        return PredictionCard({
+          prediction: prediction,
+          key: "most-recent-settled-predictions-" + index
+        });
+      })), div({
+        className: "landing__claims__recent-active"
+      }, "Recent Active Claims:", this.state.data.most_recent_active_claims.map(function(claim, index) {
+        return ClaimCard({
+          claim: claim,
+          key: "most-recent-active-claims-" + index
+        });
+      })), div({
+        className: "landing__claims__recent-settled"
+      }, "Recent Settled Claims:", this.state.data.most_recent_settled_claims.map(function(claim, index) {
+        return ClaimCard({
+          claim: claim,
+          key: "most-recent-settled-claims-" + index
+        });
+      })), div({
+        className: "landing__experts__random"
+      }, "Random Expert:", ExpertCard({
+        expert: this.state.data.random_expert
+      })), div({
+        className: "landing__claim__random"
+      }, "Random Claim:", ClaimCard({
+        claim: this.state.data.random_claim,
+        key: "random-claim"
+      })), div({
+        className: "landing__predictions__random"
+      }, "Random Prediction:", PredictionCard({
+        prediction: this.state.data.random_prediction,
+        key: "random-prediction"
+      })), div({
+        className: "landing__experts__most-accurate"
+      }, "Most accurate Experts:", this.state.data.most_accurate_experts.map(function(claim, index) {
+        return ExpertCard({
+          expert: claim,
+          key: "most-accurate-experts-" + index
+        });
+      })), div({
+        className: "landing__experts__least-accurate"
+      }, "Least accurate Experts:", this.state.data.most_accurate_experts.map(function(claim, index) {
+        return ExpertCard({
+          expert: claim,
+          key: "most-accurate-experts-" + index
+        });
+      }))) : this.state.loadError != null ? div({
+        className: "landing-error"
+      }, "Error: " + this.state.homepageError) : void 0)), Footer({}, ''));
     }
   }));
 
@@ -85645,6 +85748,10 @@ module.exports = API = (function() {
     add_bookmark: {
       path: "user/add_bookmark",
       method: "POST"
+    },
+    homepage: {
+      path: "home/homepage",
+      method: "GET"
     }
   };
 
@@ -87663,7 +87770,7 @@ module.exports = React.createFactory(React.createClass({
 
 
 },{"components/Footer":585,"components/Header":586}],613:[function(require,module,exports){
-var Footer, Header, div;
+var ClaimCard, ExpertCard, Footer, Header, PredictionCard, div;
 
 div = React.DOM.div;
 
@@ -87671,19 +87778,118 @@ Header = require("components/Header");
 
 Footer = require("components/Footer");
 
+PredictionCard = require("components/PredictionCard");
+
+ExpertCard = require("components/ExpertCard");
+
+ClaimCard = require("components/ClaimCard");
+
 module.exports = React.createFactory(React.createClass({
   displayName: 'Landing',
+  getInitialState: function() {
+    return {
+      data: null,
+      homepageError: false
+    };
+  },
+  componentWillMount: function() {
+    var params;
+    params = {
+      path: "homepage",
+      success: this.homepageSuccess,
+      error: this.homepageError
+    };
+    return API.call(params);
+  },
+  homepageSuccess: function(data) {
+    this.setState({
+      data: data
+    });
+    console.log(data);
+    return this.setState({
+      homepageError: false
+    });
+  },
+  homepageError: function(error) {
+    if ((error.responseJSON != null) && (error.responseJSON.errors != null)) {
+      return this.setState({
+        homepageError: error.responseJSON.errors[0]
+      });
+    } else {
+      return this.setState({
+        homepageError: "There was an error."
+      });
+    }
+  },
   render: function() {
     return div({}, Header({}, ''), div({
       className: "landing-wrapper"
     }, div({
       className: "landing-content"
-    }, "Landing")), Footer({}, ''));
+    }, this.state.data != null ? div({}, div({
+      className: "landing__predictions__recent-active"
+    }, "Recent Active Predictions:", this.state.data.most_recent_active_predictions.map(function(prediction, index) {
+      return PredictionCard({
+        prediction: prediction,
+        key: "most-recent-active-predictions-" + index
+      });
+    })), div({
+      className: "landing__predictions__recent-settled"
+    }, "Recent Settled Predictions:", this.state.data.most_recent_settled_predictions.map(function(prediction, index) {
+      return PredictionCard({
+        prediction: prediction,
+        key: "most-recent-settled-predictions-" + index
+      });
+    })), div({
+      className: "landing__claims__recent-active"
+    }, "Recent Active Claims:", this.state.data.most_recent_active_claims.map(function(claim, index) {
+      return ClaimCard({
+        claim: claim,
+        key: "most-recent-active-claims-" + index
+      });
+    })), div({
+      className: "landing__claims__recent-settled"
+    }, "Recent Settled Claims:", this.state.data.most_recent_settled_claims.map(function(claim, index) {
+      return ClaimCard({
+        claim: claim,
+        key: "most-recent-settled-claims-" + index
+      });
+    })), div({
+      className: "landing__experts__random"
+    }, "Random Expert:", ExpertCard({
+      expert: this.state.data.random_expert
+    })), div({
+      className: "landing__claim__random"
+    }, "Random Claim:", ClaimCard({
+      claim: this.state.data.random_claim,
+      key: "random-claim"
+    })), div({
+      className: "landing__predictions__random"
+    }, "Random Prediction:", PredictionCard({
+      prediction: this.state.data.random_prediction,
+      key: "random-prediction"
+    })), div({
+      className: "landing__experts__most-accurate"
+    }, "Most accurate Experts:", this.state.data.most_accurate_experts.map(function(claim, index) {
+      return ExpertCard({
+        expert: claim,
+        key: "most-accurate-experts-" + index
+      });
+    })), div({
+      className: "landing__experts__least-accurate"
+    }, "Least accurate Experts:", this.state.data.most_accurate_experts.map(function(claim, index) {
+      return ExpertCard({
+        expert: claim,
+        key: "most-accurate-experts-" + index
+      });
+    }))) : this.state.loadError != null ? div({
+      className: "landing-error"
+    }, "Error: " + this.state.homepageError) : void 0)), Footer({}, ''));
   }
 }));
 
 
-},{"components/Footer":585,"components/Header":586}],614:[function(require,module,exports){
+},{"components/ClaimCard":574,"components/ExpertCard":580,"components/Footer":585,"components/Header":586,"components/PredictionCard":588}],614:[function(require,module,exports){
 var Footer, Header, RaisedButton, RefreshIndicator, SessionMixin, TextField, a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;

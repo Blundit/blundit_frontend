@@ -156,7 +156,9 @@ module.exports = class API
     add_bookmark:
       path: "user/add_bookmark"
       method: "POST"
-
+    homepage:
+      path: "home/homepage"
+      method: "GET"
 
 
 
