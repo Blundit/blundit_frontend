@@ -9,13 +9,34 @@ ExpertCard = require("components/ExpertCard")
 SearchFilters = require("components/SearchFilters")
 
 LinksMixin = require("mixins/LinksMixin")
+SessionMixin = require("mixins/SessionMixin")
 
 module.exports = React.createFactory React.createClass
   displayName: "Search"
-  mixins: [LinksMixin]
+  mixins: [LinksMixin, SessionMixin]
 
   getInitialState: ->
     data: null
+    query: @getQuery()
+    sort: @getSort()
+
+  
+  componentDidMount: ->
+    @search(@state.query, @state.sort)
+
+  
+  getQuery: ->
+    if @getParameterByName("query")
+      return @getParameterByName("query")
+
+    return ''
+
+
+  getSort: ->
+    if @getParameterByName("sort")
+      return Number(@getParameterByName("sort"))
+
+    return 0
 
 
   getSortOptions: ->
@@ -28,6 +49,7 @@ module.exports = React.createFactory React.createClass
 
 
   search: (query, sort) ->
+    window.history.pushState('', 'Blundit - Search', "http://localhost:8888/search?query=#{query}&sort=#{sort}")
     params = {
       path: "search"
       data:
@@ -39,11 +61,13 @@ module.exports = React.createFactory React.createClass
 
     API.call(params)
 
+    @setState query: query
+    @setState sort: sort
+
 
   searchSuccess: (data) ->
     @setState searching: false
     @setState searchError: false
-    console.log data
     @setState data: data
 
 
@@ -53,6 +77,24 @@ module.exports = React.createFactory React.createClass
       @setState searchError: error.responseJSON.errors[0]
     else
       @setState searchError: 'There was an error searching.'
+
+
+  goToClaims: ->
+    @url = "/claims?query=#{@state.query}&sort=#{@state.sort}&from_search=1"
+
+    navigate(@url)
+
+  
+  goToPredictions: ->
+    @url = "/predictions?query=#{@state.query}&sort=#{@state.sort}&from_search=1"
+
+    navigate(@url)
+
+
+  goToExperts: ->
+    @url = "/experts?query=#{@state.query}&sort=#{@state.sort}&from_search=1"
+
+    navigate(@url)
 
 
   render: ->
@@ -84,7 +126,10 @@ module.exports = React.createFactory React.createClass
                       ExpertCard
                         expert: expert
                         key: "search-expert-card-#{index}"
-
+                    div
+                      className: "search__experts-all"
+                      onClick: @goToExperts
+                      'View All'
               div { className: "search__predictions" },
                 div { className: "search__predictions-title" },
                   "Predictions:"
@@ -97,6 +142,10 @@ module.exports = React.createFactory React.createClass
                       PredictionCard
                         prediction: prediction
                         key: "search-prediction-card-#{index}"
+                    div
+                      className: "search__predictions-all"
+                      onClick: @goToPredictions
+                      'View All'
               div { className: "search__claims" },
                 div { className: "search__claims-title" },
                   "Claims:"
@@ -109,6 +158,11 @@ module.exports = React.createFactory React.createClass
                       ClaimCard
                         claim: claim
                         key: "search-claim-card-#{index}"
+                    div
+                      className: "search__claims-all"
+                      onClick: @goToClaims
+                      'View All'
+
           
           if @state.searchError?
             div { className: "search__error" },

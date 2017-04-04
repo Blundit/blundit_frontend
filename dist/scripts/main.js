@@ -3526,6 +3526,332 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
+
+  /*
+  API Class.
+  Usage to call is like this:
+  path is required.
+  path_variables is optional, and used for replacement in paths, like 'claims/%claim_id%/add_commment'
+  data is optional.
+  
+  params = {
+    path: "claims"
+    path_variables:
+      claim_id: 1
+    data:
+      id: "xxx"
+    success: @function
+    error: @function
+  }
+  API.call(params)
+   */
+
+  module.exports = API = (function() {
+    function API() {}
+
+    API.paths = {
+      register: {
+        path: "auth/",
+        non_api: true,
+        method: "POST"
+      },
+      login: {
+        path: "auth/sign_in",
+        non_api: true,
+        method: "POST"
+      },
+      logout: {
+        path: "auth/sign_out",
+        non_api: true,
+        method: "DELETE"
+      },
+      forgot_password: {
+        path: "auth/password",
+        non_api: true,
+        method: "POST"
+      },
+      categories: {
+        path: "categories",
+        method: "GET"
+      },
+      category: {
+        path: "categories/%category_id%",
+        method: "GET"
+      },
+      category_predictions: {
+        path: "categories/%category_id%/predictions",
+        method: "GET"
+      },
+      category_claims: {
+        path: "categories/%category_id%/claims",
+        method: "GET"
+      },
+      category_experts: {
+        path: "categories/%category_id%/experts",
+        method: "GET"
+      },
+      category_all: {
+        path: "categories/%category_id%/all",
+        method: "GET"
+      },
+      claims: {
+        path: "claims",
+        method: "GET"
+      },
+      all_claims: {
+        path: "claims/all",
+        method: "GET"
+      },
+      claim: {
+        path: "claims/%claim_id%",
+        method: "GET"
+      },
+      create_claim: {
+        path: "claims/",
+        method: "POST"
+      },
+      claim_add_comment: {
+        path: "claims/%claim_id%/add_comment",
+        method: "POST"
+      },
+      vote_for_claim: {
+        path: "claims/%claim_id%/vote",
+        method: "POST"
+      },
+      predictions: {
+        path: "predictions",
+        method: "GET"
+      },
+      all_predictions: {
+        path: "predictions/all",
+        method: "GET"
+      },
+      prediction: {
+        path: "predictions/%prediction_id%",
+        method: "GET"
+      },
+      add_evidence_to_prediction: {
+        path: "predictions/%prediction_id%/add_evidence",
+        method: "POST"
+      },
+      add_evidence_to_claim: {
+        path: "claims/%claim_id%/add_evidence",
+        method: "POST"
+      },
+      create_prediction: {
+        path: "predictions/",
+        method: "POST"
+      },
+      prediction_add_comment: {
+        path: "predictions/%prediction_id%/add_comment",
+        method: "POST"
+      },
+      vote_for_prediction: {
+        path: "predictions/%prediction_id%/vote",
+        method: "POST"
+      },
+      experts: {
+        path: "experts",
+        method: "GET"
+      },
+      all_experts: {
+        path: "experts/all",
+        method: "GET"
+      },
+      expert: {
+        path: "experts/%expert_id%",
+        method: "GET"
+      },
+      create_expert: {
+        path: "experts/",
+        method: "POST"
+      },
+      expert_add_comment: {
+        path: "experts/%expert_id%/add_comment",
+        method: "POST"
+      },
+      add_prediction_to_expert: {
+        path: "experts/%expert_id%/add_prediction",
+        method: "POST"
+      },
+      add_claim_to_expert: {
+        path: "experts/%expert_id%/add_claim",
+        method: "POST"
+      },
+      add_expert_to_prediction: {
+        path: "predictions/%prediction_id%/add_expert",
+        method: "POST"
+      },
+      add_expert_to_claim: {
+        path: "claims/%claim_id%/add_expert",
+        method: "POST"
+      },
+      get_substantiations: {
+        path: "experts/%expert_id%/get_substantiations",
+        method: "POST"
+      },
+      add_substantiation: {
+        path: "experts/%expert_id%/add_substantiation",
+        method: "POST"
+      },
+      add_bona_fide: {
+        path: "experts/%expert_id%/add_bona_fide",
+        method: "POST"
+      },
+      bookmarks: {
+        path: "user/bookmarks",
+        method: "GET"
+      },
+      verify_token: {
+        path: "auth/validate_token?access-token=%accessToken%&client=%client%&uid=%uid%&",
+        method: "GET",
+        non_api: true
+      },
+      expert_comments: {
+        path: "experts/%expert_id%/comments",
+        method: "GET"
+      },
+      claim_comments: {
+        path: "claims/%claim_id%/comments",
+        method: "GET"
+      },
+      prediction_comments: {
+        path: "predictions/%prediction_id%/comments",
+        method: "GET"
+      },
+      update_bookmark: {
+        path: "user/update_bookmark/%bookmark_id%",
+        method: "POST"
+      },
+      remove_bookmark: {
+        path: "user/remove_bookmark/%bookmark_id%",
+        method: "POST"
+      },
+      add_bookmark: {
+        path: "user/add_bookmark",
+        method: "POST"
+      },
+      homepage: {
+        path: "home/homepage",
+        method: "GET"
+      },
+      search: {
+        path: "search",
+        method: "POST"
+      }
+    };
+
+    API.server = function(params) {
+      if ((this.paths[params.path].non_api != null) && this.paths[params.path].non_api === true) {
+        return "http://localhost:3000/";
+      }
+      return "http://localhost:3000/api/v1/";
+    };
+
+    API.method = function(params) {
+      return this.paths[params.path].method;
+    };
+
+    API.path = function(params) {
+      var key, ref13, value;
+      this.p = this.server(params) + this.paths[params.path].path;
+      ref13 = params.path_variables;
+      for (key in ref13) {
+        value = ref13[key];
+        this.p = this.p.replace('%' + key + '%', value);
+      }
+      if (this.paths[params.path].method === "GET") {
+        this.p = this.p + this.dataAsGet(params.data);
+      }
+      return this.p;
+    };
+
+    API.dataAsGet = function(data) {
+      var key, value;
+      this.d = "?";
+      for (key in data) {
+        value = data[key];
+        this.d += key + "=" + (encodeURIComponent(value)) + "&";
+      }
+      return this.d;
+    };
+
+    API.data = function(params) {
+      var data;
+      if (params.data != null) {
+        data = params.data;
+      } else {
+        data = {};
+      }
+      return data;
+    };
+
+    API.call = function(params) {
+      return $.ajax({
+        method: this.method(params),
+        url: this.path(params),
+        headers: UserStore.getAuthHeader(),
+        data: this.data(params),
+        dataType: "json",
+        success: function(data, status, request) {
+          UserStore.updateHeaderInfo(request);
+          if (params.success != null) {
+            return params.success(data, request);
+          }
+        },
+        error: function(error) {
+          if (params.error != null) {
+            return params.error(error);
+          }
+        }
+      });
+    };
+
+    return API;
+
+  })();
+
+  module.exports = Global = (function() {
+    function Global() {}
+
+    Global.setCookie = function(name, value, days) {
+      var date, expires;
+      if (days) {
+        date = new Date();
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+        expires = "; expires=" + date.toGMTString();
+      } else {
+        expires = "";
+      }
+      return document.cookie = name + "=" + value + expires + "; path=/";
+    };
+
+    Global.getCookie = function(name) {
+      var c, ca, i, nameEQ;
+      nameEQ = name + "=";
+      ca = document.cookie.split(";");
+      i = 0;
+      while (i < ca.length) {
+        c = ca[i];
+        while (c.charAt(0) === " ") {
+          c = c.substring(1, c.length);
+        }
+        if (c.indexOf(nameEQ) === 0) {
+          return c.substring(nameEQ.length, c.length);
+        }
+        i++;
+      }
+      return null;
+    };
+
+    Global.deleteCookie = function(name) {
+      return this.setCookie(name, "", -1);
+    };
+
+    return Global;
+
+  })();
+
   UserStore = (function() {
     function UserStore() {
       this.get = bind(this.get, this);
@@ -5675,13 +6001,32 @@ module.exports = React.createFactory(React.createClass({
 
   LinksMixin = require("mixins/LinksMixin");
 
+  SessionMixin = require("mixins/SessionMixin");
+
   module.exports = React.createFactory(React.createClass({
     displayName: "Search",
-    mixins: [LinksMixin],
+    mixins: [LinksMixin, SessionMixin],
     getInitialState: function() {
       return {
-        data: null
+        data: null,
+        query: this.getQuery(),
+        sort: this.getSort()
       };
+    },
+    componentDidMount: function() {
+      return this.search(this.state.query, this.state.sort);
+    },
+    getQuery: function() {
+      if (this.getParameterByName("query")) {
+        return this.getParameterByName("query");
+      }
+      return '';
+    },
+    getSort: function() {
+      if (this.getParameterByName("sort")) {
+        return Number(this.getParameterByName("sort"));
+      }
+      return 0;
     },
     getSortOptions: function() {
       return [
@@ -5702,6 +6047,7 @@ module.exports = React.createFactory(React.createClass({
     },
     search: function(query, sort) {
       var params;
+      window.history.pushState('', 'Blundit - Search', "http://localhost:8888/search?query=" + query + "&sort=" + sort);
       params = {
         path: "search",
         data: {
@@ -5711,7 +6057,13 @@ module.exports = React.createFactory(React.createClass({
         success: this.searchSuccess,
         error: this.searchError
       };
-      return API.call(params);
+      API.call(params);
+      this.setState({
+        query: query
+      });
+      return this.setState({
+        sort: sort
+      });
     },
     searchSuccess: function(data) {
       this.setState({
@@ -5720,7 +6072,6 @@ module.exports = React.createFactory(React.createClass({
       this.setState({
         searchError: false
       });
-      console.log(data);
       return this.setState({
         data: data
       });
@@ -5738,6 +6089,18 @@ module.exports = React.createFactory(React.createClass({
           searchError: 'There was an error searching.'
         });
       }
+    },
+    goToClaims: function() {
+      this.url = "/claims?query=" + this.state.query + "&sort=" + this.state.sort + "&from_search=1";
+      return navigate(this.url);
+    },
+    goToPredictions: function() {
+      this.url = "/predictions?query=" + this.state.query + "&sort=" + this.state.sort + "&from_search=1";
+      return navigate(this.url);
+    },
+    goToExperts: function() {
+      this.url = "/experts?query=" + this.state.query + "&sort=" + this.state.sort + "&from_search=1";
+      return navigate(this.url);
     },
     render: function() {
       return div({}, Header({}, ''), div({
@@ -5770,7 +6133,10 @@ module.exports = React.createFactory(React.createClass({
           expert: expert,
           key: "search-expert-card-" + index
         });
-      }))), div({
+      }), div({
+        className: "search__experts-all",
+        onClick: this.goToExperts
+      }, 'View All'))), div({
         className: "search__predictions"
       }, div({
         className: "search__predictions-title"
@@ -5783,7 +6149,10 @@ module.exports = React.createFactory(React.createClass({
           prediction: prediction,
           key: "search-prediction-card-" + index
         });
-      }))), div({
+      }), div({
+        className: "search__predictions-all",
+        onClick: this.goToPredictions
+      }, 'View All'))), div({
         className: "search__claims"
       }, div({
         className: "search__claims-title"
@@ -5796,7 +6165,10 @@ module.exports = React.createFactory(React.createClass({
           claim: claim,
           key: "search-claim-card-" + index
         });
-      })))) : void 0, this.state.searchError != null ? div({
+      }), div({
+        className: "search__claims-all",
+        onClick: this.goToClaims
+      }, 'View All')))) : void 0, this.state.searchError != null ? div({
         className: "search__error"
       }, this.state.searchError) : void 0)), Footer({}, ''));
     }
@@ -5846,332 +6218,6 @@ module.exports = React.createFactory(React.createClass({
       }, "Users")), Footer({}, ''));
     }
   }));
-
-
-  /*
-  API Class.
-  Usage to call is like this:
-  path is required.
-  path_variables is optional, and used for replacement in paths, like 'claims/%claim_id%/add_commment'
-  data is optional.
-  
-  params = {
-    path: "claims"
-    path_variables:
-      claim_id: 1
-    data:
-      id: "xxx"
-    success: @function
-    error: @function
-  }
-  API.call(params)
-   */
-
-  module.exports = API = (function() {
-    function API() {}
-
-    API.paths = {
-      register: {
-        path: "auth/",
-        non_api: true,
-        method: "POST"
-      },
-      login: {
-        path: "auth/sign_in",
-        non_api: true,
-        method: "POST"
-      },
-      logout: {
-        path: "auth/sign_out",
-        non_api: true,
-        method: "DELETE"
-      },
-      forgot_password: {
-        path: "auth/password",
-        non_api: true,
-        method: "POST"
-      },
-      categories: {
-        path: "categories",
-        method: "GET"
-      },
-      category: {
-        path: "categories/%category_id%",
-        method: "GET"
-      },
-      category_predictions: {
-        path: "categories/%category_id%/predictions",
-        method: "GET"
-      },
-      category_claims: {
-        path: "categories/%category_id%/claims",
-        method: "GET"
-      },
-      category_experts: {
-        path: "categories/%category_id%/experts",
-        method: "GET"
-      },
-      category_all: {
-        path: "categories/%category_id%/all",
-        method: "GET"
-      },
-      claims: {
-        path: "claims",
-        method: "GET"
-      },
-      all_claims: {
-        path: "claims/all",
-        method: "GET"
-      },
-      claim: {
-        path: "claims/%claim_id%",
-        method: "GET"
-      },
-      create_claim: {
-        path: "claims/",
-        method: "POST"
-      },
-      claim_add_comment: {
-        path: "claims/%claim_id%/add_comment",
-        method: "POST"
-      },
-      vote_for_claim: {
-        path: "claims/%claim_id%/vote",
-        method: "POST"
-      },
-      predictions: {
-        path: "predictions",
-        method: "GET"
-      },
-      all_predictions: {
-        path: "predictions/all",
-        method: "GET"
-      },
-      prediction: {
-        path: "predictions/%prediction_id%",
-        method: "GET"
-      },
-      add_evidence_to_prediction: {
-        path: "predictions/%prediction_id%/add_evidence",
-        method: "POST"
-      },
-      add_evidence_to_claim: {
-        path: "claims/%claim_id%/add_evidence",
-        method: "POST"
-      },
-      create_prediction: {
-        path: "predictions/",
-        method: "POST"
-      },
-      prediction_add_comment: {
-        path: "predictions/%prediction_id%/add_comment",
-        method: "POST"
-      },
-      vote_for_prediction: {
-        path: "predictions/%prediction_id%/vote",
-        method: "POST"
-      },
-      experts: {
-        path: "experts",
-        method: "GET"
-      },
-      all_experts: {
-        path: "experts/all",
-        method: "GET"
-      },
-      expert: {
-        path: "experts/%expert_id%",
-        method: "GET"
-      },
-      create_expert: {
-        path: "experts/",
-        method: "POST"
-      },
-      expert_add_comment: {
-        path: "experts/%expert_id%/add_comment",
-        method: "POST"
-      },
-      add_prediction_to_expert: {
-        path: "experts/%expert_id%/add_prediction",
-        method: "POST"
-      },
-      add_claim_to_expert: {
-        path: "experts/%expert_id%/add_claim",
-        method: "POST"
-      },
-      add_expert_to_prediction: {
-        path: "predictions/%prediction_id%/add_expert",
-        method: "POST"
-      },
-      add_expert_to_claim: {
-        path: "claims/%claim_id%/add_expert",
-        method: "POST"
-      },
-      get_substantiations: {
-        path: "experts/%expert_id%/get_substantiations",
-        method: "POST"
-      },
-      add_substantiation: {
-        path: "experts/%expert_id%/add_substantiation",
-        method: "POST"
-      },
-      add_bona_fide: {
-        path: "experts/%expert_id%/add_bona_fide",
-        method: "POST"
-      },
-      bookmarks: {
-        path: "user/bookmarks",
-        method: "GET"
-      },
-      verify_token: {
-        path: "auth/validate_token?access-token=%accessToken%&client=%client%&uid=%uid%&",
-        method: "GET",
-        non_api: true
-      },
-      expert_comments: {
-        path: "experts/%expert_id%/comments",
-        method: "GET"
-      },
-      claim_comments: {
-        path: "claims/%claim_id%/comments",
-        method: "GET"
-      },
-      prediction_comments: {
-        path: "predictions/%prediction_id%/comments",
-        method: "GET"
-      },
-      update_bookmark: {
-        path: "user/update_bookmark/%bookmark_id%",
-        method: "POST"
-      },
-      remove_bookmark: {
-        path: "user/remove_bookmark/%bookmark_id%",
-        method: "POST"
-      },
-      add_bookmark: {
-        path: "user/add_bookmark",
-        method: "POST"
-      },
-      homepage: {
-        path: "home/homepage",
-        method: "GET"
-      },
-      search: {
-        path: "search",
-        method: "POST"
-      }
-    };
-
-    API.server = function(params) {
-      if ((this.paths[params.path].non_api != null) && this.paths[params.path].non_api === true) {
-        return "http://localhost:3000/";
-      }
-      return "http://localhost:3000/api/v1/";
-    };
-
-    API.method = function(params) {
-      return this.paths[params.path].method;
-    };
-
-    API.path = function(params) {
-      var key, ref17, value;
-      this.p = this.server(params) + this.paths[params.path].path;
-      ref17 = params.path_variables;
-      for (key in ref17) {
-        value = ref17[key];
-        this.p = this.p.replace('%' + key + '%', value);
-      }
-      if (this.paths[params.path].method === "GET") {
-        this.p = this.p + this.dataAsGet(params.data);
-      }
-      return this.p;
-    };
-
-    API.dataAsGet = function(data) {
-      var key, value;
-      this.d = "?";
-      for (key in data) {
-        value = data[key];
-        this.d += key + "=" + (encodeURIComponent(value)) + "&";
-      }
-      return this.d;
-    };
-
-    API.data = function(params) {
-      var data;
-      if (params.data != null) {
-        data = params.data;
-      } else {
-        data = {};
-      }
-      return data;
-    };
-
-    API.call = function(params) {
-      return $.ajax({
-        method: this.method(params),
-        url: this.path(params),
-        headers: UserStore.getAuthHeader(),
-        data: this.data(params),
-        dataType: "json",
-        success: function(data, status, request) {
-          UserStore.updateHeaderInfo(request);
-          if (params.success != null) {
-            return params.success(data, request);
-          }
-        },
-        error: function(error) {
-          if (params.error != null) {
-            return params.error(error);
-          }
-        }
-      });
-    };
-
-    return API;
-
-  })();
-
-  module.exports = Global = (function() {
-    function Global() {}
-
-    Global.setCookie = function(name, value, days) {
-      var date, expires;
-      if (days) {
-        date = new Date();
-        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-        expires = "; expires=" + date.toGMTString();
-      } else {
-        expires = "";
-      }
-      return document.cookie = name + "=" + value + expires + "; path=/";
-    };
-
-    Global.getCookie = function(name) {
-      var c, ca, i, nameEQ;
-      nameEQ = name + "=";
-      ca = document.cookie.split(";");
-      i = 0;
-      while (i < ca.length) {
-        c = ca[i];
-        while (c.charAt(0) === " ") {
-          c = c.substring(1, c.length);
-        }
-        if (c.indexOf(nameEQ) === 0) {
-          return c.substring(nameEQ.length, c.length);
-        }
-        i++;
-      }
-      return null;
-    };
-
-    Global.deleteCookie = function(name) {
-      return this.setCookie(name, "", -1);
-    };
-
-    return Global;
-
-  })();
 
 }).call(this);
 
@@ -88926,7 +88972,7 @@ module.exports = React.createFactory(React.createClass({
 
 
 },{"components/Footer":585,"components/Header":587,"components/Pagination":589,"components/PredictionCard":590,"mixins/PaginationMixin":599}],622:[function(require,module,exports){
-var ClaimCard, ExpertCard, Footer, Header, LinksMixin, PredictionCard, SearchFilters, div;
+var ClaimCard, ExpertCard, Footer, Header, LinksMixin, PredictionCard, SearchFilters, SessionMixin, div;
 
 div = React.DOM.div;
 
@@ -88944,13 +88990,32 @@ SearchFilters = require("components/SearchFilters");
 
 LinksMixin = require("mixins/LinksMixin");
 
+SessionMixin = require("mixins/SessionMixin");
+
 module.exports = React.createFactory(React.createClass({
   displayName: "Search",
-  mixins: [LinksMixin],
+  mixins: [LinksMixin, SessionMixin],
   getInitialState: function() {
     return {
-      data: null
+      data: null,
+      query: this.getQuery(),
+      sort: this.getSort()
     };
+  },
+  componentDidMount: function() {
+    return this.search(this.state.query, this.state.sort);
+  },
+  getQuery: function() {
+    if (this.getParameterByName("query")) {
+      return this.getParameterByName("query");
+    }
+    return '';
+  },
+  getSort: function() {
+    if (this.getParameterByName("sort")) {
+      return Number(this.getParameterByName("sort"));
+    }
+    return 0;
   },
   getSortOptions: function() {
     return [
@@ -88971,6 +89036,7 @@ module.exports = React.createFactory(React.createClass({
   },
   search: function(query, sort) {
     var params;
+    window.history.pushState('', 'Blundit - Search', "http://localhost:8888/search?query=" + query + "&sort=" + sort);
     params = {
       path: "search",
       data: {
@@ -88980,7 +89046,13 @@ module.exports = React.createFactory(React.createClass({
       success: this.searchSuccess,
       error: this.searchError
     };
-    return API.call(params);
+    API.call(params);
+    this.setState({
+      query: query
+    });
+    return this.setState({
+      sort: sort
+    });
   },
   searchSuccess: function(data) {
     this.setState({
@@ -88989,7 +89061,6 @@ module.exports = React.createFactory(React.createClass({
     this.setState({
       searchError: false
     });
-    console.log(data);
     return this.setState({
       data: data
     });
@@ -89007,6 +89078,18 @@ module.exports = React.createFactory(React.createClass({
         searchError: 'There was an error searching.'
       });
     }
+  },
+  goToClaims: function() {
+    this.url = "/claims?query=" + this.state.query + "&sort=" + this.state.sort + "&from_search=1";
+    return navigate(this.url);
+  },
+  goToPredictions: function() {
+    this.url = "/predictions?query=" + this.state.query + "&sort=" + this.state.sort + "&from_search=1";
+    return navigate(this.url);
+  },
+  goToExperts: function() {
+    this.url = "/experts?query=" + this.state.query + "&sort=" + this.state.sort + "&from_search=1";
+    return navigate(this.url);
   },
   render: function() {
     return div({}, Header({}, ''), div({
@@ -89039,7 +89122,10 @@ module.exports = React.createFactory(React.createClass({
         expert: expert,
         key: "search-expert-card-" + index
       });
-    }))), div({
+    }), div({
+      className: "search__experts-all",
+      onClick: this.goToExperts
+    }, 'View All'))), div({
       className: "search__predictions"
     }, div({
       className: "search__predictions-title"
@@ -89052,7 +89138,10 @@ module.exports = React.createFactory(React.createClass({
         prediction: prediction,
         key: "search-prediction-card-" + index
       });
-    }))), div({
+    }), div({
+      className: "search__predictions-all",
+      onClick: this.goToPredictions
+    }, 'View All'))), div({
       className: "search__claims"
     }, div({
       className: "search__claims-title"
@@ -89065,14 +89154,17 @@ module.exports = React.createFactory(React.createClass({
         claim: claim,
         key: "search-claim-card-" + index
       });
-    })))) : void 0, this.state.searchError != null ? div({
+    }), div({
+      className: "search__claims-all",
+      onClick: this.goToClaims
+    }, 'View All')))) : void 0, this.state.searchError != null ? div({
       className: "search__error"
     }, this.state.searchError) : void 0)), Footer({}, ''));
   }
 }));
 
 
-},{"components/ClaimCard":574,"components/ExpertCard":580,"components/Footer":585,"components/Header":587,"components/PredictionCard":590,"components/SearchFilters":596,"mixins/LinksMixin":598}],623:[function(require,module,exports){
+},{"components/ClaimCard":574,"components/ExpertCard":580,"components/Footer":585,"components/Header":587,"components/PredictionCard":590,"components/SearchFilters":596,"mixins/LinksMixin":598,"mixins/SessionMixin":600}],623:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
