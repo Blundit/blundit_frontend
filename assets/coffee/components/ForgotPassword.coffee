@@ -1,8 +1,5 @@
 { div, a } = React.DOM
 
-Header = require("components/Header")
-Footer = require("components/Footer")
-
 LinksMixin = require("mixins/LinksMixin")
 
 module.exports = React.createFactory React.createClass
@@ -18,6 +15,10 @@ module.exports = React.createFactory React.createClass
     forgotLoading: false
     forgotError: false
     sentRecoveryEmail: false
+
+
+  showLogin: ->
+    @props.changeView('login')
 
 
   processForgotPassword: ->
@@ -75,34 +76,30 @@ module.exports = React.createFactory React.createClass
   
   render: ->
     div {},
-      Header {}, ''
-      div { className: "user-wrapper" },
-        div { className: "user-content" },
-          "Forgot Password"
-          if @state.sentRecoveryEmail == false
-            div {},
-              div {},
-                React.createElement(Material.TextField, { id: "forgot-email", floatingLabelText: "Email", value: @state.inputs.email.value, onChange: @handleEmailChange, errorText: @getErrorText("email") })
-              div {},
-                if @state.loginLoading == true
-                  @style = {
-                    display: 'inline-block'
-                    position: 'relative'
-                    boxShadow: 'none'
-                  }
-                  React.createElement(Material.RefreshIndicator, { style: @style, size: 50, left: 0, top: 0, status:"loading" })
+      "Forgot Password"
+      if @state.sentRecoveryEmail == false
+        div {},
+          div {},
+            React.createElement(Material.TextField, { id: "forgot-email", floatingLabelText: "Email", value: @state.inputs.email.value, onChange: @handleEmailChange, errorText: @getErrorText("email") })
+          div {},
+            if @state.loginLoading == true
+              @style = {
+                display: 'inline-block'
+                position: 'relative'
+                boxShadow: 'none'
+              }
+              React.createElement(Material.RefreshIndicator, { style: @style, size: 50, left: 0, top: 0, status:"loading" })
 
-                else
-                  React.createElement(Material.RaisedButton, {label: "Reset Password", primary: true, onClick: @processForgotPassword })
-              if @state.forgotError?
-                div {},
-                  @state.forgotError
-              div {},
-                "Remembered your password? "
-                a
-                  onClick: @goToLogin
-                  'Click here to login'
-          else
+            else
+              React.createElement(Material.RaisedButton, {label: "Reset Password", primary: true, onClick: @processForgotPassword })
+          if @state.forgotError?
             div {},
-              "An email with a link to reset your password has been sent to you."
-      Footer {}, ''
+              @state.forgotError
+          div {},
+            "Remembered your password? "
+            a
+              onClick: @showLogin
+              'Click here to login'
+      else
+        div {},
+          "An email with a link to reset your password has been sent to you."

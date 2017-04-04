@@ -1,24 +1,39 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var RaisedButton, SessionMixin, div;
+var SessionMixin, div;
 
 div = React.DOM.div;
 
 SessionMixin = require("mixins/SessionMixin");
 
-RaisedButton = Material.RaisedButton;
-
 module.exports = React.createFactory(React.createClass({
   mixins: [SessionMixin],
+  getInitialState: function() {
+    return {
+      user: null
+    };
+  },
+  componentDidMount: function() {
+    return UserStore.subscribe(this.handleUserChange);
+  },
+  componentWillUnmount: function() {
+    return UserStore.unsubscribe(this.handleUserChange);
+  },
+  handleUserChange: function(data) {
+    return this.setState({
+      user: UserStore.get()
+    });
+  },
   logout: function() {
     UserStore.logout();
-    return this.setUser(null);
+    return this.setUser({});
   },
   render: function() {
+    var ref;
     return div({
       className: "footer-wrapper"
     }, div({
       className: "footer-content"
-    }, "Footer", UserStore.loggedIn() ? div({}, div({}, React.createElement(RaisedButton, {
+    }, "Footer", ((ref = this.state.user) != null ? ref.token : void 0) != null ? div({}, div({}, React.createElement(Material.RaisedButton, {
       label: "Signout",
       primary: true,
       onClick: this.logout
@@ -27,8 +42,8 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"mixins/SessionMixin":595}],2:[function(require,module,exports){
-var LinksMixin, div, img, menuItems, ref;
+},{"mixins/SessionMixin":600}],2:[function(require,module,exports){
+var LinksMixin, LoginModal, div, img, menuItems, ref;
 
 ref = React.DOM, div = ref.div, img = ref.img;
 
@@ -57,11 +72,14 @@ menuItems = [
 
 LinksMixin = require("mixins/LinksMixin");
 
+LoginModal = require("modals/LoginModal");
+
 module.exports = React.createFactory(React.createClass({
   mixins: [LinksMixin],
   getInitialState: function() {
     return {
-      user: null
+      user: null,
+      showLoginModal: false
     };
   },
   handleUserChange: function(data) {
@@ -87,6 +105,16 @@ module.exports = React.createFactory(React.createClass({
     }
     return "url(" + avatar + ")";
   },
+  showLogin: function() {
+    return this.setState({
+      showLoginModal: true
+    });
+  },
+  hideLogin: function() {
+    return this.setState({
+      showLoginModal: false
+    });
+  },
   getHeaderItemClass: function(item) {
     this["class"] = "header__item";
     this.path = window.location.pathname;
@@ -110,11 +138,14 @@ module.exports = React.createFactory(React.createClass({
       className: "header__items"
     }, menuItems.map((function(_this) {
       return function(item, index) {
-        return div({
-          className: _this.getHeaderItemClass(item),
-          key: "header-item-" + index,
-          onClick: _this.navigateToLocation.bind(_this, item.path)
-        }, item.label);
+        var ref1;
+        if (((item.logged != null) && (((ref1 = _this.state.user) != null ? ref1.token : void 0) != null)) || !item.logged) {
+          return div({
+            className: _this.getHeaderItemClass(item),
+            key: "header-item-" + index,
+            onClick: _this.navigateToLocation.bind(_this, item.path)
+          }, item.label);
+        }
       };
     })(this))), div({
       className: "header__user"
@@ -127,15 +158,17 @@ module.exports = React.createFactory(React.createClass({
     }) : div({}, React.createElement(Material.RaisedButton, {
       label: "Login/Signup",
       primary: true,
-      onClick: this.goToLogin
-    })))));
+      onClick: this.showLogin
+    }))), this.state.showLoginModal === true ? LoginModal({
+      hideLogin: this.hideLogin
+    }) : void 0));
   }
 }));
 
 
-},{"mixins/LinksMixin":593}],3:[function(require,module,exports){
+},{"mixins/LinksMixin":598,"modals/LoginModal":601}],3:[function(require,module,exports){
 (function() {
-  var API, AddToClaim, AddToExpert, AddToPrediction, Blundit, BookmarkIndicator, Card, CardActions, CardHeader, CardText, CategoryClaims, CategoryExperts, CategoryPredictions, CategorySubHead, ClaimCard, ClaimEvidences, ClaimExpertCard, ClaimFields, Comments, ExpertBonaFides, ExpertCard, ExpertClaimCard, ExpertFields, ExpertPredictionCard, ExpertSubstantiations, FlatButton, FontIcon, Footer, Global, Header, IconButton, LinksMixin, MuiThemeProvider, Pagination, PaginationMixin, PredictionCard, PredictionEvidences, PredictionExpertCard, PredictionFields, RaisedButton, RefreshIndicator, RouterMixin, SessionMixin, TextField, UserStore, Votes, a, br, deepOrange500, div, getMuiTheme, img, menuItems, muiTheme, ref, ref1, ref10, ref11, ref12, ref13, ref14, ref15, ref2, ref3, ref4, ref5, ref6, ref7, ref8, ref9, span, startBlundit,
+  var API, AddToClaim, AddToExpert, AddToPrediction, Blundit, BookmarkIndicator, CategoryClaims, CategoryExperts, CategoryPredictions, CategorySubHead, ClaimCard, ClaimEvidences, ClaimExpertCard, ClaimFields, Comments, ExpertBonaFides, ExpertCard, ExpertClaimCard, ExpertFields, ExpertPredictionCard, ExpertSubstantiations, Footer, ForgotPassword, Global, Header, LinksMixin, Login, LoginModal, MuiThemeProvider, Pagination, PaginationMixin, PredictionCard, PredictionEvidences, PredictionExpertCard, PredictionFields, Register, RegistrationSuccessful, RouterMixin, SearchFilters, SessionMixin, UserStore, Votes, a, br, deepOrange500, div, getMuiTheme, img, menuItems, muiTheme, ref, ref1, ref10, ref11, ref12, ref13, ref14, ref15, ref16, ref2, ref3, ref4, ref5, ref6, ref7, ref8, ref9, span, startBlundit,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   window.React = require('react');
@@ -213,7 +246,8 @@ module.exports = React.createFactory(React.createClass({
       '/categories/:id': 'categoryAll',
       '/categories/:id/predictions': 'categoryPredictions',
       '/categories/:id/claims': 'categoryClaims',
-      '/categories/:id/experts': 'categoryExperts'
+      '/categories/:id/experts': 'categoryExperts',
+      '/search': 'search'
     },
     landing: function() {
       return div({}, require("views/Landing")({
@@ -231,26 +265,6 @@ module.exports = React.createFactory(React.createClass({
         user_id: id
       }));
     },
-    login: function() {
-      return div({}, require("views/Login")({
-        path: this.state.path
-      }));
-    },
-    forgotPassword: function() {
-      return div({}, require("views/ForgotPassword")({
-        path: this.state.path
-      }));
-    },
-    register: function() {
-      return div({}, require("views/Register")({
-        path: this.state.path
-      }));
-    },
-    registerSuccessful: function() {
-      return div({}, require("views/RegisterSuccessful")({
-        path: this.state.path
-      }));
-    },
     userProfile: function() {
       return div({}, require("views/User")({
         path: this.state.path,
@@ -259,6 +273,11 @@ module.exports = React.createFactory(React.createClass({
     },
     predictions: function() {
       return div({}, require("views/Predictions")({
+        path: this.state.path
+      }));
+    },
+    search: function() {
+      return div({}, require("views/Search")({
         path: this.state.path
       }));
     },
@@ -374,165 +393,6 @@ module.exports = React.createFactory(React.createClass({
   } else {
     window.attachEvent('onload', startBlundit);
   }
-
-  module.exports = {
-    goToClaim: function(id) {
-      return navigate("/claims/" + id);
-    },
-    goToExpert: function(id) {
-      return navigate("/experts/" + id);
-    },
-    goToPrediction: function(id) {
-      return navigate("/predictions/" + id);
-    },
-    goToCategory: function(id) {
-      return navigate("/categories/" + id);
-    },
-    goToMostRecentClaim: function() {
-      return navigate("/claims/" + this.props.expert.most_recent_claim[0].alias);
-    },
-    goToMostRecentPrediction: function() {
-      return navigate("/predictions/" + this.props.expert.most_recent_prediction[0].alias);
-    },
-    goToLogin: function() {
-      return navigate('/login');
-    }
-  };
-
-  module.exports = {
-    getInitialState: function() {
-      return {
-        page: 1,
-        numberOfPages: 1
-      };
-    },
-    nextPage: function() {
-      if (this.state.page < this.state.numberOfPages) {
-        this.setState({
-          page: this.state.page + 1
-        });
-      }
-      return this.fetchPaginatedData(this.state.page + 1);
-    },
-    previousPage: function() {
-      if (this.state.page > 1) {
-        this.setState({
-          page: this.state.page - 1
-        });
-      }
-      return this.fetchPaginatedData(this.state.page - 1);
-    },
-    specificPage: function(page) {
-      this.setState({
-        page: page
-      });
-      return this.fetchPaginatedData(page);
-    }
-  };
-
-  module.exports = {
-    setUser: function(data, request) {
-      window.UserStore.set(data, request);
-      this.user = window.UserStore.get();
-      if ((this.user != null) && (this.user.token != null)) {
-        window.global.setCookie('access-token', this.user.token);
-        window.global.setCookie('uid', this.user.uid);
-        return window.global.setCookie('client', this.user.client);
-      } else {
-        window.global.deleteCookie('access-token');
-        window.global.deleteCookie('uid');
-        return window.global.deleteCookie('client');
-      }
-    },
-    getParameterByName: function(name, url) {
-      var regex, results;
-      if (!url) {
-        url = window.location.href;
-      }
-      name = name.replace(/[\[\]]/g, "\\$&");
-      regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
-      results = regex.exec(url);
-      if (!results) {
-        return null;
-      }
-      if (!results[2]) {
-        return '';
-      }
-      return decodeURIComponent(results[2].replace(/\+/g, " "));
-    },
-    getUrlParams: function() {
-      var j, key, len, params, query, raw_vars, ref, v, val;
-      query = window.location.search.substring(1);
-      raw_vars = query.split("&");
-      params = {};
-      for (j = 0, len = raw_vars.length; j < len; j++) {
-        v = raw_vars[j];
-        ref = v.split("="), key = ref[0], val = ref[1];
-        params[key] = decodeURIComponent(val);
-      }
-      return params;
-    },
-    getUser: function() {
-      var obj;
-      obj = {};
-      this.token = window.global.getCookie('access-token');
-      this.client = window.global.getCookie('client');
-      this.uid = window.global.getCookie('uid');
-      if (this.token != null) {
-        obj.token = this.token;
-        obj.client = this.client;
-        obj.uid = this.uid;
-      }
-      if (obj === {}) {
-        return false;
-      }
-      return obj;
-    },
-    unsetUser: function() {
-      window.UserStore.set(null);
-      window.global.deleteCookie('access-token');
-      window.global.deleteCookie('client');
-      return window.global.deleteCookie('uid');
-    },
-    authHeader: function() {
-      return this.user = window.UserStore.getAuthHeader();
-    },
-    verifyUserToken: function() {
-      if (window.global.getCookie('access-token')) {
-        return this.verifyToken();
-      } else {
-        return this.setState({
-          verificationComplete: true
-        });
-      }
-    },
-    verifyToken: function() {
-      var params;
-      params = {
-        path: "verify_token",
-        path_variables: {
-          accessToken: window.global.getCookie('access-token'),
-          client: window.global.getCookie('client'),
-          uid: window.global.getCookie('uid')
-        },
-        success: this.verifyTokenSuccess,
-        error: this.verifyTokenError
-      };
-      return API.call(params);
-    },
-    verifyTokenSuccess: function(data) {
-      if (data) {
-        data.data.token = window.global.getCookie('access-token');
-        data.data.client = window.global.getCookie('client');
-        data.data.uid = window.global.getCookie('uid');
-        return this.setUser(data.data);
-      }
-    },
-    verifyTokenError: function(error) {
-      return this.setUser({});
-    },
-    updateUserHeaderInfo: function(request) {}
-  };
 
   div = React.DOM.div;
 
@@ -1829,7 +1689,7 @@ module.exports = React.createFactory(React.createClass({
         className: "expert-card-meta__claims"
       }, expert.number_of_claims))), div({
         className: "expert-card-comments"
-      }, this.getCommentInfo()), expert.most_recent_claim.length > 0 || expert.most_recent_prediction > 0 ? div({
+      }, this.getCommentInfo()), ((expert.most_recent_claim != null) && expert.most_recent_claim.length > 0) || ((expert.most_recent_prediction != null) && expert.most_recent_prediction.length > 0) ? div({
         className: "expert-card-links"
       }, expert.most_recent_claim.length > 0 ? div({}, "Most recent Claim: ", a({
         onClick: this.goToMostRecentClaim
@@ -2215,20 +2075,35 @@ module.exports = React.createFactory(React.createClass({
 
   SessionMixin = require("mixins/SessionMixin");
 
-  RaisedButton = Material.RaisedButton;
-
   module.exports = React.createFactory(React.createClass({
     mixins: [SessionMixin],
+    getInitialState: function() {
+      return {
+        user: null
+      };
+    },
+    componentDidMount: function() {
+      return UserStore.subscribe(this.handleUserChange);
+    },
+    componentWillUnmount: function() {
+      return UserStore.unsubscribe(this.handleUserChange);
+    },
+    handleUserChange: function(data) {
+      return this.setState({
+        user: UserStore.get()
+      });
+    },
     logout: function() {
       UserStore.logout();
-      return this.setUser(null);
+      return this.setUser({});
     },
     render: function() {
+      var ref6;
       return div({
         className: "footer-wrapper"
       }, div({
         className: "footer-content"
-      }, "Footer", UserStore.loggedIn() ? div({}, div({}, React.createElement(RaisedButton, {
+      }, "Footer", ((ref6 = this.state.user) != null ? ref6.token : void 0) != null ? div({}, div({}, React.createElement(Material.RaisedButton, {
         label: "Signout",
         primary: true,
         onClick: this.logout
@@ -2236,7 +2111,130 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref6 = React.DOM, div = ref6.div, img = ref6.img;
+  ref6 = React.DOM, div = ref6.div, a = ref6.a;
+
+  LinksMixin = require("mixins/LinksMixin");
+
+  module.exports = React.createFactory(React.createClass({
+    displayName: 'Forgot Password',
+    mixins: [LinksMixin],
+    getInitialState: function() {
+      return {
+        inputs: {
+          email: {
+            validateEmail: true,
+            value: ''
+          }
+        },
+        errors: [],
+        forgotLoading: false,
+        forgotError: false,
+        sentRecoveryEmail: false
+      };
+    },
+    showLogin: function() {
+      return this.props.changeView('login');
+    },
+    processForgotPassword: function() {
+      var params;
+      if (this.validateInputs()) {
+        this.setState({
+          errors: []
+        });
+        this.setState({
+          forgotLoading: true
+        });
+        params = {
+          path: "forgot_password",
+          data: {
+            email: this.state.inputs.email.value
+          },
+          success: this.forgotPasswordSuccess,
+          error: this.forgotPasswordError
+        };
+        return API.call(params);
+      }
+    },
+    handleEmailChange: function(event) {
+      this.inputs = this.state.inputs;
+      this.inputs.email.value = event.target.value;
+      return this.setState({
+        inputs: this.inputs
+      });
+    },
+    validateInputs: function() {
+      this.errors = [];
+      if (this.state.inputs.email.value.length < 6 || this.state.inputs.email.value.indexOf("@", 0) === -1 || this.state.inputs.email.value.indexOf(".", 0) === -1) {
+        this.errors.push({
+          id: "email",
+          text: "Valid Email Required"
+        });
+      }
+      this.setState({
+        errors: this.errors
+      });
+      if (this.errors.length === 0) {
+        return true;
+      }
+      return false;
+    },
+    getErrorText: function(key) {
+      var error, j, len, ref7;
+      ref7 = this.state.errors;
+      for (j = 0, len = ref7.length; j < len; j++) {
+        error = ref7[j];
+        if (error.id === key) {
+          return error.text;
+        }
+      }
+      return null;
+    },
+    forgotPasswordSuccess: function(data) {
+      this.setState({
+        sentRecoveryEmail: true
+      });
+      return this.setState({
+        forgotLoading: false
+      });
+    },
+    forgotPasswordError: function(error) {
+      this.setState({
+        forgotLoading: false
+      });
+      if ((error.responseJSON != null) && (error.responseJSON.errors != null)) {
+        return this.setState({
+          forgotError: error.responseJSON.errors[0]
+        });
+      }
+    },
+    render: function() {
+      return div({}, "Forgot Password", this.state.sentRecoveryEmail === false ? div({}, div({}, React.createElement(Material.TextField, {
+        id: "forgot-email",
+        floatingLabelText: "Email",
+        value: this.state.inputs.email.value,
+        onChange: this.handleEmailChange,
+        errorText: this.getErrorText("email")
+      })), div({}, this.state.loginLoading === true ? (this.style = {
+        display: 'inline-block',
+        position: 'relative',
+        boxShadow: 'none'
+      }, React.createElement(Material.RefreshIndicator, {
+        style: this.style,
+        size: 50,
+        left: 0,
+        top: 0,
+        status: "loading"
+      })) : React.createElement(Material.RaisedButton, {
+        label: "Reset Password",
+        primary: true,
+        onClick: this.processForgotPassword
+      })), this.state.forgotError != null ? div({}, this.state.forgotError) : void 0, div({}, "Remembered your password? ", a({
+        onClick: this.showLogin
+      }, 'Click here to login'))) : div({}, "An email with a link to reset your password has been sent to you."));
+    }
+  }));
+
+  ref7 = React.DOM, div = ref7.div, img = ref7.img;
 
   menuItems = [
     {
@@ -2263,11 +2261,14 @@ module.exports = React.createFactory(React.createClass({
 
   LinksMixin = require("mixins/LinksMixin");
 
+  LoginModal = require("modals/LoginModal");
+
   module.exports = React.createFactory(React.createClass({
     mixins: [LinksMixin],
     getInitialState: function() {
       return {
-        user: null
+        user: null,
+        showLoginModal: false
       };
     },
     handleUserChange: function(data) {
@@ -2293,6 +2294,16 @@ module.exports = React.createFactory(React.createClass({
       }
       return "url(" + avatar + ")";
     },
+    showLogin: function() {
+      return this.setState({
+        showLoginModal: true
+      });
+    },
+    hideLogin: function() {
+      return this.setState({
+        showLoginModal: false
+      });
+    },
     getHeaderItemClass: function(item) {
       this["class"] = "header__item";
       this.path = window.location.pathname;
@@ -2302,7 +2313,7 @@ module.exports = React.createFactory(React.createClass({
       return this["class"];
     },
     render: function() {
-      var ref7;
+      var ref8;
       return div({
         className: "header-wrapper"
       }, div({
@@ -2316,15 +2327,18 @@ module.exports = React.createFactory(React.createClass({
         className: "header__items"
       }, menuItems.map((function(_this) {
         return function(item, index) {
-          return div({
-            className: _this.getHeaderItemClass(item),
-            key: "header-item-" + index,
-            onClick: _this.navigateToLocation.bind(_this, item.path)
-          }, item.label);
+          var ref8;
+          if (((item.logged != null) && (((ref8 = _this.state.user) != null ? ref8.token : void 0) != null)) || !item.logged) {
+            return div({
+              className: _this.getHeaderItemClass(item),
+              key: "header-item-" + index,
+              onClick: _this.navigateToLocation.bind(_this, item.path)
+            }, item.label);
+          }
         };
       })(this))), div({
         className: "header__user"
-      }, ((ref7 = this.state.user) != null ? ref7.token : void 0) != null ? div({
+      }, ((ref8 = this.state.user) != null ? ref8.token : void 0) != null ? div({
         className: "header__user__avatar",
         onClick: this.navigateToLocation.bind(this, "/me"),
         style: {
@@ -2333,18 +2347,156 @@ module.exports = React.createFactory(React.createClass({
       }) : div({}, React.createElement(Material.RaisedButton, {
         label: "Login/Signup",
         primary: true,
-        onClick: this.goToLogin
-      })))));
+        onClick: this.showLogin
+      }))), this.state.showLoginModal === true ? LoginModal({
+        hideLogin: this.hideLogin
+      }) : void 0));
+    }
+  }));
+
+  ref8 = React.DOM, div = ref8.div, a = ref8.a;
+
+  SessionMixin = require("mixins/SessionMixin");
+
+  module.exports = React.createFactory(React.createClass({
+    mixins: [SessionMixin],
+    displayName: 'Login',
+    getInitialState: function() {
+      return {
+        email: '',
+        password: '',
+        errors: [],
+        loginError: null,
+        loginLoading: false
+      };
+    },
+    goToRegister: function() {
+      return this.props.changeView('register');
+    },
+    goToForgotPassword: function() {
+      return this.props.changeView('forgot');
+    },
+    handleEmailChange: function(event) {
+      return this.setState({
+        email: event.target.value
+      });
+    },
+    handlePasswordChange: function(event) {
+      return this.setState({
+        password: event.target.value
+      });
+    },
+    validateInputs: function() {
+      this.errors = [];
+      if (this.state.email.length < 6 || this.state.email.indexOf("@", 0) === -1 || this.state.email.indexOf(".", 0) === -1) {
+        this.errors.push({
+          id: "email",
+          text: "Valid Email Required"
+        });
+      }
+      if (this.state.password === '') {
+        this.errors.push({
+          id: "password",
+          text: "Password Required"
+        });
+      }
+      this.setState({
+        errors: this.errors
+      });
+      if (this.errors.length === 0) {
+        return true;
+      }
+      return false;
+    },
+    processLogin: function() {
+      var params;
+      if (this.validateInputs()) {
+        this.setState({
+          errors: []
+        });
+        this.setState({
+          loginError: false
+        });
+        this.setState({
+          loginLoading: true
+        });
+        params = {
+          path: "login",
+          data: {
+            email: this.state.email,
+            password: this.state.password
+          },
+          success: this.loginSuccess,
+          error: this.loginError
+        };
+        return API.call(params);
+      }
+    },
+    loginSuccess: function(data, request) {
+      this.setState({
+        loginLoading: false
+      });
+      this.setUser(data.data, request);
+      return this.props.hideLogin();
+    },
+    loginError: function(error) {
+      this.setState({
+        loginLoading: false
+      });
+      if ((error.responseJSON != null) && (error.responseJSON.errors != null)) {
+        return this.setState({
+          loginError: error.responseJSON.errors[0]
+        });
+      }
+    },
+    getErrorText: function(key) {
+      var error, j, len, ref9;
+      ref9 = this.state.errors;
+      for (j = 0, len = ref9.length; j < len; j++) {
+        error = ref9[j];
+        if (error.id === key) {
+          return error.text;
+        }
+      }
+      return null;
+    },
+    render: function() {
+      return div({}, "Login", div({}, div({}, React.createElement(Material.TextField, {
+        id: "login-email",
+        floatingLabelText: "Email",
+        value: this.state.email,
+        onChange: this.handleEmailChange,
+        errorText: this.getErrorText("email")
+      })), div({}, React.createElement(Material.TextField, {
+        id: "login-password",
+        floatingLabelText: "Password",
+        type: "password",
+        value: this.state.password,
+        onChange: this.handlePasswordChange,
+        errorText: this.getErrorText("password")
+      })), div({}, this.state.loginLoading === true ? (this.style = {
+        display: 'inline-block',
+        position: 'relative',
+        boxShadow: 'none'
+      }, React.createElement(Material.RefreshIndicator, {
+        style: this.style,
+        size: 50,
+        left: 0,
+        top: 0,
+        status: "loading"
+      })) : React.createElement(Material.RaisedButton, {
+        label: "Login",
+        primary: true,
+        onClick: this.processLogin
+      })), this.state.loginError != null ? div({}, this.state.loginError) : void 0), div({}, a({
+        onClick: this.goToRegister
+      }, 'Click here to register'), a({
+        onClick: this.goToForgotPassword
+      }, 'Forgot your password?')));
     }
   }));
 
   div = React.DOM.div;
-
-  IconButton = Material.IconButton;
-
-  FontIcon = Material.FontIcon;
-
-  FlatButton = Material.FlatButton;
 
   module.exports = React.createFactory(React.createClass({
     getInitialState: function() {
@@ -2358,10 +2510,10 @@ module.exports = React.createFactory(React.createClass({
       if (this.props.page === 1) {
         return;
       }
-      return React.createElement(IconButton, {
+      return React.createElement(Material.IconButton, {
         onClick: this.previousPage,
         className: "pagination__arrow"
-      }, React.createElement(FontIcon, {
+      }, React.createElement(Material.FontIcon, {
         className: "fa fa-angle-left"
       }));
     },
@@ -2369,10 +2521,10 @@ module.exports = React.createFactory(React.createClass({
       if (this.props.page === this.props.numberOfPages) {
         return;
       }
-      return React.createElement(IconButton, {
+      return React.createElement(Material.IconButton, {
         onClick: this.nextPage,
         className: "pagination__arrow"
-      }, React.createElement(FontIcon, {
+      }, React.createElement(Material.FontIcon, {
         className: "fa fa-angle-right"
       }));
     },
@@ -2396,7 +2548,7 @@ module.exports = React.createFactory(React.createClass({
       }
       return div({
         className: "pagination__first"
-      }, React.createElement(FlatButton, {
+      }, React.createElement(Material.FlatButton, {
         key: "page-1",
         label: 1,
         style: this.buttonStyle(),
@@ -2415,7 +2567,7 @@ module.exports = React.createFactory(React.createClass({
         className: "pagination__last"
       }, this.props.page <= this.props.numberOfPages - 4 ? div({
         className: "pagination__ellipsis"
-      }, "...") : void 0, React.createElement(FlatButton, {
+      }, "...") : void 0, React.createElement(Material.FlatButton, {
         key: "page-" + this.props.numberOfPages,
         className: "pagination__item",
         label: this.props.numberOfPages,
@@ -2445,18 +2597,18 @@ module.exports = React.createFactory(React.createClass({
       return div({
         className: "pagination__pages"
       }, (function() {
-        var j, ref7, ref8, results1;
+        var j, ref10, ref9, results1;
         results1 = [];
-        for (page = j = ref7 = this.leftPage, ref8 = this.rightPage; ref7 <= ref8 ? j <= ref8 : j >= ref8; page = ref7 <= ref8 ? ++j : --j) {
+        for (page = j = ref9 = this.leftPage, ref10 = this.rightPage; ref9 <= ref10 ? j <= ref10 : j >= ref10; page = ref9 <= ref10 ? ++j : --j) {
           if (page === this.props.page) {
-            results1.push(React.createElement(FlatButton, {
+            results1.push(React.createElement(Material.FlatButton, {
               key: "page-" + page,
               label: page,
               style: this.buttonStyle(),
               disabled: true
             }));
           } else {
-            results1.push(React.createElement(FlatButton, {
+            results1.push(React.createElement(Material.FlatButton, {
               key: "page-" + page,
               label: page,
               style: this.buttonStyle(),
@@ -2478,17 +2630,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  Card = Material.Card;
-
-  CardHeader = Material.CardHeader;
-
-  CardText = Material.CardText;
-
-  CardActions = Material.CardActions;
-
-  FlatButton = Material.FlatButton;
-
-  ref7 = React.DOM, div = ref7.div, img = ref7.img, a = ref7.a, br = ref7.br, span = ref7.span;
+  ref9 = React.DOM, div = ref9.div, img = ref9.img, a = ref9.a, br = ref9.br, span = ref9.span;
 
   LinksMixin = require("mixins/LinksMixin");
 
@@ -2536,7 +2678,7 @@ module.exports = React.createFactory(React.createClass({
       prediction = this.props.prediction;
       return div({
         className: "prediction-card"
-      }, React.createElement(Card, {}, React.createElement(CardHeader, {
+      }, React.createElement(Material.Card, {}, React.createElement(Material.CardHeader, {
         title: prediction.title,
         subtitle: this.getDescription()
       }), div({
@@ -2576,19 +2718,19 @@ module.exports = React.createFactory(React.createClass({
             className: "prediction-card-experts__expert-name"
           }, expert.name));
         };
-      })(this))) : void 0), React.createElement(CardActions, {}, prediction.status === 0 && UserStore.loggedIn() ? div({
+      })(this))) : void 0), React.createElement(Material.CardActions, {}, prediction.status === 0 && UserStore.loggedIn() ? div({
         className: "prediction-card-vote",
         onClick: this.goToPrediction
       }, "VOTE") : prediction.status === 0 && !UserStore.loggedIn() ? div({
         className: "prediction-card-vote"
-      }, "Log in to Vote") : void 0, React.createElement(FlatButton, {
+      }, "Log in to Vote") : void 0, React.createElement(Material.FlatButton, {
         label: "View",
         onClick: this.goToPrediction.bind(this, prediction.alias)
       }))));
     }
   }));
 
-  ref8 = React.DOM, div = ref8.div, a = ref8.a;
+  ref10 = React.DOM, div = ref10.div, a = ref10.a;
 
   module.exports = React.createFactory(React.createClass({
     displayName: "PredictionEvidences",
@@ -2705,8 +2847,8 @@ module.exports = React.createFactory(React.createClass({
       });
     },
     render: function() {
-      var expert, prediction, ref9;
-      ref9 = this.props, expert = ref9.expert, prediction = ref9.prediction;
+      var expert, prediction, ref11;
+      ref11 = this.props, expert = ref11.expert, prediction = ref11.prediction;
       return div({
         className: "prediction__experts-list-item"
       }, div({
@@ -2757,10 +2899,10 @@ module.exports = React.createFactory(React.createClass({
       return this.props.updateField("category", value);
     },
     getErrorText: function(key) {
-      var error, j, len, ref9;
-      ref9 = this.props.errors;
-      for (j = 0, len = ref9.length; j < len; j++) {
-        error = ref9[j];
+      var error, j, len, ref11;
+      ref11 = this.props.errors;
+      for (j = 0, len = ref11.length; j < len; j++) {
+        error = ref11[j];
         if (error.id === key) {
           return error.text;
         }
@@ -2822,15 +2964,285 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
+  ref11 = React.DOM, div = ref11.div, a = ref11.a;
+
+  LinksMixin = require("mixins/LinksMixin");
+
+  module.exports = React.createFactory(React.createClass({
+    displayName: 'Register',
+    mixins: [LinksMixin],
+    getInitialState: function() {
+      return {
+        email: '',
+        password: '',
+        password_confirmation: '',
+        errors: [],
+        registerError: null,
+        registerLoading: false
+      };
+    },
+    handleEmailChange: function(event) {
+      return this.setState({
+        email: event.target.value
+      });
+    },
+    handlePasswordChange: function(event) {
+      return this.setState({
+        password: event.target.value
+      });
+    },
+    handlePasswordConfirmationChange: function(event) {
+      return this.setState({
+        password_confirmation: event.target.value
+      });
+    },
+    validateInputs: function() {
+      this.errors = [];
+      if (this.state.email.length < 6 || this.state.email.indexOf("@", 0) === -1 || this.state.email.indexOf(".", 0) === -1) {
+        this.errors.push({
+          id: "email",
+          text: "Valid Email Required"
+        });
+      }
+      if (this.state.password === '') {
+        this.errors.push({
+          id: "password",
+          text: "Password Required"
+        });
+      }
+      if (this.state.password_confirmation === '') {
+        this.errors.push({
+          id: "password_confirmation",
+          text: "Password Required"
+        });
+      }
+      if (this.state.password !== '' && this.state.password_confirmation !== '' && this.state.password !== this.state.password_confirmation) {
+        this.errors.push({
+          id: "password",
+          text: "Password and Password Confirmation must match."
+        });
+        this.errors.push({
+          id: "password_confirmation",
+          text: "Password and Password Confirmation must match."
+        });
+      }
+      this.setState({
+        errors: this.errors
+      });
+      if (this.errors.length === 0) {
+        return true;
+      }
+      return false;
+    },
+    processRegister: function() {
+      var params;
+      if (this.validateInputs()) {
+        this.setState({
+          registerError: false
+        });
+        this.setState({
+          errors: []
+        });
+        this.setState({
+          registerLoading: true
+        });
+        params = {
+          path: "register",
+          data: {
+            email: this.state.email,
+            password: this.state.password,
+            password_confirmation: this.state.password_confirmation
+          },
+          success: this.registerSuccess,
+          error: this.registerError
+        };
+        return API.call(params);
+      }
+    },
+    registerSuccess: function(data, request) {
+      this.setState({
+        registerLoading: false
+      });
+      return this.props.changeView('registered');
+    },
+    registerError: function(error) {
+      this.setState({
+        registerLoading: false
+      });
+      if ((error.responseJSON != null) && (error.responseJSON.errors != null)) {
+        return this.setState({
+          registerError: error.responseJSON.errors[0]
+        });
+      }
+    },
+    getErrorText: function(key) {
+      var error, j, len, ref12;
+      ref12 = this.state.errors;
+      for (j = 0, len = ref12.length; j < len; j++) {
+        error = ref12[j];
+        if (error.id === key) {
+          return error.text;
+        }
+      }
+      return null;
+    },
+    showLogin: function() {
+      return this.props.changeView('login');
+    },
+    render: function() {
+      return div({}, "Register", div({}, div({}, React.createElement(Material.TextField, {
+        id: "register-email",
+        floatingLabelText: "Email",
+        value: this.state.email,
+        onChange: this.handleEmailChange,
+        errorText: this.getErrorText("email")
+      })), div({}, React.createElement(Material.TextField, {
+        id: "register-password",
+        floatingLabelText: "Password",
+        type: "password",
+        value: this.state.password,
+        onChange: this.handlePasswordChange,
+        errorText: this.getErrorText("password")
+      })), div({}, React.createElement(Material.TextField, {
+        id: "register-password-confirmation",
+        floatingLabelText: "Confirm",
+        type: "password",
+        value: this.state.password_confirmation,
+        onChange: this.handlePasswordConfirmationChange,
+        errorText: this.getErrorText("password_confirmation")
+      })), div({}, this.state.registerLoading === true ? (this.style = {
+        display: 'inline-block',
+        position: 'relative',
+        boxShadow: 'none'
+      }, React.createElement(Material.RefreshIndicator, {
+        style: this.style,
+        size: 50,
+        left: 0,
+        top: 0,
+        status: "loading"
+      })) : React.createElement(Material.RaisedButton, {
+        label: "Register",
+        primary: true,
+        onClick: this.processRegister
+      })), this.state.registerError != null ? div({}, this.state.registerError) : void 0), div({}, a({
+        onClick: this.showLogin
+      }, 'Click here to login')));
+    }
+  }));
+
+  div = React.DOM.div;
+
+  module.exports = React.createFactory(React.createClass({
+    render: function() {
+      return div({}, "You've successfully registered! You'll get a confirmation email shortly, which will allow you to log in and start Blunditing.");
+    }
+  }));
+
+  div = React.DOM.div;
+
+  SessionMixin = require("mixins/SessionMixin");
+
+  module.exports = React.createFactory(React.createClass({
+    displayName: 'Search Filters',
+    mixins: [SessionMixin],
+    getInitialState: function() {
+      return {
+        sortOptions: this.getSortOptions(),
+        inputs: {
+          sort: {
+            val: this.getSortValue()
+          },
+          search: {
+            val: this.getSearchQuery()
+          }
+        },
+        errors: [],
+        searchError: false
+      };
+    },
+    getSortOptions: function() {
+      if (!this.props.sortOptions) {
+        return [];
+      }
+      return this.props.sortOptions;
+    },
+    getSortValue: function() {
+      if (this.getParameterByName("sort")) {
+        return Number(this.getParameterByName("sort"));
+      }
+      return 0;
+    },
+    getSearchQuery: function() {
+      if (this.getParameterByName("query")) {
+        return this.getParameterByName("query");
+      }
+      return '';
+    },
+    handleSearchChange: function(event) {
+      this.inputs = this.state.inputs;
+      this.inputs.search.val = event.target.value;
+      return this.setState({
+        inputs: this.inputs
+      });
+    },
+    getErrorText: function(key) {
+      var error, j, len, ref12;
+      ref12 = this.state.errors;
+      for (j = 0, len = ref12.length; j < len; j++) {
+        error = ref12[j];
+        if (error.id === key) {
+          return error.text;
+        }
+      }
+      return null;
+    },
+    search: function() {
+      return this.props.search(this.state.inputs.search.val, this.state.inputs.sort.val);
+    },
+    handleChange: function(event, index, value) {
+      this.inputs = this.state.inputs;
+      this.inputs.sort.val = value;
+      return this.setState({
+        inputs: this.inputs
+      });
+    },
+    render: function() {
+      return div({
+        className: "sarch__filter"
+      }, "Search Filter:", React.createElement(Material.TextField, {
+        id: "search-field",
+        hintText: "Enter text to search for",
+        floatingLabelText: "Search",
+        fullWidth: true,
+        value: this.state.inputs.search.val,
+        onChange: this.handleSearchChange,
+        errorText: this.getErrorText("search")
+      }), this.state.sortOptions.length > 0 ? React.createElement(Material.SelectField, {
+        floatingLabelText: "Sort",
+        value: this.state.inputs.sort.val,
+        onChange: this.handleChange
+      }, this.state.sortOptions.map(function(item, index) {
+        return React.createElement(Material.MenuItem, {
+          value: item.id,
+          primaryText: item.title,
+          key: "search-filter-item-" + index
+        });
+      })) : void 0, React.createElement(Material.RaisedButton, {
+        label: "Search",
+        onClick: this.search
+      }));
+    }
+  }));
+
   div = React.DOM.div;
 
   module.exports = React.createFactory(React.createClass({
     displayName: 'Votes',
     getVoteValText: function() {
-      var item, ref9;
+      var item, ref12;
       item = this.props.item;
       if (item.user_vote != null) {
-        return (ref9 = item.user_vote.vote === 1) != null ? ref9 : {
+        return (ref12 = item.user_vote.vote === 1) != null ? ref12 : {
           "True": "False"
         };
       } else {
@@ -2844,8 +3256,8 @@ module.exports = React.createFactory(React.createClass({
       return this.props.vote(0);
     },
     notOpenYet: function() {
-      var d1, d2, item, ref9, type;
-      ref9 = this.props, item = ref9.item, type = ref9.type;
+      var d1, d2, item, ref12, type;
+      ref12 = this.props, item = ref12.item, type = ref12.type;
       if (type !== "prediction") {
         return false;
       } else {
@@ -2866,8 +3278,8 @@ module.exports = React.createFactory(React.createClass({
       };
     },
     render: function() {
-      var item, ref9, submitted, submitting, type;
-      ref9 = this.props, type = ref9.type, item = ref9.item, submitting = ref9.submitting, submitted = ref9.submitted;
+      var item, ref12, submitted, submitting, type;
+      ref12 = this.props, type = ref12.type, item = ref12.item, submitting = ref12.submitting, submitted = ref12.submitted;
       return div({
         className: type + "__vote"
       }, div({
@@ -2900,327 +3312,219 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
+  module.exports = {
+    goToClaim: function(id) {
+      return navigate("/claims/" + id);
+    },
+    goToExpert: function(id) {
+      return navigate("/experts/" + id);
+    },
+    goToPrediction: function(id) {
+      return navigate("/predictions/" + id);
+    },
+    goToCategory: function(id) {
+      return navigate("/categories/" + id);
+    },
+    goToMostRecentClaim: function() {
+      return navigate("/claims/" + this.props.expert.most_recent_claim[0].alias);
+    },
+    goToMostRecentPrediction: function() {
+      return navigate("/predictions/" + this.props.expert.most_recent_prediction[0].alias);
+    },
+    goToLogin: function() {
+      return navigate('/login');
+    }
+  };
 
-  /*
-  API Class.
-  Usage to call is like this:
-  path is required.
-  path_variables is optional, and used for replacement in paths, like 'claims/%claim_id%/add_commment'
-  data is optional.
-  
-  params = {
-    path: "claims"
-    path_variables:
-      claim_id: 1
-    data:
-      id: "xxx"
-    success: @function
-    error: @function
-  }
-  API.call(params)
-   */
-
-  module.exports = API = (function() {
-    function API() {}
-
-    API.paths = {
-      register: {
-        path: "auth/",
-        non_api: true,
-        method: "POST"
-      },
-      login: {
-        path: "auth/sign_in",
-        non_api: true,
-        method: "POST"
-      },
-      logout: {
-        path: "auth/sign_out",
-        non_api: true,
-        method: "DELETE"
-      },
-      forgot_password: {
-        path: "auth/password",
-        non_api: true,
-        method: "POST"
-      },
-      categories: {
-        path: "categories",
-        method: "GET"
-      },
-      category: {
-        path: "categories/%category_id%",
-        method: "GET"
-      },
-      category_predictions: {
-        path: "categories/%category_id%/predictions",
-        method: "GET"
-      },
-      category_claims: {
-        path: "categories/%category_id%/claims",
-        method: "GET"
-      },
-      category_experts: {
-        path: "categories/%category_id%/experts",
-        method: "GET"
-      },
-      category_all: {
-        path: "categories/%category_id%/all",
-        method: "GET"
-      },
-      claims: {
-        path: "claims",
-        method: "GET"
-      },
-      all_claims: {
-        path: "claims/all",
-        method: "GET"
-      },
-      claim: {
-        path: "claims/%claim_id%",
-        method: "GET"
-      },
-      create_claim: {
-        path: "claims/",
-        method: "POST"
-      },
-      claim_add_comment: {
-        path: "claims/%claim_id%/add_comment",
-        method: "POST"
-      },
-      vote_for_claim: {
-        path: "claims/%claim_id%/vote",
-        method: "POST"
-      },
-      predictions: {
-        path: "predictions",
-        method: "GET"
-      },
-      all_predictions: {
-        path: "predictions/all",
-        method: "GET"
-      },
-      prediction: {
-        path: "predictions/%prediction_id%",
-        method: "GET"
-      },
-      add_evidence_to_prediction: {
-        path: "predictions/%prediction_id%/add_evidence",
-        method: "POST"
-      },
-      add_evidence_to_claim: {
-        path: "claims/%claim_id%/add_evidence",
-        method: "POST"
-      },
-      create_prediction: {
-        path: "predictions/",
-        method: "POST"
-      },
-      prediction_add_comment: {
-        path: "predictions/%prediction_id%/add_comment",
-        method: "POST"
-      },
-      vote_for_prediction: {
-        path: "predictions/%prediction_id%/vote",
-        method: "POST"
-      },
-      experts: {
-        path: "experts",
-        method: "GET"
-      },
-      all_experts: {
-        path: "experts/all",
-        method: "GET"
-      },
-      expert: {
-        path: "experts/%expert_id%",
-        method: "GET"
-      },
-      create_expert: {
-        path: "experts/",
-        method: "POST"
-      },
-      expert_add_comment: {
-        path: "experts/%expert_id%/add_comment",
-        method: "POST"
-      },
-      add_prediction_to_expert: {
-        path: "experts/%expert_id%/add_prediction",
-        method: "POST"
-      },
-      add_claim_to_expert: {
-        path: "experts/%expert_id%/add_claim",
-        method: "POST"
-      },
-      add_expert_to_prediction: {
-        path: "predictions/%prediction_id%/add_expert",
-        method: "POST"
-      },
-      add_expert_to_claim: {
-        path: "claims/%claim_id%/add_expert",
-        method: "POST"
-      },
-      get_substantiations: {
-        path: "experts/%expert_id%/get_substantiations",
-        method: "POST"
-      },
-      add_substantiation: {
-        path: "experts/%expert_id%/add_substantiation",
-        method: "POST"
-      },
-      add_bona_fide: {
-        path: "experts/%expert_id%/add_bona_fide",
-        method: "POST"
-      },
-      bookmarks: {
-        path: "user/bookmarks",
-        method: "GET"
-      },
-      verify_token: {
-        path: "auth/validate_token?access-token=%accessToken%&client=%client%&uid=%uid%&",
-        method: "GET",
-        non_api: true
-      },
-      expert_comments: {
-        path: "experts/%expert_id%/comments",
-        method: "GET"
-      },
-      claim_comments: {
-        path: "claims/%claim_id%/comments",
-        method: "GET"
-      },
-      prediction_comments: {
-        path: "predictions/%prediction_id%/comments",
-        method: "GET"
-      },
-      update_bookmark: {
-        path: "user/update_bookmark/%bookmark_id%",
-        method: "POST"
-      },
-      remove_bookmark: {
-        path: "user/remove_bookmark/%bookmark_id%",
-        method: "POST"
-      },
-      add_bookmark: {
-        path: "user/add_bookmark",
-        method: "POST"
-      },
-      homepage: {
-        path: "home/homepage",
-        method: "GET"
+  module.exports = {
+    getInitialState: function() {
+      return {
+        page: 1,
+        numberOfPages: 1
+      };
+    },
+    nextPage: function() {
+      if (this.state.page < this.state.numberOfPages) {
+        this.setState({
+          page: this.state.page + 1
+        });
       }
-    };
-
-    API.server = function(params) {
-      if ((this.paths[params.path].non_api != null) && this.paths[params.path].non_api === true) {
-        return "http://localhost:3000/";
+      return this.fetchPaginatedData(this.state.page + 1);
+    },
+    previousPage: function() {
+      if (this.state.page > 1) {
+        this.setState({
+          page: this.state.page - 1
+        });
       }
-      return "http://localhost:3000/api/v1/";
-    };
-
-    API.method = function(params) {
-      return this.paths[params.path].method;
-    };
-
-    API.path = function(params) {
-      var key, ref9, value;
-      this.p = this.server(params) + this.paths[params.path].path;
-      ref9 = params.path_variables;
-      for (key in ref9) {
-        value = ref9[key];
-        this.p = this.p.replace('%' + key + '%', value);
-      }
-      if (this.paths[params.path].method === "GET") {
-        this.p = this.p + this.dataAsGet(params.data);
-      }
-      return this.p;
-    };
-
-    API.dataAsGet = function(data) {
-      var key, value;
-      this.d = "?";
-      for (key in data) {
-        value = data[key];
-        this.d += key + "=" + (encodeURIComponent(value)) + "&";
-      }
-      return this.d;
-    };
-
-    API.data = function(params) {
-      var data;
-      if (params.data != null) {
-        data = params.data;
-      } else {
-        data = {};
-      }
-      return data;
-    };
-
-    API.call = function(params) {
-      return $.ajax({
-        method: this.method(params),
-        url: this.path(params),
-        headers: UserStore.getAuthHeader(),
-        data: this.data(params),
-        dataType: "json",
-        success: function(data, status, request) {
-          UserStore.updateHeaderInfo(request);
-          if (params.success != null) {
-            return params.success(data, request);
-          }
-        },
-        error: function(error) {
-          if (params.error != null) {
-            return params.error(error);
-          }
-        }
+      return this.fetchPaginatedData(this.state.page - 1);
+    },
+    specificPage: function(page) {
+      this.setState({
+        page: page
       });
-    };
+      return this.fetchPaginatedData(page);
+    }
+  };
 
-    return API;
-
-  })();
-
-  module.exports = Global = (function() {
-    function Global() {}
-
-    Global.setCookie = function(name, value, days) {
-      var date, expires;
-      if (days) {
-        date = new Date();
-        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-        expires = "; expires=" + date.toGMTString();
+  module.exports = {
+    setUser: function(data, request) {
+      window.UserStore.set(data, request);
+      this.user = window.UserStore.get();
+      if ((this.user != null) && (this.user.token != null)) {
+        window.global.setCookie('access-token', this.user.token);
+        window.global.setCookie('uid', this.user.uid);
+        return window.global.setCookie('client', this.user.client);
       } else {
-        expires = "";
+        window.global.deleteCookie('access-token');
+        window.global.deleteCookie('uid');
+        return window.global.deleteCookie('client');
       }
-      return document.cookie = name + "=" + value + expires + "; path=/";
-    };
-
-    Global.getCookie = function(name) {
-      var c, ca, i, nameEQ;
-      nameEQ = name + "=";
-      ca = document.cookie.split(";");
-      i = 0;
-      while (i < ca.length) {
-        c = ca[i];
-        while (c.charAt(0) === " ") {
-          c = c.substring(1, c.length);
-        }
-        if (c.indexOf(nameEQ) === 0) {
-          return c.substring(nameEQ.length, c.length);
-        }
-        i++;
+    },
+    getParameterByName: function(name, url) {
+      var regex, results;
+      if (!url) {
+        url = window.location.href;
       }
-      return null;
-    };
+      name = name.replace(/[\[\]]/g, "\\$&");
+      regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
+      results = regex.exec(url);
+      if (!results) {
+        return null;
+      }
+      if (!results[2]) {
+        return '';
+      }
+      return decodeURIComponent(results[2].replace(/\+/g, " "));
+    },
+    getUrlParams: function() {
+      var j, key, len, params, query, raw_vars, ref12, v, val;
+      query = window.location.search.substring(1);
+      raw_vars = query.split("&");
+      params = {};
+      for (j = 0, len = raw_vars.length; j < len; j++) {
+        v = raw_vars[j];
+        ref12 = v.split("="), key = ref12[0], val = ref12[1];
+        params[key] = decodeURIComponent(val);
+      }
+      return params;
+    },
+    getUser: function() {
+      var obj;
+      obj = {};
+      this.token = window.global.getCookie('access-token');
+      this.client = window.global.getCookie('client');
+      this.uid = window.global.getCookie('uid');
+      if (this.token != null) {
+        obj.token = this.token;
+        obj.client = this.client;
+        obj.uid = this.uid;
+      }
+      if (obj === {}) {
+        return false;
+      }
+      return obj;
+    },
+    unsetUser: function() {
+      window.UserStore.set(null);
+      window.global.deleteCookie('access-token');
+      window.global.deleteCookie('client');
+      return window.global.deleteCookie('uid');
+    },
+    authHeader: function() {
+      return this.user = window.UserStore.getAuthHeader();
+    },
+    verifyUserToken: function() {
+      if (window.global.getCookie('access-token')) {
+        return this.verifyToken();
+      } else {
+        return this.setState({
+          verificationComplete: true
+        });
+      }
+    },
+    verifyToken: function() {
+      var params;
+      params = {
+        path: "verify_token",
+        path_variables: {
+          accessToken: window.global.getCookie('access-token'),
+          client: window.global.getCookie('client'),
+          uid: window.global.getCookie('uid')
+        },
+        success: this.verifyTokenSuccess,
+        error: this.verifyTokenError
+      };
+      return API.call(params);
+    },
+    verifyTokenSuccess: function(data) {
+      if (data) {
+        data.data.token = window.global.getCookie('access-token');
+        data.data.client = window.global.getCookie('client');
+        data.data.uid = window.global.getCookie('uid');
+        return this.setUser(data.data);
+      }
+    },
+    verifyTokenError: function(error) {
+      return this.setUser({});
+    },
+    updateUserHeaderInfo: function(request) {}
+  };
 
-    Global.deleteCookie = function(name) {
-      return this.setCookie(name, "", -1);
-    };
+  ref12 = React.DOM, div = ref12.div, span = ref12.span;
 
-    return Global;
+  Login = require("components/Login");
 
-  })();
+  Register = require("components/Register");
+
+  ForgotPassword = require("components/ForgotPassword");
+
+  RegistrationSuccessful = require("components/RegistrationSuccessful");
+
+  module.exports = React.createFactory(React.createClass({
+    getInitialState: function() {
+      return {
+        view: "login"
+      };
+    },
+    changeView: function(view) {
+      return this.setState({
+        view: view
+      });
+    },
+    render: function() {
+      return div({
+        className: "modal"
+      }, div({
+        className: "modal__bg"
+      }, ''), div({
+        className: "modal__login"
+      }, div({
+        className: "modal__login-header"
+      }, div({
+        className: "modal__login-title"
+      }, this.state.view), div({
+        className: "modal__login-header-close"
+      }, span({
+        className: "fa fa-close",
+        onClick: this.props.hideLogin
+      }, ''))), div({
+        className: "modal__login-body"
+      }, this.state.view === "login" ? Login({
+        changeView: this.changeView,
+        hideLogin: this.props.hideLogin
+      }) : this.state.view === "register" ? Register({
+        changeView: this.changeView,
+        hideLogin: this.props.hideLogin
+      }) : this.state.view === "forgot" ? ForgotPassword({
+        changeView: this.changeView,
+        hideLogin: this.props.hideLogin
+      }) : this.state.view === "registered" ? RegistrationSuccessful({
+        changeView: this.changeView,
+        hideLogin: this.props.hideLogin
+      }) : void 0)));
+    }
+  }));
 
   UserStore = (function() {
     function UserStore() {
@@ -3431,7 +3735,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref9 = React.DOM, div = ref9.div, span = ref9.span;
+  ref13 = React.DOM, div = ref13.div, span = ref13.span;
 
   Header = require("components/Header");
 
@@ -3917,7 +4221,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref10 = React.DOM, div = ref10.div, img = ref10.img;
+  ref14 = React.DOM, div = ref14.div, img = ref14.img;
 
   Header = require("components/Header");
 
@@ -4081,8 +4385,8 @@ module.exports = React.createFactory(React.createClass({
       }
     },
     render: function() {
-      var claim, experts, ref11;
-      ref11 = this.state, claim = ref11.claim, experts = ref11.experts;
+      var claim, experts, ref15;
+      ref15 = this.state, claim = ref15.claim, experts = ref15.experts;
       return div({}, Header({}, ''), div({
         className: "claims-wrapper"
       }, div({
@@ -4167,8 +4471,6 @@ module.exports = React.createFactory(React.createClass({
 
   PaginationMixin = require("mixins/PaginationMixin");
 
-  RaisedButton = Material.RaisedButton;
-
   module.exports = React.createFactory(React.createClass({
     mixins: [PaginationMixin],
     displayName: 'Claims',
@@ -4215,7 +4517,7 @@ module.exports = React.createFactory(React.createClass({
         className: "claims-wrapper"
       }, div({
         className: "claims-content"
-      }, React.createElement(RaisedButton, {
+      }, React.createElement(Material.RaisedButton, {
         label: "Create New Claim",
         primary: true,
         onClick: this.goToNewClaim
@@ -4634,7 +4936,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref11 = React.DOM, div = ref11.div, img = ref11.img;
+  ref15 = React.DOM, div = ref15.div, img = ref15.img;
 
   Header = require("components/Header");
 
@@ -4745,8 +5047,8 @@ module.exports = React.createFactory(React.createClass({
       }, "Success! You've added a new expert to the system. Now you can add more information to them!") : void 0);
     },
     render: function() {
-      var claims, expert, predictions, ref12;
-      ref12 = this.state, expert = ref12.expert, predictions = ref12.predictions, claims = ref12.claims;
+      var claims, expert, predictions, ref16;
+      ref16 = this.state, expert = ref16.expert, predictions = ref16.predictions, claims = ref16.claims;
       return div({}, Header({}, ''), div({
         className: "experts-wrapper"
       }, div({
@@ -4919,134 +5221,6 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref12 = React.DOM, div = ref12.div, a = ref12.a;
-
-  Header = require("components/Header");
-
-  Footer = require("components/Footer");
-
-  LinksMixin = require("mixins/LinksMixin");
-
-  module.exports = React.createFactory(React.createClass({
-    displayName: 'Forgot Password',
-    mixins: [LinksMixin],
-    getInitialState: function() {
-      return {
-        inputs: {
-          email: {
-            validateEmail: true,
-            value: ''
-          }
-        },
-        errors: [],
-        forgotLoading: false,
-        forgotError: false,
-        sentRecoveryEmail: false
-      };
-    },
-    processForgotPassword: function() {
-      var params;
-      if (this.validateInputs()) {
-        this.setState({
-          errors: []
-        });
-        this.setState({
-          forgotLoading: true
-        });
-        params = {
-          path: "forgot_password",
-          data: {
-            email: this.state.inputs.email.value
-          },
-          success: this.forgotPasswordSuccess,
-          error: this.forgotPasswordError
-        };
-        return API.call(params);
-      }
-    },
-    handleEmailChange: function(event) {
-      this.inputs = this.state.inputs;
-      this.inputs.email.value = event.target.value;
-      return this.setState({
-        inputs: this.inputs
-      });
-    },
-    validateInputs: function() {
-      this.errors = [];
-      if (this.state.inputs.email.value.length < 6 || this.state.inputs.email.value.indexOf("@", 0) === -1 || this.state.inputs.email.value.indexOf(".", 0) === -1) {
-        this.errors.push({
-          id: "email",
-          text: "Valid Email Required"
-        });
-      }
-      this.setState({
-        errors: this.errors
-      });
-      if (this.errors.length === 0) {
-        return true;
-      }
-      return false;
-    },
-    getErrorText: function(key) {
-      var error, j, len, ref13;
-      ref13 = this.state.errors;
-      for (j = 0, len = ref13.length; j < len; j++) {
-        error = ref13[j];
-        if (error.id === key) {
-          return error.text;
-        }
-      }
-      return null;
-    },
-    forgotPasswordSuccess: function(data) {
-      this.setState({
-        sentRecoveryEmail: true
-      });
-      return this.setState({
-        forgotLoading: false
-      });
-    },
-    forgotPasswordError: function(error) {
-      this.setState({
-        forgotLoading: false
-      });
-      if ((error.responseJSON != null) && (error.responseJSON.errors != null)) {
-        return this.setState({
-          forgotError: error.responseJSON.errors[0]
-        });
-      }
-    },
-    render: function() {
-      return div({}, Header({}, ''), div({
-        className: "user-wrapper"
-      }, div({
-        className: "user-content"
-      }, "Forgot Password", this.state.sentRecoveryEmail === false ? div({}, div({}, React.createElement(Material.TextField, {
-        id: "forgot-email",
-        floatingLabelText: "Email",
-        value: this.state.inputs.email.value,
-        onChange: this.handleEmailChange,
-        errorText: this.getErrorText("email")
-      })), div({}, this.state.loginLoading === true ? (this.style = {
-        display: 'inline-block',
-        position: 'relative',
-        boxShadow: 'none'
-      }, React.createElement(Material.RefreshIndicator, {
-        style: this.style,
-        size: 50,
-        left: 0,
-        top: 0,
-        status: "loading"
-      })) : React.createElement(Material.RaisedButton, {
-        label: "Reset Password",
-        primary: true,
-        onClick: this.processForgotPassword
-      })), this.state.forgotError != null ? div({}, this.state.forgotError) : void 0, div({}, "Remembered your password? ", a({
-        onClick: this.goToLogin
-      }, 'Click here to login'))) : div({}, "An email with a link to reset your password has been sent to you."))), Footer({}, ''));
-    }
-  }));
-
   div = React.DOM.div;
 
   Header = require("components/Header");
@@ -5163,163 +5337,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref13 = React.DOM, div = ref13.div, a = ref13.a;
-
-  Header = require("components/Header");
-
-  Footer = require("components/Footer");
-
-  SessionMixin = require("mixins/SessionMixin");
-
-  TextField = Material.TextField;
-
-  RaisedButton = Material.RaisedButton;
-
-  RefreshIndicator = Material.RefreshIndicator;
-
-  module.exports = React.createFactory(React.createClass({
-    mixins: [SessionMixin],
-    displayName: 'Login',
-    getInitialState: function() {
-      return {
-        email: '',
-        password: '',
-        errors: [],
-        loginError: null,
-        loginLoading: false
-      };
-    },
-    goToRegister: function() {
-      return navigate('/register');
-    },
-    goToForgotPassword: function() {
-      return navigate('/forgot_password');
-    },
-    handleEmailChange: function(event) {
-      return this.setState({
-        email: event.target.value
-      });
-    },
-    handlePasswordChange: function(event) {
-      return this.setState({
-        password: event.target.value
-      });
-    },
-    validateInputs: function() {
-      this.errors = [];
-      if (this.state.email.length < 6 || this.state.email.indexOf("@", 0) === -1 || this.state.email.indexOf(".", 0) === -1) {
-        this.errors.push({
-          id: "email",
-          text: "Valid Email Required"
-        });
-      }
-      if (this.state.password === '') {
-        this.errors.push({
-          id: "password",
-          text: "Password Required"
-        });
-      }
-      this.setState({
-        errors: this.errors
-      });
-      if (this.errors.length === 0) {
-        return true;
-      }
-      return false;
-    },
-    processLogin: function() {
-      var params;
-      if (this.validateInputs()) {
-        this.setState({
-          errors: []
-        });
-        this.setState({
-          loginError: false
-        });
-        this.setState({
-          loginLoading: true
-        });
-        params = {
-          path: "login",
-          data: {
-            email: this.state.email,
-            password: this.state.password
-          },
-          success: this.loginSuccess,
-          error: this.loginError
-        };
-        return API.call(params);
-      }
-    },
-    loginSuccess: function(data, request) {
-      this.setState({
-        loginLoading: false
-      });
-      this.setUser(data.data, request);
-      return navigate('/me');
-    },
-    loginError: function(error) {
-      this.setState({
-        loginLoading: false
-      });
-      if ((error.responseJSON != null) && (error.responseJSON.errors != null)) {
-        return this.setState({
-          loginError: error.responseJSON.errors[0]
-        });
-      }
-    },
-    getErrorText: function(key) {
-      var error, j, len, ref14;
-      ref14 = this.state.errors;
-      for (j = 0, len = ref14.length; j < len; j++) {
-        error = ref14[j];
-        if (error.id === key) {
-          return error.text;
-        }
-      }
-      return null;
-    },
-    render: function() {
-      return div({}, Header({}, ''), div({
-        className: "user-wrapper"
-      }, div({
-        className: "user-content"
-      }, "Login", div({}, div({}, React.createElement(TextField, {
-        id: "login-email",
-        floatingLabelText: "Email",
-        value: this.state.email,
-        onChange: this.handleEmailChange,
-        errorText: this.getErrorText("email")
-      })), div({}, React.createElement(TextField, {
-        id: "login-password",
-        floatingLabelText: "Password",
-        type: "password",
-        value: this.state.password,
-        onChange: this.handlePasswordChange,
-        errorText: this.getErrorText("password")
-      })), div({}, this.state.loginLoading === true ? (this.style = {
-        display: 'inline-block',
-        position: 'relative',
-        boxShadow: 'none'
-      }, React.createElement(RefreshIndicator, {
-        style: this.style,
-        size: 50,
-        left: 0,
-        top: 0,
-        status: "loading"
-      })) : React.createElement(RaisedButton, {
-        label: "Login",
-        primary: true,
-        onClick: this.processLogin
-      })), this.state.loginError != null ? div({}, this.state.loginError) : void 0), div({}, a({
-        onClick: this.goToRegister
-      }, 'Click here to register'), a({
-        onClick: this.goToForgotPassword
-      }, 'Forgot your password?')))), Footer({}, ''));
-    }
-  }));
-
-  ref14 = React.DOM, div = ref14.div, img = ref14.img;
+  ref16 = React.DOM, div = ref16.div, img = ref16.img;
 
   Header = require("components/Header");
 
@@ -5486,8 +5504,8 @@ module.exports = React.createFactory(React.createClass({
       return date;
     },
     render: function() {
-      var experts, prediction, ref15;
-      ref15 = this.state, prediction = ref15.prediction, experts = ref15.experts;
+      var experts, prediction, ref17;
+      ref17 = this.state, prediction = ref17.prediction, experts = ref17.experts;
       return div({}, Header({}, ''), div({
         className: "predictions-wrapper"
       }, div({
@@ -5641,158 +5659,95 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref15 = React.DOM, div = ref15.div, a = ref15.a;
+  div = React.DOM.div;
 
   Header = require("components/Header");
 
   Footer = require("components/Footer");
 
+  ClaimCard = require("components/ClaimCard");
+
+  PredictionCard = require("components/PredictionCard");
+
+  ExpertCard = require("components/ExpertCard");
+
+  SearchFilters = require("components/SearchFilters");
+
   LinksMixin = require("mixins/LinksMixin");
 
   module.exports = React.createFactory(React.createClass({
-    displayName: 'Register',
+    displayName: "Search",
     mixins: [LinksMixin],
     getInitialState: function() {
       return {
-        email: '',
-        password: '',
-        password_confirmation: '',
-        errors: [],
-        registerError: null,
-        registerLoading: false
+        data: null
       };
     },
-    handleEmailChange: function(event) {
-      return this.setState({
-        email: event.target.value
-      });
+    getSortOptions: function() {
+      return [
+        {
+          id: 0,
+          title: "Newest"
+        }, {
+          id: 1,
+          title: "Oldest"
+        }, {
+          id: 2,
+          title: "Most Recently Updated"
+        }, {
+          id: 3,
+          title: "Least Recently Updated"
+        }
+      ];
     },
-    handlePasswordChange: function(event) {
-      return this.setState({
-        password: event.target.value
-      });
-    },
-    handlePasswordConfirmationChange: function(event) {
-      return this.setState({
-        password_confirmation: event.target.value
-      });
-    },
-    validateInputs: function() {
-      this.errors = [];
-      if (this.state.email.length < 6 || this.state.email.indexOf("@", 0) === -1 || this.state.email.indexOf(".", 0) === -1) {
-        this.errors.push({
-          id: "email",
-          text: "Valid Email Required"
-        });
-      }
-      if (this.state.password === '') {
-        this.errors.push({
-          id: "password",
-          text: "Password Required"
-        });
-      }
-      if (this.state.password_confirmation === '') {
-        this.errors.push({
-          id: "password_confirmation",
-          text: "Password Required"
-        });
-      }
-      if (this.state.password !== '' && this.state.password_confirmation !== '' && this.state.password !== this.state.password_confirmation) {
-        this.errors.push({
-          id: "password",
-          text: "Password and Password Confirmation must match."
-        });
-        this.errors.push({
-          id: "password_confirmation",
-          text: "Password and Password Confirmation must match."
-        });
-      }
-      this.setState({
-        errors: this.errors
-      });
-      if (this.errors.length === 0) {
-        return true;
-      }
-      return false;
-    },
-    processRegister: function() {
+    search: function(query, sort) {
       var params;
-      if (this.validateInputs()) {
-        this.setState({
-          registerError: false
-        });
-        this.setState({
-          errors: []
-        });
-        this.setState({
-          registerLoading: true
-        });
-        params = {
-          path: "register",
-          data: {
-            email: this.state.email,
-            password: this.state.password,
-            password_confirmation: this.state.password_confirmation
-          },
-          success: this.registerSuccess,
-          error: this.registerError
-        };
-        return API.call(params);
-      }
+      params = {
+        path: "search",
+        data: {
+          query: query,
+          sort: sort
+        },
+        success: this.searchSuccess,
+        error: this.searchError
+      };
+      return API.call(params);
     },
-    registerSuccess: function(data, request) {
+    searchSuccess: function(data) {
       this.setState({
-        registerLoading: false
+        searching: false
       });
-      return navigate('/register_success');
-    },
-    registerError: function(error) {
       this.setState({
-        registerLoading: false
+        searchError: false
+      });
+      console.log(data);
+      return this.setState({
+        data: data
+      });
+    },
+    searchError: function(error) {
+      this.setState({
+        searching: false
       });
       if ((error.responseJSON != null) && (error.responseJSON.errors != null)) {
         return this.setState({
-          registerError: error.responseJSON.errors[0]
+          searchError: error.responseJSON.errors[0]
+        });
+      } else {
+        return this.setState({
+          searchError: 'There was an error searching.'
         });
       }
     },
-    getErrorText: function(key) {
-      var error, j, len, ref16;
-      ref16 = this.state.errors;
-      for (j = 0, len = ref16.length; j < len; j++) {
-        error = ref16[j];
-        if (error.id === key) {
-          return error.text;
-        }
-      }
-      return null;
-    },
     render: function() {
       return div({}, Header({}, ''), div({
-        className: "user-wrapper"
+        className: "search-wrapper"
       }, div({
-        className: "user-content"
-      }, "Register", div({}, div({}, React.createElement(Material.TextField, {
-        id: "register-email",
-        floatingLabelText: "Email",
-        value: this.state.email,
-        onChange: this.handleEmailChange,
-        errorText: this.getErrorText("email")
-      })), div({}, React.createElement(Material.TextField, {
-        id: "register-password",
-        floatingLabelText: "Password",
-        type: "password",
-        value: this.state.password,
-        onChange: this.handlePasswordChange,
-        errorText: this.getErrorText("password")
-      })), div({}, React.createElement(Material.TextField, {
-        id: "register-password-confirmation",
-        floatingLabelText: "Confirm",
-        type: "password",
-        value: this.state.password_confirmation,
-        onChange: this.handlePasswordConfirmationChange,
-        errorText: this.getErrorText("password_confirmation")
-      })), div({}, this.state.registerLoading === true ? (this.style = {
+        className: "search-content"
+      }, SearchFilters({
+        sortOptions: this.getSortOptions(),
+        search: this.search
+      }), this.state.searching === true ? (this.style = {
         display: 'inline-block',
         position: 'relative',
         boxShadow: 'none'
@@ -5802,30 +5757,48 @@ module.exports = React.createFactory(React.createClass({
         left: 0,
         top: 0,
         status: "loading"
-      })) : React.createElement(Material.RaisedButton, {
-        label: "Register",
-        primary: true,
-        onClick: this.processRegister
-      })), this.state.registerError != null ? div({}, this.state.registerError) : void 0), div({}, a({
-        onClick: this.goToLogin
-      }, 'Click here to login')))), Footer({}, ''));
-    }
-  }));
-
-  div = React.DOM.div;
-
-  Header = require("components/Header");
-
-  Footer = require("components/Footer");
-
-  module.exports = React.createFactory(React.createClass({
-    displayName: 'Register Successful',
-    render: function() {
-      return div({}, Header({}, ''), div({
-        className: "landing-wrapper"
+      })) : void 0, this.state.data != null ? div({}, div({
+        className: "search__experts"
       }, div({
-        className: "landing-content"
-      }, "You've successfully registered! You'll get a confirmation email shortly, which will allow you to log in and start Blunditing.")), Footer({}, ''));
+        className: "search__experts-title"
+      }, "Experts:"), this.state.data.experts.length === 0 ? div({
+        className: "search__experts-items--empty"
+      }, "No expert found for '" + this.state.data.query + "'") : div({
+        className: "search__experts-items"
+      }, this.state.data.experts.map(function(expert, index) {
+        return ExpertCard({
+          expert: expert,
+          key: "search-expert-card-" + index
+        });
+      }))), div({
+        className: "search__predictions"
+      }, div({
+        className: "search__predictions-title"
+      }, "Predictions:"), this.state.data.predictions.length === 0 ? div({
+        className: "search__predictions-items--empty"
+      }, "No prediction found for '" + this.state.data.query + "'") : div({
+        className: "search__predictions-items"
+      }, this.state.data.predictions.map(function(prediction, index) {
+        return PredictionCard({
+          prediction: prediction,
+          key: "search-prediction-card-" + index
+        });
+      }))), div({
+        className: "search__claims"
+      }, div({
+        className: "search__claims-title"
+      }, "Claims:"), this.state.data.claims.length === 0 ? div({
+        className: "search__claims-items--empty"
+      }, "No claim found for '" + this.state.data.query + "'") : div({
+        className: "search__claims-items"
+      }, this.state.data.claims.map(function(claim, index) {
+        return ClaimCard({
+          claim: claim,
+          key: "search-claim-card-" + index
+        });
+      })))) : void 0, this.state.searchError != null ? div({
+        className: "search__error"
+      }, this.state.searchError) : void 0)), Footer({}, ''));
     }
   }));
 
@@ -5874,9 +5847,335 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
+
+  /*
+  API Class.
+  Usage to call is like this:
+  path is required.
+  path_variables is optional, and used for replacement in paths, like 'claims/%claim_id%/add_commment'
+  data is optional.
+  
+  params = {
+    path: "claims"
+    path_variables:
+      claim_id: 1
+    data:
+      id: "xxx"
+    success: @function
+    error: @function
+  }
+  API.call(params)
+   */
+
+  module.exports = API = (function() {
+    function API() {}
+
+    API.paths = {
+      register: {
+        path: "auth/",
+        non_api: true,
+        method: "POST"
+      },
+      login: {
+        path: "auth/sign_in",
+        non_api: true,
+        method: "POST"
+      },
+      logout: {
+        path: "auth/sign_out",
+        non_api: true,
+        method: "DELETE"
+      },
+      forgot_password: {
+        path: "auth/password",
+        non_api: true,
+        method: "POST"
+      },
+      categories: {
+        path: "categories",
+        method: "GET"
+      },
+      category: {
+        path: "categories/%category_id%",
+        method: "GET"
+      },
+      category_predictions: {
+        path: "categories/%category_id%/predictions",
+        method: "GET"
+      },
+      category_claims: {
+        path: "categories/%category_id%/claims",
+        method: "GET"
+      },
+      category_experts: {
+        path: "categories/%category_id%/experts",
+        method: "GET"
+      },
+      category_all: {
+        path: "categories/%category_id%/all",
+        method: "GET"
+      },
+      claims: {
+        path: "claims",
+        method: "GET"
+      },
+      all_claims: {
+        path: "claims/all",
+        method: "GET"
+      },
+      claim: {
+        path: "claims/%claim_id%",
+        method: "GET"
+      },
+      create_claim: {
+        path: "claims/",
+        method: "POST"
+      },
+      claim_add_comment: {
+        path: "claims/%claim_id%/add_comment",
+        method: "POST"
+      },
+      vote_for_claim: {
+        path: "claims/%claim_id%/vote",
+        method: "POST"
+      },
+      predictions: {
+        path: "predictions",
+        method: "GET"
+      },
+      all_predictions: {
+        path: "predictions/all",
+        method: "GET"
+      },
+      prediction: {
+        path: "predictions/%prediction_id%",
+        method: "GET"
+      },
+      add_evidence_to_prediction: {
+        path: "predictions/%prediction_id%/add_evidence",
+        method: "POST"
+      },
+      add_evidence_to_claim: {
+        path: "claims/%claim_id%/add_evidence",
+        method: "POST"
+      },
+      create_prediction: {
+        path: "predictions/",
+        method: "POST"
+      },
+      prediction_add_comment: {
+        path: "predictions/%prediction_id%/add_comment",
+        method: "POST"
+      },
+      vote_for_prediction: {
+        path: "predictions/%prediction_id%/vote",
+        method: "POST"
+      },
+      experts: {
+        path: "experts",
+        method: "GET"
+      },
+      all_experts: {
+        path: "experts/all",
+        method: "GET"
+      },
+      expert: {
+        path: "experts/%expert_id%",
+        method: "GET"
+      },
+      create_expert: {
+        path: "experts/",
+        method: "POST"
+      },
+      expert_add_comment: {
+        path: "experts/%expert_id%/add_comment",
+        method: "POST"
+      },
+      add_prediction_to_expert: {
+        path: "experts/%expert_id%/add_prediction",
+        method: "POST"
+      },
+      add_claim_to_expert: {
+        path: "experts/%expert_id%/add_claim",
+        method: "POST"
+      },
+      add_expert_to_prediction: {
+        path: "predictions/%prediction_id%/add_expert",
+        method: "POST"
+      },
+      add_expert_to_claim: {
+        path: "claims/%claim_id%/add_expert",
+        method: "POST"
+      },
+      get_substantiations: {
+        path: "experts/%expert_id%/get_substantiations",
+        method: "POST"
+      },
+      add_substantiation: {
+        path: "experts/%expert_id%/add_substantiation",
+        method: "POST"
+      },
+      add_bona_fide: {
+        path: "experts/%expert_id%/add_bona_fide",
+        method: "POST"
+      },
+      bookmarks: {
+        path: "user/bookmarks",
+        method: "GET"
+      },
+      verify_token: {
+        path: "auth/validate_token?access-token=%accessToken%&client=%client%&uid=%uid%&",
+        method: "GET",
+        non_api: true
+      },
+      expert_comments: {
+        path: "experts/%expert_id%/comments",
+        method: "GET"
+      },
+      claim_comments: {
+        path: "claims/%claim_id%/comments",
+        method: "GET"
+      },
+      prediction_comments: {
+        path: "predictions/%prediction_id%/comments",
+        method: "GET"
+      },
+      update_bookmark: {
+        path: "user/update_bookmark/%bookmark_id%",
+        method: "POST"
+      },
+      remove_bookmark: {
+        path: "user/remove_bookmark/%bookmark_id%",
+        method: "POST"
+      },
+      add_bookmark: {
+        path: "user/add_bookmark",
+        method: "POST"
+      },
+      homepage: {
+        path: "home/homepage",
+        method: "GET"
+      },
+      search: {
+        path: "search",
+        method: "POST"
+      }
+    };
+
+    API.server = function(params) {
+      if ((this.paths[params.path].non_api != null) && this.paths[params.path].non_api === true) {
+        return "http://localhost:3000/";
+      }
+      return "http://localhost:3000/api/v1/";
+    };
+
+    API.method = function(params) {
+      return this.paths[params.path].method;
+    };
+
+    API.path = function(params) {
+      var key, ref17, value;
+      this.p = this.server(params) + this.paths[params.path].path;
+      ref17 = params.path_variables;
+      for (key in ref17) {
+        value = ref17[key];
+        this.p = this.p.replace('%' + key + '%', value);
+      }
+      if (this.paths[params.path].method === "GET") {
+        this.p = this.p + this.dataAsGet(params.data);
+      }
+      return this.p;
+    };
+
+    API.dataAsGet = function(data) {
+      var key, value;
+      this.d = "?";
+      for (key in data) {
+        value = data[key];
+        this.d += key + "=" + (encodeURIComponent(value)) + "&";
+      }
+      return this.d;
+    };
+
+    API.data = function(params) {
+      var data;
+      if (params.data != null) {
+        data = params.data;
+      } else {
+        data = {};
+      }
+      return data;
+    };
+
+    API.call = function(params) {
+      return $.ajax({
+        method: this.method(params),
+        url: this.path(params),
+        headers: UserStore.getAuthHeader(),
+        data: this.data(params),
+        dataType: "json",
+        success: function(data, status, request) {
+          UserStore.updateHeaderInfo(request);
+          if (params.success != null) {
+            return params.success(data, request);
+          }
+        },
+        error: function(error) {
+          if (params.error != null) {
+            return params.error(error);
+          }
+        }
+      });
+    };
+
+    return API;
+
+  })();
+
+  module.exports = Global = (function() {
+    function Global() {}
+
+    Global.setCookie = function(name, value, days) {
+      var date, expires;
+      if (days) {
+        date = new Date();
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+        expires = "; expires=" + date.toGMTString();
+      } else {
+        expires = "";
+      }
+      return document.cookie = name + "=" + value + expires + "; path=/";
+    };
+
+    Global.getCookie = function(name) {
+      var c, ca, i, nameEQ;
+      nameEQ = name + "=";
+      ca = document.cookie.split(";");
+      i = 0;
+      while (i < ca.length) {
+        c = ca[i];
+        while (c.charAt(0) === " ") {
+          c = c.substring(1, c.length);
+        }
+        if (c.indexOf(nameEQ) === 0) {
+          return c.substring(nameEQ.length, c.length);
+        }
+        i++;
+      }
+      return null;
+    };
+
+    Global.deleteCookie = function(name) {
+      return this.setCookie(name, "", -1);
+    };
+
+    return Global;
+
+  })();
+
 }).call(this);
 
-},{"./components/Footer":1,"./components/Header":2,"components/AddToClaim":566,"components/AddToExpert":567,"components/AddToPrediction":568,"components/BookmarkIndicator":569,"components/CategoryClaims":570,"components/CategoryExperts":571,"components/CategoryPredictions":572,"components/CategorySubHead":573,"components/ClaimCard":574,"components/ClaimEvidences":575,"components/ClaimExpertCard":576,"components/ClaimFields":577,"components/Comments":578,"components/ExpertBonaFides":579,"components/ExpertCard":580,"components/ExpertClaimCard":581,"components/ExpertFields":582,"components/ExpertPredictionCard":583,"components/ExpertSubstantiations":584,"components/Footer":585,"components/Header":586,"components/Pagination":587,"components/PredictionCard":588,"components/PredictionEvidences":589,"components/PredictionExpertCard":590,"components/PredictionFields":591,"components/Votes":592,"lodash":180,"material-ui":318,"material-ui/styles/MuiThemeProvider":337,"material-ui/styles/colors":339,"material-ui/styles/getMuiTheme":340,"mixins/LinksMixin":593,"mixins/PaginationMixin":594,"mixins/SessionMixin":595,"react":551,"react-dom":377,"react-mini-router":509,"react-tap-event-plugin":520,"shared/API":596,"shared/Global":597,"stores/UserStore":598,"views/404":599,"views/Bookmarks":600,"views/Categories":601,"views/CategoryAll":602,"views/CategoryClaims":603,"views/CategoryExperts":604,"views/CategoryPredictions":605,"views/Claim":606,"views/Claims":607,"views/CreateClaim":608,"views/CreateExpert":609,"views/CreatePrediction":610,"views/Expert":611,"views/Experts":612,"views/ForgotPassword":613,"views/Landing":614,"views/Login":615,"views/Prediction":616,"views/Predictions":617,"views/Register":618,"views/RegisterSuccessful":619,"views/User":620,"views/Users":621}],4:[function(require,module,exports){
+},{"./components/Footer":1,"./components/Header":2,"components/AddToClaim":566,"components/AddToExpert":567,"components/AddToPrediction":568,"components/BookmarkIndicator":569,"components/CategoryClaims":570,"components/CategoryExperts":571,"components/CategoryPredictions":572,"components/CategorySubHead":573,"components/ClaimCard":574,"components/ClaimEvidences":575,"components/ClaimExpertCard":576,"components/ClaimFields":577,"components/Comments":578,"components/ExpertBonaFides":579,"components/ExpertCard":580,"components/ExpertClaimCard":581,"components/ExpertFields":582,"components/ExpertPredictionCard":583,"components/ExpertSubstantiations":584,"components/Footer":585,"components/ForgotPassword":586,"components/Header":587,"components/Login":588,"components/Pagination":589,"components/PredictionCard":590,"components/PredictionEvidences":591,"components/PredictionExpertCard":592,"components/PredictionFields":593,"components/Register":594,"components/RegistrationSuccessful":595,"components/SearchFilters":596,"components/Votes":597,"lodash":180,"material-ui":318,"material-ui/styles/MuiThemeProvider":337,"material-ui/styles/colors":339,"material-ui/styles/getMuiTheme":340,"mixins/LinksMixin":598,"mixins/PaginationMixin":599,"mixins/SessionMixin":600,"modals/LoginModal":601,"react":551,"react-dom":377,"react-mini-router":509,"react-tap-event-plugin":520,"shared/API":602,"shared/Global":603,"stores/UserStore":604,"views/404":605,"views/Bookmarks":606,"views/Categories":607,"views/CategoryAll":608,"views/CategoryClaims":609,"views/CategoryExperts":610,"views/CategoryPredictions":611,"views/Claim":612,"views/Claims":613,"views/CreateClaim":614,"views/CreateExpert":615,"views/CreatePrediction":616,"views/Expert":617,"views/Experts":618,"views/Landing":619,"views/Prediction":620,"views/Predictions":621,"views/Search":622,"views/User":623,"views/Users":624}],4:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/array/from"), __esModule: true };
 },{"core-js/library/fn/array/from":26}],5:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/get-iterator"), __esModule: true };
@@ -83480,7 +83779,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"mixins/LinksMixin":593}],571:[function(require,module,exports){
+},{"mixins/LinksMixin":598}],571:[function(require,module,exports){
 var LinksMixin, div;
 
 div = React.DOM.div;
@@ -83512,7 +83811,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"mixins/LinksMixin":593}],572:[function(require,module,exports){
+},{"mixins/LinksMixin":598}],572:[function(require,module,exports){
 var LinksMixin, div;
 
 div = React.DOM.div;
@@ -83544,7 +83843,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"mixins/LinksMixin":593}],573:[function(require,module,exports){
+},{"mixins/LinksMixin":598}],573:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -83716,7 +84015,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"mixins/LinksMixin":593}],575:[function(require,module,exports){
+},{"mixins/LinksMixin":598}],575:[function(require,module,exports){
 var a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
@@ -83859,7 +84158,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ExpertSubstantiations":584,"mixins/LinksMixin":593}],577:[function(require,module,exports){
+},{"components/ExpertSubstantiations":584,"mixins/LinksMixin":598}],577:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -84176,7 +84475,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Pagination":587,"mixins/PaginationMixin":594}],579:[function(require,module,exports){
+},{"components/Pagination":589,"mixins/PaginationMixin":599}],579:[function(require,module,exports){
 var a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
@@ -84335,7 +84634,7 @@ module.exports = React.createFactory(React.createClass({
       className: "expert-card-meta__claims"
     }, expert.number_of_claims))), div({
       className: "expert-card-comments"
-    }, this.getCommentInfo()), expert.most_recent_claim.length > 0 || expert.most_recent_prediction > 0 ? div({
+    }, this.getCommentInfo()), ((expert.most_recent_claim != null) && expert.most_recent_claim.length > 0) || ((expert.most_recent_prediction != null) && expert.most_recent_prediction.length > 0) ? div({
       className: "expert-card-links"
     }, expert.most_recent_claim.length > 0 ? div({}, "Most recent Claim: ", a({
       onClick: this.goToMostRecentClaim
@@ -84359,7 +84658,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"mixins/LinksMixin":593}],581:[function(require,module,exports){
+},{"mixins/LinksMixin":598}],581:[function(require,module,exports){
 var ExpertSubstantiations, LinksMixin, div;
 
 div = React.DOM.div;
@@ -84413,7 +84712,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ExpertSubstantiations":584,"mixins/LinksMixin":593}],582:[function(require,module,exports){
+},{"components/ExpertSubstantiations":584,"mixins/LinksMixin":598}],582:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -84597,7 +84896,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ExpertSubstantiations":584,"mixins/LinksMixin":593}],584:[function(require,module,exports){
+},{"components/ExpertSubstantiations":584,"mixins/LinksMixin":598}],584:[function(require,module,exports){
 var a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
@@ -84736,18 +85035,285 @@ module.exports = React.createFactory(React.createClass({
 
 },{}],585:[function(require,module,exports){
 module.exports=require(1)
-},{"mixins/SessionMixin":595}],586:[function(require,module,exports){
+},{"mixins/SessionMixin":600}],586:[function(require,module,exports){
+var LinksMixin, a, div, ref;
+
+ref = React.DOM, div = ref.div, a = ref.a;
+
+LinksMixin = require("mixins/LinksMixin");
+
+module.exports = React.createFactory(React.createClass({
+  displayName: 'Forgot Password',
+  mixins: [LinksMixin],
+  getInitialState: function() {
+    return {
+      inputs: {
+        email: {
+          validateEmail: true,
+          value: ''
+        }
+      },
+      errors: [],
+      forgotLoading: false,
+      forgotError: false,
+      sentRecoveryEmail: false
+    };
+  },
+  showLogin: function() {
+    return this.props.changeView('login');
+  },
+  processForgotPassword: function() {
+    var params;
+    if (this.validateInputs()) {
+      this.setState({
+        errors: []
+      });
+      this.setState({
+        forgotLoading: true
+      });
+      params = {
+        path: "forgot_password",
+        data: {
+          email: this.state.inputs.email.value
+        },
+        success: this.forgotPasswordSuccess,
+        error: this.forgotPasswordError
+      };
+      return API.call(params);
+    }
+  },
+  handleEmailChange: function(event) {
+    this.inputs = this.state.inputs;
+    this.inputs.email.value = event.target.value;
+    return this.setState({
+      inputs: this.inputs
+    });
+  },
+  validateInputs: function() {
+    this.errors = [];
+    if (this.state.inputs.email.value.length < 6 || this.state.inputs.email.value.indexOf("@", 0) === -1 || this.state.inputs.email.value.indexOf(".", 0) === -1) {
+      this.errors.push({
+        id: "email",
+        text: "Valid Email Required"
+      });
+    }
+    this.setState({
+      errors: this.errors
+    });
+    if (this.errors.length === 0) {
+      return true;
+    }
+    return false;
+  },
+  getErrorText: function(key) {
+    var error, i, len, ref1;
+    ref1 = this.state.errors;
+    for (i = 0, len = ref1.length; i < len; i++) {
+      error = ref1[i];
+      if (error.id === key) {
+        return error.text;
+      }
+    }
+    return null;
+  },
+  forgotPasswordSuccess: function(data) {
+    this.setState({
+      sentRecoveryEmail: true
+    });
+    return this.setState({
+      forgotLoading: false
+    });
+  },
+  forgotPasswordError: function(error) {
+    this.setState({
+      forgotLoading: false
+    });
+    if ((error.responseJSON != null) && (error.responseJSON.errors != null)) {
+      return this.setState({
+        forgotError: error.responseJSON.errors[0]
+      });
+    }
+  },
+  render: function() {
+    return div({}, "Forgot Password", this.state.sentRecoveryEmail === false ? div({}, div({}, React.createElement(Material.TextField, {
+      id: "forgot-email",
+      floatingLabelText: "Email",
+      value: this.state.inputs.email.value,
+      onChange: this.handleEmailChange,
+      errorText: this.getErrorText("email")
+    })), div({}, this.state.loginLoading === true ? (this.style = {
+      display: 'inline-block',
+      position: 'relative',
+      boxShadow: 'none'
+    }, React.createElement(Material.RefreshIndicator, {
+      style: this.style,
+      size: 50,
+      left: 0,
+      top: 0,
+      status: "loading"
+    })) : React.createElement(Material.RaisedButton, {
+      label: "Reset Password",
+      primary: true,
+      onClick: this.processForgotPassword
+    })), this.state.forgotError != null ? div({}, this.state.forgotError) : void 0, div({}, "Remembered your password? ", a({
+      onClick: this.showLogin
+    }, 'Click here to login'))) : div({}, "An email with a link to reset your password has been sent to you."));
+  }
+}));
+
+
+},{"mixins/LinksMixin":598}],587:[function(require,module,exports){
 module.exports=require(2)
-},{"mixins/LinksMixin":593}],587:[function(require,module,exports){
-var FlatButton, FontIcon, IconButton, div;
+},{"mixins/LinksMixin":598,"modals/LoginModal":601}],588:[function(require,module,exports){
+var SessionMixin, a, div, ref;
+
+ref = React.DOM, div = ref.div, a = ref.a;
+
+SessionMixin = require("mixins/SessionMixin");
+
+module.exports = React.createFactory(React.createClass({
+  mixins: [SessionMixin],
+  displayName: 'Login',
+  getInitialState: function() {
+    return {
+      email: '',
+      password: '',
+      errors: [],
+      loginError: null,
+      loginLoading: false
+    };
+  },
+  goToRegister: function() {
+    return this.props.changeView('register');
+  },
+  goToForgotPassword: function() {
+    return this.props.changeView('forgot');
+  },
+  handleEmailChange: function(event) {
+    return this.setState({
+      email: event.target.value
+    });
+  },
+  handlePasswordChange: function(event) {
+    return this.setState({
+      password: event.target.value
+    });
+  },
+  validateInputs: function() {
+    this.errors = [];
+    if (this.state.email.length < 6 || this.state.email.indexOf("@", 0) === -1 || this.state.email.indexOf(".", 0) === -1) {
+      this.errors.push({
+        id: "email",
+        text: "Valid Email Required"
+      });
+    }
+    if (this.state.password === '') {
+      this.errors.push({
+        id: "password",
+        text: "Password Required"
+      });
+    }
+    this.setState({
+      errors: this.errors
+    });
+    if (this.errors.length === 0) {
+      return true;
+    }
+    return false;
+  },
+  processLogin: function() {
+    var params;
+    if (this.validateInputs()) {
+      this.setState({
+        errors: []
+      });
+      this.setState({
+        loginError: false
+      });
+      this.setState({
+        loginLoading: true
+      });
+      params = {
+        path: "login",
+        data: {
+          email: this.state.email,
+          password: this.state.password
+        },
+        success: this.loginSuccess,
+        error: this.loginError
+      };
+      return API.call(params);
+    }
+  },
+  loginSuccess: function(data, request) {
+    this.setState({
+      loginLoading: false
+    });
+    this.setUser(data.data, request);
+    return this.props.hideLogin();
+  },
+  loginError: function(error) {
+    this.setState({
+      loginLoading: false
+    });
+    if ((error.responseJSON != null) && (error.responseJSON.errors != null)) {
+      return this.setState({
+        loginError: error.responseJSON.errors[0]
+      });
+    }
+  },
+  getErrorText: function(key) {
+    var error, i, len, ref1;
+    ref1 = this.state.errors;
+    for (i = 0, len = ref1.length; i < len; i++) {
+      error = ref1[i];
+      if (error.id === key) {
+        return error.text;
+      }
+    }
+    return null;
+  },
+  render: function() {
+    return div({}, "Login", div({}, div({}, React.createElement(Material.TextField, {
+      id: "login-email",
+      floatingLabelText: "Email",
+      value: this.state.email,
+      onChange: this.handleEmailChange,
+      errorText: this.getErrorText("email")
+    })), div({}, React.createElement(Material.TextField, {
+      id: "login-password",
+      floatingLabelText: "Password",
+      type: "password",
+      value: this.state.password,
+      onChange: this.handlePasswordChange,
+      errorText: this.getErrorText("password")
+    })), div({}, this.state.loginLoading === true ? (this.style = {
+      display: 'inline-block',
+      position: 'relative',
+      boxShadow: 'none'
+    }, React.createElement(Material.RefreshIndicator, {
+      style: this.style,
+      size: 50,
+      left: 0,
+      top: 0,
+      status: "loading"
+    })) : React.createElement(Material.RaisedButton, {
+      label: "Login",
+      primary: true,
+      onClick: this.processLogin
+    })), this.state.loginError != null ? div({}, this.state.loginError) : void 0), div({}, a({
+      onClick: this.goToRegister
+    }, 'Click here to register'), a({
+      onClick: this.goToForgotPassword
+    }, 'Forgot your password?')));
+  }
+}));
+
+
+},{"mixins/SessionMixin":600}],589:[function(require,module,exports){
+var div;
 
 div = React.DOM.div;
-
-IconButton = Material.IconButton;
-
-FontIcon = Material.FontIcon;
-
-FlatButton = Material.FlatButton;
 
 module.exports = React.createFactory(React.createClass({
   getInitialState: function() {
@@ -84761,10 +85327,10 @@ module.exports = React.createFactory(React.createClass({
     if (this.props.page === 1) {
       return;
     }
-    return React.createElement(IconButton, {
+    return React.createElement(Material.IconButton, {
       onClick: this.previousPage,
       className: "pagination__arrow"
-    }, React.createElement(FontIcon, {
+    }, React.createElement(Material.FontIcon, {
       className: "fa fa-angle-left"
     }));
   },
@@ -84772,10 +85338,10 @@ module.exports = React.createFactory(React.createClass({
     if (this.props.page === this.props.numberOfPages) {
       return;
     }
-    return React.createElement(IconButton, {
+    return React.createElement(Material.IconButton, {
       onClick: this.nextPage,
       className: "pagination__arrow"
-    }, React.createElement(FontIcon, {
+    }, React.createElement(Material.FontIcon, {
       className: "fa fa-angle-right"
     }));
   },
@@ -84799,7 +85365,7 @@ module.exports = React.createFactory(React.createClass({
     }
     return div({
       className: "pagination__first"
-    }, React.createElement(FlatButton, {
+    }, React.createElement(Material.FlatButton, {
       key: "page-1",
       label: 1,
       style: this.buttonStyle(),
@@ -84818,7 +85384,7 @@ module.exports = React.createFactory(React.createClass({
       className: "pagination__last"
     }, this.props.page <= this.props.numberOfPages - 4 ? div({
       className: "pagination__ellipsis"
-    }, "...") : void 0, React.createElement(FlatButton, {
+    }, "...") : void 0, React.createElement(Material.FlatButton, {
       key: "page-" + this.props.numberOfPages,
       className: "pagination__item",
       label: this.props.numberOfPages,
@@ -84852,14 +85418,14 @@ module.exports = React.createFactory(React.createClass({
       results = [];
       for (page = i = ref = this.leftPage, ref1 = this.rightPage; ref <= ref1 ? i <= ref1 : i >= ref1; page = ref <= ref1 ? ++i : --i) {
         if (page === this.props.page) {
-          results.push(React.createElement(FlatButton, {
+          results.push(React.createElement(Material.FlatButton, {
             key: "page-" + page,
             label: page,
             style: this.buttonStyle(),
             disabled: true
           }));
         } else {
-          results.push(React.createElement(FlatButton, {
+          results.push(React.createElement(Material.FlatButton, {
             key: "page-" + page,
             label: page,
             style: this.buttonStyle(),
@@ -84882,18 +85448,8 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],588:[function(require,module,exports){
-var Card, CardActions, CardHeader, CardText, FlatButton, LinksMixin, a, br, div, img, ref, span;
-
-Card = Material.Card;
-
-CardHeader = Material.CardHeader;
-
-CardText = Material.CardText;
-
-CardActions = Material.CardActions;
-
-FlatButton = Material.FlatButton;
+},{}],590:[function(require,module,exports){
+var LinksMixin, a, br, div, img, ref, span;
 
 ref = React.DOM, div = ref.div, img = ref.img, a = ref.a, br = ref.br, span = ref.span;
 
@@ -84943,7 +85499,7 @@ module.exports = React.createFactory(React.createClass({
     prediction = this.props.prediction;
     return div({
       className: "prediction-card"
-    }, React.createElement(Card, {}, React.createElement(CardHeader, {
+    }, React.createElement(Material.Card, {}, React.createElement(Material.CardHeader, {
       title: prediction.title,
       subtitle: this.getDescription()
     }), div({
@@ -84983,12 +85539,12 @@ module.exports = React.createFactory(React.createClass({
           className: "prediction-card-experts__expert-name"
         }, expert.name));
       };
-    })(this))) : void 0), React.createElement(CardActions, {}, prediction.status === 0 && UserStore.loggedIn() ? div({
+    })(this))) : void 0), React.createElement(Material.CardActions, {}, prediction.status === 0 && UserStore.loggedIn() ? div({
       className: "prediction-card-vote",
       onClick: this.goToPrediction
     }, "VOTE") : prediction.status === 0 && !UserStore.loggedIn() ? div({
       className: "prediction-card-vote"
-    }, "Log in to Vote") : void 0, React.createElement(FlatButton, {
+    }, "Log in to Vote") : void 0, React.createElement(Material.FlatButton, {
       label: "View",
       onClick: this.goToPrediction.bind(this, prediction.alias)
     }))));
@@ -84996,7 +85552,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"mixins/LinksMixin":593}],589:[function(require,module,exports){
+},{"mixins/LinksMixin":598}],591:[function(require,module,exports){
 var a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
@@ -85085,7 +85641,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],590:[function(require,module,exports){
+},{}],592:[function(require,module,exports){
 var ExpertSubstantiations, LinksMixin, div;
 
 div = React.DOM.div;
@@ -85139,7 +85695,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ExpertSubstantiations":584,"mixins/LinksMixin":593}],591:[function(require,module,exports){
+},{"components/ExpertSubstantiations":584,"mixins/LinksMixin":598}],593:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -85242,7 +85798,289 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],592:[function(require,module,exports){
+},{}],594:[function(require,module,exports){
+var LinksMixin, a, div, ref;
+
+ref = React.DOM, div = ref.div, a = ref.a;
+
+LinksMixin = require("mixins/LinksMixin");
+
+module.exports = React.createFactory(React.createClass({
+  displayName: 'Register',
+  mixins: [LinksMixin],
+  getInitialState: function() {
+    return {
+      email: '',
+      password: '',
+      password_confirmation: '',
+      errors: [],
+      registerError: null,
+      registerLoading: false
+    };
+  },
+  handleEmailChange: function(event) {
+    return this.setState({
+      email: event.target.value
+    });
+  },
+  handlePasswordChange: function(event) {
+    return this.setState({
+      password: event.target.value
+    });
+  },
+  handlePasswordConfirmationChange: function(event) {
+    return this.setState({
+      password_confirmation: event.target.value
+    });
+  },
+  validateInputs: function() {
+    this.errors = [];
+    if (this.state.email.length < 6 || this.state.email.indexOf("@", 0) === -1 || this.state.email.indexOf(".", 0) === -1) {
+      this.errors.push({
+        id: "email",
+        text: "Valid Email Required"
+      });
+    }
+    if (this.state.password === '') {
+      this.errors.push({
+        id: "password",
+        text: "Password Required"
+      });
+    }
+    if (this.state.password_confirmation === '') {
+      this.errors.push({
+        id: "password_confirmation",
+        text: "Password Required"
+      });
+    }
+    if (this.state.password !== '' && this.state.password_confirmation !== '' && this.state.password !== this.state.password_confirmation) {
+      this.errors.push({
+        id: "password",
+        text: "Password and Password Confirmation must match."
+      });
+      this.errors.push({
+        id: "password_confirmation",
+        text: "Password and Password Confirmation must match."
+      });
+    }
+    this.setState({
+      errors: this.errors
+    });
+    if (this.errors.length === 0) {
+      return true;
+    }
+    return false;
+  },
+  processRegister: function() {
+    var params;
+    if (this.validateInputs()) {
+      this.setState({
+        registerError: false
+      });
+      this.setState({
+        errors: []
+      });
+      this.setState({
+        registerLoading: true
+      });
+      params = {
+        path: "register",
+        data: {
+          email: this.state.email,
+          password: this.state.password,
+          password_confirmation: this.state.password_confirmation
+        },
+        success: this.registerSuccess,
+        error: this.registerError
+      };
+      return API.call(params);
+    }
+  },
+  registerSuccess: function(data, request) {
+    this.setState({
+      registerLoading: false
+    });
+    return this.props.changeView('registered');
+  },
+  registerError: function(error) {
+    this.setState({
+      registerLoading: false
+    });
+    if ((error.responseJSON != null) && (error.responseJSON.errors != null)) {
+      return this.setState({
+        registerError: error.responseJSON.errors[0]
+      });
+    }
+  },
+  getErrorText: function(key) {
+    var error, i, len, ref1;
+    ref1 = this.state.errors;
+    for (i = 0, len = ref1.length; i < len; i++) {
+      error = ref1[i];
+      if (error.id === key) {
+        return error.text;
+      }
+    }
+    return null;
+  },
+  showLogin: function() {
+    return this.props.changeView('login');
+  },
+  render: function() {
+    return div({}, "Register", div({}, div({}, React.createElement(Material.TextField, {
+      id: "register-email",
+      floatingLabelText: "Email",
+      value: this.state.email,
+      onChange: this.handleEmailChange,
+      errorText: this.getErrorText("email")
+    })), div({}, React.createElement(Material.TextField, {
+      id: "register-password",
+      floatingLabelText: "Password",
+      type: "password",
+      value: this.state.password,
+      onChange: this.handlePasswordChange,
+      errorText: this.getErrorText("password")
+    })), div({}, React.createElement(Material.TextField, {
+      id: "register-password-confirmation",
+      floatingLabelText: "Confirm",
+      type: "password",
+      value: this.state.password_confirmation,
+      onChange: this.handlePasswordConfirmationChange,
+      errorText: this.getErrorText("password_confirmation")
+    })), div({}, this.state.registerLoading === true ? (this.style = {
+      display: 'inline-block',
+      position: 'relative',
+      boxShadow: 'none'
+    }, React.createElement(Material.RefreshIndicator, {
+      style: this.style,
+      size: 50,
+      left: 0,
+      top: 0,
+      status: "loading"
+    })) : React.createElement(Material.RaisedButton, {
+      label: "Register",
+      primary: true,
+      onClick: this.processRegister
+    })), this.state.registerError != null ? div({}, this.state.registerError) : void 0), div({}, a({
+      onClick: this.showLogin
+    }, 'Click here to login')));
+  }
+}));
+
+
+},{"mixins/LinksMixin":598}],595:[function(require,module,exports){
+var div;
+
+div = React.DOM.div;
+
+module.exports = React.createFactory(React.createClass({
+  render: function() {
+    return div({}, "You've successfully registered! You'll get a confirmation email shortly, which will allow you to log in and start Blunditing.");
+  }
+}));
+
+
+},{}],596:[function(require,module,exports){
+var SessionMixin, div;
+
+div = React.DOM.div;
+
+SessionMixin = require("mixins/SessionMixin");
+
+module.exports = React.createFactory(React.createClass({
+  displayName: 'Search Filters',
+  mixins: [SessionMixin],
+  getInitialState: function() {
+    return {
+      sortOptions: this.getSortOptions(),
+      inputs: {
+        sort: {
+          val: this.getSortValue()
+        },
+        search: {
+          val: this.getSearchQuery()
+        }
+      },
+      errors: [],
+      searchError: false
+    };
+  },
+  getSortOptions: function() {
+    if (!this.props.sortOptions) {
+      return [];
+    }
+    return this.props.sortOptions;
+  },
+  getSortValue: function() {
+    if (this.getParameterByName("sort")) {
+      return Number(this.getParameterByName("sort"));
+    }
+    return 0;
+  },
+  getSearchQuery: function() {
+    if (this.getParameterByName("query")) {
+      return this.getParameterByName("query");
+    }
+    return '';
+  },
+  handleSearchChange: function(event) {
+    this.inputs = this.state.inputs;
+    this.inputs.search.val = event.target.value;
+    return this.setState({
+      inputs: this.inputs
+    });
+  },
+  getErrorText: function(key) {
+    var error, i, len, ref;
+    ref = this.state.errors;
+    for (i = 0, len = ref.length; i < len; i++) {
+      error = ref[i];
+      if (error.id === key) {
+        return error.text;
+      }
+    }
+    return null;
+  },
+  search: function() {
+    return this.props.search(this.state.inputs.search.val, this.state.inputs.sort.val);
+  },
+  handleChange: function(event, index, value) {
+    this.inputs = this.state.inputs;
+    this.inputs.sort.val = value;
+    return this.setState({
+      inputs: this.inputs
+    });
+  },
+  render: function() {
+    return div({
+      className: "sarch__filter"
+    }, "Search Filter:", React.createElement(Material.TextField, {
+      id: "search-field",
+      hintText: "Enter text to search for",
+      floatingLabelText: "Search",
+      fullWidth: true,
+      value: this.state.inputs.search.val,
+      onChange: this.handleSearchChange,
+      errorText: this.getErrorText("search")
+    }), this.state.sortOptions.length > 0 ? React.createElement(Material.SelectField, {
+      floatingLabelText: "Sort",
+      value: this.state.inputs.sort.val,
+      onChange: this.handleChange
+    }, this.state.sortOptions.map(function(item, index) {
+      return React.createElement(Material.MenuItem, {
+        value: item.id,
+        primaryText: item.title,
+        key: "search-filter-item-" + index
+      });
+    })) : void 0, React.createElement(Material.RaisedButton, {
+      label: "Search",
+      onClick: this.search
+    }));
+  }
+}));
+
+
+},{"mixins/SessionMixin":600}],597:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -85324,7 +86162,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],593:[function(require,module,exports){
+},{}],598:[function(require,module,exports){
 module.exports = {
   goToClaim: function(id) {
     return navigate("/claims/" + id);
@@ -85350,7 +86188,7 @@ module.exports = {
 };
 
 
-},{}],594:[function(require,module,exports){
+},{}],599:[function(require,module,exports){
 module.exports = {
   getInitialState: function() {
     return {
@@ -85383,7 +86221,7 @@ module.exports = {
 };
 
 
-},{}],595:[function(require,module,exports){
+},{}],600:[function(require,module,exports){
 module.exports = {
   setUser: function(data, request) {
     window.UserStore.set(data, request);
@@ -85489,7 +86327,66 @@ module.exports = {
 };
 
 
-},{}],596:[function(require,module,exports){
+},{}],601:[function(require,module,exports){
+var ForgotPassword, Login, Register, RegistrationSuccessful, div, ref, span;
+
+ref = React.DOM, div = ref.div, span = ref.span;
+
+Login = require("components/Login");
+
+Register = require("components/Register");
+
+ForgotPassword = require("components/ForgotPassword");
+
+RegistrationSuccessful = require("components/RegistrationSuccessful");
+
+module.exports = React.createFactory(React.createClass({
+  getInitialState: function() {
+    return {
+      view: "login"
+    };
+  },
+  changeView: function(view) {
+    return this.setState({
+      view: view
+    });
+  },
+  render: function() {
+    return div({
+      className: "modal"
+    }, div({
+      className: "modal__bg"
+    }, ''), div({
+      className: "modal__login"
+    }, div({
+      className: "modal__login-header"
+    }, div({
+      className: "modal__login-title"
+    }, this.state.view), div({
+      className: "modal__login-header-close"
+    }, span({
+      className: "fa fa-close",
+      onClick: this.props.hideLogin
+    }, ''))), div({
+      className: "modal__login-body"
+    }, this.state.view === "login" ? Login({
+      changeView: this.changeView,
+      hideLogin: this.props.hideLogin
+    }) : this.state.view === "register" ? Register({
+      changeView: this.changeView,
+      hideLogin: this.props.hideLogin
+    }) : this.state.view === "forgot" ? ForgotPassword({
+      changeView: this.changeView,
+      hideLogin: this.props.hideLogin
+    }) : this.state.view === "registered" ? RegistrationSuccessful({
+      changeView: this.changeView,
+      hideLogin: this.props.hideLogin
+    }) : void 0)));
+  }
+}));
+
+
+},{"components/ForgotPassword":586,"components/Login":588,"components/Register":594,"components/RegistrationSuccessful":595}],602:[function(require,module,exports){
 
 /*
 API Class.
@@ -85699,6 +86596,10 @@ module.exports = API = (function() {
     homepage: {
       path: "home/homepage",
       method: "GET"
+    },
+    search: {
+      path: "search",
+      method: "POST"
     }
   };
 
@@ -85773,7 +86674,7 @@ module.exports = API = (function() {
 })();
 
 
-},{}],597:[function(require,module,exports){
+},{}],603:[function(require,module,exports){
 var Global;
 
 module.exports = Global = (function() {
@@ -85818,7 +86719,7 @@ module.exports = Global = (function() {
 })();
 
 
-},{}],598:[function(require,module,exports){
+},{}],604:[function(require,module,exports){
 var UserStore,
   bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
@@ -86015,7 +86916,7 @@ module.exports = new UserStore({
 });
 
 
-},{}],599:[function(require,module,exports){
+},{}],605:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -86036,7 +86937,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":585,"components/Header":586}],600:[function(require,module,exports){
+},{"components/Footer":585,"components/Header":587}],606:[function(require,module,exports){
 var Footer, Header, div, ref, span;
 
 ref = React.DOM, div = ref.div, span = ref.span;
@@ -86168,7 +87069,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":585,"components/Header":586}],601:[function(require,module,exports){
+},{"components/Footer":585,"components/Header":587}],607:[function(require,module,exports){
 var Footer, Header, LinksMixin, div;
 
 div = React.DOM.div;
@@ -86222,7 +87123,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":585,"components/Header":586,"mixins/LinksMixin":593}],602:[function(require,module,exports){
+},{"components/Footer":585,"components/Header":587,"mixins/LinksMixin":598}],608:[function(require,module,exports){
 var CategoryClaims, CategoryExperts, CategoryPredictions, CategorySubHead, Footer, Header, div;
 
 div = React.DOM.div;
@@ -86309,7 +87210,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/CategoryClaims":570,"components/CategoryExperts":571,"components/CategoryPredictions":572,"components/CategorySubHead":573,"components/Footer":585,"components/Header":586}],603:[function(require,module,exports){
+},{"components/CategoryClaims":570,"components/CategoryExperts":571,"components/CategoryPredictions":572,"components/CategorySubHead":573,"components/Footer":585,"components/Header":587}],609:[function(require,module,exports){
 var CategoryClaims, CategorySubHead, Footer, Header, div;
 
 div = React.DOM.div;
@@ -86388,7 +87289,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/CategoryClaims":570,"components/CategorySubHead":573,"components/Footer":585,"components/Header":586}],604:[function(require,module,exports){
+},{"components/CategoryClaims":570,"components/CategorySubHead":573,"components/Footer":585,"components/Header":587}],610:[function(require,module,exports){
 var CategoryExperts, CategorySubHead, Footer, Header, div;
 
 div = React.DOM.div;
@@ -86467,7 +87368,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/CategoryExperts":571,"components/CategorySubHead":573,"components/Footer":585,"components/Header":586}],605:[function(require,module,exports){
+},{"components/CategoryExperts":571,"components/CategorySubHead":573,"components/Footer":585,"components/Header":587}],611:[function(require,module,exports){
 var CategoryPredictions, CategorySubHead, Footer, Header, div;
 
 div = React.DOM.div;
@@ -86546,7 +87447,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/CategoryPredictions":572,"components/CategorySubHead":573,"components/Footer":585,"components/Header":586}],606:[function(require,module,exports){
+},{"components/CategoryPredictions":572,"components/CategorySubHead":573,"components/Footer":585,"components/Header":587}],612:[function(require,module,exports){
 var AddToClaim, BookmarkIndicator, ClaimEvidences, ClaimExpertCard, Comments, Footer, Header, LinksMixin, SessionMixin, Votes, div, img, ref;
 
 ref = React.DOM, div = ref.div, img = ref.img;
@@ -86788,8 +87689,8 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/AddToClaim":566,"components/BookmarkIndicator":569,"components/ClaimEvidences":575,"components/ClaimExpertCard":576,"components/Comments":578,"components/Footer":585,"components/Header":586,"components/Votes":592,"mixins/LinksMixin":593,"mixins/SessionMixin":595}],607:[function(require,module,exports){
-var ClaimCard, Footer, Header, Pagination, PaginationMixin, RaisedButton, div;
+},{"components/AddToClaim":566,"components/BookmarkIndicator":569,"components/ClaimEvidences":575,"components/ClaimExpertCard":576,"components/Comments":578,"components/Footer":585,"components/Header":587,"components/Votes":597,"mixins/LinksMixin":598,"mixins/SessionMixin":600}],613:[function(require,module,exports){
+var ClaimCard, Footer, Header, Pagination, PaginationMixin, div;
 
 div = React.DOM.div;
 
@@ -86802,8 +87703,6 @@ ClaimCard = require("components/ClaimCard");
 Pagination = require("components/Pagination");
 
 PaginationMixin = require("mixins/PaginationMixin");
-
-RaisedButton = Material.RaisedButton;
 
 module.exports = React.createFactory(React.createClass({
   mixins: [PaginationMixin],
@@ -86851,7 +87750,7 @@ module.exports = React.createFactory(React.createClass({
       className: "claims-wrapper"
     }, div({
       className: "claims-content"
-    }, React.createElement(RaisedButton, {
+    }, React.createElement(Material.RaisedButton, {
       label: "Create New Claim",
       primary: true,
       onClick: this.goToNewClaim
@@ -86873,7 +87772,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ClaimCard":574,"components/Footer":585,"components/Header":586,"components/Pagination":587,"mixins/PaginationMixin":594}],608:[function(require,module,exports){
+},{"components/ClaimCard":574,"components/Footer":585,"components/Header":587,"components/Pagination":589,"mixins/PaginationMixin":599}],614:[function(require,module,exports){
 var ClaimFields, Footer, Header, div;
 
 div = React.DOM.div;
@@ -87004,7 +87903,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ClaimFields":577,"components/Footer":585,"components/Header":586}],609:[function(require,module,exports){
+},{"components/ClaimFields":577,"components/Footer":585,"components/Header":587}],615:[function(require,module,exports){
 var ExpertFields, Footer, Header, div;
 
 div = React.DOM.div;
@@ -87144,7 +88043,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ExpertFields":582,"components/Footer":585,"components/Header":586}],610:[function(require,module,exports){
+},{"components/ExpertFields":582,"components/Footer":585,"components/Header":587}],616:[function(require,module,exports){
 var Footer, Header, PredictionFields, div;
 
 div = React.DOM.div;
@@ -87283,7 +88182,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":585,"components/Header":586,"components/PredictionFields":591}],611:[function(require,module,exports){
+},{"components/Footer":585,"components/Header":587,"components/PredictionFields":593}],617:[function(require,module,exports){
 var AddToExpert, BookmarkIndicator, Comments, ExpertBonaFides, ExpertClaimCard, ExpertPredictionCard, Footer, Header, LinksMixin, SessionMixin, div, img, ref;
 
 ref = React.DOM, div = ref.div, img = ref.img;
@@ -87493,7 +88392,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/AddToExpert":567,"components/BookmarkIndicator":569,"components/Comments":578,"components/ExpertBonaFides":579,"components/ExpertClaimCard":581,"components/ExpertPredictionCard":583,"components/Footer":585,"components/Header":586,"mixins/LinksMixin":593,"mixins/SessionMixin":595}],612:[function(require,module,exports){
+},{"components/AddToExpert":567,"components/BookmarkIndicator":569,"components/Comments":578,"components/ExpertBonaFides":579,"components/ExpertClaimCard":581,"components/ExpertPredictionCard":583,"components/Footer":585,"components/Header":587,"mixins/LinksMixin":598,"mixins/SessionMixin":600}],618:[function(require,module,exports){
 var ExpertCard, Footer, Header, Pagination, PaginationMixin, div;
 
 div = React.DOM.div;
@@ -87576,139 +88475,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ExpertCard":580,"components/Footer":585,"components/Header":586,"components/Pagination":587,"mixins/PaginationMixin":594}],613:[function(require,module,exports){
-var Footer, Header, LinksMixin, a, div, ref;
-
-ref = React.DOM, div = ref.div, a = ref.a;
-
-Header = require("components/Header");
-
-Footer = require("components/Footer");
-
-LinksMixin = require("mixins/LinksMixin");
-
-module.exports = React.createFactory(React.createClass({
-  displayName: 'Forgot Password',
-  mixins: [LinksMixin],
-  getInitialState: function() {
-    return {
-      inputs: {
-        email: {
-          validateEmail: true,
-          value: ''
-        }
-      },
-      errors: [],
-      forgotLoading: false,
-      forgotError: false,
-      sentRecoveryEmail: false
-    };
-  },
-  processForgotPassword: function() {
-    var params;
-    if (this.validateInputs()) {
-      this.setState({
-        errors: []
-      });
-      this.setState({
-        forgotLoading: true
-      });
-      params = {
-        path: "forgot_password",
-        data: {
-          email: this.state.inputs.email.value
-        },
-        success: this.forgotPasswordSuccess,
-        error: this.forgotPasswordError
-      };
-      return API.call(params);
-    }
-  },
-  handleEmailChange: function(event) {
-    this.inputs = this.state.inputs;
-    this.inputs.email.value = event.target.value;
-    return this.setState({
-      inputs: this.inputs
-    });
-  },
-  validateInputs: function() {
-    this.errors = [];
-    if (this.state.inputs.email.value.length < 6 || this.state.inputs.email.value.indexOf("@", 0) === -1 || this.state.inputs.email.value.indexOf(".", 0) === -1) {
-      this.errors.push({
-        id: "email",
-        text: "Valid Email Required"
-      });
-    }
-    this.setState({
-      errors: this.errors
-    });
-    if (this.errors.length === 0) {
-      return true;
-    }
-    return false;
-  },
-  getErrorText: function(key) {
-    var error, i, len, ref1;
-    ref1 = this.state.errors;
-    for (i = 0, len = ref1.length; i < len; i++) {
-      error = ref1[i];
-      if (error.id === key) {
-        return error.text;
-      }
-    }
-    return null;
-  },
-  forgotPasswordSuccess: function(data) {
-    this.setState({
-      sentRecoveryEmail: true
-    });
-    return this.setState({
-      forgotLoading: false
-    });
-  },
-  forgotPasswordError: function(error) {
-    this.setState({
-      forgotLoading: false
-    });
-    if ((error.responseJSON != null) && (error.responseJSON.errors != null)) {
-      return this.setState({
-        forgotError: error.responseJSON.errors[0]
-      });
-    }
-  },
-  render: function() {
-    return div({}, Header({}, ''), div({
-      className: "user-wrapper"
-    }, div({
-      className: "user-content"
-    }, "Forgot Password", this.state.sentRecoveryEmail === false ? div({}, div({}, React.createElement(Material.TextField, {
-      id: "forgot-email",
-      floatingLabelText: "Email",
-      value: this.state.inputs.email.value,
-      onChange: this.handleEmailChange,
-      errorText: this.getErrorText("email")
-    })), div({}, this.state.loginLoading === true ? (this.style = {
-      display: 'inline-block',
-      position: 'relative',
-      boxShadow: 'none'
-    }, React.createElement(Material.RefreshIndicator, {
-      style: this.style,
-      size: 50,
-      left: 0,
-      top: 0,
-      status: "loading"
-    })) : React.createElement(Material.RaisedButton, {
-      label: "Reset Password",
-      primary: true,
-      onClick: this.processForgotPassword
-    })), this.state.forgotError != null ? div({}, this.state.forgotError) : void 0, div({}, "Remembered your password? ", a({
-      onClick: this.goToLogin
-    }, 'Click here to login'))) : div({}, "An email with a link to reset your password has been sent to you."))), Footer({}, ''));
-  }
-}));
-
-
-},{"components/Footer":585,"components/Header":586,"mixins/LinksMixin":593}],614:[function(require,module,exports){
+},{"components/ExpertCard":580,"components/Footer":585,"components/Header":587,"components/Pagination":589,"mixins/PaginationMixin":599}],619:[function(require,module,exports){
 var ClaimCard, ExpertCard, Footer, Header, PredictionCard, div;
 
 div = React.DOM.div;
@@ -87828,167 +88595,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ClaimCard":574,"components/ExpertCard":580,"components/Footer":585,"components/Header":586,"components/PredictionCard":588}],615:[function(require,module,exports){
-var Footer, Header, RaisedButton, RefreshIndicator, SessionMixin, TextField, a, div, ref;
-
-ref = React.DOM, div = ref.div, a = ref.a;
-
-Header = require("components/Header");
-
-Footer = require("components/Footer");
-
-SessionMixin = require("mixins/SessionMixin");
-
-TextField = Material.TextField;
-
-RaisedButton = Material.RaisedButton;
-
-RefreshIndicator = Material.RefreshIndicator;
-
-module.exports = React.createFactory(React.createClass({
-  mixins: [SessionMixin],
-  displayName: 'Login',
-  getInitialState: function() {
-    return {
-      email: '',
-      password: '',
-      errors: [],
-      loginError: null,
-      loginLoading: false
-    };
-  },
-  goToRegister: function() {
-    return navigate('/register');
-  },
-  goToForgotPassword: function() {
-    return navigate('/forgot_password');
-  },
-  handleEmailChange: function(event) {
-    return this.setState({
-      email: event.target.value
-    });
-  },
-  handlePasswordChange: function(event) {
-    return this.setState({
-      password: event.target.value
-    });
-  },
-  validateInputs: function() {
-    this.errors = [];
-    if (this.state.email.length < 6 || this.state.email.indexOf("@", 0) === -1 || this.state.email.indexOf(".", 0) === -1) {
-      this.errors.push({
-        id: "email",
-        text: "Valid Email Required"
-      });
-    }
-    if (this.state.password === '') {
-      this.errors.push({
-        id: "password",
-        text: "Password Required"
-      });
-    }
-    this.setState({
-      errors: this.errors
-    });
-    if (this.errors.length === 0) {
-      return true;
-    }
-    return false;
-  },
-  processLogin: function() {
-    var params;
-    if (this.validateInputs()) {
-      this.setState({
-        errors: []
-      });
-      this.setState({
-        loginError: false
-      });
-      this.setState({
-        loginLoading: true
-      });
-      params = {
-        path: "login",
-        data: {
-          email: this.state.email,
-          password: this.state.password
-        },
-        success: this.loginSuccess,
-        error: this.loginError
-      };
-      return API.call(params);
-    }
-  },
-  loginSuccess: function(data, request) {
-    this.setState({
-      loginLoading: false
-    });
-    this.setUser(data.data, request);
-    return navigate('/me');
-  },
-  loginError: function(error) {
-    this.setState({
-      loginLoading: false
-    });
-    if ((error.responseJSON != null) && (error.responseJSON.errors != null)) {
-      return this.setState({
-        loginError: error.responseJSON.errors[0]
-      });
-    }
-  },
-  getErrorText: function(key) {
-    var error, i, len, ref1;
-    ref1 = this.state.errors;
-    for (i = 0, len = ref1.length; i < len; i++) {
-      error = ref1[i];
-      if (error.id === key) {
-        return error.text;
-      }
-    }
-    return null;
-  },
-  render: function() {
-    return div({}, Header({}, ''), div({
-      className: "user-wrapper"
-    }, div({
-      className: "user-content"
-    }, "Login", div({}, div({}, React.createElement(TextField, {
-      id: "login-email",
-      floatingLabelText: "Email",
-      value: this.state.email,
-      onChange: this.handleEmailChange,
-      errorText: this.getErrorText("email")
-    })), div({}, React.createElement(TextField, {
-      id: "login-password",
-      floatingLabelText: "Password",
-      type: "password",
-      value: this.state.password,
-      onChange: this.handlePasswordChange,
-      errorText: this.getErrorText("password")
-    })), div({}, this.state.loginLoading === true ? (this.style = {
-      display: 'inline-block',
-      position: 'relative',
-      boxShadow: 'none'
-    }, React.createElement(RefreshIndicator, {
-      style: this.style,
-      size: 50,
-      left: 0,
-      top: 0,
-      status: "loading"
-    })) : React.createElement(RaisedButton, {
-      label: "Login",
-      primary: true,
-      onClick: this.processLogin
-    })), this.state.loginError != null ? div({}, this.state.loginError) : void 0), div({}, a({
-      onClick: this.goToRegister
-    }, 'Click here to register'), a({
-      onClick: this.goToForgotPassword
-    }, 'Forgot your password?')))), Footer({}, ''));
-  }
-}));
-
-
-},{"components/Footer":585,"components/Header":586,"mixins/SessionMixin":595}],616:[function(require,module,exports){
+},{"components/ClaimCard":574,"components/ExpertCard":580,"components/Footer":585,"components/Header":587,"components/PredictionCard":590}],620:[function(require,module,exports){
 var AddToPrediction, BookmarkIndicator, Comments, Footer, Header, LinksMixin, PredictionEvidences, PredictionExpertCard, SessionMixin, Votes, div, img, ref;
 
 ref = React.DOM, div = ref.div, img = ref.img;
@@ -88235,7 +88842,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/AddToPrediction":568,"components/BookmarkIndicator":569,"components/Comments":578,"components/Footer":585,"components/Header":586,"components/PredictionEvidences":589,"components/PredictionExpertCard":590,"components/Votes":592,"mixins/LinksMixin":593,"mixins/SessionMixin":595}],617:[function(require,module,exports){
+},{"components/AddToPrediction":568,"components/BookmarkIndicator":569,"components/Comments":578,"components/Footer":585,"components/Header":587,"components/PredictionEvidences":591,"components/PredictionExpertCard":592,"components/Votes":597,"mixins/LinksMixin":598,"mixins/SessionMixin":600}],621:[function(require,module,exports){
 var Footer, Header, Pagination, PaginationMixin, PredictionCard, div;
 
 div = React.DOM.div;
@@ -88318,161 +88925,98 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":585,"components/Header":586,"components/Pagination":587,"components/PredictionCard":588,"mixins/PaginationMixin":594}],618:[function(require,module,exports){
-var Footer, Header, LinksMixin, a, div, ref;
+},{"components/Footer":585,"components/Header":587,"components/Pagination":589,"components/PredictionCard":590,"mixins/PaginationMixin":599}],622:[function(require,module,exports){
+var ClaimCard, ExpertCard, Footer, Header, LinksMixin, PredictionCard, SearchFilters, div;
 
-ref = React.DOM, div = ref.div, a = ref.a;
+div = React.DOM.div;
 
 Header = require("components/Header");
 
 Footer = require("components/Footer");
 
+ClaimCard = require("components/ClaimCard");
+
+PredictionCard = require("components/PredictionCard");
+
+ExpertCard = require("components/ExpertCard");
+
+SearchFilters = require("components/SearchFilters");
+
 LinksMixin = require("mixins/LinksMixin");
 
 module.exports = React.createFactory(React.createClass({
-  displayName: 'Register',
+  displayName: "Search",
   mixins: [LinksMixin],
   getInitialState: function() {
     return {
-      email: '',
-      password: '',
-      password_confirmation: '',
-      errors: [],
-      registerError: null,
-      registerLoading: false
+      data: null
     };
   },
-  handleEmailChange: function(event) {
-    return this.setState({
-      email: event.target.value
-    });
+  getSortOptions: function() {
+    return [
+      {
+        id: 0,
+        title: "Newest"
+      }, {
+        id: 1,
+        title: "Oldest"
+      }, {
+        id: 2,
+        title: "Most Recently Updated"
+      }, {
+        id: 3,
+        title: "Least Recently Updated"
+      }
+    ];
   },
-  handlePasswordChange: function(event) {
-    return this.setState({
-      password: event.target.value
-    });
-  },
-  handlePasswordConfirmationChange: function(event) {
-    return this.setState({
-      password_confirmation: event.target.value
-    });
-  },
-  validateInputs: function() {
-    this.errors = [];
-    if (this.state.email.length < 6 || this.state.email.indexOf("@", 0) === -1 || this.state.email.indexOf(".", 0) === -1) {
-      this.errors.push({
-        id: "email",
-        text: "Valid Email Required"
-      });
-    }
-    if (this.state.password === '') {
-      this.errors.push({
-        id: "password",
-        text: "Password Required"
-      });
-    }
-    if (this.state.password_confirmation === '') {
-      this.errors.push({
-        id: "password_confirmation",
-        text: "Password Required"
-      });
-    }
-    if (this.state.password !== '' && this.state.password_confirmation !== '' && this.state.password !== this.state.password_confirmation) {
-      this.errors.push({
-        id: "password",
-        text: "Password and Password Confirmation must match."
-      });
-      this.errors.push({
-        id: "password_confirmation",
-        text: "Password and Password Confirmation must match."
-      });
-    }
-    this.setState({
-      errors: this.errors
-    });
-    if (this.errors.length === 0) {
-      return true;
-    }
-    return false;
-  },
-  processRegister: function() {
+  search: function(query, sort) {
     var params;
-    if (this.validateInputs()) {
-      this.setState({
-        registerError: false
-      });
-      this.setState({
-        errors: []
-      });
-      this.setState({
-        registerLoading: true
-      });
-      params = {
-        path: "register",
-        data: {
-          email: this.state.email,
-          password: this.state.password,
-          password_confirmation: this.state.password_confirmation
-        },
-        success: this.registerSuccess,
-        error: this.registerError
-      };
-      return API.call(params);
-    }
+    params = {
+      path: "search",
+      data: {
+        query: query,
+        sort: sort
+      },
+      success: this.searchSuccess,
+      error: this.searchError
+    };
+    return API.call(params);
   },
-  registerSuccess: function(data, request) {
+  searchSuccess: function(data) {
     this.setState({
-      registerLoading: false
+      searching: false
     });
-    return navigate('/register_success');
-  },
-  registerError: function(error) {
     this.setState({
-      registerLoading: false
+      searchError: false
+    });
+    console.log(data);
+    return this.setState({
+      data: data
+    });
+  },
+  searchError: function(error) {
+    this.setState({
+      searching: false
     });
     if ((error.responseJSON != null) && (error.responseJSON.errors != null)) {
       return this.setState({
-        registerError: error.responseJSON.errors[0]
+        searchError: error.responseJSON.errors[0]
+      });
+    } else {
+      return this.setState({
+        searchError: 'There was an error searching.'
       });
     }
   },
-  getErrorText: function(key) {
-    var error, i, len, ref1;
-    ref1 = this.state.errors;
-    for (i = 0, len = ref1.length; i < len; i++) {
-      error = ref1[i];
-      if (error.id === key) {
-        return error.text;
-      }
-    }
-    return null;
-  },
   render: function() {
     return div({}, Header({}, ''), div({
-      className: "user-wrapper"
+      className: "search-wrapper"
     }, div({
-      className: "user-content"
-    }, "Register", div({}, div({}, React.createElement(Material.TextField, {
-      id: "register-email",
-      floatingLabelText: "Email",
-      value: this.state.email,
-      onChange: this.handleEmailChange,
-      errorText: this.getErrorText("email")
-    })), div({}, React.createElement(Material.TextField, {
-      id: "register-password",
-      floatingLabelText: "Password",
-      type: "password",
-      value: this.state.password,
-      onChange: this.handlePasswordChange,
-      errorText: this.getErrorText("password")
-    })), div({}, React.createElement(Material.TextField, {
-      id: "register-password-confirmation",
-      floatingLabelText: "Confirm",
-      type: "password",
-      value: this.state.password_confirmation,
-      onChange: this.handlePasswordConfirmationChange,
-      errorText: this.getErrorText("password_confirmation")
-    })), div({}, this.state.registerLoading === true ? (this.style = {
+      className: "search-content"
+    }, SearchFilters({
+      sortOptions: this.getSortOptions(),
+      search: this.search
+    }), this.state.searching === true ? (this.style = {
       display: 'inline-block',
       position: 'relative',
       boxShadow: 'none'
@@ -88482,39 +89026,53 @@ module.exports = React.createFactory(React.createClass({
       left: 0,
       top: 0,
       status: "loading"
-    })) : React.createElement(Material.RaisedButton, {
-      label: "Register",
-      primary: true,
-      onClick: this.processRegister
-    })), this.state.registerError != null ? div({}, this.state.registerError) : void 0), div({}, a({
-      onClick: this.goToLogin
-    }, 'Click here to login')))), Footer({}, ''));
-  }
-}));
-
-
-},{"components/Footer":585,"components/Header":586,"mixins/LinksMixin":593}],619:[function(require,module,exports){
-var Footer, Header, div;
-
-div = React.DOM.div;
-
-Header = require("components/Header");
-
-Footer = require("components/Footer");
-
-module.exports = React.createFactory(React.createClass({
-  displayName: 'Register Successful',
-  render: function() {
-    return div({}, Header({}, ''), div({
-      className: "landing-wrapper"
+    })) : void 0, this.state.data != null ? div({}, div({
+      className: "search__experts"
     }, div({
-      className: "landing-content"
-    }, "You've successfully registered! You'll get a confirmation email shortly, which will allow you to log in and start Blunditing.")), Footer({}, ''));
+      className: "search__experts-title"
+    }, "Experts:"), this.state.data.experts.length === 0 ? div({
+      className: "search__experts-items--empty"
+    }, "No expert found for '" + this.state.data.query + "'") : div({
+      className: "search__experts-items"
+    }, this.state.data.experts.map(function(expert, index) {
+      return ExpertCard({
+        expert: expert,
+        key: "search-expert-card-" + index
+      });
+    }))), div({
+      className: "search__predictions"
+    }, div({
+      className: "search__predictions-title"
+    }, "Predictions:"), this.state.data.predictions.length === 0 ? div({
+      className: "search__predictions-items--empty"
+    }, "No prediction found for '" + this.state.data.query + "'") : div({
+      className: "search__predictions-items"
+    }, this.state.data.predictions.map(function(prediction, index) {
+      return PredictionCard({
+        prediction: prediction,
+        key: "search-prediction-card-" + index
+      });
+    }))), div({
+      className: "search__claims"
+    }, div({
+      className: "search__claims-title"
+    }, "Claims:"), this.state.data.claims.length === 0 ? div({
+      className: "search__claims-items--empty"
+    }, "No claim found for '" + this.state.data.query + "'") : div({
+      className: "search__claims-items"
+    }, this.state.data.claims.map(function(claim, index) {
+      return ClaimCard({
+        claim: claim,
+        key: "search-claim-card-" + index
+      });
+    })))) : void 0, this.state.searchError != null ? div({
+      className: "search__error"
+    }, this.state.searchError) : void 0)), Footer({}, ''));
   }
 }));
 
 
-},{"components/Footer":585,"components/Header":586}],620:[function(require,module,exports){
+},{"components/ClaimCard":574,"components/ExpertCard":580,"components/Footer":585,"components/Header":587,"components/PredictionCard":590,"components/SearchFilters":596,"mixins/LinksMixin":598}],623:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -88546,7 +89104,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":585,"components/Header":586}],621:[function(require,module,exports){
+},{"components/Footer":585,"components/Header":587}],624:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -88567,4 +89125,4 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":585,"components/Header":586}]},{},[3])
+},{"components/Footer":585,"components/Header":587}]},{},[3])

@@ -1,14 +1,6 @@
 { div, a } = React.DOM
 
-Header = require("components/Header")
-Footer = require("components/Footer")
-
 SessionMixin = require("mixins/SessionMixin")
-
-TextField = Material.TextField
-RaisedButton = Material.RaisedButton
-RefreshIndicator = Material.RefreshIndicator
-
 
 module.exports = React.createFactory React.createClass
   mixins: [SessionMixin]
@@ -22,13 +14,13 @@ module.exports = React.createFactory React.createClass
     loginError: null
     loginLoading: false
 
-
+  
   goToRegister: ->
-    navigate('/register')
+    @props.changeView('register')
 
 
   goToForgotPassword: ->
-    navigate('/forgot_password')
+    @props.changeView('forgot')
 
   
   handleEmailChange: (event) ->
@@ -74,7 +66,7 @@ module.exports = React.createFactory React.createClass
   loginSuccess: (data, request) ->
     @setState loginLoading: false
     @setUser(data.data, request)
-    navigate('/me')
+    @props.hideLogin()
 
 
   loginError: (error) ->
@@ -93,38 +85,33 @@ module.exports = React.createFactory React.createClass
   
   render: ->
     div {},
-      Header {}, ''
-      div { className: "user-wrapper" },
-        div { className: "user-content" },
-          "Login"
+      "Login"
 
+      div {},
+        div {},
+          React.createElement(Material.TextField, { id: "login-email", floatingLabelText: "Email", value: @state.email, onChange: @handleEmailChange, errorText: @getErrorText("email") })
+        div {},
+          React.createElement(Material.TextField, {id: "login-password", floatingLabelText: "Password", type: "password", value: @state.password, onChange: @handlePasswordChange, errorText: @getErrorText("password") })
+        div {},
+          if @state.loginLoading == true
+            @style = {
+              display: 'inline-block'
+              position: 'relative'
+              boxShadow: 'none'
+            }
+            React.createElement(Material.RefreshIndicator, { style: @style, size: 50, left: 0, top: 0, status:"loading" })
+
+          else
+            React.createElement(Material.RaisedButton, {label: "Login", primary: true, onClick: @processLogin })
+        if @state.loginError?
           div {},
-            div {},
-              React.createElement(TextField, { id: "login-email", floatingLabelText: "Email", value: @state.email, onChange: @handleEmailChange, errorText: @getErrorText("email") })
-            div {},
-              React.createElement(TextField, {id: "login-password", floatingLabelText: "Password", type: "password", value: @state.password, onChange: @handlePasswordChange, errorText: @getErrorText("password") })
-            div {},
-              if @state.loginLoading == true
-                @style = {
-                  display: 'inline-block'
-                  position: 'relative'
-                  boxShadow: 'none'
-                }
-                React.createElement(RefreshIndicator, { style: @style, size: 50, left: 0, top: 0, status:"loading" })
-
-              else
-                React.createElement(RaisedButton, {label: "Login", primary: true, onClick: @processLogin })
-            if @state.loginError?
-              div {},
-                @state.loginError
+            @state.loginError
 
 
-          div {},
-            a
-              onClick: @goToRegister
-              'Click here to register'
-            a
-              onClick: @goToForgotPassword
-              'Forgot your password?'
-
-      Footer {}, ''
+      div {},
+        a
+          onClick: @goToRegister
+          'Click here to register'
+        a
+          onClick: @goToForgotPassword
+          'Forgot your password?'

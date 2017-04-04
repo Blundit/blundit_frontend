@@ -159,6 +159,9 @@ module.exports = class API
     homepage:
       path: "home/homepage"
       method: "GET"
+    search:
+      path: "search"
+      method: "POST"
 
 
 

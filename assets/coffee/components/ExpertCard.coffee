@@ -57,7 +57,7 @@ module.exports = React.createFactory React.createClass
         div { className: "expert-card-comments" },
           @getCommentInfo()
         
-        if expert.most_recent_claim.length > 0 or expert.most_recent_prediction > 0
+        if (expert.most_recent_claim? and expert.most_recent_claim.length > 0) or (expert.most_recent_prediction? and expert.most_recent_prediction.length > 0)
           div { className: "expert-card-links"},
             if expert.most_recent_claim.length > 0
               div {},

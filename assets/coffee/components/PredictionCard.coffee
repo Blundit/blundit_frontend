@@ -1,9 +1,3 @@
-Card = Material.Card
-CardHeader = Material.CardHeader
-CardText = Material.CardText
-CardActions = Material.CardActions
-FlatButton = Material.FlatButton
-
 { div, img, a, br, span } = React.DOM
 
 LinksMixin = require("mixins/LinksMixin")
@@ -50,8 +44,8 @@ module.exports = React.createFactory React.createClass
   render: ->
     { prediction } = @props
     div { className: "prediction-card" },
-      React.createElement(Card, {},
-        React.createElement(CardHeader,
+      React.createElement(Material.Card, {},
+        React.createElement(Material.CardHeader,
           {
             title: prediction.title
             subtitle: @getDescription()
@@ -90,7 +84,7 @@ module.exports = React.createFactory React.createClass
                     expert.name
           
 
-        React.createElement(CardActions, {},
+        React.createElement(Material.CardActions, {},
           if prediction.status == 0 and UserStore.loggedIn()
             # also add check here to see if user has already voted
             # and add vote buttons
@@ -103,6 +97,6 @@ module.exports = React.createFactory React.createClass
               "Log in to Vote"
 
 
-          React.createElement(FlatButton, { label: "View", onClick: @goToPrediction.bind(@, prediction.alias) })
+          React.createElement(Material.FlatButton, { label: "View", onClick: @goToPrediction.bind(@, prediction.alias) })
         )
       )

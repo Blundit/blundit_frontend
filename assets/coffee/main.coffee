@@ -67,6 +67,7 @@ Blundit = React.createFactory React.createClass
     '/categories/:id/predictions': 'categoryPredictions'
     '/categories/:id/claims': 'categoryClaims'
     '/categories/:id/experts': 'categoryExperts'
+    '/search': 'search'
     
 
   landing: ->
@@ -87,30 +88,6 @@ Blundit = React.createFactory React.createClass
         path: @state.path
         user_id: id
 
-
-  login: ->
-    div {},
-      require("views/Login")
-        path: @state.path
-
-  
-  forgotPassword: ->
-    div {},
-      require("views/ForgotPassword")
-        path: @state.path
-
-  
-  register: ->
-    div {},
-      require("views/Register")
-        path: @state.path
-
-
-  registerSuccessful: ->
-    div {},
-      require("views/RegisterSuccessful")
-        path: @state.path
-
   
   userProfile: ->
     div {},
@@ -122,6 +99,12 @@ Blundit = React.createFactory React.createClass
   predictions: ->
     div {},
       require("views/Predictions")
+        path: @state.path
+
+  
+  search: ->
+    div {},
+      require("views/Search")
         path: @state.path
 
   

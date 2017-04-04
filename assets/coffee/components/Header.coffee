@@ -11,10 +11,13 @@ menuItems = [
 
 LinksMixin = require("mixins/LinksMixin")
 
+LoginModal = require("modals/LoginModal")
+
 module.exports = React.createFactory React.createClass
   mixins: [LinksMixin]
   getInitialState: ->
     user: null
+    showLoginModal: false
 
   handleUserChange: (data) ->
     @setState user: UserStore.get()
@@ -41,6 +44,14 @@ module.exports = React.createFactory React.createClass
     return "url(#{avatar})"
 
   
+  showLogin: ->
+    @setState showLoginModal: true
+
+  
+  hideLogin: ->
+    @setState showLoginModal: false
+
+  
   getHeaderItemClass: (item) ->
     @class = "header__item"
     @path = window.location.pathname
@@ -61,11 +72,12 @@ module.exports = React.createFactory React.createClass
 
         div { className: "header__items" },
           menuItems.map (item, index) =>
-            div
-              className: @getHeaderItemClass(item)
-              key: "header-item-#{index}"
-              onClick: @navigateToLocation.bind(@, item.path)
-              item.label
+            if (item.logged? and @state.user?.token?) or !item.logged
+              div
+                className: @getHeaderItemClass(item)
+                key: "header-item-#{index}"
+                onClick: @navigateToLocation.bind(@, item.path)
+                item.label
         
         div { className: "header__user" },
           if @state.user?.token?
@@ -76,5 +88,7 @@ module.exports = React.createFactory React.createClass
                 backgroundImage: @getUserAvatar()
           else
             div {},
-              React.createElement(Material.RaisedButton, { label: "Login/Signup", primary: true, onClick: @goToLogin })
-
+              React.createElement(Material.RaisedButton, { label: "Login/Signup", primary: true, onClick: @showLogin })
+        if @state.showLoginModal == true
+          LoginModal
+            hideLogin: @hideLogin

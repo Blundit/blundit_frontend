@@ -1,8 +1,5 @@
 { div, a } = React.DOM
 
-Header = require("components/Header")
-Footer = require("components/Footer")
-
 LinksMixin = require("mixins/LinksMixin")
 
 module.exports = React.createFactory React.createClass
@@ -72,7 +69,7 @@ module.exports = React.createFactory React.createClass
 
   registerSuccess: (data, request) ->
     @setState registerLoading: false
-    navigate('/register_success')
+    @props.changeView('registered')
 
 
   registerError: (error) ->
@@ -89,37 +86,37 @@ module.exports = React.createFactory React.createClass
     return null
 
   
+  showLogin: ->
+    @props.changeView('login')
+
+  
   render: ->
     div {},
-      Header {}, ''
-      div { className: "user-wrapper" },
-        div { className: "user-content" },
-          "Register"
+      "Register"
 
+      div {},
+        div {},
+          React.createElement(Material.TextField, { id: "register-email", floatingLabelText: "Email", value: @state.email, onChange: @handleEmailChange, errorText: @getErrorText("email") })
+        div {},
+          React.createElement(Material.TextField, {id: "register-password", floatingLabelText: "Password", type: "password", value: @state.password, onChange: @handlePasswordChange, errorText: @getErrorText("password") })
+        div {},
+          React.createElement(Material.TextField, {id: "register-password-confirmation", floatingLabelText: "Confirm", type: "password", value: @state.password_confirmation, onChange: @handlePasswordConfirmationChange, errorText: @getErrorText("password_confirmation") })
+        div {},
+          if @state.registerLoading == true
+            @style = {
+              display: 'inline-block'
+              position: 'relative'
+              boxShadow: 'none'
+            }
+            React.createElement(Material.RefreshIndicator, { style: @style, size: 50, left: 0, top: 0, status:"loading" })
+
+          else
+            React.createElement(Material.RaisedButton, {label: "Register", primary: true, onClick: @processRegister })
+        if @state.registerError?
           div {},
-            div {},
-              React.createElement(Material.TextField, { id: "register-email", floatingLabelText: "Email", value: @state.email, onChange: @handleEmailChange, errorText: @getErrorText("email") })
-            div {},
-              React.createElement(Material.TextField, {id: "register-password", floatingLabelText: "Password", type: "password", value: @state.password, onChange: @handlePasswordChange, errorText: @getErrorText("password") })
-            div {},
-              React.createElement(Material.TextField, {id: "register-password-confirmation", floatingLabelText: "Confirm", type: "password", value: @state.password_confirmation, onChange: @handlePasswordConfirmationChange, errorText: @getErrorText("password_confirmation") })
-            div {},
-              if @state.registerLoading == true
-                @style = {
-                  display: 'inline-block'
-                  position: 'relative'
-                  boxShadow: 'none'
-                }
-                React.createElement(Material.RefreshIndicator, { style: @style, size: 50, left: 0, top: 0, status:"loading" })
+            @state.registerError
 
-              else
-                React.createElement(Material.RaisedButton, {label: "Register", primary: true, onClick: @processRegister })
-            if @state.registerError?
-              div {},
-                @state.registerError
-
-          div {},
-            a
-              onClick: @goToLogin
-              'Click here to login'
-      Footer {}, ''
+      div {},
+        a
+          onClick: @showLogin
+          'Click here to login'

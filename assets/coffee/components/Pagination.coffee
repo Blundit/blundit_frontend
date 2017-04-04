@@ -1,10 +1,5 @@
 { div } = React.DOM
 
-IconButton = Material.IconButton
-FontIcon = Material.FontIcon
-FlatButton = Material.FlatButton
-
-
 module.exports = React.createFactory React.createClass
   getInitialState: ->
     page: @props.page
@@ -14,15 +9,15 @@ module.exports = React.createFactory React.createClass
 
   drawBackArrow: ->
     return if @props.page == 1
-    React.createElement(IconButton, { onClick: @previousPage, className: "pagination__arrow" },
-      React.createElement(FontIcon, { className: "fa fa-angle-left" })
+    React.createElement(Material.IconButton, { onClick: @previousPage, className: "pagination__arrow" },
+      React.createElement(Material.FontIcon, { className: "fa fa-angle-left" })
     )
 
 
   drawNextArrow: ->
     return if @props.page == @props.numberOfPages
-    React.createElement(IconButton, { onClick: @nextPage, className: "pagination__arrow" },
-      React.createElement(FontIcon, { className: "fa fa-angle-right" })
+    React.createElement(Material.IconButton, { onClick: @nextPage, className: "pagination__arrow" },
+      React.createElement(Material.FontIcon, { className: "fa fa-angle-right" })
     )
 
   
@@ -48,7 +43,7 @@ module.exports = React.createFactory React.createClass
     return if @props.page <= 3
 
     div { className: "pagination__first" },
-      React.createElement(FlatButton, { key: "page-1", label: 1, style: @buttonStyle(), className: "pagination__item", primary: true, onClick: @specificPage.bind(@, 1) })
+      React.createElement(Material.FlatButton, { key: "page-1", label: 1, style: @buttonStyle(), className: "pagination__item", primary: true, onClick: @specificPage.bind(@, 1) })
       if @props.page >= 5
         div { className: "pagination__ellipsis" },
           "..."
@@ -61,7 +56,7 @@ module.exports = React.createFactory React.createClass
       if @props.page <= @props.numberOfPages - 4
         div { className: "pagination__ellipsis" },
           "..."
-      React.createElement(FlatButton, { key: "page-#{@props.numberOfPages}", className: "pagination__item", label: @props.numberOfPages, style: @buttonStyle(), primary: true, onClick: @specificPage.bind(@, @props.numberOfPages) })
+      React.createElement(Material.FlatButton, { key: "page-#{@props.numberOfPages}", className: "pagination__item", label: @props.numberOfPages, style: @buttonStyle(), primary: true, onClick: @specificPage.bind(@, @props.numberOfPages) })
 
 
 
@@ -87,9 +82,9 @@ module.exports = React.createFactory React.createClass
     div { className: "pagination__pages" },
       for page in [@leftPage..@rightPage]
         if page == @props.page
-          React.createElement(FlatButton, { key: "page-#{page}", label: page, style: @buttonStyle(), disabled: true })
+          React.createElement(Material.FlatButton, { key: "page-#{page}", label: page, style: @buttonStyle(), disabled: true })
         else
-          React.createElement(FlatButton, { key: "page-#{page}", label: page, style: @buttonStyle(), primary: true, onClick: @specificPage.bind(@, page) })
+          React.createElement(Material.FlatButton, { key: "page-#{page}", label: page, style: @buttonStyle(), primary: true, onClick: @specificPage.bind(@, page) })
 
 
   render: ->
