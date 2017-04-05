@@ -4,32 +4,62 @@ Header = require("components/Header")
 Footer = require("components/Footer")
 PredictionCard = require("components/PredictionCard")
 Pagination = require("components/Pagination")
+SearchFilters = require("components/SearchFilters")
 
 PaginationMixin = require("mixins/PaginationMixin")
-
+LinksMixin = require("mixins/LinksMixin")
+SessionMixin = require("mixins/SessionMixin")
 
 module.exports = React.createFactory React.createClass
-  mixins: [PaginationMixin]
+  mixins: [PaginationMixin, LinksMixin, SessionMixin]
   displayName: 'Predictions'
 
 
   getInitialState: ->
     predictions: null
+    query: @getQuery()
+    sort: @getSort()
 
 
-  componentDidMount: ->
+  componentWillMount: ->
     @fetchPaginatedData()
 
 
-  fetchPaginatedData: (id = @state.page) ->
+  fetchPaginatedData: (id = @state.page, query = @state.query, sort = @state.sort) ->
     params = {
       path: "predictions"
       data:
         page: id
+        query: query
+        sort: sort
       success: @predictionListSuccess
       error: @predictionListError
     }
     API.call(params)
+
+
+  getQuery: ->
+    if @getParameterByName("query")
+      return @getParameterByName("query")
+
+    return ''
+
+
+  getSort: ->
+    if @getParameterByName("sort")
+      return Number(@getParameterByName("sort"))
+
+    return 0
+
+
+  search: (query, sort) ->
+    @setState page: 1
+    @setState query: query
+    @setState sort: sort
+
+    window.history.pushState('', 'Blundit - Predictions', "http://localhost:8888/predictions?query=#{query}&sort=#{sort}&page=1")
+
+    @fetchPaginatedData(1, query, sort)
 
 
   predictionListSuccess: (data) ->
@@ -45,6 +75,17 @@ module.exports = React.createFactory React.createClass
   goToNewPrediction: ->
     navigate('/predictions/new')
 
+
+  getSortOptions: ->
+    return [
+      { id: 0, title: "Newest" },
+      { id: 1, title: "Oldest" },
+      { id: 2, title: "Most Recently Updated" },
+      { id: 3, title: "Least Recently Updated" },
+      { id: 4, title: "Most Accurate" },
+      { id: 5, title: "Least Accurate" }
+    ]
+
   
   render: ->
     
@@ -52,6 +93,14 @@ module.exports = React.createFactory React.createClass
       Header {}, ''
       div { className: "predictions-wrapper" },
         div { className: "predictions-content" },
+          if @getParameterByName("from_search")?
+            div
+              className: "predictions__back-to-search"
+              onClick: @goBackToSearch
+              'Back to Search'
+          SearchFilters
+            sortOptions: @getSortOptions()
+            search: @search
           React.createElement(Material.RaisedButton, { label: "Create New Prediction", primary: true, onClick: @goToNewPrediction })
           div { className: "predictions__list" },
             if @state.predictions?

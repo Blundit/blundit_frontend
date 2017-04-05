@@ -25,3 +25,7 @@ module.exports =
   
   goToLogin: ->
     navigate('/login')
+
+  
+  goBackToSearch: ->
+    navigate("/search?query=#{@state.query}&sort=#{@state.sort}")

@@ -4,30 +4,51 @@ Header = require("components/Header")
 Footer = require("components/Footer")
 ClaimCard = require("components/ClaimCard")
 Pagination = require("components/Pagination")
+SearchFilters = require("components/SearchFilters")
 
 PaginationMixin = require("mixins/PaginationMixin")
+LinksMixin = require("mixins/LinksMixin")
+SessionMixin = require("mixins/SessionMixin")
 
 module.exports = React.createFactory React.createClass
-  mixins: [PaginationMixin]
+  mixins: [PaginationMixin, LinksMixin, SessionMixin]
   displayName: 'Claims'
 
   getInitialState: ->
     claims: null
+    query: @getQuery()
+    sort: @getSort()
 
 
-  componentDidMount: ->
+  componentWillMount: ->
     @fetchPaginatedData()
 
 
-  fetchPaginatedData: (id = @state.page) ->
+  fetchPaginatedData: (id = @state.page, query = @state.query, sort = @state.sort) ->
     params = {
       path: "claims"
       data:
         page: id
+        query: query
+        sort: sort
       success: @claimListSuccess
       error: @claimListError
     }
     API.call(params)
+
+
+  getQuery: ->
+    if @getParameterByName("query")
+      return @getParameterByName("query")
+
+    return ''
+
+
+  getSort: ->
+    if @getParameterByName("sort")
+      return Number(@getParameterByName("sort"))
+
+    return 0
 
 
   claimListSuccess: (data) ->
@@ -43,12 +64,39 @@ module.exports = React.createFactory React.createClass
   goToNewClaim: ->
     navigate('/claims/new')
 
+  
+  search: (query, sort) ->
+    @setState page: 1
+    @setState query: query
+    @setState sort: sort
+
+    window.history.pushState('', 'Blundit - Claims', "http://localhost:8888/claims?query=#{query}&sort=#{sort}&page=1")
+
+    @fetchPaginatedData(1, query, sort)
+
+  
+  getSortOptions: ->
+    return [
+      { id: 0, title: "Newest" },
+      { id: 1, title: "Oldest" },
+      { id: 2, title: "Most Recently Updated" },
+      { id: 3, title: "Least Recently Updated" },
+    ]
+
 
   render: ->
     div {},
       Header {}, ''
       div { className: "claims-wrapper" },
         div { className: "claims-content" },
+          if @getParameterByName("from_search")?
+            div
+              className: "predictions__back-to-search"
+              onClick: @goBackToSearch
+              'Back to Search'
+          SearchFilters
+            sortOptions: @getSortOptions()
+            search: @search
           React.createElement(Material.RaisedButton, { label: "Create New Claim", primary: true, onClick: @goToNewClaim })
           div { className: "claims__list" },
             if @state.claims?

@@ -3333,6 +3333,9 @@ module.exports = React.createFactory(React.createClass({
     },
     goToLogin: function() {
       return navigate('/login');
+    },
+    goBackToSearch: function() {
+      return navigate("/search?query=" + this.state.query + "&sort=" + this.state.sort);
     }
   };
 
@@ -4795,33 +4798,61 @@ module.exports = React.createFactory(React.createClass({
 
   Pagination = require("components/Pagination");
 
+  SearchFilters = require("components/SearchFilters");
+
   PaginationMixin = require("mixins/PaginationMixin");
 
+  LinksMixin = require("mixins/LinksMixin");
+
+  SessionMixin = require("mixins/SessionMixin");
+
   module.exports = React.createFactory(React.createClass({
-    mixins: [PaginationMixin],
+    mixins: [PaginationMixin, LinksMixin, SessionMixin],
     displayName: 'Claims',
     getInitialState: function() {
       return {
-        claims: null
+        claims: null,
+        query: this.getQuery(),
+        sort: this.getSort()
       };
     },
-    componentDidMount: function() {
+    componentWillMount: function() {
       return this.fetchPaginatedData();
     },
-    fetchPaginatedData: function(id) {
+    fetchPaginatedData: function(id, query, sort) {
       var params;
       if (id == null) {
         id = this.state.page;
       }
+      if (query == null) {
+        query = this.state.query;
+      }
+      if (sort == null) {
+        sort = this.state.sort;
+      }
       params = {
         path: "claims",
         data: {
-          page: id
+          page: id,
+          query: query,
+          sort: sort
         },
         success: this.claimListSuccess,
         error: this.claimListError
       };
       return API.call(params);
+    },
+    getQuery: function() {
+      if (this.getParameterByName("query")) {
+        return this.getParameterByName("query");
+      }
+      return '';
+    },
+    getSort: function() {
+      if (this.getParameterByName("sort")) {
+        return Number(this.getParameterByName("sort"));
+      }
+      return 0;
     },
     claimListSuccess: function(data) {
       this.setState({
@@ -4838,12 +4869,48 @@ module.exports = React.createFactory(React.createClass({
     goToNewClaim: function() {
       return navigate('/claims/new');
     },
+    search: function(query, sort) {
+      this.setState({
+        page: 1
+      });
+      this.setState({
+        query: query
+      });
+      this.setState({
+        sort: sort
+      });
+      window.history.pushState('', 'Blundit - Claims', "http://localhost:8888/claims?query=" + query + "&sort=" + sort + "&page=1");
+      return this.fetchPaginatedData(1, query, sort);
+    },
+    getSortOptions: function() {
+      return [
+        {
+          id: 0,
+          title: "Newest"
+        }, {
+          id: 1,
+          title: "Oldest"
+        }, {
+          id: 2,
+          title: "Most Recently Updated"
+        }, {
+          id: 3,
+          title: "Least Recently Updated"
+        }
+      ];
+    },
     render: function() {
       return div({}, Header({}, ''), div({
         className: "claims-wrapper"
       }, div({
         className: "claims-content"
-      }, React.createElement(Material.RaisedButton, {
+      }, this.getParameterByName("from_search") != null ? div({
+        className: "predictions__back-to-search",
+        onClick: this.goBackToSearch
+      }, 'Back to Search') : void 0, SearchFilters({
+        sortOptions: this.getSortOptions(),
+        search: this.search
+      }), React.createElement(Material.RaisedButton, {
         label: "Create New Claim",
         primary: true,
         onClick: this.goToNewClaim
@@ -5478,33 +5545,61 @@ module.exports = React.createFactory(React.createClass({
 
   Pagination = require("components/Pagination");
 
+  SearchFilters = require("components/SearchFilters");
+
   PaginationMixin = require("mixins/PaginationMixin");
 
+  LinksMixin = require("mixins/LinksMixin");
+
+  SessionMixin = require("mixins/SessionMixin");
+
   module.exports = React.createFactory(React.createClass({
-    mixins: [PaginationMixin],
+    mixins: [PaginationMixin, LinksMixin, SessionMixin],
     displayName: 'Experts',
     getInitialState: function() {
       return {
-        experts: null
+        experts: null,
+        query: this.getQuery(),
+        sort: this.getSort()
       };
     },
-    componentDidMount: function() {
+    componentWillMount: function() {
       return this.fetchPaginatedData();
     },
-    fetchPaginatedData: function(id) {
+    fetchPaginatedData: function(id, query, sort) {
       var params;
       if (id == null) {
         id = this.state.page;
       }
+      if (query == null) {
+        query = this.state.query;
+      }
+      if (sort == null) {
+        sort = this.state.sort;
+      }
       params = {
         path: "experts",
         data: {
-          page: id
+          page: id,
+          query: query,
+          sort: sort
         },
         success: this.expertListSuccess,
         error: this.expertListError
       };
       return API.call(params);
+    },
+    getQuery: function() {
+      if (this.getParameterByName("query")) {
+        return this.getParameterByName("query");
+      }
+      return '';
+    },
+    getSort: function() {
+      if (this.getParameterByName("sort")) {
+        return Number(this.getParameterByName("sort"));
+      }
+      return 0;
     },
     expertListSuccess: function(data) {
       this.setState({
@@ -5521,12 +5616,54 @@ module.exports = React.createFactory(React.createClass({
     goToNewExpert: function() {
       return navigate('/experts/new');
     },
+    search: function(query, sort) {
+      this.setState({
+        page: 1
+      });
+      this.setState({
+        query: query
+      });
+      this.setState({
+        sort: sort
+      });
+      window.history.pushState('', 'Blundit - Experts', "http://localhost:8888/experts?query=" + query + "&sort=" + sort + "&page=1");
+      return this.fetchPaginatedData(1, query, sort);
+    },
+    getSortOptions: function() {
+      return [
+        {
+          id: 0,
+          title: "Newest"
+        }, {
+          id: 1,
+          title: "Oldest"
+        }, {
+          id: 2,
+          title: "Most Recently Updated"
+        }, {
+          id: 3,
+          title: "Least Recently Updated"
+        }, {
+          id: 4,
+          title: "Most Accurate"
+        }, {
+          id: 5,
+          title: "Least Accurate"
+        }
+      ];
+    },
     render: function() {
       return div({}, Header({}, ''), div({
         className: "experts-wrapper"
       }, div({
         className: "experts-content"
-      }, React.createElement(Material.RaisedButton, {
+      }, this.getParameterByName("from_search") != null ? div({
+        className: "predictions__back-to-search",
+        onClick: this.goBackToSearch
+      }, 'Back to Search') : void 0, SearchFilters({
+        sortOptions: this.getSortOptions(),
+        search: this.search
+      }), React.createElement(Material.RaisedButton, {
         label: "Create New Expert",
         primary: true,
         onClick: this.goToNewExpert
@@ -5916,33 +6053,74 @@ module.exports = React.createFactory(React.createClass({
 
   Pagination = require("components/Pagination");
 
+  SearchFilters = require("components/SearchFilters");
+
   PaginationMixin = require("mixins/PaginationMixin");
 
+  LinksMixin = require("mixins/LinksMixin");
+
+  SessionMixin = require("mixins/SessionMixin");
+
   module.exports = React.createFactory(React.createClass({
-    mixins: [PaginationMixin],
+    mixins: [PaginationMixin, LinksMixin, SessionMixin],
     displayName: 'Predictions',
     getInitialState: function() {
       return {
-        predictions: null
+        predictions: null,
+        query: this.getQuery(),
+        sort: this.getSort()
       };
     },
-    componentDidMount: function() {
+    componentWillMount: function() {
       return this.fetchPaginatedData();
     },
-    fetchPaginatedData: function(id) {
+    fetchPaginatedData: function(id, query, sort) {
       var params;
       if (id == null) {
         id = this.state.page;
       }
+      if (query == null) {
+        query = this.state.query;
+      }
+      if (sort == null) {
+        sort = this.state.sort;
+      }
       params = {
         path: "predictions",
         data: {
-          page: id
+          page: id,
+          query: query,
+          sort: sort
         },
         success: this.predictionListSuccess,
         error: this.predictionListError
       };
       return API.call(params);
+    },
+    getQuery: function() {
+      if (this.getParameterByName("query")) {
+        return this.getParameterByName("query");
+      }
+      return '';
+    },
+    getSort: function() {
+      if (this.getParameterByName("sort")) {
+        return Number(this.getParameterByName("sort"));
+      }
+      return 0;
+    },
+    search: function(query, sort) {
+      this.setState({
+        page: 1
+      });
+      this.setState({
+        query: query
+      });
+      this.setState({
+        sort: sort
+      });
+      window.history.pushState('', 'Blundit - Predictions', "http://localhost:8888/predictions?query=" + query + "&sort=" + sort + "&page=1");
+      return this.fetchPaginatedData(1, query, sort);
     },
     predictionListSuccess: function(data) {
       this.setState({
@@ -5959,12 +6137,41 @@ module.exports = React.createFactory(React.createClass({
     goToNewPrediction: function() {
       return navigate('/predictions/new');
     },
+    getSortOptions: function() {
+      return [
+        {
+          id: 0,
+          title: "Newest"
+        }, {
+          id: 1,
+          title: "Oldest"
+        }, {
+          id: 2,
+          title: "Most Recently Updated"
+        }, {
+          id: 3,
+          title: "Least Recently Updated"
+        }, {
+          id: 4,
+          title: "Most Accurate"
+        }, {
+          id: 5,
+          title: "Least Accurate"
+        }
+      ];
+    },
     render: function() {
       return div({}, Header({}, ''), div({
         className: "predictions-wrapper"
       }, div({
         className: "predictions-content"
-      }, React.createElement(Material.RaisedButton, {
+      }, this.getParameterByName("from_search") != null ? div({
+        className: "predictions__back-to-search",
+        onClick: this.goBackToSearch
+      }, 'Back to Search') : void 0, SearchFilters({
+        sortOptions: this.getSortOptions(),
+        search: this.search
+      }), React.createElement(Material.RaisedButton, {
         label: "Create New Prediction",
         primary: true,
         onClick: this.goToNewPrediction
@@ -86230,6 +86437,9 @@ module.exports = {
   },
   goToLogin: function() {
     return navigate('/login');
+  },
+  goBackToSearch: function() {
+    return navigate("/search?query=" + this.state.query + "&sort=" + this.state.sort);
   }
 };
 
@@ -87736,7 +87946,7 @@ module.exports = React.createFactory(React.createClass({
 
 
 },{"components/AddToClaim":566,"components/BookmarkIndicator":569,"components/ClaimEvidences":575,"components/ClaimExpertCard":576,"components/Comments":578,"components/Footer":585,"components/Header":587,"components/Votes":597,"mixins/LinksMixin":598,"mixins/SessionMixin":600}],613:[function(require,module,exports){
-var ClaimCard, Footer, Header, Pagination, PaginationMixin, div;
+var ClaimCard, Footer, Header, LinksMixin, Pagination, PaginationMixin, SearchFilters, SessionMixin, div;
 
 div = React.DOM.div;
 
@@ -87748,33 +87958,61 @@ ClaimCard = require("components/ClaimCard");
 
 Pagination = require("components/Pagination");
 
+SearchFilters = require("components/SearchFilters");
+
 PaginationMixin = require("mixins/PaginationMixin");
 
+LinksMixin = require("mixins/LinksMixin");
+
+SessionMixin = require("mixins/SessionMixin");
+
 module.exports = React.createFactory(React.createClass({
-  mixins: [PaginationMixin],
+  mixins: [PaginationMixin, LinksMixin, SessionMixin],
   displayName: 'Claims',
   getInitialState: function() {
     return {
-      claims: null
+      claims: null,
+      query: this.getQuery(),
+      sort: this.getSort()
     };
   },
-  componentDidMount: function() {
+  componentWillMount: function() {
     return this.fetchPaginatedData();
   },
-  fetchPaginatedData: function(id) {
+  fetchPaginatedData: function(id, query, sort) {
     var params;
     if (id == null) {
       id = this.state.page;
     }
+    if (query == null) {
+      query = this.state.query;
+    }
+    if (sort == null) {
+      sort = this.state.sort;
+    }
     params = {
       path: "claims",
       data: {
-        page: id
+        page: id,
+        query: query,
+        sort: sort
       },
       success: this.claimListSuccess,
       error: this.claimListError
     };
     return API.call(params);
+  },
+  getQuery: function() {
+    if (this.getParameterByName("query")) {
+      return this.getParameterByName("query");
+    }
+    return '';
+  },
+  getSort: function() {
+    if (this.getParameterByName("sort")) {
+      return Number(this.getParameterByName("sort"));
+    }
+    return 0;
   },
   claimListSuccess: function(data) {
     this.setState({
@@ -87791,12 +88029,48 @@ module.exports = React.createFactory(React.createClass({
   goToNewClaim: function() {
     return navigate('/claims/new');
   },
+  search: function(query, sort) {
+    this.setState({
+      page: 1
+    });
+    this.setState({
+      query: query
+    });
+    this.setState({
+      sort: sort
+    });
+    window.history.pushState('', 'Blundit - Claims', "http://localhost:8888/claims?query=" + query + "&sort=" + sort + "&page=1");
+    return this.fetchPaginatedData(1, query, sort);
+  },
+  getSortOptions: function() {
+    return [
+      {
+        id: 0,
+        title: "Newest"
+      }, {
+        id: 1,
+        title: "Oldest"
+      }, {
+        id: 2,
+        title: "Most Recently Updated"
+      }, {
+        id: 3,
+        title: "Least Recently Updated"
+      }
+    ];
+  },
   render: function() {
     return div({}, Header({}, ''), div({
       className: "claims-wrapper"
     }, div({
       className: "claims-content"
-    }, React.createElement(Material.RaisedButton, {
+    }, this.getParameterByName("from_search") != null ? div({
+      className: "predictions__back-to-search",
+      onClick: this.goBackToSearch
+    }, 'Back to Search') : void 0, SearchFilters({
+      sortOptions: this.getSortOptions(),
+      search: this.search
+    }), React.createElement(Material.RaisedButton, {
       label: "Create New Claim",
       primary: true,
       onClick: this.goToNewClaim
@@ -87818,7 +88092,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ClaimCard":574,"components/Footer":585,"components/Header":587,"components/Pagination":589,"mixins/PaginationMixin":599}],614:[function(require,module,exports){
+},{"components/ClaimCard":574,"components/Footer":585,"components/Header":587,"components/Pagination":589,"components/SearchFilters":596,"mixins/LinksMixin":598,"mixins/PaginationMixin":599,"mixins/SessionMixin":600}],614:[function(require,module,exports){
 var ClaimFields, Footer, Header, div;
 
 div = React.DOM.div;
@@ -88439,7 +88713,7 @@ module.exports = React.createFactory(React.createClass({
 
 
 },{"components/AddToExpert":567,"components/BookmarkIndicator":569,"components/Comments":578,"components/ExpertBonaFides":579,"components/ExpertClaimCard":581,"components/ExpertPredictionCard":583,"components/Footer":585,"components/Header":587,"mixins/LinksMixin":598,"mixins/SessionMixin":600}],618:[function(require,module,exports){
-var ExpertCard, Footer, Header, Pagination, PaginationMixin, div;
+var ExpertCard, Footer, Header, LinksMixin, Pagination, PaginationMixin, SearchFilters, SessionMixin, div;
 
 div = React.DOM.div;
 
@@ -88451,33 +88725,61 @@ ExpertCard = require("components/ExpertCard");
 
 Pagination = require("components/Pagination");
 
+SearchFilters = require("components/SearchFilters");
+
 PaginationMixin = require("mixins/PaginationMixin");
 
+LinksMixin = require("mixins/LinksMixin");
+
+SessionMixin = require("mixins/SessionMixin");
+
 module.exports = React.createFactory(React.createClass({
-  mixins: [PaginationMixin],
+  mixins: [PaginationMixin, LinksMixin, SessionMixin],
   displayName: 'Experts',
   getInitialState: function() {
     return {
-      experts: null
+      experts: null,
+      query: this.getQuery(),
+      sort: this.getSort()
     };
   },
-  componentDidMount: function() {
+  componentWillMount: function() {
     return this.fetchPaginatedData();
   },
-  fetchPaginatedData: function(id) {
+  fetchPaginatedData: function(id, query, sort) {
     var params;
     if (id == null) {
       id = this.state.page;
     }
+    if (query == null) {
+      query = this.state.query;
+    }
+    if (sort == null) {
+      sort = this.state.sort;
+    }
     params = {
       path: "experts",
       data: {
-        page: id
+        page: id,
+        query: query,
+        sort: sort
       },
       success: this.expertListSuccess,
       error: this.expertListError
     };
     return API.call(params);
+  },
+  getQuery: function() {
+    if (this.getParameterByName("query")) {
+      return this.getParameterByName("query");
+    }
+    return '';
+  },
+  getSort: function() {
+    if (this.getParameterByName("sort")) {
+      return Number(this.getParameterByName("sort"));
+    }
+    return 0;
   },
   expertListSuccess: function(data) {
     this.setState({
@@ -88494,12 +88796,54 @@ module.exports = React.createFactory(React.createClass({
   goToNewExpert: function() {
     return navigate('/experts/new');
   },
+  search: function(query, sort) {
+    this.setState({
+      page: 1
+    });
+    this.setState({
+      query: query
+    });
+    this.setState({
+      sort: sort
+    });
+    window.history.pushState('', 'Blundit - Experts', "http://localhost:8888/experts?query=" + query + "&sort=" + sort + "&page=1");
+    return this.fetchPaginatedData(1, query, sort);
+  },
+  getSortOptions: function() {
+    return [
+      {
+        id: 0,
+        title: "Newest"
+      }, {
+        id: 1,
+        title: "Oldest"
+      }, {
+        id: 2,
+        title: "Most Recently Updated"
+      }, {
+        id: 3,
+        title: "Least Recently Updated"
+      }, {
+        id: 4,
+        title: "Most Accurate"
+      }, {
+        id: 5,
+        title: "Least Accurate"
+      }
+    ];
+  },
   render: function() {
     return div({}, Header({}, ''), div({
       className: "experts-wrapper"
     }, div({
       className: "experts-content"
-    }, React.createElement(Material.RaisedButton, {
+    }, this.getParameterByName("from_search") != null ? div({
+      className: "predictions__back-to-search",
+      onClick: this.goBackToSearch
+    }, 'Back to Search') : void 0, SearchFilters({
+      sortOptions: this.getSortOptions(),
+      search: this.search
+    }), React.createElement(Material.RaisedButton, {
       label: "Create New Expert",
       primary: true,
       onClick: this.goToNewExpert
@@ -88521,7 +88865,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ExpertCard":580,"components/Footer":585,"components/Header":587,"components/Pagination":589,"mixins/PaginationMixin":599}],619:[function(require,module,exports){
+},{"components/ExpertCard":580,"components/Footer":585,"components/Header":587,"components/Pagination":589,"components/SearchFilters":596,"mixins/LinksMixin":598,"mixins/PaginationMixin":599,"mixins/SessionMixin":600}],619:[function(require,module,exports){
 var ClaimCard, ExpertCard, Footer, Header, PredictionCard, div;
 
 div = React.DOM.div;
@@ -88889,7 +89233,7 @@ module.exports = React.createFactory(React.createClass({
 
 
 },{"components/AddToPrediction":568,"components/BookmarkIndicator":569,"components/Comments":578,"components/Footer":585,"components/Header":587,"components/PredictionEvidences":591,"components/PredictionExpertCard":592,"components/Votes":597,"mixins/LinksMixin":598,"mixins/SessionMixin":600}],621:[function(require,module,exports){
-var Footer, Header, Pagination, PaginationMixin, PredictionCard, div;
+var Footer, Header, LinksMixin, Pagination, PaginationMixin, PredictionCard, SearchFilters, SessionMixin, div;
 
 div = React.DOM.div;
 
@@ -88901,33 +89245,74 @@ PredictionCard = require("components/PredictionCard");
 
 Pagination = require("components/Pagination");
 
+SearchFilters = require("components/SearchFilters");
+
 PaginationMixin = require("mixins/PaginationMixin");
 
+LinksMixin = require("mixins/LinksMixin");
+
+SessionMixin = require("mixins/SessionMixin");
+
 module.exports = React.createFactory(React.createClass({
-  mixins: [PaginationMixin],
+  mixins: [PaginationMixin, LinksMixin, SessionMixin],
   displayName: 'Predictions',
   getInitialState: function() {
     return {
-      predictions: null
+      predictions: null,
+      query: this.getQuery(),
+      sort: this.getSort()
     };
   },
-  componentDidMount: function() {
+  componentWillMount: function() {
     return this.fetchPaginatedData();
   },
-  fetchPaginatedData: function(id) {
+  fetchPaginatedData: function(id, query, sort) {
     var params;
     if (id == null) {
       id = this.state.page;
     }
+    if (query == null) {
+      query = this.state.query;
+    }
+    if (sort == null) {
+      sort = this.state.sort;
+    }
     params = {
       path: "predictions",
       data: {
-        page: id
+        page: id,
+        query: query,
+        sort: sort
       },
       success: this.predictionListSuccess,
       error: this.predictionListError
     };
     return API.call(params);
+  },
+  getQuery: function() {
+    if (this.getParameterByName("query")) {
+      return this.getParameterByName("query");
+    }
+    return '';
+  },
+  getSort: function() {
+    if (this.getParameterByName("sort")) {
+      return Number(this.getParameterByName("sort"));
+    }
+    return 0;
+  },
+  search: function(query, sort) {
+    this.setState({
+      page: 1
+    });
+    this.setState({
+      query: query
+    });
+    this.setState({
+      sort: sort
+    });
+    window.history.pushState('', 'Blundit - Predictions', "http://localhost:8888/predictions?query=" + query + "&sort=" + sort + "&page=1");
+    return this.fetchPaginatedData(1, query, sort);
   },
   predictionListSuccess: function(data) {
     this.setState({
@@ -88944,12 +89329,41 @@ module.exports = React.createFactory(React.createClass({
   goToNewPrediction: function() {
     return navigate('/predictions/new');
   },
+  getSortOptions: function() {
+    return [
+      {
+        id: 0,
+        title: "Newest"
+      }, {
+        id: 1,
+        title: "Oldest"
+      }, {
+        id: 2,
+        title: "Most Recently Updated"
+      }, {
+        id: 3,
+        title: "Least Recently Updated"
+      }, {
+        id: 4,
+        title: "Most Accurate"
+      }, {
+        id: 5,
+        title: "Least Accurate"
+      }
+    ];
+  },
   render: function() {
     return div({}, Header({}, ''), div({
       className: "predictions-wrapper"
     }, div({
       className: "predictions-content"
-    }, React.createElement(Material.RaisedButton, {
+    }, this.getParameterByName("from_search") != null ? div({
+      className: "predictions__back-to-search",
+      onClick: this.goBackToSearch
+    }, 'Back to Search') : void 0, SearchFilters({
+      sortOptions: this.getSortOptions(),
+      search: this.search
+    }), React.createElement(Material.RaisedButton, {
       label: "Create New Prediction",
       primary: true,
       onClick: this.goToNewPrediction
@@ -88971,7 +89385,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":585,"components/Header":587,"components/Pagination":589,"components/PredictionCard":590,"mixins/PaginationMixin":599}],622:[function(require,module,exports){
+},{"components/Footer":585,"components/Header":587,"components/Pagination":589,"components/PredictionCard":590,"components/SearchFilters":596,"mixins/LinksMixin":598,"mixins/PaginationMixin":599,"mixins/SessionMixin":600}],622:[function(require,module,exports){
 var ClaimCard, ExpertCard, Footer, Header, LinksMixin, PredictionCard, SearchFilters, SessionMixin, div;
 
 div = React.DOM.div;
