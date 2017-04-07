@@ -98,10 +98,11 @@ module.exports = React.createFactory(React.createClass({
   },
   getUserAvatar: function() {
     var avatar;
-    if (!UserStore.get() || (UserStore.get().avatar == null)) {
+    console.log(UserStore.get());
+    if (!UserStore.get() || (UserStore.get().avatar_file_name == null)) {
       avatar = "/images/avatars/placeholder.png";
     } else {
-      avatar = "/images/avatars/" + (UserStore.get().avatar);
+      avatar = "http://localhost:3000/images/user_avatars/" + (UserStore.get().avatar_file_name);
     }
     return "url(" + avatar + ")";
   },
@@ -168,7 +169,7 @@ module.exports = React.createFactory(React.createClass({
 
 },{"mixins/LinksMixin":598,"modals/LoginModal":601}],3:[function(require,module,exports){
 (function() {
-  var API, AddToClaim, AddToExpert, AddToPrediction, Blundit, BookmarkIndicator, CategoryClaims, CategoryExperts, CategoryPredictions, CategorySubHead, ClaimCard, ClaimEvidences, ClaimExpertCard, ClaimFields, Comments, ExpertBonaFides, ExpertCard, ExpertClaimCard, ExpertFields, ExpertPredictionCard, ExpertSubstantiations, Footer, ForgotPassword, Global, Header, LinksMixin, Login, LoginModal, MuiThemeProvider, Pagination, PaginationMixin, PredictionCard, PredictionEvidences, PredictionExpertCard, PredictionFields, Register, RegistrationSuccessful, RouterMixin, SearchFilters, SessionMixin, UserStore, Votes, a, br, deepOrange500, div, getMuiTheme, img, menuItems, muiTheme, ref, ref1, ref10, ref11, ref12, ref13, ref14, ref15, ref16, ref2, ref3, ref4, ref5, ref6, ref7, ref8, ref9, span, startBlundit,
+  var API, AddToClaim, AddToExpert, AddToPrediction, Blundit, BookmarkIndicator, CategoryClaims, CategoryExperts, CategoryPredictions, CategorySubHead, ClaimCard, ClaimEvidences, ClaimExpertCard, ClaimFields, Comments, ExpertBonaFides, ExpertCard, ExpertClaimCard, ExpertFields, ExpertPredictionCard, ExpertSubstantiations, Footer, ForgotPassword, Global, Header, LinksMixin, Login, LoginModal, MuiThemeProvider, Pagination, PaginationMixin, PredictionCard, PredictionEvidences, PredictionExpertCard, PredictionFields, Register, RegistrationSuccessful, RouterMixin, SearchFilters, SessionMixin, UserStore, Votes, a, br, deepOrange500, div, getMuiTheme, img, input, menuItems, muiTheme, ref, ref1, ref10, ref11, ref12, ref13, ref14, ref15, ref16, ref17, ref2, ref3, ref4, ref5, ref6, ref7, ref8, ref9, span, startBlundit,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   window.React = require('react');
@@ -1479,6 +1480,7 @@ module.exports = React.createFactory(React.createClass({
       }, "Comments: " + this.props.id, this.state.comments === null ? div({}, "Loading Comments") : this.state.comments.length === 0 ? div({}, "Currently No Comments") : void 0, this.state.comments != null ? this.state.comments.map((function(_this) {
         return function(comment, index) {
           if (comment.user != null) {
+            console.log("!", comment.user);
             return div({
               className: "comments__comment",
               key: "comment-" + index
@@ -1487,7 +1489,7 @@ module.exports = React.createFactory(React.createClass({
             }, div({
               className: "comments__comment-user-avatar",
               style: {
-                backgroundImage: "url(" + comment.user.avatar_file_name + ")"
+                backgroundImage: "url(http://localhost:3000/images/user_avatars/" + comment.user.avatar_file_name + ")"
               }
             }), div({
               className: "comments__comment-user-name"
@@ -2287,10 +2289,11 @@ module.exports = React.createFactory(React.createClass({
     },
     getUserAvatar: function() {
       var avatar;
-      if (!UserStore.get() || (UserStore.get().avatar == null)) {
+      console.log(UserStore.get());
+      if (!UserStore.get() || (UserStore.get().avatar_file_name == null)) {
         avatar = "/images/avatars/placeholder.png";
       } else {
-        avatar = "/images/avatars/" + (UserStore.get().avatar);
+        avatar = "http://localhost:3000/images/user_avatars/" + (UserStore.get().avatar_file_name);
       }
       return "url(" + avatar + ")";
     },
@@ -3312,6 +3315,379 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
+
+  /*
+  API Class.
+  Usage to call is like this:
+  path is required.
+  path_variables is optional, and used for replacement in paths, like 'claims/%claim_id%/add_commment'
+  data is optional.
+  
+  params = {
+    path: "claims"
+    path_variables:
+      claim_id: 1
+    data:
+      id: "xxx"
+    success: @function
+    error: @function
+  }
+  API.call(params)
+   */
+
+  module.exports = API = (function() {
+    function API() {}
+
+    API.paths = {
+      register: {
+        path: "auth/",
+        non_api: true,
+        method: "POST"
+      },
+      login: {
+        path: "auth/sign_in",
+        non_api: true,
+        method: "POST"
+      },
+      logout: {
+        path: "auth/sign_out",
+        non_api: true,
+        method: "DELETE"
+      },
+      forgot_password: {
+        path: "auth/password",
+        non_api: true,
+        method: "POST"
+      },
+      categories: {
+        path: "categories",
+        method: "GET"
+      },
+      category: {
+        path: "categories/%category_id%",
+        method: "GET"
+      },
+      category_predictions: {
+        path: "categories/%category_id%/predictions",
+        method: "GET"
+      },
+      category_claims: {
+        path: "categories/%category_id%/claims",
+        method: "GET"
+      },
+      category_experts: {
+        path: "categories/%category_id%/experts",
+        method: "GET"
+      },
+      category_all: {
+        path: "categories/%category_id%/all",
+        method: "GET"
+      },
+      claims: {
+        path: "claims",
+        method: "GET"
+      },
+      all_claims: {
+        path: "claims/all",
+        method: "GET"
+      },
+      claim: {
+        path: "claims/%claim_id%",
+        method: "GET"
+      },
+      create_claim: {
+        path: "claims/",
+        method: "POST"
+      },
+      claim_add_comment: {
+        path: "claims/%claim_id%/add_comment",
+        method: "POST"
+      },
+      vote_for_claim: {
+        path: "claims/%claim_id%/vote",
+        method: "POST"
+      },
+      predictions: {
+        path: "predictions",
+        method: "GET"
+      },
+      all_predictions: {
+        path: "predictions/all",
+        method: "GET"
+      },
+      prediction: {
+        path: "predictions/%prediction_id%",
+        method: "GET"
+      },
+      add_evidence_to_prediction: {
+        path: "predictions/%prediction_id%/add_evidence",
+        method: "POST"
+      },
+      add_evidence_to_claim: {
+        path: "claims/%claim_id%/add_evidence",
+        method: "POST"
+      },
+      create_prediction: {
+        path: "predictions/",
+        method: "POST"
+      },
+      prediction_add_comment: {
+        path: "predictions/%prediction_id%/add_comment",
+        method: "POST"
+      },
+      vote_for_prediction: {
+        path: "predictions/%prediction_id%/vote",
+        method: "POST"
+      },
+      experts: {
+        path: "experts",
+        method: "GET"
+      },
+      all_experts: {
+        path: "experts/all",
+        method: "GET"
+      },
+      expert: {
+        path: "experts/%expert_id%",
+        method: "GET"
+      },
+      create_expert: {
+        path: "experts/",
+        method: "POST"
+      },
+      expert_add_comment: {
+        path: "experts/%expert_id%/add_comment",
+        method: "POST"
+      },
+      add_prediction_to_expert: {
+        path: "experts/%expert_id%/add_prediction",
+        method: "POST"
+      },
+      add_claim_to_expert: {
+        path: "experts/%expert_id%/add_claim",
+        method: "POST"
+      },
+      add_expert_to_prediction: {
+        path: "predictions/%prediction_id%/add_expert",
+        method: "POST"
+      },
+      add_expert_to_claim: {
+        path: "claims/%claim_id%/add_expert",
+        method: "POST"
+      },
+      get_substantiations: {
+        path: "experts/%expert_id%/get_substantiations",
+        method: "POST"
+      },
+      add_substantiation: {
+        path: "experts/%expert_id%/add_substantiation",
+        method: "POST"
+      },
+      add_bona_fide: {
+        path: "experts/%expert_id%/add_bona_fide",
+        method: "POST"
+      },
+      bookmarks: {
+        path: "user/bookmarks",
+        method: "GET"
+      },
+      verify_token: {
+        path: "auth/validate_token?access-token=%accessToken%&client=%client%&uid=%uid%&",
+        method: "GET",
+        non_api: true
+      },
+      expert_comments: {
+        path: "experts/%expert_id%/comments",
+        method: "GET"
+      },
+      claim_comments: {
+        path: "claims/%claim_id%/comments",
+        method: "GET"
+      },
+      prediction_comments: {
+        path: "predictions/%prediction_id%/comments",
+        method: "GET"
+      },
+      update_bookmark: {
+        path: "user/update_bookmark/%bookmark_id%",
+        method: "POST"
+      },
+      remove_bookmark: {
+        path: "user/remove_bookmark/%bookmark_id%",
+        method: "POST"
+      },
+      add_bookmark: {
+        path: "user/add_bookmark",
+        method: "POST"
+      },
+      homepage: {
+        path: "home/homepage",
+        method: "GET"
+      },
+      search: {
+        path: "search",
+        method: "POST"
+      },
+      update_user: {
+        path: "user/update",
+        method: "PUT"
+      }
+    };
+
+    API.server = function(params) {
+      if ((this.paths[params.path].non_api != null) && this.paths[params.path].non_api === true) {
+        return "http://localhost:3000/";
+      }
+      return "http://localhost:3000/api/v1/";
+    };
+
+    API.method = function(params) {
+      return this.paths[params.path].method;
+    };
+
+    API.path = function(params) {
+      var key, ref12, value;
+      this.p = this.server(params) + this.paths[params.path].path;
+      ref12 = params.path_variables;
+      for (key in ref12) {
+        value = ref12[key];
+        this.p = this.p.replace('%' + key + '%', value);
+      }
+      if (this.paths[params.path].method === "GET") {
+        this.p = this.p + this.dataAsGet(params.data);
+      }
+      return this.p;
+    };
+
+    API.dataAsGet = function(data) {
+      var key, value;
+      this.d = "?";
+      for (key in data) {
+        value = data[key];
+        this.d += key + "=" + (encodeURIComponent(value)) + "&";
+      }
+      return this.d;
+    };
+
+    API.data = function(params) {
+      var data;
+      if (params.data != null) {
+        data = params.data;
+      } else {
+        data = {};
+      }
+      return data;
+    };
+
+    API.processData = function(params) {
+      if (params.path === "update_user") {
+        return false;
+      } else {
+
+      }
+    };
+
+    API.contentType = function(params) {
+      if (params.path === "update_user") {
+        return false;
+      } else {
+        return "";
+      }
+    };
+
+    API.call = function(params) {
+      if (params.path === "update_user") {
+        this.callFile(params);
+        return;
+      }
+      return $.ajax({
+        method: this.method(params),
+        url: this.path(params),
+        headers: UserStore.getAuthHeader(),
+        data: this.data(params),
+        dataType: "json",
+        success: function(data, status, request) {
+          UserStore.updateHeaderInfo(request);
+          if (params.success != null) {
+            return params.success(data, request);
+          }
+        },
+        error: function(error) {
+          if (params.error != null) {
+            return params.error(error);
+          }
+        }
+      });
+    };
+
+    API.callFile = function(params) {
+      return $.ajax({
+        method: this.method(params),
+        url: this.path(params),
+        headers: UserStore.getAuthHeader(),
+        data: this.data(params),
+        dataType: "json",
+        processData: false,
+        contentType: false,
+        success: function(data, status, request) {
+          UserStore.updateHeaderInfo(request);
+          if (params.success != null) {
+            return params.success(data, request);
+          }
+        },
+        error: function(error) {
+          if (params.error != null) {
+            return params.error(error);
+          }
+        }
+      });
+    };
+
+    return API;
+
+  })();
+
+  module.exports = Global = (function() {
+    function Global() {}
+
+    Global.setCookie = function(name, value, days) {
+      var date, expires;
+      if (days) {
+        date = new Date();
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+        expires = "; expires=" + date.toGMTString();
+      } else {
+        expires = "";
+      }
+      return document.cookie = name + "=" + value + expires + "; path=/";
+    };
+
+    Global.getCookie = function(name) {
+      var c, ca, i, nameEQ;
+      nameEQ = name + "=";
+      ca = document.cookie.split(";");
+      i = 0;
+      while (i < ca.length) {
+        c = ca[i];
+        while (c.charAt(0) === " ") {
+          c = c.substring(1, c.length);
+        }
+        if (c.indexOf(nameEQ) === 0) {
+          return c.substring(nameEQ.length, c.length);
+        }
+        i++;
+      }
+      return null;
+    };
+
+    Global.deleteCookie = function(name) {
+      return this.setCookie(name, "", -1);
+    };
+
+    return Global;
+
+  })();
+
   module.exports = {
     goToClaim: function(id) {
       return navigate("/claims/" + id);
@@ -3528,524 +3904,6 @@ module.exports = React.createFactory(React.createClass({
       }) : void 0)));
     }
   }));
-
-
-  /*
-  API Class.
-  Usage to call is like this:
-  path is required.
-  path_variables is optional, and used for replacement in paths, like 'claims/%claim_id%/add_commment'
-  data is optional.
-  
-  params = {
-    path: "claims"
-    path_variables:
-      claim_id: 1
-    data:
-      id: "xxx"
-    success: @function
-    error: @function
-  }
-  API.call(params)
-   */
-
-  module.exports = API = (function() {
-    function API() {}
-
-    API.paths = {
-      register: {
-        path: "auth/",
-        non_api: true,
-        method: "POST"
-      },
-      login: {
-        path: "auth/sign_in",
-        non_api: true,
-        method: "POST"
-      },
-      logout: {
-        path: "auth/sign_out",
-        non_api: true,
-        method: "DELETE"
-      },
-      forgot_password: {
-        path: "auth/password",
-        non_api: true,
-        method: "POST"
-      },
-      categories: {
-        path: "categories",
-        method: "GET"
-      },
-      category: {
-        path: "categories/%category_id%",
-        method: "GET"
-      },
-      category_predictions: {
-        path: "categories/%category_id%/predictions",
-        method: "GET"
-      },
-      category_claims: {
-        path: "categories/%category_id%/claims",
-        method: "GET"
-      },
-      category_experts: {
-        path: "categories/%category_id%/experts",
-        method: "GET"
-      },
-      category_all: {
-        path: "categories/%category_id%/all",
-        method: "GET"
-      },
-      claims: {
-        path: "claims",
-        method: "GET"
-      },
-      all_claims: {
-        path: "claims/all",
-        method: "GET"
-      },
-      claim: {
-        path: "claims/%claim_id%",
-        method: "GET"
-      },
-      create_claim: {
-        path: "claims/",
-        method: "POST"
-      },
-      claim_add_comment: {
-        path: "claims/%claim_id%/add_comment",
-        method: "POST"
-      },
-      vote_for_claim: {
-        path: "claims/%claim_id%/vote",
-        method: "POST"
-      },
-      predictions: {
-        path: "predictions",
-        method: "GET"
-      },
-      all_predictions: {
-        path: "predictions/all",
-        method: "GET"
-      },
-      prediction: {
-        path: "predictions/%prediction_id%",
-        method: "GET"
-      },
-      add_evidence_to_prediction: {
-        path: "predictions/%prediction_id%/add_evidence",
-        method: "POST"
-      },
-      add_evidence_to_claim: {
-        path: "claims/%claim_id%/add_evidence",
-        method: "POST"
-      },
-      create_prediction: {
-        path: "predictions/",
-        method: "POST"
-      },
-      prediction_add_comment: {
-        path: "predictions/%prediction_id%/add_comment",
-        method: "POST"
-      },
-      vote_for_prediction: {
-        path: "predictions/%prediction_id%/vote",
-        method: "POST"
-      },
-      experts: {
-        path: "experts",
-        method: "GET"
-      },
-      all_experts: {
-        path: "experts/all",
-        method: "GET"
-      },
-      expert: {
-        path: "experts/%expert_id%",
-        method: "GET"
-      },
-      create_expert: {
-        path: "experts/",
-        method: "POST"
-      },
-      expert_add_comment: {
-        path: "experts/%expert_id%/add_comment",
-        method: "POST"
-      },
-      add_prediction_to_expert: {
-        path: "experts/%expert_id%/add_prediction",
-        method: "POST"
-      },
-      add_claim_to_expert: {
-        path: "experts/%expert_id%/add_claim",
-        method: "POST"
-      },
-      add_expert_to_prediction: {
-        path: "predictions/%prediction_id%/add_expert",
-        method: "POST"
-      },
-      add_expert_to_claim: {
-        path: "claims/%claim_id%/add_expert",
-        method: "POST"
-      },
-      get_substantiations: {
-        path: "experts/%expert_id%/get_substantiations",
-        method: "POST"
-      },
-      add_substantiation: {
-        path: "experts/%expert_id%/add_substantiation",
-        method: "POST"
-      },
-      add_bona_fide: {
-        path: "experts/%expert_id%/add_bona_fide",
-        method: "POST"
-      },
-      bookmarks: {
-        path: "user/bookmarks",
-        method: "GET"
-      },
-      verify_token: {
-        path: "auth/validate_token?access-token=%accessToken%&client=%client%&uid=%uid%&",
-        method: "GET",
-        non_api: true
-      },
-      expert_comments: {
-        path: "experts/%expert_id%/comments",
-        method: "GET"
-      },
-      claim_comments: {
-        path: "claims/%claim_id%/comments",
-        method: "GET"
-      },
-      prediction_comments: {
-        path: "predictions/%prediction_id%/comments",
-        method: "GET"
-      },
-      update_bookmark: {
-        path: "user/update_bookmark/%bookmark_id%",
-        method: "POST"
-      },
-      remove_bookmark: {
-        path: "user/remove_bookmark/%bookmark_id%",
-        method: "POST"
-      },
-      add_bookmark: {
-        path: "user/add_bookmark",
-        method: "POST"
-      },
-      homepage: {
-        path: "home/homepage",
-        method: "GET"
-      },
-      search: {
-        path: "search",
-        method: "POST"
-      }
-    };
-
-    API.server = function(params) {
-      if ((this.paths[params.path].non_api != null) && this.paths[params.path].non_api === true) {
-        return "http://localhost:3000/";
-      }
-      return "http://localhost:3000/api/v1/";
-    };
-
-    API.method = function(params) {
-      return this.paths[params.path].method;
-    };
-
-    API.path = function(params) {
-      var key, ref13, value;
-      this.p = this.server(params) + this.paths[params.path].path;
-      ref13 = params.path_variables;
-      for (key in ref13) {
-        value = ref13[key];
-        this.p = this.p.replace('%' + key + '%', value);
-      }
-      if (this.paths[params.path].method === "GET") {
-        this.p = this.p + this.dataAsGet(params.data);
-      }
-      return this.p;
-    };
-
-    API.dataAsGet = function(data) {
-      var key, value;
-      this.d = "?";
-      for (key in data) {
-        value = data[key];
-        this.d += key + "=" + (encodeURIComponent(value)) + "&";
-      }
-      return this.d;
-    };
-
-    API.data = function(params) {
-      var data;
-      if (params.data != null) {
-        data = params.data;
-      } else {
-        data = {};
-      }
-      return data;
-    };
-
-    API.call = function(params) {
-      return $.ajax({
-        method: this.method(params),
-        url: this.path(params),
-        headers: UserStore.getAuthHeader(),
-        data: this.data(params),
-        dataType: "json",
-        success: function(data, status, request) {
-          UserStore.updateHeaderInfo(request);
-          if (params.success != null) {
-            return params.success(data, request);
-          }
-        },
-        error: function(error) {
-          if (params.error != null) {
-            return params.error(error);
-          }
-        }
-      });
-    };
-
-    return API;
-
-  })();
-
-  module.exports = Global = (function() {
-    function Global() {}
-
-    Global.setCookie = function(name, value, days) {
-      var date, expires;
-      if (days) {
-        date = new Date();
-        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-        expires = "; expires=" + date.toGMTString();
-      } else {
-        expires = "";
-      }
-      return document.cookie = name + "=" + value + expires + "; path=/";
-    };
-
-    Global.getCookie = function(name) {
-      var c, ca, i, nameEQ;
-      nameEQ = name + "=";
-      ca = document.cookie.split(";");
-      i = 0;
-      while (i < ca.length) {
-        c = ca[i];
-        while (c.charAt(0) === " ") {
-          c = c.substring(1, c.length);
-        }
-        if (c.indexOf(nameEQ) === 0) {
-          return c.substring(nameEQ.length, c.length);
-        }
-        i++;
-      }
-      return null;
-    };
-
-    Global.deleteCookie = function(name) {
-      return this.setCookie(name, "", -1);
-    };
-
-    return Global;
-
-  })();
-
-  UserStore = (function() {
-    function UserStore() {
-      this.get = bind(this.get, this);
-      this.set = bind(this.set, this);
-      this.emitChange = bind(this.emitChange, this);
-      this.unsubscribe = bind(this.unsubscribe, this);
-      this.subscribe = bind(this.subscribe, this);
-      this.dequeueMessagesFetch = bind(this.dequeueMessagesFetch, this);
-    }
-
-    UserStore.prototype.data = {};
-
-    UserStore.prototype.votes = [];
-
-    UserStore.prototype.subscribers = 0;
-
-    UserStore.prototype.changeEvent = 'blundit:user';
-
-    UserStore.prototype.fetchMessagesTimeout = null;
-
-    UserStore.prototype.lastMessagesFetch = null;
-
-    UserStore.prototype.messagesTtl = 60000;
-
-    UserStore.prototype.loggedIn = function() {
-      if (this.data && (this.data.token != null)) {
-        return true;
-      }
-      return false;
-    };
-
-    UserStore.prototype.dequeueMessagesFetch = function() {
-      clearTimeout(this.fetchMessagesTimeout);
-      return this.fetchMessagesTimeout = null;
-    };
-
-    UserStore.prototype.subscribe = function(callback) {
-      addEventListener(this.changeEvent, callback, false);
-      this.subscribers++;
-      if (this.data != null) {
-        return this.emitChange();
-      }
-    };
-
-    UserStore.prototype.unsubscribe = function(callback) {
-      removeEventListener(this.changeEvent, callback);
-      this.subscribers--;
-      if (!(this.subscribers > 0)) {
-        return this.dequeueMessagesFetch();
-      }
-    };
-
-    UserStore.prototype.emitChange = function() {
-      var event;
-      event = document.createEvent('Event');
-      event.initEvent(this.changeEvent, true, true);
-      return dispatchEvent(event);
-    };
-
-    UserStore.prototype.set = function(data, request) {
-      this.data = data;
-      if (request != null) {
-        this.data.token = request.getResponseHeader('access-token');
-        this.data.uid = request.getResponseHeader('uid');
-        this.data.client = request.getResponseHeader('client');
-      }
-      return this.emitChange();
-    };
-
-    UserStore.prototype.logout = function() {
-      var params;
-      params = {
-        path: "logout",
-        success: this.logoutSuccess,
-        error: this.logoutError
-      };
-      return API.call(params);
-    };
-
-    UserStore.prototype.logoutSuccess = function() {};
-
-    UserStore.prototype.logoutError = function() {};
-
-    UserStore.prototype.setToken = function(token) {
-      return this.data.token = token;
-    };
-
-    UserStore.getAuthHeader = function() {
-      this.user = this.get();
-      if ((this.user != null) && (this.user.token != null)) {
-        return {
-          "access-token": this.user.token,
-          "client": this.user.client,
-          "uid": this.user.uid
-        };
-      } else {
-        return {};
-      }
-    };
-
-    UserStore.prototype.getAuthHeader = function() {
-      this.user = this.get();
-      if ((this.user != null) && (this.user.token != null)) {
-        return {
-          "access-token": this.user.token,
-          "client": this.user.client,
-          "uid": this.user.uid
-        };
-      } else {
-        return {};
-      }
-    };
-
-    UserStore.prototype.fetchUserData = function(navigateTarget) {
-      return;
-      return $.ajax({
-        type: 'GET',
-        headers: this.getAuthHeader(),
-        url: this.urls.get_user_data,
-        dataType: 'json',
-        success: (function(_this) {
-          return function(data) {
-            _this.setUserAccounts(_this.fixDates(data));
-            _this.doQueueMessages();
-            _this.fetchUserProfile();
-            if (navigateTarget != null) {
-              return window.navigate(navigateTarget);
-            }
-          };
-        })(this)
-      });
-    };
-
-    UserStore.prototype.fetchUserProfile = function(navigateTarget) {
-      return $.ajax({
-        type: 'GET',
-        headers: this.getAuthHeader(),
-        url: this.urls.get_current_user,
-        dataType: 'json',
-        success: (function(_this) {
-          return function(data) {
-            return _this.setUserProfile(data);
-          };
-        })(this)
-      });
-    };
-
-    UserStore.prototype.setUserProfile = function(data) {
-      this.data.profile = data;
-      return this.emitChange();
-    };
-
-    UserStore.prototype.doQueueMessages = function() {
-      if (this.subscribers > 0) {
-        return this.queueMessagesFetch();
-      } else {
-        return this.dequeueMessagesFetch();
-      }
-    };
-
-    UserStore.get = function() {
-      return UserStore.data;
-    };
-
-    UserStore.prototype.get = function() {
-      return this.data;
-    };
-
-    UserStore.prototype.updateHeaderInfo = function(request) {
-      if (request.getResponseHeader('access-token') == null) {
-        return;
-      }
-      this.token = request.getResponseHeader('access-token');
-      this.uid = request.getResponseHeader('uid');
-      this.client = request.getResponseHeader('client');
-      window.global.setCookie('access-token', this.token);
-      window.global.setCookie('uid', this.uid);
-      window.global.setCookie('client', this.client);
-      this.user = this.get();
-      this.user.token = this.token;
-      this.user.uid = this.uid;
-      return this.user.client = this.client;
-    };
-
-    return UserStore;
-
-  })();
-
-  module.exports = new UserStore({
-    messagestl: 1000 * 60
-  });
 
   div = React.DOM.div;
 
@@ -5717,7 +5575,6 @@ module.exports = React.createFactory(React.createClass({
       this.setState({
         data: data
       });
-      console.log(data);
       return this.setState({
         homepageError: false
       });
@@ -6381,7 +6238,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  div = React.DOM.div;
+  ref17 = React.DOM, div = ref17.div, input = ref17.input, br = ref17.br, img = ref17.img;
 
   Header = require("components/Header");
 
@@ -6389,6 +6246,47 @@ module.exports = React.createFactory(React.createClass({
 
   module.exports = React.createFactory(React.createClass({
     displayName: 'User',
+    getInitialState: function() {
+      return {
+        inputs: {
+          first_name: {
+            val: ''
+          },
+          last_name: {
+            val: ''
+          },
+          email: {
+            val: ''
+          },
+          notification_frequency: {
+            val: ''
+          }
+        },
+        user: null,
+        errors: [],
+        updateSubmitting: false,
+        updateError: null,
+        updateSuccess: null,
+        notification_frequencies: [
+          {
+            id: "none",
+            title: "No Notifications"
+          }, {
+            id: "as_they_happen",
+            title: "As They Happen"
+          }, {
+            id: "daily",
+            title: "Daily Digests"
+          }, {
+            id: "weekly",
+            title: "Weekly Digests"
+          }, {
+            id: "monthly",
+            title: "Monthly Digests"
+          }
+        ]
+      };
+    },
     componentDidMount: function() {
       return UserStore.subscribe(this.handleUserChange);
     },
@@ -6396,16 +6294,207 @@ module.exports = React.createFactory(React.createClass({
       return UserStore.unsubscribe(this.handleUserChange);
     },
     handleUserChange: function() {
-      return this.setState({
-        user: UserStore.get()
+      this.user = UserStore.get();
+      this.setState({
+        user: this.user
       });
+      this.inputs = this.state.inputs;
+      this.inputs.first_name.val = this.user.first_name;
+      this.inputs.last_name.val = this.user.last_name;
+      this.inputs.email.val = this.user.email;
+      this.inputs.notification_frequency.val = this.user.notification_frequency;
+      return this.setState({
+        inputs: this.inputs
+      });
+    },
+    submitUserUpdate: function() {
+      var avatar, params;
+      if (this.validateInputs()) {
+        this.setState({
+          updateSubmitting: true
+        });
+        this.setState({
+          updateSuccess: null
+        });
+        this.setState({
+          updateError: null
+        });
+        this.formData = new FormData();
+        avatar = document.getElementById('user__avatar');
+        if (avatar.files[0] != null) {
+          this.formData.append("avatar", avatar.files[0]);
+        }
+        this.formData.append("first_name", this.state.inputs.first_name.val);
+        this.formData.append("last_name", this.state.inputs.last_name.val);
+        this.formData.append("email", this.state.inputs.email.val);
+        this.formData.append("notification_frequency", this.state.inputs.notification_frequency.val);
+        params = {
+          path: "update_user",
+          data: this.formData,
+          success: this.updateUserSuccess,
+          error: this.updateUserError
+        };
+        return API.call(params);
+      }
+    },
+    validateInputs: function() {
+      this.errors = [];
+      if (this.state.inputs.first_name.val === '') {
+        this.errors.push({
+          id: "first_name",
+          text: "First Name required."
+        });
+      }
+      if (this.state.inputs.last_name.val === '') {
+        this.errors.push({
+          id: "last_name",
+          text: "Last Name required."
+        });
+      }
+      if (this.state.inputs.email.val.length < 6 || this.state.inputs.email.val.indexOf("@", 0) === -1 || this.state.inputs.email.val.indexOf(".", 0) === -1) {
+        this.errors.push({
+          id: "email",
+          text: "Valid email required."
+        });
+      }
+      this.setState({
+        errors: this.errors
+      });
+      if (this.errors.length === 0) {
+        return true;
+      }
+      return false;
+    },
+    getErrorText: function(key) {
+      var error, j, len, ref18;
+      ref18 = this.state.errors;
+      for (j = 0, len = ref18.length; j < len; j++) {
+        error = ref18[j];
+        if (error.id === key) {
+          return error.text;
+        }
+      }
+      return null;
+    },
+    updateUserSuccess: function(data) {
+      UserStore.updateUserData(data.user);
+      this.setState({
+        updateSubmitting: false
+      });
+      return this.setState({
+        updateSuccess: "User Updated!"
+      });
+    },
+    updateUserError: function(error) {
+      this.setState({
+        updateSubmitting: false
+      });
+      if ((error.responseJSON != null) && (error.responseJSON.errors != null)) {
+        return this.setState({
+          updateError: error.responseJSON.errors[0]
+        });
+      } else {
+        return this.setState({
+          updateError: "There was an error."
+        });
+      }
+    },
+    handleFirstNameChange: function(event) {
+      this.inputs = this.state.inputs;
+      this.inputs.first_name.val = event.target.value;
+      return this.setState({
+        inputs: this.inputs
+      });
+    },
+    handleLastNameChange: function(event) {
+      this.inputs = this.state.inputs;
+      this.inputs.last_name.val = event.target.value;
+      return this.setState({
+        inputs: this.inputs
+      });
+    },
+    handleEmailChange: function(event) {
+      this.inputs = this.state.inputs;
+      this.inputs.email.val = event.target.value;
+      return this.setState({
+        inputs: this.inputs
+      });
+    },
+    handleChange: function(event, index, value) {
+      this.inputs = this.state.inputs;
+      this.inputs.notification_frequency.val = value;
+      return this.setState({
+        inputs: this.inputs
+      });
+    },
+    getUserAvatarPath: function() {
+      return "http://localhost:3000/images/user_avatars/" + this.state.user.avatar_file_name;
     },
     render: function() {
       return div({}, Header({}, ''), div({
         className: "user-wrapper"
       }, div({
         className: "user-content"
-      }, this.props.me === true ? "My page" : "User " + this.props.user_id)), Footer({}, ''));
+      }, this.state.user === null || (this.state.user.token == null) ? div({
+        className: "user__not-logged-in"
+      }, "You must be logged in to view this content.") : div({
+        className: "user"
+      }, "If you want to update some basic info about yourself, here's the place. (Eventually, you'll be able to see stats and other cool stuff here.)", React.createElement(Material.TextField, {
+        id: "user-first-name",
+        hintText: "First Name",
+        floatingLabelText: "First Name",
+        fullWidth: true,
+        value: this.state.inputs.first_name.val,
+        onChange: this.handleFirstNameChange,
+        errorText: this.getErrorText("first_name")
+      }), React.createElement(Material.TextField, {
+        id: "user-last-name",
+        hintText: "Last Name",
+        floatingLabelText: "Last Name",
+        fullWidth: true,
+        value: this.state.inputs.last_name.val,
+        onChange: this.handleLastNameChange,
+        errorText: this.getErrorText("last_name")
+      }), React.createElement(Material.TextField, {
+        id: "user-email",
+        hintText: "Email",
+        floatingLabelText: "Email",
+        fullWidth: true,
+        value: this.state.inputs.email.val,
+        onChange: this.handleEmailChange,
+        errorText: this.getErrorText("email")
+      }), React.createElement(Material.SelectField, {
+        floatingLabelText: "Notification Frequency",
+        value: this.state.inputs.notification_frequency.val,
+        onChange: this.handleChange
+      }, this.state.notification_frequencies.map(function(item, index) {
+        return React.createElement(Material.MenuItem, {
+          value: item.id,
+          primaryText: item.title,
+          key: "user-notification-frequency-" + index
+        });
+      })), br({}), br({}), br({}), div({}, "Your Avatar:", br({}), this.state.user.avatar_file_name != null ? img({
+        src: this.getUserAvatarPath()
+      }) : void 0, input({
+        className: "user__avatar",
+        type: "file",
+        id: "user__avatar",
+        accept: ".png,.jpeg,.jpg,.gif"
+      })), div({}, this.state.updateSubmitting === true ? (this.style = {
+        display: 'inline-block',
+        position: 'relative',
+        boxShadow: 'none'
+      }, React.createElement(Material.RefreshIndicator, {
+        style: this.style,
+        size: 50,
+        left: 0,
+        top: 0,
+        status: "loading"
+      })) : React.createElement(Material.RaisedButton, {
+        label: "Update User",
+        primary: true,
+        onClick: this.submitUserUpdate
+      })), this.state.updateError != null ? div({}, this.state.updateError) : void 0, this.state.updateSuccess != null ? div({}, this.state.updateSuccess) : void 0))), Footer({}, ''));
     }
   }));
 
@@ -6425,6 +6514,207 @@ module.exports = React.createFactory(React.createClass({
       }, "Users")), Footer({}, ''));
     }
   }));
+
+  UserStore = (function() {
+    function UserStore() {
+      this.get = bind(this.get, this);
+      this.set = bind(this.set, this);
+      this.emitChange = bind(this.emitChange, this);
+      this.unsubscribe = bind(this.unsubscribe, this);
+      this.subscribe = bind(this.subscribe, this);
+      this.dequeueMessagesFetch = bind(this.dequeueMessagesFetch, this);
+    }
+
+    UserStore.prototype.data = {};
+
+    UserStore.prototype.votes = [];
+
+    UserStore.prototype.subscribers = 0;
+
+    UserStore.prototype.changeEvent = 'blundit:user';
+
+    UserStore.prototype.fetchMessagesTimeout = null;
+
+    UserStore.prototype.lastMessagesFetch = null;
+
+    UserStore.prototype.messagesTtl = 60000;
+
+    UserStore.prototype.loggedIn = function() {
+      if (this.data && (this.data.token != null)) {
+        return true;
+      }
+      return false;
+    };
+
+    UserStore.prototype.dequeueMessagesFetch = function() {
+      clearTimeout(this.fetchMessagesTimeout);
+      return this.fetchMessagesTimeout = null;
+    };
+
+    UserStore.prototype.subscribe = function(callback) {
+      addEventListener(this.changeEvent, callback, false);
+      this.subscribers++;
+      if (this.data != null) {
+        return this.emitChange();
+      }
+    };
+
+    UserStore.prototype.unsubscribe = function(callback) {
+      removeEventListener(this.changeEvent, callback);
+      this.subscribers--;
+      if (!(this.subscribers > 0)) {
+        return this.dequeueMessagesFetch();
+      }
+    };
+
+    UserStore.prototype.emitChange = function() {
+      var event;
+      event = document.createEvent('Event');
+      event.initEvent(this.changeEvent, true, true);
+      return dispatchEvent(event);
+    };
+
+    UserStore.prototype.updateUserData = function(data) {
+      this.data.first_name = data.first_name;
+      this.data.last_name = data.last_name;
+      this.data.email = data.email;
+      this.data.notification_frequency = data.notification_frequency;
+      this.data.avatar_file_name = data.avatar_file_name;
+      return this.emitChange();
+    };
+
+    UserStore.prototype.set = function(data, request) {
+      this.data = data;
+      if (request != null) {
+        this.data.token = request.getResponseHeader('access-token');
+        this.data.uid = request.getResponseHeader('uid');
+        this.data.client = request.getResponseHeader('client');
+      }
+      return this.emitChange();
+    };
+
+    UserStore.prototype.logout = function() {
+      var params;
+      params = {
+        path: "logout",
+        success: this.logoutSuccess,
+        error: this.logoutError
+      };
+      return API.call(params);
+    };
+
+    UserStore.prototype.logoutSuccess = function() {};
+
+    UserStore.prototype.logoutError = function() {};
+
+    UserStore.prototype.setToken = function(token) {
+      return this.data.token = token;
+    };
+
+    UserStore.getAuthHeader = function() {
+      this.user = this.get();
+      if ((this.user != null) && (this.user.token != null)) {
+        return {
+          "access-token": this.user.token,
+          "client": this.user.client,
+          "uid": this.user.uid
+        };
+      } else {
+        return {};
+      }
+    };
+
+    UserStore.prototype.getAuthHeader = function() {
+      this.user = this.get();
+      if ((this.user != null) && (this.user.token != null)) {
+        return {
+          "access-token": this.user.token,
+          "client": this.user.client,
+          "uid": this.user.uid
+        };
+      } else {
+        return {};
+      }
+    };
+
+    UserStore.prototype.fetchUserData = function(navigateTarget) {
+      return;
+      return $.ajax({
+        type: 'GET',
+        headers: this.getAuthHeader(),
+        url: this.urls.get_user_data,
+        dataType: 'json',
+        success: (function(_this) {
+          return function(data) {
+            _this.setUserAccounts(_this.fixDates(data));
+            _this.doQueueMessages();
+            _this.fetchUserProfile();
+            if (navigateTarget != null) {
+              return window.navigate(navigateTarget);
+            }
+          };
+        })(this)
+      });
+    };
+
+    UserStore.prototype.fetchUserProfile = function(navigateTarget) {
+      return $.ajax({
+        type: 'GET',
+        headers: this.getAuthHeader(),
+        url: this.urls.get_current_user,
+        dataType: 'json',
+        success: (function(_this) {
+          return function(data) {
+            return _this.setUserProfile(data);
+          };
+        })(this)
+      });
+    };
+
+    UserStore.prototype.setUserProfile = function(data) {
+      this.data.profile = data;
+      return this.emitChange();
+    };
+
+    UserStore.prototype.doQueueMessages = function() {
+      if (this.subscribers > 0) {
+        return this.queueMessagesFetch();
+      } else {
+        return this.dequeueMessagesFetch();
+      }
+    };
+
+    UserStore.get = function() {
+      return UserStore.data;
+    };
+
+    UserStore.prototype.get = function() {
+      return this.data;
+    };
+
+    UserStore.prototype.updateHeaderInfo = function(request) {
+      if (request.getResponseHeader('access-token') == null) {
+        return;
+      }
+      this.token = request.getResponseHeader('access-token');
+      this.uid = request.getResponseHeader('uid');
+      this.client = request.getResponseHeader('client');
+      window.global.setCookie('access-token', this.token);
+      window.global.setCookie('uid', this.uid);
+      window.global.setCookie('client', this.client);
+      this.user = this.get();
+      this.user.token = this.token;
+      this.user.uid = this.uid;
+      return this.user.client = this.client;
+    };
+
+    return UserStore;
+
+  })();
+
+  module.exports = new UserStore({
+    messagestl: 1000 * 60
+  });
 
 }).call(this);
 
@@ -84669,6 +84959,7 @@ module.exports = React.createFactory(React.createClass({
     }, "Comments: " + this.props.id, this.state.comments === null ? div({}, "Loading Comments") : this.state.comments.length === 0 ? div({}, "Currently No Comments") : void 0, this.state.comments != null ? this.state.comments.map((function(_this) {
       return function(comment, index) {
         if (comment.user != null) {
+          console.log("!", comment.user);
           return div({
             className: "comments__comment",
             key: "comment-" + index
@@ -84677,7 +84968,7 @@ module.exports = React.createFactory(React.createClass({
           }, div({
             className: "comments__comment-user-avatar",
             style: {
-              backgroundImage: "url(" + comment.user.avatar_file_name + ")"
+              backgroundImage: "url(http://localhost:3000/images/user_avatars/" + comment.user.avatar_file_name + ")"
             }
           }), div({
             className: "comments__comment-user-name"
@@ -86856,6 +87147,10 @@ module.exports = API = (function() {
     search: {
       path: "search",
       method: "POST"
+    },
+    update_user: {
+      path: "user/update",
+      method: "PUT"
     }
   };
 
@@ -86904,13 +87199,56 @@ module.exports = API = (function() {
     return data;
   };
 
+  API.processData = function(params) {
+    if (params.path === "update_user") {
+      return false;
+    } else {
+
+    }
+  };
+
+  API.contentType = function(params) {
+    if (params.path === "update_user") {
+      return false;
+    } else {
+      return "";
+    }
+  };
+
   API.call = function(params) {
+    if (params.path === "update_user") {
+      this.callFile(params);
+      return;
+    }
     return $.ajax({
       method: this.method(params),
       url: this.path(params),
       headers: UserStore.getAuthHeader(),
       data: this.data(params),
       dataType: "json",
+      success: function(data, status, request) {
+        UserStore.updateHeaderInfo(request);
+        if (params.success != null) {
+          return params.success(data, request);
+        }
+      },
+      error: function(error) {
+        if (params.error != null) {
+          return params.error(error);
+        }
+      }
+    });
+  };
+
+  API.callFile = function(params) {
+    return $.ajax({
+      method: this.method(params),
+      url: this.path(params),
+      headers: UserStore.getAuthHeader(),
+      data: this.data(params),
+      dataType: "json",
+      processData: false,
+      contentType: false,
       success: function(data, status, request) {
         UserStore.updateHeaderInfo(request);
         if (params.success != null) {
@@ -87036,6 +87374,15 @@ UserStore = (function() {
     event = document.createEvent('Event');
     event.initEvent(this.changeEvent, true, true);
     return dispatchEvent(event);
+  };
+
+  UserStore.prototype.updateUserData = function(data) {
+    this.data.first_name = data.first_name;
+    this.data.last_name = data.last_name;
+    this.data.email = data.email;
+    this.data.notification_frequency = data.notification_frequency;
+    this.data.avatar_file_name = data.avatar_file_name;
+    return this.emitChange();
   };
 
   UserStore.prototype.set = function(data, request) {
@@ -88901,7 +89248,6 @@ module.exports = React.createFactory(React.createClass({
     this.setState({
       data: data
     });
-    console.log(data);
     return this.setState({
       homepageError: false
     });
@@ -89579,9 +89925,9 @@ module.exports = React.createFactory(React.createClass({
 
 
 },{"components/ClaimCard":574,"components/ExpertCard":580,"components/Footer":585,"components/Header":587,"components/PredictionCard":590,"components/SearchFilters":596,"mixins/LinksMixin":598,"mixins/SessionMixin":600}],623:[function(require,module,exports){
-var Footer, Header, div;
+var Footer, Header, br, div, img, input, ref;
 
-div = React.DOM.div;
+ref = React.DOM, div = ref.div, input = ref.input, br = ref.br, img = ref.img;
 
 Header = require("components/Header");
 
@@ -89589,6 +89935,47 @@ Footer = require("components/Footer");
 
 module.exports = React.createFactory(React.createClass({
   displayName: 'User',
+  getInitialState: function() {
+    return {
+      inputs: {
+        first_name: {
+          val: ''
+        },
+        last_name: {
+          val: ''
+        },
+        email: {
+          val: ''
+        },
+        notification_frequency: {
+          val: ''
+        }
+      },
+      user: null,
+      errors: [],
+      updateSubmitting: false,
+      updateError: null,
+      updateSuccess: null,
+      notification_frequencies: [
+        {
+          id: "none",
+          title: "No Notifications"
+        }, {
+          id: "as_they_happen",
+          title: "As They Happen"
+        }, {
+          id: "daily",
+          title: "Daily Digests"
+        }, {
+          id: "weekly",
+          title: "Weekly Digests"
+        }, {
+          id: "monthly",
+          title: "Monthly Digests"
+        }
+      ]
+    };
+  },
   componentDidMount: function() {
     return UserStore.subscribe(this.handleUserChange);
   },
@@ -89596,16 +89983,207 @@ module.exports = React.createFactory(React.createClass({
     return UserStore.unsubscribe(this.handleUserChange);
   },
   handleUserChange: function() {
-    return this.setState({
-      user: UserStore.get()
+    this.user = UserStore.get();
+    this.setState({
+      user: this.user
     });
+    this.inputs = this.state.inputs;
+    this.inputs.first_name.val = this.user.first_name;
+    this.inputs.last_name.val = this.user.last_name;
+    this.inputs.email.val = this.user.email;
+    this.inputs.notification_frequency.val = this.user.notification_frequency;
+    return this.setState({
+      inputs: this.inputs
+    });
+  },
+  submitUserUpdate: function() {
+    var avatar, params;
+    if (this.validateInputs()) {
+      this.setState({
+        updateSubmitting: true
+      });
+      this.setState({
+        updateSuccess: null
+      });
+      this.setState({
+        updateError: null
+      });
+      this.formData = new FormData();
+      avatar = document.getElementById('user__avatar');
+      if (avatar.files[0] != null) {
+        this.formData.append("avatar", avatar.files[0]);
+      }
+      this.formData.append("first_name", this.state.inputs.first_name.val);
+      this.formData.append("last_name", this.state.inputs.last_name.val);
+      this.formData.append("email", this.state.inputs.email.val);
+      this.formData.append("notification_frequency", this.state.inputs.notification_frequency.val);
+      params = {
+        path: "update_user",
+        data: this.formData,
+        success: this.updateUserSuccess,
+        error: this.updateUserError
+      };
+      return API.call(params);
+    }
+  },
+  validateInputs: function() {
+    this.errors = [];
+    if (this.state.inputs.first_name.val === '') {
+      this.errors.push({
+        id: "first_name",
+        text: "First Name required."
+      });
+    }
+    if (this.state.inputs.last_name.val === '') {
+      this.errors.push({
+        id: "last_name",
+        text: "Last Name required."
+      });
+    }
+    if (this.state.inputs.email.val.length < 6 || this.state.inputs.email.val.indexOf("@", 0) === -1 || this.state.inputs.email.val.indexOf(".", 0) === -1) {
+      this.errors.push({
+        id: "email",
+        text: "Valid email required."
+      });
+    }
+    this.setState({
+      errors: this.errors
+    });
+    if (this.errors.length === 0) {
+      return true;
+    }
+    return false;
+  },
+  getErrorText: function(key) {
+    var error, i, len, ref1;
+    ref1 = this.state.errors;
+    for (i = 0, len = ref1.length; i < len; i++) {
+      error = ref1[i];
+      if (error.id === key) {
+        return error.text;
+      }
+    }
+    return null;
+  },
+  updateUserSuccess: function(data) {
+    UserStore.updateUserData(data.user);
+    this.setState({
+      updateSubmitting: false
+    });
+    return this.setState({
+      updateSuccess: "User Updated!"
+    });
+  },
+  updateUserError: function(error) {
+    this.setState({
+      updateSubmitting: false
+    });
+    if ((error.responseJSON != null) && (error.responseJSON.errors != null)) {
+      return this.setState({
+        updateError: error.responseJSON.errors[0]
+      });
+    } else {
+      return this.setState({
+        updateError: "There was an error."
+      });
+    }
+  },
+  handleFirstNameChange: function(event) {
+    this.inputs = this.state.inputs;
+    this.inputs.first_name.val = event.target.value;
+    return this.setState({
+      inputs: this.inputs
+    });
+  },
+  handleLastNameChange: function(event) {
+    this.inputs = this.state.inputs;
+    this.inputs.last_name.val = event.target.value;
+    return this.setState({
+      inputs: this.inputs
+    });
+  },
+  handleEmailChange: function(event) {
+    this.inputs = this.state.inputs;
+    this.inputs.email.val = event.target.value;
+    return this.setState({
+      inputs: this.inputs
+    });
+  },
+  handleChange: function(event, index, value) {
+    this.inputs = this.state.inputs;
+    this.inputs.notification_frequency.val = value;
+    return this.setState({
+      inputs: this.inputs
+    });
+  },
+  getUserAvatarPath: function() {
+    return "http://localhost:3000/images/user_avatars/" + this.state.user.avatar_file_name;
   },
   render: function() {
     return div({}, Header({}, ''), div({
       className: "user-wrapper"
     }, div({
       className: "user-content"
-    }, this.props.me === true ? "My page" : "User " + this.props.user_id)), Footer({}, ''));
+    }, this.state.user === null || (this.state.user.token == null) ? div({
+      className: "user__not-logged-in"
+    }, "You must be logged in to view this content.") : div({
+      className: "user"
+    }, "If you want to update some basic info about yourself, here's the place. (Eventually, you'll be able to see stats and other cool stuff here.)", React.createElement(Material.TextField, {
+      id: "user-first-name",
+      hintText: "First Name",
+      floatingLabelText: "First Name",
+      fullWidth: true,
+      value: this.state.inputs.first_name.val,
+      onChange: this.handleFirstNameChange,
+      errorText: this.getErrorText("first_name")
+    }), React.createElement(Material.TextField, {
+      id: "user-last-name",
+      hintText: "Last Name",
+      floatingLabelText: "Last Name",
+      fullWidth: true,
+      value: this.state.inputs.last_name.val,
+      onChange: this.handleLastNameChange,
+      errorText: this.getErrorText("last_name")
+    }), React.createElement(Material.TextField, {
+      id: "user-email",
+      hintText: "Email",
+      floatingLabelText: "Email",
+      fullWidth: true,
+      value: this.state.inputs.email.val,
+      onChange: this.handleEmailChange,
+      errorText: this.getErrorText("email")
+    }), React.createElement(Material.SelectField, {
+      floatingLabelText: "Notification Frequency",
+      value: this.state.inputs.notification_frequency.val,
+      onChange: this.handleChange
+    }, this.state.notification_frequencies.map(function(item, index) {
+      return React.createElement(Material.MenuItem, {
+        value: item.id,
+        primaryText: item.title,
+        key: "user-notification-frequency-" + index
+      });
+    })), br({}), br({}), br({}), div({}, "Your Avatar:", br({}), this.state.user.avatar_file_name != null ? img({
+      src: this.getUserAvatarPath()
+    }) : void 0, input({
+      className: "user__avatar",
+      type: "file",
+      id: "user__avatar",
+      accept: ".png,.jpeg,.jpg,.gif"
+    })), div({}, this.state.updateSubmitting === true ? (this.style = {
+      display: 'inline-block',
+      position: 'relative',
+      boxShadow: 'none'
+    }, React.createElement(Material.RefreshIndicator, {
+      style: this.style,
+      size: 50,
+      left: 0,
+      top: 0,
+      status: "loading"
+    })) : React.createElement(Material.RaisedButton, {
+      label: "Update User",
+      primary: true,
+      onClick: this.submitUserUpdate
+    })), this.state.updateError != null ? div({}, this.state.updateError) : void 0, this.state.updateSuccess != null ? div({}, this.state.updateSuccess) : void 0))), Footer({}, ''));
   }
 }));
 

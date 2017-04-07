@@ -22,7 +22,6 @@ class UserStore
     addEventListener(@changeEvent, callback, false)
     @subscribers++
     @emitChange() if @data?
-    # @queueMessagesFetch()
 
 
   unsubscribe: (callback) =>
@@ -35,6 +34,17 @@ class UserStore
     event = document.createEvent('Event')
     event.initEvent(@changeEvent, true, true)
     dispatchEvent(event)
+
+  
+  updateUserData: (data) ->
+    # TODO: optimize this with a proper merge
+    @data.first_name = data.first_name
+    @data.last_name = data.last_name
+    @data.email = data.email
+    @data.notification_frequency = data.notification_frequency
+    @data.avatar_file_name = data.avatar_file_name
+    @emitChange()
+
 
 
   set: (data, request) =>

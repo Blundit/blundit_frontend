@@ -25,7 +25,6 @@ module.exports = React.createFactory React.createClass
 
   homepageSuccess: (data) ->
     @setState data: data
-    console.log data
     @setState homepageError: false
 
   

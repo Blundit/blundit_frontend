@@ -162,6 +162,9 @@ module.exports = class API
     search:
       path: "search"
       method: "POST"
+    update_user:
+      path: "user/update"
+      method: "PUT"
 
 
 
@@ -206,13 +209,47 @@ module.exports = class API
     return data
 
 
+  @processData: (params) ->
+    if params.path == "update_user"
+      return false
+    else
+      return 
+
+
+  @contentType: (params) ->
+    if params.path == "update_user"
+      return false
+    else
+      return ""
+
+
   @call = (params) ->
+    if params.path == "update_user"
+      @callFile(params)
+      return
+
     $.ajax
       method: @method(params)
       url: @path(params)
       headers: UserStore.getAuthHeader()
       data: @data(params)
       dataType: "json"
+      success: (data, status, request) ->
+        UserStore.updateHeaderInfo(request)
+        params.success(data, request) if params.success?
+      error: (error) ->
+        params.error(error) if params.error?
+  
+
+  @callFile = (params) ->
+    $.ajax
+      method: @method(params)
+      url: @path(params)
+      headers: UserStore.getAuthHeader()
+      data: @data(params)
+      dataType: "json"
+      processData: false
+      contentType: false
       success: (data, status, request) ->
         UserStore.updateHeaderInfo(request)
         params.success(data, request) if params.success?

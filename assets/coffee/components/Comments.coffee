@@ -131,6 +131,7 @@ module.exports = React.createFactory React.createClass
       if @state.comments?
         @state.comments.map (comment, index) =>
           if comment.user?
+            console.log "!", comment.user
             div
               className: "comments__comment"
               key: "comment-#{index}"
@@ -138,7 +139,7 @@ module.exports = React.createFactory React.createClass
                 div
                   className: "comments__comment-user-avatar"
                   style:
-                    backgroundImage: "url(#{comment.user.avatar_file_name})"
+                    backgroundImage: "url(http://localhost:3000/images/user_avatars/#{comment.user.avatar_file_name})"
                 div { className: "comments__comment-user-name" },
                   comment.user.first_name + " " + comment.user.last_name
               div { className: "comments__comment-meta" },
