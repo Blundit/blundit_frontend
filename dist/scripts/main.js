@@ -33,16 +33,18 @@ module.exports = React.createFactory(React.createClass({
       className: "footer-wrapper"
     }, div({
       className: "footer-content"
-    }, "Footer", ((ref = this.state.user) != null ? ref.token : void 0) != null ? div({}, div({}, React.createElement(Material.RaisedButton, {
+    }, div({
+      className: "footer__card"
+    }, "this is the footer.", ((ref = this.state.user) != null ? ref.token : void 0) != null ? div({}, div({}, React.createElement(Material.RaisedButton, {
       label: "Signout",
       primary: true,
       onClick: this.logout
-    }))) : void 0));
+    }))) : void 0)));
   }
 }));
 
 
-},{"mixins/SessionMixin":600}],2:[function(require,module,exports){
+},{"mixins/SessionMixin":602}],2:[function(require,module,exports){
 var LinksMixin, LoginModal, div, img, menuItems, ref;
 
 ref = React.DOM, div = ref.div, img = ref.img;
@@ -167,9 +169,9 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"mixins/LinksMixin":598,"modals/LoginModal":601}],3:[function(require,module,exports){
+},{"mixins/LinksMixin":600,"modals/LoginModal":603}],3:[function(require,module,exports){
 (function() {
-  var API, AddToClaim, AddToExpert, AddToPrediction, Blundit, BookmarkIndicator, CategoryClaims, CategoryExperts, CategoryPredictions, CategorySubHead, ClaimCard, ClaimEvidences, ClaimExpertCard, ClaimFields, Comments, ExpertBonaFides, ExpertCard, ExpertClaimCard, ExpertFields, ExpertPredictionCard, ExpertSubstantiations, Footer, ForgotPassword, Global, Header, LinksMixin, Login, LoginModal, MuiThemeProvider, Pagination, PaginationMixin, PredictionCard, PredictionEvidences, PredictionExpertCard, PredictionFields, Register, RegistrationSuccessful, RouterMixin, SearchFilters, SessionMixin, UserStore, Votes, a, br, deepOrange500, div, getMuiTheme, img, input, menuItems, muiTheme, ref, ref1, ref10, ref11, ref12, ref13, ref14, ref15, ref16, ref17, ref2, ref3, ref4, ref5, ref6, ref7, ref8, ref9, span, startBlundit,
+  var API, AddToClaim, AddToExpert, AddToPrediction, Blundit, BookmarkIndicator, CategoryClaims, CategoryExperts, CategoryPredictions, CategorySubHead, ClaimCard, ClaimEvidences, ClaimExpertCard, ClaimFields, Comments, ExpertBonaFides, ExpertCard, ExpertClaimCard, ExpertFields, ExpertPredictionCard, ExpertSubstantiations, ExpertTextCard, Footer, ForgotPassword, Global, Header, LinksMixin, Login, LoginModal, MuiThemeProvider, Pagination, PaginationMixin, PredictionCard, PredictionEvidences, PredictionExpertCard, PredictionFields, PredictionTextCard, Register, RegistrationSuccessful, RouterMixin, SearchFilters, SessionMixin, UserStore, Votes, a, br, deepOrange500, div, getMuiTheme, img, input, menuItems, muiTheme, ref, ref1, ref10, ref11, ref12, ref13, ref14, ref15, ref16, ref17, ref18, ref19, ref2, ref3, ref4, ref5, ref6, ref7, ref8, ref9, span, startBlundit,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   window.React = require('react');
@@ -1048,24 +1050,16 @@ module.exports = React.createFactory(React.createClass({
       }), div({
         className: "claim-card-text"
       }, div({
-        className: "claim-card-date"
-      }, this.claimDate()), div({
         className: "claim-card-status"
       }, this.getStatus()), div({
         className: "claim-card-votes"
       }, this.getVoteInfo()), div({
         className: "claim-card-comments"
       }, this.getCommentInfo()), claim.categories.length > 0 ? div({
-        className: "claim-card-categories"
-      }, claim.categories.map((function(_this) {
-        return function(category, index) {
-          return span({
-            key: "claim-card-category-" + index,
-            className: "claim-card-categories__category",
-            onClick: _this.goToCategory.bind(_this, category.id)
-          }, category.name);
-        };
-      })(this))) : void 0, claim.recent_experts.length > 0 ? div({
+        className: "claim-card-category"
+      }, span({
+        onClick: this.goToCategory.bind(this, claim.categories[0].id)
+      }, claim.categories[0].name)) : void 0, claim.recent_experts.length > 0 ? div({
         className: "claim-card-experts"
       }, claim.recent_experts.map((function(_this) {
         return function(expert, index) {
@@ -1657,6 +1651,12 @@ module.exports = React.createFactory(React.createClass({
       }
       return '';
     },
+    getExpertOccupation: function() {
+      if (this.props.expert.occupation != null) {
+        return this.props.expert.occupation;
+      }
+      return 'Occupation';
+    },
     showAccuracy: function() {
       var accuracy;
       accuracy = this.props.expert.accuracy;
@@ -1667,49 +1667,58 @@ module.exports = React.createFactory(React.createClass({
       expert = this.props.expert;
       return expert.comments_count + " comments";
     },
+    expertCardStyle: function() {
+      return {
+        height: "100%",
+        position: "relative"
+      };
+    },
+    viewButtonStyle: function() {
+      return {
+        width: "100%",
+        textAlign: "center"
+      };
+    },
     render: function() {
       var expert;
       expert = this.props.expert;
       return div({
         className: "expert-card"
-      }, React.createElement(Material.Card, {}, React.createElement(Material.CardMedia, {
+      }, React.createElement(Material.Card, {
+        style: this.expertCardStyle()
+      }, React.createElement(Material.CardMedia, {
         overlay: React.createElement(Material.CardTitle, {
           title: expert.name,
-          subtitle: this.getExpertDescription()
+          subtitle: this.getExpertOccupation()
         })
       }, img({
         src: this.avatar()
-      })), React.createElement(Material.CardText, {}, this.getAccuracy), div({
+      })), expert.categories.length > 0 ? div({
+        className: "expert-card-category"
+      }, span({
+        onClick: this.goToCategory.bind(this, expert.categories[0].id)
+      }, expert.categories[0].name)) : void 0, div({
         className: "expert-card-meta"
       }, div({
         className: "expert-card-meta__left"
-      }, this.showAccuracy()), div({
+      }, "Accuracy: " + (this.showAccuracy())), div({
         className: "expert-card-meta__right"
       }, span({
         className: "expert-card-meta__predictions"
-      }, expert.number_of_predictions), span({
+      }, expert.number_of_predictions + " P"), span({
         className: "expert-card-meta__claims"
-      }, expert.number_of_claims))), div({
+      }, expert.number_of_claims + " C"))), div({
         className: "expert-card-comments"
       }, this.getCommentInfo()), ((expert.most_recent_claim != null) && expert.most_recent_claim.length > 0) || ((expert.most_recent_prediction != null) && expert.most_recent_prediction.length > 0) ? div({
         className: "expert-card-links"
-      }, expert.most_recent_claim.length > 0 ? div({}, "Most recent Claim: ", a({
+      }, expert.most_recent_claim.length > 0 ? a({
         onClick: this.goToMostRecentClaim
-      }, expert.most_recent_claim[0].title)) : void 0, expert.most_recent_prediction.length > 0 ? div({}, "Most recent Prediction: ", a({
+      }, expert.most_recent_claim[0].title) : void 0, expert.most_recent_prediction.length > 0 ? a({
         onClick: this.goToMostRecentPrediction
-      }, expert.most_recent_prediction[0].title)) : void 0) : void 0, expert.categories.length > 0 ? div({
-        className: "expert-card-categories"
-      }, expert.categories.map((function(_this) {
-        return function(category, index) {
-          return span({
-            key: "expert-card-category-" + index,
-            className: "expert-card-categories__category",
-            onClick: _this.goToCategory.bind(_this, category.id)
-          }, category.name);
-        };
-      })(this))) : void 0, React.createElement(Material.CardActions, {}, React.createElement(Material.FlatButton, {
+      }, expert.most_recent_prediction[0].title) : void 0) : void 0, React.createElement(Material.CardActions, {}, React.createElement(Material.FlatButton, {
         label: "View",
-        onClick: this.goToExpert.bind(this, expert.alias)
+        onClick: this.goToExpert.bind(this, expert.alias),
+        style: this.viewButtonStyle()
       }))));
     }
   }));
@@ -2073,6 +2082,60 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
+  ref6 = React.DOM, div = ref6.div, img = ref6.img, br = ref6.br, span = ref6.span, a = ref6.a;
+
+  LinksMixin = require("mixins/LinksMixin");
+
+  module.exports = React.createFactory(React.createClass({
+    displayName: 'ExpertTExtCard',
+    mixins: [LinksMixin],
+    avatar: function() {
+      var expert;
+      expert = this.props.expert;
+      if (expert.avatar != null) {
+        return expert.avatar;
+      }
+      return "/images/avatars/placeholder.png";
+    },
+    showAccuracy: function() {
+      var accuracy;
+      accuracy = this.props.expert.accuracy;
+      return Math.floor(accuracy * 100) + "%";
+    },
+    getCommentsCount: function(count) {
+      if (count < 1000) {
+        return count;
+      } else if (count >= 1000 && count < 1000000) {
+        return Math.floor((count / 1000) * 10) / 10 + "K";
+      } else if (count >= 1000000 && count < 1000000000) {
+        return Math.floor((count / 1000000) * 10) / 10 + "M";
+      } else if (count >= 1000000000 && count < 1000000000000) {
+        return Math.floor((count / 1000000000) * 10) / 10 + "B";
+      } else {
+        return "Inf";
+      }
+    },
+    render: function() {
+      var expert;
+      expert = this.props.expert;
+      return div({
+        className: "expert-text-card"
+      }, div({
+        className: "expert-text-card__avatar",
+        style: {
+          backgroundImage: "url(" + (this.avatar()) + ")"
+        }
+      }), div({
+        className: "expert-text-card__name",
+        onClick: this.goToExpert.bind(this, expert.alias)
+      }, expert.name), div({
+        className: "expert-text-card__comments"
+      }, this.getCommentsCount(expert.comments_count), span({
+        className: "fa fa-comment"
+      }, '')));
+    }
+  }));
+
   div = React.DOM.div;
 
   SessionMixin = require("mixins/SessionMixin");
@@ -2100,20 +2163,22 @@ module.exports = React.createFactory(React.createClass({
       return this.setUser({});
     },
     render: function() {
-      var ref6;
+      var ref7;
       return div({
         className: "footer-wrapper"
       }, div({
         className: "footer-content"
-      }, "Footer", ((ref6 = this.state.user) != null ? ref6.token : void 0) != null ? div({}, div({}, React.createElement(Material.RaisedButton, {
+      }, div({
+        className: "footer__card"
+      }, "this is the footer.", ((ref7 = this.state.user) != null ? ref7.token : void 0) != null ? div({}, div({}, React.createElement(Material.RaisedButton, {
         label: "Signout",
         primary: true,
         onClick: this.logout
-      }))) : void 0));
+      }))) : void 0)));
     }
   }));
 
-  ref6 = React.DOM, div = ref6.div, a = ref6.a;
+  ref7 = React.DOM, div = ref7.div, a = ref7.a;
 
   LinksMixin = require("mixins/LinksMixin");
 
@@ -2181,10 +2246,10 @@ module.exports = React.createFactory(React.createClass({
       return false;
     },
     getErrorText: function(key) {
-      var error, j, len, ref7;
-      ref7 = this.state.errors;
-      for (j = 0, len = ref7.length; j < len; j++) {
-        error = ref7[j];
+      var error, j, len, ref8;
+      ref8 = this.state.errors;
+      for (j = 0, len = ref8.length; j < len; j++) {
+        error = ref8[j];
         if (error.id === key) {
           return error.text;
         }
@@ -2236,7 +2301,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref7 = React.DOM, div = ref7.div, img = ref7.img;
+  ref8 = React.DOM, div = ref8.div, img = ref8.img;
 
   menuItems = [
     {
@@ -2316,7 +2381,7 @@ module.exports = React.createFactory(React.createClass({
       return this["class"];
     },
     render: function() {
-      var ref8;
+      var ref9;
       return div({
         className: "header-wrapper"
       }, div({
@@ -2330,8 +2395,8 @@ module.exports = React.createFactory(React.createClass({
         className: "header__items"
       }, menuItems.map((function(_this) {
         return function(item, index) {
-          var ref8;
-          if (((item.logged != null) && (((ref8 = _this.state.user) != null ? ref8.token : void 0) != null)) || !item.logged) {
+          var ref9;
+          if (((item.logged != null) && (((ref9 = _this.state.user) != null ? ref9.token : void 0) != null)) || !item.logged) {
             return div({
               className: _this.getHeaderItemClass(item),
               key: "header-item-" + index,
@@ -2341,7 +2406,7 @@ module.exports = React.createFactory(React.createClass({
         };
       })(this))), div({
         className: "header__user"
-      }, ((ref8 = this.state.user) != null ? ref8.token : void 0) != null ? div({
+      }, ((ref9 = this.state.user) != null ? ref9.token : void 0) != null ? div({
         className: "header__user__avatar",
         onClick: this.navigateToLocation.bind(this, "/me"),
         style: {
@@ -2357,7 +2422,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref8 = React.DOM, div = ref8.div, a = ref8.a;
+  ref9 = React.DOM, div = ref9.div, a = ref9.a;
 
   SessionMixin = require("mixins/SessionMixin");
 
@@ -2453,10 +2518,10 @@ module.exports = React.createFactory(React.createClass({
       }
     },
     getErrorText: function(key) {
-      var error, j, len, ref9;
-      ref9 = this.state.errors;
-      for (j = 0, len = ref9.length; j < len; j++) {
-        error = ref9[j];
+      var error, j, len, ref10;
+      ref10 = this.state.errors;
+      for (j = 0, len = ref10.length; j < len; j++) {
+        error = ref10[j];
         if (error.id === key) {
           return error.text;
         }
@@ -2600,9 +2665,9 @@ module.exports = React.createFactory(React.createClass({
       return div({
         className: "pagination__pages"
       }, (function() {
-        var j, ref10, ref9, results1;
+        var j, ref10, ref11, results1;
         results1 = [];
-        for (page = j = ref9 = this.leftPage, ref10 = this.rightPage; ref9 <= ref10 ? j <= ref10 : j >= ref10; page = ref9 <= ref10 ? ++j : --j) {
+        for (page = j = ref10 = this.leftPage, ref11 = this.rightPage; ref10 <= ref11 ? j <= ref11 : j >= ref11; page = ref10 <= ref11 ? ++j : --j) {
           if (page === this.props.page) {
             results1.push(React.createElement(Material.FlatButton, {
               key: "page-" + page,
@@ -2633,7 +2698,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref9 = React.DOM, div = ref9.div, img = ref9.img, a = ref9.a, br = ref9.br, span = ref9.span;
+  ref10 = React.DOM, div = ref10.div, img = ref10.img, a = ref10.a, br = ref10.br, span = ref10.span;
 
   LinksMixin = require("mixins/LinksMixin");
 
@@ -2671,40 +2736,52 @@ module.exports = React.createFactory(React.createClass({
       prediction = this.props.prediction;
       return prediction.comments_count + " comments";
     },
+    formatDate: function(date) {
+      var day, monthIndex, monthNames, suffix, year;
+      monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+      day = date.getDate();
+      monthIndex = date.getMonth();
+      year = date.getFullYear();
+      if (day === 1 || day === 11 || day === 21 || day === 31) {
+        suffix = 'st';
+      } else if (day === 2 || day === 12 || day === 22) {
+        suffix = 'nd';
+      } else if (day === 3 || day === 13 || day === 23) {
+        suffix = 'rd';
+      } else {
+        suffix = 'th';
+      }
+      return monthNames[monthIndex] + ' ' + day + suffix + ', ' + year;
+    },
     predictionDate: function() {
       var prediction;
       prediction = this.props.prediction;
-      return prediction.created_at;
+      this.d = new Date(prediction.created_at);
+      return this.formatDate(this.d);
     },
     render: function() {
       var prediction;
       prediction = this.props.prediction;
       return div({
         className: "prediction-card"
-      }, React.createElement(Material.Card, {}, React.createElement(Material.CardHeader, {
-        title: prediction.title,
-        subtitle: this.getDescription()
-      }), div({
+      }, React.createElement(Material.Card, {}, div({
+        className: "prediction-card-title",
+        onClick: this.goToPrediction.bind(this, prediction.alias)
+      }, prediction.title), div({
         className: "prediction-card-text"
       }, div({
         className: "prediction-card-date"
-      }, this.predictionDate()), div({
+      }, "Will happen on ", span({}, this.predictionDate())), div({
         className: "prediction-card-status"
       }, this.getStatus()), div({
         className: "prediction-card-votes"
       }, this.getVoteInfo()), div({
         className: "prediction-card-comments"
       }, this.getCommentInfo()), prediction.categories.length > 0 ? div({
-        className: "prediction-card-categories"
-      }, prediction.categories.map((function(_this) {
-        return function(category, index) {
-          return span({
-            key: "prediction-card-category-" + index,
-            className: "prediction-card-categories__category",
-            onClick: _this.goToCategory.bind(_this, category.id)
-          }, category.name);
-        };
-      })(this))) : void 0, prediction.recent_experts.length > 0 ? div({
+        className: "prediction-card-category"
+      }, span({
+        onClick: this.goToCategory.bind(this, prediction.categories[0].id)
+      }, prediction.categories[0].name)) : void 0, prediction.recent_experts.length > 0 ? div({
         className: "prediction-card-experts"
       }, prediction.recent_experts.map((function(_this) {
         return function(expert, index) {
@@ -2726,14 +2803,11 @@ module.exports = React.createFactory(React.createClass({
         onClick: this.goToPrediction
       }, "VOTE") : prediction.status === 0 && !UserStore.loggedIn() ? div({
         className: "prediction-card-vote"
-      }, "Log in to Vote") : void 0, React.createElement(Material.FlatButton, {
-        label: "View",
-        onClick: this.goToPrediction.bind(this, prediction.alias)
-      }))));
+      }, "Log in to Vote") : void 0)));
     }
   }));
 
-  ref10 = React.DOM, div = ref10.div, a = ref10.a;
+  ref11 = React.DOM, div = ref11.div, a = ref11.a;
 
   module.exports = React.createFactory(React.createClass({
     displayName: "PredictionEvidences",
@@ -2850,8 +2924,8 @@ module.exports = React.createFactory(React.createClass({
       });
     },
     render: function() {
-      var expert, prediction, ref11;
-      ref11 = this.props, expert = ref11.expert, prediction = ref11.prediction;
+      var expert, prediction, ref12;
+      ref12 = this.props, expert = ref12.expert, prediction = ref12.prediction;
       return div({
         className: "prediction__experts-list-item"
       }, div({
@@ -2902,10 +2976,10 @@ module.exports = React.createFactory(React.createClass({
       return this.props.updateField("category", value);
     },
     getErrorText: function(key) {
-      var error, j, len, ref11;
-      ref11 = this.props.errors;
-      for (j = 0, len = ref11.length; j < len; j++) {
-        error = ref11[j];
+      var error, j, len, ref12;
+      ref12 = this.props.errors;
+      for (j = 0, len = ref12.length; j < len; j++) {
+        error = ref12[j];
         if (error.id === key) {
           return error.text;
         }
@@ -2967,7 +3041,66 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref11 = React.DOM, div = ref11.div, a = ref11.a;
+  ref12 = React.DOM, div = ref12.div, img = ref12.img, a = ref12.a, br = ref12.br, span = ref12.span;
+
+  LinksMixin = require("mixins/LinksMixin");
+
+  module.exports = React.createFactory(React.createClass({
+    displayName: 'PredictionTextCard',
+    mixins: [LinksMixin],
+    getDescription: function() {
+      var prediction;
+      prediction = this.props.prediction;
+      if (prediction.description != null) {
+        return prediction.description;
+      }
+      return '';
+    },
+    getStatus: function() {
+      var prediction;
+      prediction = this.props.prediction;
+      if (prediction.status === 0) {
+        return "?";
+      } else if (prediction.status === 1) {
+        if (prediction.vote_value >= 0.5) {
+          return "Right";
+        } else {
+          return "Wrong";
+        }
+      }
+    },
+    getVoteInfo: function() {
+      var prediction;
+      prediction = this.props.prediction;
+      return prediction.votes_count + " votes";
+    },
+    getCommentInfo: function() {
+      var prediction;
+      prediction = this.props.prediction;
+      return prediction.comments_count + " comments";
+    },
+    predictionDate: function() {
+      var prediction;
+      prediction = this.props.prediction;
+      return prediction.created_at;
+    },
+    render: function() {
+      var prediction;
+      prediction = this.props.prediction;
+      return div({
+        className: "prediction-text-card"
+      }, div({
+        className: "prediction-text-card__title",
+        onClick: this.goToPrediction.bind(this, prediction.alias)
+      }, prediction.title), div({
+        className: "prediction-text-card__comments"
+      }, prediction.comments_count, span({
+        className: "fa fa-comment"
+      }, '')));
+    }
+  }));
+
+  ref13 = React.DOM, div = ref13.div, a = ref13.a;
 
   LinksMixin = require("mixins/LinksMixin");
 
@@ -3079,10 +3212,10 @@ module.exports = React.createFactory(React.createClass({
       }
     },
     getErrorText: function(key) {
-      var error, j, len, ref12;
-      ref12 = this.state.errors;
-      for (j = 0, len = ref12.length; j < len; j++) {
-        error = ref12[j];
+      var error, j, len, ref14;
+      ref14 = this.state.errors;
+      for (j = 0, len = ref14.length; j < len; j++) {
+        error = ref14[j];
         if (error.id === key) {
           return error.text;
         }
@@ -3189,10 +3322,10 @@ module.exports = React.createFactory(React.createClass({
       });
     },
     getErrorText: function(key) {
-      var error, j, len, ref12;
-      ref12 = this.state.errors;
-      for (j = 0, len = ref12.length; j < len; j++) {
-        error = ref12[j];
+      var error, j, len, ref14;
+      ref14 = this.state.errors;
+      for (j = 0, len = ref14.length; j < len; j++) {
+        error = ref14[j];
         if (error.id === key) {
           return error.text;
         }
@@ -3211,8 +3344,11 @@ module.exports = React.createFactory(React.createClass({
     },
     render: function() {
       return div({
-        className: "sarch__filter"
-      }, "Search Filter:", React.createElement(Material.TextField, {
+        className: "default__card sarch__filter"
+      }, this.getParameterByName("from_search") != null ? div({
+        className: "predictions__back-to-search",
+        onClick: this.goBackToSearch
+      }, 'Back to Search') : void 0, React.createElement(Material.TextField, {
         id: "search-field",
         hintText: "Enter text to search for",
         floatingLabelText: "Search",
@@ -3242,10 +3378,10 @@ module.exports = React.createFactory(React.createClass({
   module.exports = React.createFactory(React.createClass({
     displayName: 'Votes',
     getVoteValText: function() {
-      var item, ref12;
+      var item, ref14;
       item = this.props.item;
       if (item.user_vote != null) {
-        return (ref12 = item.user_vote.vote === 1) != null ? ref12 : {
+        return (ref14 = item.user_vote.vote === 1) != null ? ref14 : {
           "True": "False"
         };
       } else {
@@ -3259,8 +3395,8 @@ module.exports = React.createFactory(React.createClass({
       return this.props.vote(0);
     },
     notOpenYet: function() {
-      var d1, d2, item, ref12, type;
-      ref12 = this.props, item = ref12.item, type = ref12.type;
+      var d1, d2, item, ref14, type;
+      ref14 = this.props, item = ref14.item, type = ref14.type;
       if (type !== "prediction") {
         return false;
       } else {
@@ -3281,8 +3417,8 @@ module.exports = React.createFactory(React.createClass({
       };
     },
     render: function() {
-      var item, ref12, submitted, submitting, type;
-      ref12 = this.props, type = ref12.type, item = ref12.item, submitting = ref12.submitting, submitted = ref12.submitted;
+      var item, ref14, submitted, submitting, type;
+      ref14 = this.props, type = ref14.type, item = ref14.item, submitting = ref14.submitting, submitted = ref14.submitted;
       return div({
         className: type + "__vote"
       }, div({
@@ -3312,6 +3448,223 @@ module.exports = React.createFactory(React.createClass({
       }, "Thank you for your vote!") : div({
         className: type + "__vote--closed"
       }, this.notOpenYet() ? "This " + type + " isn't open yet. Come back later to vote on it." : "This " + type + " is closed, and can't be voted on."));
+    }
+  }));
+
+  module.exports = {
+    goToClaim: function(id) {
+      return navigate("/claims/" + id);
+    },
+    goToExpert: function(id) {
+      return navigate("/experts/" + id);
+    },
+    goToPrediction: function(id) {
+      return navigate("/predictions/" + id);
+    },
+    goToCategory: function(id) {
+      return navigate("/categories/" + id);
+    },
+    goToMostRecentClaim: function() {
+      return navigate("/claims/" + this.props.expert.most_recent_claim[0].alias);
+    },
+    goToMostRecentPrediction: function() {
+      return navigate("/predictions/" + this.props.expert.most_recent_prediction[0].alias);
+    },
+    goToLogin: function() {
+      return navigate('/login');
+    },
+    goBackToSearch: function() {
+      return navigate("/search?query=" + this.state.query + "&sort=" + this.state.sort);
+    }
+  };
+
+  module.exports = {
+    getInitialState: function() {
+      return {
+        page: 1,
+        numberOfPages: 1
+      };
+    },
+    nextPage: function() {
+      if (this.state.page < this.state.numberOfPages) {
+        this.setState({
+          page: this.state.page + 1
+        });
+      }
+      return this.fetchPaginatedData(this.state.page + 1);
+    },
+    previousPage: function() {
+      if (this.state.page > 1) {
+        this.setState({
+          page: this.state.page - 1
+        });
+      }
+      return this.fetchPaginatedData(this.state.page - 1);
+    },
+    specificPage: function(page) {
+      this.setState({
+        page: page
+      });
+      return this.fetchPaginatedData(page);
+    }
+  };
+
+  module.exports = {
+    setUser: function(data, request) {
+      window.UserStore.set(data, request);
+      this.user = window.UserStore.get();
+      if ((this.user != null) && (this.user.token != null)) {
+        window.global.setCookie('access-token', this.user.token);
+        window.global.setCookie('uid', this.user.uid);
+        return window.global.setCookie('client', this.user.client);
+      } else {
+        window.global.deleteCookie('access-token');
+        window.global.deleteCookie('uid');
+        return window.global.deleteCookie('client');
+      }
+    },
+    getParameterByName: function(name, url) {
+      var regex, results;
+      if (!url) {
+        url = window.location.href;
+      }
+      name = name.replace(/[\[\]]/g, "\\$&");
+      regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
+      results = regex.exec(url);
+      if (!results) {
+        return null;
+      }
+      if (!results[2]) {
+        return '';
+      }
+      return decodeURIComponent(results[2].replace(/\+/g, " "));
+    },
+    getUrlParams: function() {
+      var j, key, len, params, query, raw_vars, ref14, v, val;
+      query = window.location.search.substring(1);
+      raw_vars = query.split("&");
+      params = {};
+      for (j = 0, len = raw_vars.length; j < len; j++) {
+        v = raw_vars[j];
+        ref14 = v.split("="), key = ref14[0], val = ref14[1];
+        params[key] = decodeURIComponent(val);
+      }
+      return params;
+    },
+    getUser: function() {
+      var obj;
+      obj = {};
+      this.token = window.global.getCookie('access-token');
+      this.client = window.global.getCookie('client');
+      this.uid = window.global.getCookie('uid');
+      if (this.token != null) {
+        obj.token = this.token;
+        obj.client = this.client;
+        obj.uid = this.uid;
+      }
+      if (obj === {}) {
+        return false;
+      }
+      return obj;
+    },
+    unsetUser: function() {
+      window.UserStore.set(null);
+      window.global.deleteCookie('access-token');
+      window.global.deleteCookie('client');
+      return window.global.deleteCookie('uid');
+    },
+    authHeader: function() {
+      return this.user = window.UserStore.getAuthHeader();
+    },
+    verifyUserToken: function() {
+      if (window.global.getCookie('access-token')) {
+        return this.verifyToken();
+      } else {
+        return this.setState({
+          verificationComplete: true
+        });
+      }
+    },
+    verifyToken: function() {
+      var params;
+      params = {
+        path: "verify_token",
+        path_variables: {
+          accessToken: window.global.getCookie('access-token'),
+          client: window.global.getCookie('client'),
+          uid: window.global.getCookie('uid')
+        },
+        success: this.verifyTokenSuccess,
+        error: this.verifyTokenError
+      };
+      return API.call(params);
+    },
+    verifyTokenSuccess: function(data) {
+      if (data) {
+        data.data.token = window.global.getCookie('access-token');
+        data.data.client = window.global.getCookie('client');
+        data.data.uid = window.global.getCookie('uid');
+        return this.setUser(data.data);
+      }
+    },
+    verifyTokenError: function(error) {
+      return this.setUser({});
+    },
+    updateUserHeaderInfo: function(request) {}
+  };
+
+  ref14 = React.DOM, div = ref14.div, span = ref14.span;
+
+  Login = require("components/Login");
+
+  Register = require("components/Register");
+
+  ForgotPassword = require("components/ForgotPassword");
+
+  RegistrationSuccessful = require("components/RegistrationSuccessful");
+
+  module.exports = React.createFactory(React.createClass({
+    getInitialState: function() {
+      return {
+        view: "login"
+      };
+    },
+    changeView: function(view) {
+      return this.setState({
+        view: view
+      });
+    },
+    render: function() {
+      return div({
+        className: "modal"
+      }, div({
+        className: "modal__bg"
+      }, ''), div({
+        className: "modal__login"
+      }, div({
+        className: "modal__login-header"
+      }, div({
+        className: "modal__login-title"
+      }, this.state.view), div({
+        className: "modal__login-header-close"
+      }, span({
+        className: "fa fa-close",
+        onClick: this.props.hideLogin
+      }, ''))), div({
+        className: "modal__login-body"
+      }, this.state.view === "login" ? Login({
+        changeView: this.changeView,
+        hideLogin: this.props.hideLogin
+      }) : this.state.view === "register" ? Register({
+        changeView: this.changeView,
+        hideLogin: this.props.hideLogin
+      }) : this.state.view === "forgot" ? ForgotPassword({
+        changeView: this.changeView,
+        hideLogin: this.props.hideLogin
+      }) : this.state.view === "registered" ? RegistrationSuccessful({
+        changeView: this.changeView,
+        hideLogin: this.props.hideLogin
+      }) : void 0)));
     }
   }));
 
@@ -3546,11 +3899,11 @@ module.exports = React.createFactory(React.createClass({
     };
 
     API.path = function(params) {
-      var key, ref12, value;
+      var key, ref15, value;
       this.p = this.server(params) + this.paths[params.path].path;
-      ref12 = params.path_variables;
-      for (key in ref12) {
-        value = ref12[key];
+      ref15 = params.path_variables;
+      for (key in ref15) {
+        value = ref15[key];
         this.p = this.p.replace('%' + key + '%', value);
       }
       if (this.paths[params.path].method === "GET") {
@@ -3688,222 +4041,206 @@ module.exports = React.createFactory(React.createClass({
 
   })();
 
-  module.exports = {
-    goToClaim: function(id) {
-      return navigate("/claims/" + id);
-    },
-    goToExpert: function(id) {
-      return navigate("/experts/" + id);
-    },
-    goToPrediction: function(id) {
-      return navigate("/predictions/" + id);
-    },
-    goToCategory: function(id) {
-      return navigate("/categories/" + id);
-    },
-    goToMostRecentClaim: function() {
-      return navigate("/claims/" + this.props.expert.most_recent_claim[0].alias);
-    },
-    goToMostRecentPrediction: function() {
-      return navigate("/predictions/" + this.props.expert.most_recent_prediction[0].alias);
-    },
-    goToLogin: function() {
-      return navigate('/login');
-    },
-    goBackToSearch: function() {
-      return navigate("/search?query=" + this.state.query + "&sort=" + this.state.sort);
+  UserStore = (function() {
+    function UserStore() {
+      this.get = bind(this.get, this);
+      this.set = bind(this.set, this);
+      this.emitChange = bind(this.emitChange, this);
+      this.unsubscribe = bind(this.unsubscribe, this);
+      this.subscribe = bind(this.subscribe, this);
+      this.dequeueMessagesFetch = bind(this.dequeueMessagesFetch, this);
     }
-  };
 
-  module.exports = {
-    getInitialState: function() {
-      return {
-        page: 1,
-        numberOfPages: 1
-      };
-    },
-    nextPage: function() {
-      if (this.state.page < this.state.numberOfPages) {
-        this.setState({
-          page: this.state.page + 1
-        });
-      }
-      return this.fetchPaginatedData(this.state.page + 1);
-    },
-    previousPage: function() {
-      if (this.state.page > 1) {
-        this.setState({
-          page: this.state.page - 1
-        });
-      }
-      return this.fetchPaginatedData(this.state.page - 1);
-    },
-    specificPage: function(page) {
-      this.setState({
-        page: page
-      });
-      return this.fetchPaginatedData(page);
-    }
-  };
+    UserStore.prototype.data = {};
 
-  module.exports = {
-    setUser: function(data, request) {
-      window.UserStore.set(data, request);
-      this.user = window.UserStore.get();
-      if ((this.user != null) && (this.user.token != null)) {
-        window.global.setCookie('access-token', this.user.token);
-        window.global.setCookie('uid', this.user.uid);
-        return window.global.setCookie('client', this.user.client);
-      } else {
-        window.global.deleteCookie('access-token');
-        window.global.deleteCookie('uid');
-        return window.global.deleteCookie('client');
+    UserStore.prototype.votes = [];
+
+    UserStore.prototype.subscribers = 0;
+
+    UserStore.prototype.changeEvent = 'blundit:user';
+
+    UserStore.prototype.fetchMessagesTimeout = null;
+
+    UserStore.prototype.lastMessagesFetch = null;
+
+    UserStore.prototype.messagesTtl = 60000;
+
+    UserStore.prototype.loggedIn = function() {
+      if (this.data && (this.data.token != null)) {
+        return true;
       }
-    },
-    getParameterByName: function(name, url) {
-      var regex, results;
-      if (!url) {
-        url = window.location.href;
+      return false;
+    };
+
+    UserStore.prototype.dequeueMessagesFetch = function() {
+      clearTimeout(this.fetchMessagesTimeout);
+      return this.fetchMessagesTimeout = null;
+    };
+
+    UserStore.prototype.subscribe = function(callback) {
+      addEventListener(this.changeEvent, callback, false);
+      this.subscribers++;
+      if (this.data != null) {
+        return this.emitChange();
       }
-      name = name.replace(/[\[\]]/g, "\\$&");
-      regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
-      results = regex.exec(url);
-      if (!results) {
-        return null;
+    };
+
+    UserStore.prototype.unsubscribe = function(callback) {
+      removeEventListener(this.changeEvent, callback);
+      this.subscribers--;
+      if (!(this.subscribers > 0)) {
+        return this.dequeueMessagesFetch();
       }
-      if (!results[2]) {
-        return '';
+    };
+
+    UserStore.prototype.emitChange = function() {
+      var event;
+      event = document.createEvent('Event');
+      event.initEvent(this.changeEvent, true, true);
+      return dispatchEvent(event);
+    };
+
+    UserStore.prototype.updateUserData = function(data) {
+      this.data.first_name = data.first_name;
+      this.data.last_name = data.last_name;
+      this.data.email = data.email;
+      this.data.notification_frequency = data.notification_frequency;
+      this.data.avatar_file_name = data.avatar_file_name;
+      return this.emitChange();
+    };
+
+    UserStore.prototype.set = function(data, request) {
+      this.data = data;
+      if (request != null) {
+        this.data.token = request.getResponseHeader('access-token');
+        this.data.uid = request.getResponseHeader('uid');
+        this.data.client = request.getResponseHeader('client');
       }
-      return decodeURIComponent(results[2].replace(/\+/g, " "));
-    },
-    getUrlParams: function() {
-      var j, key, len, params, query, raw_vars, ref12, v, val;
-      query = window.location.search.substring(1);
-      raw_vars = query.split("&");
-      params = {};
-      for (j = 0, len = raw_vars.length; j < len; j++) {
-        v = raw_vars[j];
-        ref12 = v.split("="), key = ref12[0], val = ref12[1];
-        params[key] = decodeURIComponent(val);
-      }
-      return params;
-    },
-    getUser: function() {
-      var obj;
-      obj = {};
-      this.token = window.global.getCookie('access-token');
-      this.client = window.global.getCookie('client');
-      this.uid = window.global.getCookie('uid');
-      if (this.token != null) {
-        obj.token = this.token;
-        obj.client = this.client;
-        obj.uid = this.uid;
-      }
-      if (obj === {}) {
-        return false;
-      }
-      return obj;
-    },
-    unsetUser: function() {
-      window.UserStore.set(null);
-      window.global.deleteCookie('access-token');
-      window.global.deleteCookie('client');
-      return window.global.deleteCookie('uid');
-    },
-    authHeader: function() {
-      return this.user = window.UserStore.getAuthHeader();
-    },
-    verifyUserToken: function() {
-      if (window.global.getCookie('access-token')) {
-        return this.verifyToken();
-      } else {
-        return this.setState({
-          verificationComplete: true
-        });
-      }
-    },
-    verifyToken: function() {
+      return this.emitChange();
+    };
+
+    UserStore.prototype.logout = function() {
       var params;
       params = {
-        path: "verify_token",
-        path_variables: {
-          accessToken: window.global.getCookie('access-token'),
-          client: window.global.getCookie('client'),
-          uid: window.global.getCookie('uid')
-        },
-        success: this.verifyTokenSuccess,
-        error: this.verifyTokenError
+        path: "logout",
+        success: this.logoutSuccess,
+        error: this.logoutError
       };
       return API.call(params);
-    },
-    verifyTokenSuccess: function(data) {
-      if (data) {
-        data.data.token = window.global.getCookie('access-token');
-        data.data.client = window.global.getCookie('client');
-        data.data.uid = window.global.getCookie('uid');
-        return this.setUser(data.data);
+    };
+
+    UserStore.prototype.logoutSuccess = function() {};
+
+    UserStore.prototype.logoutError = function() {};
+
+    UserStore.prototype.setToken = function(token) {
+      return this.data.token = token;
+    };
+
+    UserStore.getAuthHeader = function() {
+      this.user = this.get();
+      if ((this.user != null) && (this.user.token != null)) {
+        return {
+          "access-token": this.user.token,
+          "client": this.user.client,
+          "uid": this.user.uid
+        };
+      } else {
+        return {};
       }
-    },
-    verifyTokenError: function(error) {
-      return this.setUser({});
-    },
-    updateUserHeaderInfo: function(request) {}
-  };
+    };
 
-  ref12 = React.DOM, div = ref12.div, span = ref12.span;
+    UserStore.prototype.getAuthHeader = function() {
+      this.user = this.get();
+      if ((this.user != null) && (this.user.token != null)) {
+        return {
+          "access-token": this.user.token,
+          "client": this.user.client,
+          "uid": this.user.uid
+        };
+      } else {
+        return {};
+      }
+    };
 
-  Login = require("components/Login");
-
-  Register = require("components/Register");
-
-  ForgotPassword = require("components/ForgotPassword");
-
-  RegistrationSuccessful = require("components/RegistrationSuccessful");
-
-  module.exports = React.createFactory(React.createClass({
-    getInitialState: function() {
-      return {
-        view: "login"
-      };
-    },
-    changeView: function(view) {
-      return this.setState({
-        view: view
+    UserStore.prototype.fetchUserData = function(navigateTarget) {
+      return;
+      return $.ajax({
+        type: 'GET',
+        headers: this.getAuthHeader(),
+        url: this.urls.get_user_data,
+        dataType: 'json',
+        success: (function(_this) {
+          return function(data) {
+            _this.setUserAccounts(_this.fixDates(data));
+            _this.doQueueMessages();
+            _this.fetchUserProfile();
+            if (navigateTarget != null) {
+              return window.navigate(navigateTarget);
+            }
+          };
+        })(this)
       });
-    },
-    render: function() {
-      return div({
-        className: "modal"
-      }, div({
-        className: "modal__bg"
-      }, ''), div({
-        className: "modal__login"
-      }, div({
-        className: "modal__login-header"
-      }, div({
-        className: "modal__login-title"
-      }, this.state.view), div({
-        className: "modal__login-header-close"
-      }, span({
-        className: "fa fa-close",
-        onClick: this.props.hideLogin
-      }, ''))), div({
-        className: "modal__login-body"
-      }, this.state.view === "login" ? Login({
-        changeView: this.changeView,
-        hideLogin: this.props.hideLogin
-      }) : this.state.view === "register" ? Register({
-        changeView: this.changeView,
-        hideLogin: this.props.hideLogin
-      }) : this.state.view === "forgot" ? ForgotPassword({
-        changeView: this.changeView,
-        hideLogin: this.props.hideLogin
-      }) : this.state.view === "registered" ? RegistrationSuccessful({
-        changeView: this.changeView,
-        hideLogin: this.props.hideLogin
-      }) : void 0)));
-    }
-  }));
+    };
+
+    UserStore.prototype.fetchUserProfile = function(navigateTarget) {
+      return $.ajax({
+        type: 'GET',
+        headers: this.getAuthHeader(),
+        url: this.urls.get_current_user,
+        dataType: 'json',
+        success: (function(_this) {
+          return function(data) {
+            return _this.setUserProfile(data);
+          };
+        })(this)
+      });
+    };
+
+    UserStore.prototype.setUserProfile = function(data) {
+      this.data.profile = data;
+      return this.emitChange();
+    };
+
+    UserStore.prototype.doQueueMessages = function() {
+      if (this.subscribers > 0) {
+        return this.queueMessagesFetch();
+      } else {
+        return this.dequeueMessagesFetch();
+      }
+    };
+
+    UserStore.get = function() {
+      return UserStore.data;
+    };
+
+    UserStore.prototype.get = function() {
+      return this.data;
+    };
+
+    UserStore.prototype.updateHeaderInfo = function(request) {
+      if (request.getResponseHeader('access-token') == null) {
+        return;
+      }
+      this.token = request.getResponseHeader('access-token');
+      this.uid = request.getResponseHeader('uid');
+      this.client = request.getResponseHeader('client');
+      window.global.setCookie('access-token', this.token);
+      window.global.setCookie('uid', this.uid);
+      window.global.setCookie('client', this.client);
+      this.user = this.get();
+      this.user.token = this.token;
+      this.user.uid = this.uid;
+      return this.user.client = this.client;
+    };
+
+    return UserStore;
+
+  })();
+
+  module.exports = new UserStore({
+    messagestl: 1000 * 60
+  });
 
   div = React.DOM.div;
 
@@ -3922,7 +4259,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref13 = React.DOM, div = ref13.div, span = ref13.span;
+  ref15 = React.DOM, div = ref15.div, span = ref15.span;
 
   Header = require("components/Header");
 
@@ -4408,7 +4745,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref14 = React.DOM, div = ref14.div, img = ref14.img;
+  ref16 = React.DOM, div = ref16.div, img = ref16.img;
 
   Header = require("components/Header");
 
@@ -4572,8 +4909,8 @@ module.exports = React.createFactory(React.createClass({
       }
     },
     render: function() {
-      var claim, experts, ref15;
-      ref15 = this.state, claim = ref15.claim, experts = ref15.experts;
+      var claim, experts, ref17;
+      ref17 = this.state, claim = ref17.claim, experts = ref17.experts;
       return div({}, Header({}, ''), div({
         className: "claims-wrapper"
       }, div({
@@ -4757,22 +5094,29 @@ module.exports = React.createFactory(React.createClass({
         }
       ];
     },
+    newItemStyle: function() {
+      return {
+        width: "100%"
+      };
+    },
     render: function() {
       return div({}, Header({}, ''), div({
         className: "claims-wrapper"
       }, div({
         className: "claims-content"
-      }, this.getParameterByName("from_search") != null ? div({
-        className: "predictions__back-to-search",
-        onClick: this.goBackToSearch
-      }, 'Back to Search') : void 0, SearchFilters({
+      }, SearchFilters({
         sortOptions: this.getSortOptions(),
         search: this.search
-      }), React.createElement(Material.RaisedButton, {
+      }), div({
+        className: "default__card"
+      }, React.createElement(Material.RaisedButton, {
         label: "Create New Claim",
         primary: true,
-        onClick: this.goToNewClaim
-      }), div({
+        onClick: this.goToNewClaim,
+        style: this.newItemStyle()
+      })), div({
+        className: "default__card"
+      }, div({
         className: "claims__list"
       }, this.state.claims != null ? this.state.claims.map(function(claim, index) {
         return ClaimCard({
@@ -4785,7 +5129,7 @@ module.exports = React.createFactory(React.createClass({
         nextPage: this.nextPage,
         previousPage: this.previousPage,
         specificPage: this.specificPage
-      }) : void 0)), Footer({}, ''));
+      }) : void 0))), Footer({}, ''));
     }
   }));
 
@@ -5187,7 +5531,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref15 = React.DOM, div = ref15.div, img = ref15.img;
+  ref17 = React.DOM, div = ref17.div, img = ref17.img;
 
   Header = require("components/Header");
 
@@ -5298,8 +5642,8 @@ module.exports = React.createFactory(React.createClass({
       }, "Success! You've added a new expert to the system. Now you can add more information to them!") : void 0);
     },
     render: function() {
-      var claims, expert, predictions, ref16;
-      ref16 = this.state, expert = ref16.expert, predictions = ref16.predictions, claims = ref16.claims;
+      var claims, expert, predictions, ref18;
+      ref18 = this.state, expert = ref18.expert, predictions = ref18.predictions, claims = ref18.claims;
       return div({}, Header({}, ''), div({
         className: "experts-wrapper"
       }, div({
@@ -5510,22 +5854,29 @@ module.exports = React.createFactory(React.createClass({
         }
       ];
     },
+    newItemStyle: function() {
+      return {
+        width: "100%"
+      };
+    },
     render: function() {
       return div({}, Header({}, ''), div({
         className: "experts-wrapper"
       }, div({
         className: "experts-content"
-      }, this.getParameterByName("from_search") != null ? div({
-        className: "predictions__back-to-search",
-        onClick: this.goBackToSearch
-      }, 'Back to Search') : void 0, SearchFilters({
+      }, SearchFilters({
         sortOptions: this.getSortOptions(),
         search: this.search
-      }), React.createElement(Material.RaisedButton, {
+      }), div({
+        className: "default__card"
+      }, React.createElement(Material.RaisedButton, {
         label: "Create New Expert",
         primary: true,
-        onClick: this.goToNewExpert
-      }), div({
+        onClick: this.goToNewExpert,
+        style: this.newItemStyle()
+      })), div({
+        className: "default__card"
+      }, div({
         className: "experts__list"
       }, this.state.experts != null ? this.state.experts.map(function(expert, index) {
         return ExpertCard({
@@ -5538,7 +5889,7 @@ module.exports = React.createFactory(React.createClass({
         nextPage: this.nextPage,
         previousPage: this.previousPage,
         specificPage: this.specificPage
-      }) : void 0)), Footer({}, ''));
+      }) : void 0))), Footer({}, ''));
     }
   }));
 
@@ -5550,7 +5901,11 @@ module.exports = React.createFactory(React.createClass({
 
   PredictionCard = require("components/PredictionCard");
 
+  PredictionTextCard = require("components/PredictionTextCard");
+
   ExpertCard = require("components/ExpertCard");
+
+  ExpertTextCard = require("components/ExpertTextCard");
 
   ClaimCard = require("components/ClaimCard");
 
@@ -5595,69 +5950,101 @@ module.exports = React.createFactory(React.createClass({
         className: "landing-wrapper"
       }, div({
         className: "landing-content"
-      }, this.state.data != null ? div({}, div({
-        className: "landing__predictions__recent-active"
-      }, "Recent Active Predictions:", this.state.data.most_recent_active_predictions.map(function(prediction, index) {
+      }, this.state.data == null ? div({}, div({
+        className: "default__card"
+      }, div({
+        className: "not-found"
+      }, "Loading..."))) : void 0, this.state.data != null ? div({}, div({
+        className: "default__card landing__predictions__recent-active"
+      }, div({
+        className: "text__title"
+      }, "Recent Active Predictions"), this.state.data.most_recent_active_predictions.length > 0 ? this.state.data.most_recent_active_predictions.map(function(prediction, index) {
         return PredictionCard({
           prediction: prediction,
           key: "most-recent-active-predictions-" + index
         });
-      })), div({
-        className: "landing__predictions__recent-settled"
-      }, "Recent Settled Predictions:", this.state.data.most_recent_settled_predictions.map(function(prediction, index) {
+      }) : div({
+        className: "not-found"
+      }, "No items were found.")), div({
+        className: "default__card landing__predictions__recent-settled"
+      }, div({
+        className: "text__title"
+      }, "Recent Settled Predictions"), this.state.data.most_recent_settled_predictions.length > 0 ? this.state.data.most_recent_settled_predictions.map(function(prediction, index) {
         return PredictionCard({
           prediction: prediction,
           key: "most-recent-settled-predictions-" + index
         });
-      })), div({
-        className: "landing__claims__recent-active"
-      }, "Recent Active Claims:", this.state.data.most_recent_active_claims.map(function(claim, index) {
+      }) : div({
+        className: "not-found"
+      }, "No items were found.")), div({
+        className: "default__card landing__claims__recent-active"
+      }, div({
+        className: "text__title"
+      }, "Recent Active Claims"), this.state.data.most_recent_active_claims.length > 0 ? this.state.data.most_recent_active_claims.map(function(claim, index) {
         return ClaimCard({
           claim: claim,
           key: "most-recent-active-claims-" + index
         });
-      })), div({
-        className: "landing__claims__recent-settled"
-      }, "Recent Settled Claims:", this.state.data.most_recent_settled_claims.map(function(claim, index) {
+      }) : div({
+        className: "not-found"
+      }, "No items were found.")), div({
+        className: "default__card landing__claims__recent-settled"
+      }, div({
+        className: "text__title"
+      }, "Recent Settled Claims"), this.state.data.most_recent_settled_claims.length > 0 ? this.state.data.most_recent_settled_claims.map(function(claim, index) {
         return ClaimCard({
           claim: claim,
           key: "most-recent-settled-claims-" + index
         });
-      })), div({
-        className: "landing__experts__random"
-      }, "Random Expert:", ExpertCard({
-        expert: this.state.data.random_expert
-      })), div({
-        className: "landing__claim__random"
-      }, "Random Claim:", ClaimCard({
-        claim: this.state.data.random_claim,
-        key: "random-claim"
-      })), div({
-        className: "landing__predictions__random"
-      }, "Random Prediction:", PredictionCard({
-        prediction: this.state.data.random_prediction,
-        key: "random-prediction"
-      })), div({
-        className: "landing__experts__most-accurate"
-      }, "Most accurate Experts:", this.state.data.most_accurate_experts.map(function(claim, index) {
+      }) : div({
+        className: "not-found"
+      }, "No items were found.")), div({
+        className: "default__card landing__experts__text"
+      }, div({
+        className: "text__title"
+      }, "Most Accurate Experts:"), this.state.data.most_accurate_experts.map(function(expert, index) {
         return ExpertCard({
-          expert: claim,
+          expert: expert,
           key: "most-accurate-experts-" + index
         });
       })), div({
-        className: "landing__experts__least-accurate"
-      }, "Least accurate Experts:", this.state.data.most_accurate_experts.map(function(claim, index) {
+        className: "default__card landing__experts__text"
+      }, div({
+        className: "text__title"
+      }, "Least Accurate Experts:"), this.state.data.least_accurate_experts.map(function(expert, index) {
         return ExpertCard({
-          expert: claim,
-          key: "most-accurate-experts-" + index
+          expert: expert,
+          key: "least-accurate-experts-" + index
         });
-      }))) : this.state.loadError != null ? div({
+      })), div({
+        className: "default__card landing__experts__text"
+      }, div({
+        className: "landing__experts__text-column"
+      }, div({
+        className: "text__title"
+      }, "Most Popular Experts:"), this.state.data.most_popular_experts.map(function(expert, index) {
+        return ExpertTextCard({
+          expert: expert,
+          key: "most-popular-experts-" + index
+        });
+      })), div({
+        className: "landing__experts__text-column"
+      }, div({
+        className: "text__title"
+      }, "Most Popular Claims:"), this.state.data.most_popular_predictions.map(function(prediction, index) {
+        return PredictionTextCard({
+          prediction: prediction,
+          key: "most-popular-predictions-" + index
+        });
+      })))) : this.state.loadError != null ? div({
+        className: "default__card"
+      }, div({
         className: "landing-error"
-      }, "Error: " + this.state.homepageError) : void 0)), Footer({}, ''));
+      }, "Error: " + this.state.homepageError)) : void 0)), Footer({}, ''));
     }
   }));
 
-  ref16 = React.DOM, div = ref16.div, img = ref16.img;
+  ref18 = React.DOM, div = ref18.div, img = ref18.img;
 
   Header = require("components/Header");
 
@@ -5824,8 +6211,8 @@ module.exports = React.createFactory(React.createClass({
       return date;
     },
     render: function() {
-      var experts, prediction, ref17;
-      ref17 = this.state, prediction = ref17.prediction, experts = ref17.experts;
+      var experts, prediction, ref19;
+      ref19 = this.state, prediction = ref19.prediction, experts = ref19.experts;
       return div({}, Header({}, ''), div({
         className: "predictions-wrapper"
       }, div({
@@ -6017,22 +6404,29 @@ module.exports = React.createFactory(React.createClass({
         }
       ];
     },
+    newItemStyle: function() {
+      return {
+        width: "100%"
+      };
+    },
     render: function() {
       return div({}, Header({}, ''), div({
         className: "predictions-wrapper"
       }, div({
         className: "predictions-content"
-      }, this.getParameterByName("from_search") != null ? div({
-        className: "predictions__back-to-search",
-        onClick: this.goBackToSearch
-      }, 'Back to Search') : void 0, SearchFilters({
+      }, SearchFilters({
         sortOptions: this.getSortOptions(),
         search: this.search
-      }), React.createElement(Material.RaisedButton, {
+      }), div({
+        className: "default__card"
+      }, React.createElement(Material.RaisedButton, {
         label: "Create New Prediction",
         primary: true,
-        onClick: this.goToNewPrediction
-      }), div({
+        onClick: this.goToNewPrediction,
+        style: this.newItemStyle()
+      })), div({
+        className: "default__card"
+      }, div({
         className: "predictions__list"
       }, this.state.predictions != null ? this.state.predictions.map(function(prediction, index) {
         return PredictionCard({
@@ -6045,7 +6439,7 @@ module.exports = React.createFactory(React.createClass({
         nextPage: this.nextPage,
         previousPage: this.previousPage,
         specificPage: this.specificPage
-      }) : void 0)), Footer({}, ''));
+      }) : void 0))), Footer({}, ''));
     }
   }));
 
@@ -6238,7 +6632,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref17 = React.DOM, div = ref17.div, input = ref17.input, br = ref17.br, img = ref17.img;
+  ref19 = React.DOM, div = ref19.div, input = ref19.input, br = ref19.br, img = ref19.img;
 
   Header = require("components/Header");
 
@@ -6366,10 +6760,10 @@ module.exports = React.createFactory(React.createClass({
       return false;
     },
     getErrorText: function(key) {
-      var error, j, len, ref18;
-      ref18 = this.state.errors;
-      for (j = 0, len = ref18.length; j < len; j++) {
-        error = ref18[j];
+      var error, j, len, ref20;
+      ref20 = this.state.errors;
+      for (j = 0, len = ref20.length; j < len; j++) {
+        error = ref20[j];
         if (error.id === key) {
           return error.text;
         }
@@ -6515,210 +6909,9 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  UserStore = (function() {
-    function UserStore() {
-      this.get = bind(this.get, this);
-      this.set = bind(this.set, this);
-      this.emitChange = bind(this.emitChange, this);
-      this.unsubscribe = bind(this.unsubscribe, this);
-      this.subscribe = bind(this.subscribe, this);
-      this.dequeueMessagesFetch = bind(this.dequeueMessagesFetch, this);
-    }
-
-    UserStore.prototype.data = {};
-
-    UserStore.prototype.votes = [];
-
-    UserStore.prototype.subscribers = 0;
-
-    UserStore.prototype.changeEvent = 'blundit:user';
-
-    UserStore.prototype.fetchMessagesTimeout = null;
-
-    UserStore.prototype.lastMessagesFetch = null;
-
-    UserStore.prototype.messagesTtl = 60000;
-
-    UserStore.prototype.loggedIn = function() {
-      if (this.data && (this.data.token != null)) {
-        return true;
-      }
-      return false;
-    };
-
-    UserStore.prototype.dequeueMessagesFetch = function() {
-      clearTimeout(this.fetchMessagesTimeout);
-      return this.fetchMessagesTimeout = null;
-    };
-
-    UserStore.prototype.subscribe = function(callback) {
-      addEventListener(this.changeEvent, callback, false);
-      this.subscribers++;
-      if (this.data != null) {
-        return this.emitChange();
-      }
-    };
-
-    UserStore.prototype.unsubscribe = function(callback) {
-      removeEventListener(this.changeEvent, callback);
-      this.subscribers--;
-      if (!(this.subscribers > 0)) {
-        return this.dequeueMessagesFetch();
-      }
-    };
-
-    UserStore.prototype.emitChange = function() {
-      var event;
-      event = document.createEvent('Event');
-      event.initEvent(this.changeEvent, true, true);
-      return dispatchEvent(event);
-    };
-
-    UserStore.prototype.updateUserData = function(data) {
-      this.data.first_name = data.first_name;
-      this.data.last_name = data.last_name;
-      this.data.email = data.email;
-      this.data.notification_frequency = data.notification_frequency;
-      this.data.avatar_file_name = data.avatar_file_name;
-      return this.emitChange();
-    };
-
-    UserStore.prototype.set = function(data, request) {
-      this.data = data;
-      if (request != null) {
-        this.data.token = request.getResponseHeader('access-token');
-        this.data.uid = request.getResponseHeader('uid');
-        this.data.client = request.getResponseHeader('client');
-      }
-      return this.emitChange();
-    };
-
-    UserStore.prototype.logout = function() {
-      var params;
-      params = {
-        path: "logout",
-        success: this.logoutSuccess,
-        error: this.logoutError
-      };
-      return API.call(params);
-    };
-
-    UserStore.prototype.logoutSuccess = function() {};
-
-    UserStore.prototype.logoutError = function() {};
-
-    UserStore.prototype.setToken = function(token) {
-      return this.data.token = token;
-    };
-
-    UserStore.getAuthHeader = function() {
-      this.user = this.get();
-      if ((this.user != null) && (this.user.token != null)) {
-        return {
-          "access-token": this.user.token,
-          "client": this.user.client,
-          "uid": this.user.uid
-        };
-      } else {
-        return {};
-      }
-    };
-
-    UserStore.prototype.getAuthHeader = function() {
-      this.user = this.get();
-      if ((this.user != null) && (this.user.token != null)) {
-        return {
-          "access-token": this.user.token,
-          "client": this.user.client,
-          "uid": this.user.uid
-        };
-      } else {
-        return {};
-      }
-    };
-
-    UserStore.prototype.fetchUserData = function(navigateTarget) {
-      return;
-      return $.ajax({
-        type: 'GET',
-        headers: this.getAuthHeader(),
-        url: this.urls.get_user_data,
-        dataType: 'json',
-        success: (function(_this) {
-          return function(data) {
-            _this.setUserAccounts(_this.fixDates(data));
-            _this.doQueueMessages();
-            _this.fetchUserProfile();
-            if (navigateTarget != null) {
-              return window.navigate(navigateTarget);
-            }
-          };
-        })(this)
-      });
-    };
-
-    UserStore.prototype.fetchUserProfile = function(navigateTarget) {
-      return $.ajax({
-        type: 'GET',
-        headers: this.getAuthHeader(),
-        url: this.urls.get_current_user,
-        dataType: 'json',
-        success: (function(_this) {
-          return function(data) {
-            return _this.setUserProfile(data);
-          };
-        })(this)
-      });
-    };
-
-    UserStore.prototype.setUserProfile = function(data) {
-      this.data.profile = data;
-      return this.emitChange();
-    };
-
-    UserStore.prototype.doQueueMessages = function() {
-      if (this.subscribers > 0) {
-        return this.queueMessagesFetch();
-      } else {
-        return this.dequeueMessagesFetch();
-      }
-    };
-
-    UserStore.get = function() {
-      return UserStore.data;
-    };
-
-    UserStore.prototype.get = function() {
-      return this.data;
-    };
-
-    UserStore.prototype.updateHeaderInfo = function(request) {
-      if (request.getResponseHeader('access-token') == null) {
-        return;
-      }
-      this.token = request.getResponseHeader('access-token');
-      this.uid = request.getResponseHeader('uid');
-      this.client = request.getResponseHeader('client');
-      window.global.setCookie('access-token', this.token);
-      window.global.setCookie('uid', this.uid);
-      window.global.setCookie('client', this.client);
-      this.user = this.get();
-      this.user.token = this.token;
-      this.user.uid = this.uid;
-      return this.user.client = this.client;
-    };
-
-    return UserStore;
-
-  })();
-
-  module.exports = new UserStore({
-    messagestl: 1000 * 60
-  });
-
 }).call(this);
 
-},{"./components/Footer":1,"./components/Header":2,"components/AddToClaim":566,"components/AddToExpert":567,"components/AddToPrediction":568,"components/BookmarkIndicator":569,"components/CategoryClaims":570,"components/CategoryExperts":571,"components/CategoryPredictions":572,"components/CategorySubHead":573,"components/ClaimCard":574,"components/ClaimEvidences":575,"components/ClaimExpertCard":576,"components/ClaimFields":577,"components/Comments":578,"components/ExpertBonaFides":579,"components/ExpertCard":580,"components/ExpertClaimCard":581,"components/ExpertFields":582,"components/ExpertPredictionCard":583,"components/ExpertSubstantiations":584,"components/Footer":585,"components/ForgotPassword":586,"components/Header":587,"components/Login":588,"components/Pagination":589,"components/PredictionCard":590,"components/PredictionEvidences":591,"components/PredictionExpertCard":592,"components/PredictionFields":593,"components/Register":594,"components/RegistrationSuccessful":595,"components/SearchFilters":596,"components/Votes":597,"lodash":180,"material-ui":318,"material-ui/styles/MuiThemeProvider":337,"material-ui/styles/colors":339,"material-ui/styles/getMuiTheme":340,"mixins/LinksMixin":598,"mixins/PaginationMixin":599,"mixins/SessionMixin":600,"modals/LoginModal":601,"react":551,"react-dom":377,"react-mini-router":509,"react-tap-event-plugin":520,"shared/API":602,"shared/Global":603,"stores/UserStore":604,"views/404":605,"views/Bookmarks":606,"views/Categories":607,"views/CategoryAll":608,"views/CategoryClaims":609,"views/CategoryExperts":610,"views/CategoryPredictions":611,"views/Claim":612,"views/Claims":613,"views/CreateClaim":614,"views/CreateExpert":615,"views/CreatePrediction":616,"views/Expert":617,"views/Experts":618,"views/Landing":619,"views/Prediction":620,"views/Predictions":621,"views/Search":622,"views/User":623,"views/Users":624}],4:[function(require,module,exports){
+},{"./components/Footer":1,"./components/Header":2,"components/AddToClaim":566,"components/AddToExpert":567,"components/AddToPrediction":568,"components/BookmarkIndicator":569,"components/CategoryClaims":570,"components/CategoryExperts":571,"components/CategoryPredictions":572,"components/CategorySubHead":573,"components/ClaimCard":574,"components/ClaimEvidences":575,"components/ClaimExpertCard":576,"components/ClaimFields":577,"components/Comments":578,"components/ExpertBonaFides":579,"components/ExpertCard":580,"components/ExpertClaimCard":581,"components/ExpertFields":582,"components/ExpertPredictionCard":583,"components/ExpertSubstantiations":584,"components/ExpertTextCard":585,"components/Footer":586,"components/ForgotPassword":587,"components/Header":588,"components/Login":589,"components/Pagination":590,"components/PredictionCard":591,"components/PredictionEvidences":592,"components/PredictionExpertCard":593,"components/PredictionFields":594,"components/PredictionTextCard":595,"components/Register":596,"components/RegistrationSuccessful":597,"components/SearchFilters":598,"components/Votes":599,"lodash":180,"material-ui":318,"material-ui/styles/MuiThemeProvider":337,"material-ui/styles/colors":339,"material-ui/styles/getMuiTheme":340,"mixins/LinksMixin":600,"mixins/PaginationMixin":601,"mixins/SessionMixin":602,"modals/LoginModal":603,"react":551,"react-dom":377,"react-mini-router":509,"react-tap-event-plugin":520,"shared/API":604,"shared/Global":605,"stores/UserStore":606,"views/404":607,"views/Bookmarks":608,"views/Categories":609,"views/CategoryAll":610,"views/CategoryClaims":611,"views/CategoryExperts":612,"views/CategoryPredictions":613,"views/Claim":614,"views/Claims":615,"views/CreateClaim":616,"views/CreateExpert":617,"views/CreatePrediction":618,"views/Expert":619,"views/Experts":620,"views/Landing":621,"views/Prediction":622,"views/Predictions":623,"views/Search":624,"views/User":625,"views/Users":626}],4:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/array/from"), __esModule: true };
 },{"core-js/library/fn/array/from":26}],5:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/get-iterator"), __esModule: true };
@@ -84322,7 +84515,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"mixins/LinksMixin":598}],571:[function(require,module,exports){
+},{"mixins/LinksMixin":600}],571:[function(require,module,exports){
 var LinksMixin, div;
 
 div = React.DOM.div;
@@ -84354,7 +84547,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"mixins/LinksMixin":598}],572:[function(require,module,exports){
+},{"mixins/LinksMixin":600}],572:[function(require,module,exports){
 var LinksMixin, div;
 
 div = React.DOM.div;
@@ -84386,7 +84579,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"mixins/LinksMixin":598}],573:[function(require,module,exports){
+},{"mixins/LinksMixin":600}],573:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -84511,24 +84704,16 @@ module.exports = React.createFactory(React.createClass({
     }), div({
       className: "claim-card-text"
     }, div({
-      className: "claim-card-date"
-    }, this.claimDate()), div({
       className: "claim-card-status"
     }, this.getStatus()), div({
       className: "claim-card-votes"
     }, this.getVoteInfo()), div({
       className: "claim-card-comments"
     }, this.getCommentInfo()), claim.categories.length > 0 ? div({
-      className: "claim-card-categories"
-    }, claim.categories.map((function(_this) {
-      return function(category, index) {
-        return span({
-          key: "claim-card-category-" + index,
-          className: "claim-card-categories__category",
-          onClick: _this.goToCategory.bind(_this, category.id)
-        }, category.name);
-      };
-    })(this))) : void 0, claim.recent_experts.length > 0 ? div({
+      className: "claim-card-category"
+    }, span({
+      onClick: this.goToCategory.bind(this, claim.categories[0].id)
+    }, claim.categories[0].name)) : void 0, claim.recent_experts.length > 0 ? div({
       className: "claim-card-experts"
     }, claim.recent_experts.map((function(_this) {
       return function(expert, index) {
@@ -84558,7 +84743,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"mixins/LinksMixin":598}],575:[function(require,module,exports){
+},{"mixins/LinksMixin":600}],575:[function(require,module,exports){
 var a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
@@ -84701,7 +84886,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ExpertSubstantiations":584,"mixins/LinksMixin":598}],577:[function(require,module,exports){
+},{"components/ExpertSubstantiations":584,"mixins/LinksMixin":600}],577:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -85019,7 +85204,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Pagination":589,"mixins/PaginationMixin":599}],579:[function(require,module,exports){
+},{"components/Pagination":590,"mixins/PaginationMixin":601}],579:[function(require,module,exports){
 var a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
@@ -85144,6 +85329,12 @@ module.exports = React.createFactory(React.createClass({
     }
     return '';
   },
+  getExpertOccupation: function() {
+    if (this.props.expert.occupation != null) {
+      return this.props.expert.occupation;
+    }
+    return 'Occupation';
+  },
   showAccuracy: function() {
     var accuracy;
     accuracy = this.props.expert.accuracy;
@@ -85154,55 +85345,64 @@ module.exports = React.createFactory(React.createClass({
     expert = this.props.expert;
     return expert.comments_count + " comments";
   },
+  expertCardStyle: function() {
+    return {
+      height: "100%",
+      position: "relative"
+    };
+  },
+  viewButtonStyle: function() {
+    return {
+      width: "100%",
+      textAlign: "center"
+    };
+  },
   render: function() {
     var expert;
     expert = this.props.expert;
     return div({
       className: "expert-card"
-    }, React.createElement(Material.Card, {}, React.createElement(Material.CardMedia, {
+    }, React.createElement(Material.Card, {
+      style: this.expertCardStyle()
+    }, React.createElement(Material.CardMedia, {
       overlay: React.createElement(Material.CardTitle, {
         title: expert.name,
-        subtitle: this.getExpertDescription()
+        subtitle: this.getExpertOccupation()
       })
     }, img({
       src: this.avatar()
-    })), React.createElement(Material.CardText, {}, this.getAccuracy), div({
+    })), expert.categories.length > 0 ? div({
+      className: "expert-card-category"
+    }, span({
+      onClick: this.goToCategory.bind(this, expert.categories[0].id)
+    }, expert.categories[0].name)) : void 0, div({
       className: "expert-card-meta"
     }, div({
       className: "expert-card-meta__left"
-    }, this.showAccuracy()), div({
+    }, "Accuracy: " + (this.showAccuracy())), div({
       className: "expert-card-meta__right"
     }, span({
       className: "expert-card-meta__predictions"
-    }, expert.number_of_predictions), span({
+    }, expert.number_of_predictions + " P"), span({
       className: "expert-card-meta__claims"
-    }, expert.number_of_claims))), div({
+    }, expert.number_of_claims + " C"))), div({
       className: "expert-card-comments"
     }, this.getCommentInfo()), ((expert.most_recent_claim != null) && expert.most_recent_claim.length > 0) || ((expert.most_recent_prediction != null) && expert.most_recent_prediction.length > 0) ? div({
       className: "expert-card-links"
-    }, expert.most_recent_claim.length > 0 ? div({}, "Most recent Claim: ", a({
+    }, expert.most_recent_claim.length > 0 ? a({
       onClick: this.goToMostRecentClaim
-    }, expert.most_recent_claim[0].title)) : void 0, expert.most_recent_prediction.length > 0 ? div({}, "Most recent Prediction: ", a({
+    }, expert.most_recent_claim[0].title) : void 0, expert.most_recent_prediction.length > 0 ? a({
       onClick: this.goToMostRecentPrediction
-    }, expert.most_recent_prediction[0].title)) : void 0) : void 0, expert.categories.length > 0 ? div({
-      className: "expert-card-categories"
-    }, expert.categories.map((function(_this) {
-      return function(category, index) {
-        return span({
-          key: "expert-card-category-" + index,
-          className: "expert-card-categories__category",
-          onClick: _this.goToCategory.bind(_this, category.id)
-        }, category.name);
-      };
-    })(this))) : void 0, React.createElement(Material.CardActions, {}, React.createElement(Material.FlatButton, {
+    }, expert.most_recent_prediction[0].title) : void 0) : void 0, React.createElement(Material.CardActions, {}, React.createElement(Material.FlatButton, {
       label: "View",
-      onClick: this.goToExpert.bind(this, expert.alias)
+      onClick: this.goToExpert.bind(this, expert.alias),
+      style: this.viewButtonStyle()
     }))));
   }
 }));
 
 
-},{"mixins/LinksMixin":598}],581:[function(require,module,exports){
+},{"mixins/LinksMixin":600}],581:[function(require,module,exports){
 var ExpertSubstantiations, LinksMixin, div;
 
 div = React.DOM.div;
@@ -85256,7 +85456,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ExpertSubstantiations":584,"mixins/LinksMixin":598}],582:[function(require,module,exports){
+},{"components/ExpertSubstantiations":584,"mixins/LinksMixin":600}],582:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -85440,7 +85640,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ExpertSubstantiations":584,"mixins/LinksMixin":598}],584:[function(require,module,exports){
+},{"components/ExpertSubstantiations":584,"mixins/LinksMixin":600}],584:[function(require,module,exports){
 var a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
@@ -85578,8 +85778,66 @@ module.exports = React.createFactory(React.createClass({
 
 
 },{}],585:[function(require,module,exports){
+var LinksMixin, a, br, div, img, ref, span;
+
+ref = React.DOM, div = ref.div, img = ref.img, br = ref.br, span = ref.span, a = ref.a;
+
+LinksMixin = require("mixins/LinksMixin");
+
+module.exports = React.createFactory(React.createClass({
+  displayName: 'ExpertTExtCard',
+  mixins: [LinksMixin],
+  avatar: function() {
+    var expert;
+    expert = this.props.expert;
+    if (expert.avatar != null) {
+      return expert.avatar;
+    }
+    return "/images/avatars/placeholder.png";
+  },
+  showAccuracy: function() {
+    var accuracy;
+    accuracy = this.props.expert.accuracy;
+    return Math.floor(accuracy * 100) + "%";
+  },
+  getCommentsCount: function(count) {
+    if (count < 1000) {
+      return count;
+    } else if (count >= 1000 && count < 1000000) {
+      return Math.floor((count / 1000) * 10) / 10 + "K";
+    } else if (count >= 1000000 && count < 1000000000) {
+      return Math.floor((count / 1000000) * 10) / 10 + "M";
+    } else if (count >= 1000000000 && count < 1000000000000) {
+      return Math.floor((count / 1000000000) * 10) / 10 + "B";
+    } else {
+      return "Inf";
+    }
+  },
+  render: function() {
+    var expert;
+    expert = this.props.expert;
+    return div({
+      className: "expert-text-card"
+    }, div({
+      className: "expert-text-card__avatar",
+      style: {
+        backgroundImage: "url(" + (this.avatar()) + ")"
+      }
+    }), div({
+      className: "expert-text-card__name",
+      onClick: this.goToExpert.bind(this, expert.alias)
+    }, expert.name), div({
+      className: "expert-text-card__comments"
+    }, this.getCommentsCount(expert.comments_count), span({
+      className: "fa fa-comment"
+    }, '')));
+  }
+}));
+
+
+},{"mixins/LinksMixin":600}],586:[function(require,module,exports){
 module.exports=require(1)
-},{"mixins/SessionMixin":600}],586:[function(require,module,exports){
+},{"mixins/SessionMixin":602}],587:[function(require,module,exports){
 var LinksMixin, a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
@@ -85706,9 +85964,9 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"mixins/LinksMixin":598}],587:[function(require,module,exports){
+},{"mixins/LinksMixin":600}],588:[function(require,module,exports){
 module.exports=require(2)
-},{"mixins/LinksMixin":598,"modals/LoginModal":601}],588:[function(require,module,exports){
+},{"mixins/LinksMixin":600,"modals/LoginModal":603}],589:[function(require,module,exports){
 var SessionMixin, a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
@@ -85854,7 +86112,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"mixins/SessionMixin":600}],589:[function(require,module,exports){
+},{"mixins/SessionMixin":602}],590:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -85992,7 +86250,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],590:[function(require,module,exports){
+},{}],591:[function(require,module,exports){
 var LinksMixin, a, br, div, img, ref, span;
 
 ref = React.DOM, div = ref.div, img = ref.img, a = ref.a, br = ref.br, span = ref.span;
@@ -86033,40 +86291,52 @@ module.exports = React.createFactory(React.createClass({
     prediction = this.props.prediction;
     return prediction.comments_count + " comments";
   },
+  formatDate: function(date) {
+    var day, monthIndex, monthNames, suffix, year;
+    monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    day = date.getDate();
+    monthIndex = date.getMonth();
+    year = date.getFullYear();
+    if (day === 1 || day === 11 || day === 21 || day === 31) {
+      suffix = 'st';
+    } else if (day === 2 || day === 12 || day === 22) {
+      suffix = 'nd';
+    } else if (day === 3 || day === 13 || day === 23) {
+      suffix = 'rd';
+    } else {
+      suffix = 'th';
+    }
+    return monthNames[monthIndex] + ' ' + day + suffix + ', ' + year;
+  },
   predictionDate: function() {
     var prediction;
     prediction = this.props.prediction;
-    return prediction.created_at;
+    this.d = new Date(prediction.created_at);
+    return this.formatDate(this.d);
   },
   render: function() {
     var prediction;
     prediction = this.props.prediction;
     return div({
       className: "prediction-card"
-    }, React.createElement(Material.Card, {}, React.createElement(Material.CardHeader, {
-      title: prediction.title,
-      subtitle: this.getDescription()
-    }), div({
+    }, React.createElement(Material.Card, {}, div({
+      className: "prediction-card-title",
+      onClick: this.goToPrediction.bind(this, prediction.alias)
+    }, prediction.title), div({
       className: "prediction-card-text"
     }, div({
       className: "prediction-card-date"
-    }, this.predictionDate()), div({
+    }, "Will happen on ", span({}, this.predictionDate())), div({
       className: "prediction-card-status"
     }, this.getStatus()), div({
       className: "prediction-card-votes"
     }, this.getVoteInfo()), div({
       className: "prediction-card-comments"
     }, this.getCommentInfo()), prediction.categories.length > 0 ? div({
-      className: "prediction-card-categories"
-    }, prediction.categories.map((function(_this) {
-      return function(category, index) {
-        return span({
-          key: "prediction-card-category-" + index,
-          className: "prediction-card-categories__category",
-          onClick: _this.goToCategory.bind(_this, category.id)
-        }, category.name);
-      };
-    })(this))) : void 0, prediction.recent_experts.length > 0 ? div({
+      className: "prediction-card-category"
+    }, span({
+      onClick: this.goToCategory.bind(this, prediction.categories[0].id)
+    }, prediction.categories[0].name)) : void 0, prediction.recent_experts.length > 0 ? div({
       className: "prediction-card-experts"
     }, prediction.recent_experts.map((function(_this) {
       return function(expert, index) {
@@ -86088,15 +86358,12 @@ module.exports = React.createFactory(React.createClass({
       onClick: this.goToPrediction
     }, "VOTE") : prediction.status === 0 && !UserStore.loggedIn() ? div({
       className: "prediction-card-vote"
-    }, "Log in to Vote") : void 0, React.createElement(Material.FlatButton, {
-      label: "View",
-      onClick: this.goToPrediction.bind(this, prediction.alias)
-    }))));
+    }, "Log in to Vote") : void 0)));
   }
 }));
 
 
-},{"mixins/LinksMixin":598}],591:[function(require,module,exports){
+},{"mixins/LinksMixin":600}],592:[function(require,module,exports){
 var a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
@@ -86185,7 +86452,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],592:[function(require,module,exports){
+},{}],593:[function(require,module,exports){
 var ExpertSubstantiations, LinksMixin, div;
 
 div = React.DOM.div;
@@ -86239,7 +86506,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ExpertSubstantiations":584,"mixins/LinksMixin":598}],593:[function(require,module,exports){
+},{"components/ExpertSubstantiations":584,"mixins/LinksMixin":600}],594:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -86342,7 +86609,70 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],594:[function(require,module,exports){
+},{}],595:[function(require,module,exports){
+var LinksMixin, a, br, div, img, ref, span;
+
+ref = React.DOM, div = ref.div, img = ref.img, a = ref.a, br = ref.br, span = ref.span;
+
+LinksMixin = require("mixins/LinksMixin");
+
+module.exports = React.createFactory(React.createClass({
+  displayName: 'PredictionTextCard',
+  mixins: [LinksMixin],
+  getDescription: function() {
+    var prediction;
+    prediction = this.props.prediction;
+    if (prediction.description != null) {
+      return prediction.description;
+    }
+    return '';
+  },
+  getStatus: function() {
+    var prediction;
+    prediction = this.props.prediction;
+    if (prediction.status === 0) {
+      return "?";
+    } else if (prediction.status === 1) {
+      if (prediction.vote_value >= 0.5) {
+        return "Right";
+      } else {
+        return "Wrong";
+      }
+    }
+  },
+  getVoteInfo: function() {
+    var prediction;
+    prediction = this.props.prediction;
+    return prediction.votes_count + " votes";
+  },
+  getCommentInfo: function() {
+    var prediction;
+    prediction = this.props.prediction;
+    return prediction.comments_count + " comments";
+  },
+  predictionDate: function() {
+    var prediction;
+    prediction = this.props.prediction;
+    return prediction.created_at;
+  },
+  render: function() {
+    var prediction;
+    prediction = this.props.prediction;
+    return div({
+      className: "prediction-text-card"
+    }, div({
+      className: "prediction-text-card__title",
+      onClick: this.goToPrediction.bind(this, prediction.alias)
+    }, prediction.title), div({
+      className: "prediction-text-card__comments"
+    }, prediction.comments_count, span({
+      className: "fa fa-comment"
+    }, '')));
+  }
+}));
+
+
+},{"mixins/LinksMixin":600}],596:[function(require,module,exports){
 var LinksMixin, a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
@@ -86512,7 +86842,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"mixins/LinksMixin":598}],595:[function(require,module,exports){
+},{"mixins/LinksMixin":600}],597:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -86524,7 +86854,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],596:[function(require,module,exports){
+},{}],598:[function(require,module,exports){
 var SessionMixin, div;
 
 div = React.DOM.div;
@@ -86597,8 +86927,11 @@ module.exports = React.createFactory(React.createClass({
   },
   render: function() {
     return div({
-      className: "sarch__filter"
-    }, "Search Filter:", React.createElement(Material.TextField, {
+      className: "default__card sarch__filter"
+    }, this.getParameterByName("from_search") != null ? div({
+      className: "predictions__back-to-search",
+      onClick: this.goBackToSearch
+    }, 'Back to Search') : void 0, React.createElement(Material.TextField, {
       id: "search-field",
       hintText: "Enter text to search for",
       floatingLabelText: "Search",
@@ -86624,7 +86957,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"mixins/SessionMixin":600}],597:[function(require,module,exports){
+},{"mixins/SessionMixin":602}],599:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -86706,7 +87039,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],598:[function(require,module,exports){
+},{}],600:[function(require,module,exports){
 module.exports = {
   goToClaim: function(id) {
     return navigate("/claims/" + id);
@@ -86735,7 +87068,7 @@ module.exports = {
 };
 
 
-},{}],599:[function(require,module,exports){
+},{}],601:[function(require,module,exports){
 module.exports = {
   getInitialState: function() {
     return {
@@ -86768,7 +87101,7 @@ module.exports = {
 };
 
 
-},{}],600:[function(require,module,exports){
+},{}],602:[function(require,module,exports){
 module.exports = {
   setUser: function(data, request) {
     window.UserStore.set(data, request);
@@ -86874,7 +87207,7 @@ module.exports = {
 };
 
 
-},{}],601:[function(require,module,exports){
+},{}],603:[function(require,module,exports){
 var ForgotPassword, Login, Register, RegistrationSuccessful, div, ref, span;
 
 ref = React.DOM, div = ref.div, span = ref.span;
@@ -86933,7 +87266,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ForgotPassword":586,"components/Login":588,"components/Register":594,"components/RegistrationSuccessful":595}],602:[function(require,module,exports){
+},{"components/ForgotPassword":587,"components/Login":589,"components/Register":596,"components/RegistrationSuccessful":597}],604:[function(require,module,exports){
 
 /*
 API Class.
@@ -87268,7 +87601,7 @@ module.exports = API = (function() {
 })();
 
 
-},{}],603:[function(require,module,exports){
+},{}],605:[function(require,module,exports){
 var Global;
 
 module.exports = Global = (function() {
@@ -87313,7 +87646,7 @@ module.exports = Global = (function() {
 })();
 
 
-},{}],604:[function(require,module,exports){
+},{}],606:[function(require,module,exports){
 var UserStore,
   bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
@@ -87519,7 +87852,7 @@ module.exports = new UserStore({
 });
 
 
-},{}],605:[function(require,module,exports){
+},{}],607:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -87540,7 +87873,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":585,"components/Header":587}],606:[function(require,module,exports){
+},{"components/Footer":586,"components/Header":588}],608:[function(require,module,exports){
 var Footer, Header, div, ref, span;
 
 ref = React.DOM, div = ref.div, span = ref.span;
@@ -87672,7 +88005,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":585,"components/Header":587}],607:[function(require,module,exports){
+},{"components/Footer":586,"components/Header":588}],609:[function(require,module,exports){
 var Footer, Header, LinksMixin, div;
 
 div = React.DOM.div;
@@ -87726,7 +88059,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":585,"components/Header":587,"mixins/LinksMixin":598}],608:[function(require,module,exports){
+},{"components/Footer":586,"components/Header":588,"mixins/LinksMixin":600}],610:[function(require,module,exports){
 var CategoryClaims, CategoryExperts, CategoryPredictions, CategorySubHead, Footer, Header, div;
 
 div = React.DOM.div;
@@ -87813,7 +88146,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/CategoryClaims":570,"components/CategoryExperts":571,"components/CategoryPredictions":572,"components/CategorySubHead":573,"components/Footer":585,"components/Header":587}],609:[function(require,module,exports){
+},{"components/CategoryClaims":570,"components/CategoryExperts":571,"components/CategoryPredictions":572,"components/CategorySubHead":573,"components/Footer":586,"components/Header":588}],611:[function(require,module,exports){
 var CategoryClaims, CategorySubHead, Footer, Header, div;
 
 div = React.DOM.div;
@@ -87892,7 +88225,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/CategoryClaims":570,"components/CategorySubHead":573,"components/Footer":585,"components/Header":587}],610:[function(require,module,exports){
+},{"components/CategoryClaims":570,"components/CategorySubHead":573,"components/Footer":586,"components/Header":588}],612:[function(require,module,exports){
 var CategoryExperts, CategorySubHead, Footer, Header, div;
 
 div = React.DOM.div;
@@ -87971,7 +88304,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/CategoryExperts":571,"components/CategorySubHead":573,"components/Footer":585,"components/Header":587}],611:[function(require,module,exports){
+},{"components/CategoryExperts":571,"components/CategorySubHead":573,"components/Footer":586,"components/Header":588}],613:[function(require,module,exports){
 var CategoryPredictions, CategorySubHead, Footer, Header, div;
 
 div = React.DOM.div;
@@ -88050,7 +88383,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/CategoryPredictions":572,"components/CategorySubHead":573,"components/Footer":585,"components/Header":587}],612:[function(require,module,exports){
+},{"components/CategoryPredictions":572,"components/CategorySubHead":573,"components/Footer":586,"components/Header":588}],614:[function(require,module,exports){
 var AddToClaim, BookmarkIndicator, ClaimEvidences, ClaimExpertCard, Comments, Footer, Header, LinksMixin, SessionMixin, Votes, div, img, ref;
 
 ref = React.DOM, div = ref.div, img = ref.img;
@@ -88292,7 +88625,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/AddToClaim":566,"components/BookmarkIndicator":569,"components/ClaimEvidences":575,"components/ClaimExpertCard":576,"components/Comments":578,"components/Footer":585,"components/Header":587,"components/Votes":597,"mixins/LinksMixin":598,"mixins/SessionMixin":600}],613:[function(require,module,exports){
+},{"components/AddToClaim":566,"components/BookmarkIndicator":569,"components/ClaimEvidences":575,"components/ClaimExpertCard":576,"components/Comments":578,"components/Footer":586,"components/Header":588,"components/Votes":599,"mixins/LinksMixin":600,"mixins/SessionMixin":602}],615:[function(require,module,exports){
 var ClaimCard, Footer, Header, LinksMixin, Pagination, PaginationMixin, SearchFilters, SessionMixin, div;
 
 div = React.DOM.div;
@@ -88406,22 +88739,29 @@ module.exports = React.createFactory(React.createClass({
       }
     ];
   },
+  newItemStyle: function() {
+    return {
+      width: "100%"
+    };
+  },
   render: function() {
     return div({}, Header({}, ''), div({
       className: "claims-wrapper"
     }, div({
       className: "claims-content"
-    }, this.getParameterByName("from_search") != null ? div({
-      className: "predictions__back-to-search",
-      onClick: this.goBackToSearch
-    }, 'Back to Search') : void 0, SearchFilters({
+    }, SearchFilters({
       sortOptions: this.getSortOptions(),
       search: this.search
-    }), React.createElement(Material.RaisedButton, {
+    }), div({
+      className: "default__card"
+    }, React.createElement(Material.RaisedButton, {
       label: "Create New Claim",
       primary: true,
-      onClick: this.goToNewClaim
-    }), div({
+      onClick: this.goToNewClaim,
+      style: this.newItemStyle()
+    })), div({
+      className: "default__card"
+    }, div({
       className: "claims__list"
     }, this.state.claims != null ? this.state.claims.map(function(claim, index) {
       return ClaimCard({
@@ -88434,12 +88774,12 @@ module.exports = React.createFactory(React.createClass({
       nextPage: this.nextPage,
       previousPage: this.previousPage,
       specificPage: this.specificPage
-    }) : void 0)), Footer({}, ''));
+    }) : void 0))), Footer({}, ''));
   }
 }));
 
 
-},{"components/ClaimCard":574,"components/Footer":585,"components/Header":587,"components/Pagination":589,"components/SearchFilters":596,"mixins/LinksMixin":598,"mixins/PaginationMixin":599,"mixins/SessionMixin":600}],614:[function(require,module,exports){
+},{"components/ClaimCard":574,"components/Footer":586,"components/Header":588,"components/Pagination":590,"components/SearchFilters":598,"mixins/LinksMixin":600,"mixins/PaginationMixin":601,"mixins/SessionMixin":602}],616:[function(require,module,exports){
 var ClaimFields, Footer, Header, div;
 
 div = React.DOM.div;
@@ -88570,7 +88910,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ClaimFields":577,"components/Footer":585,"components/Header":587}],615:[function(require,module,exports){
+},{"components/ClaimFields":577,"components/Footer":586,"components/Header":588}],617:[function(require,module,exports){
 var ExpertFields, Footer, Header, div;
 
 div = React.DOM.div;
@@ -88710,7 +89050,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ExpertFields":582,"components/Footer":585,"components/Header":587}],616:[function(require,module,exports){
+},{"components/ExpertFields":582,"components/Footer":586,"components/Header":588}],618:[function(require,module,exports){
 var Footer, Header, PredictionFields, div;
 
 div = React.DOM.div;
@@ -88849,7 +89189,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":585,"components/Header":587,"components/PredictionFields":593}],617:[function(require,module,exports){
+},{"components/Footer":586,"components/Header":588,"components/PredictionFields":594}],619:[function(require,module,exports){
 var AddToExpert, BookmarkIndicator, Comments, ExpertBonaFides, ExpertClaimCard, ExpertPredictionCard, Footer, Header, LinksMixin, SessionMixin, div, img, ref;
 
 ref = React.DOM, div = ref.div, img = ref.img;
@@ -89059,7 +89399,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/AddToExpert":567,"components/BookmarkIndicator":569,"components/Comments":578,"components/ExpertBonaFides":579,"components/ExpertClaimCard":581,"components/ExpertPredictionCard":583,"components/Footer":585,"components/Header":587,"mixins/LinksMixin":598,"mixins/SessionMixin":600}],618:[function(require,module,exports){
+},{"components/AddToExpert":567,"components/BookmarkIndicator":569,"components/Comments":578,"components/ExpertBonaFides":579,"components/ExpertClaimCard":581,"components/ExpertPredictionCard":583,"components/Footer":586,"components/Header":588,"mixins/LinksMixin":600,"mixins/SessionMixin":602}],620:[function(require,module,exports){
 var ExpertCard, Footer, Header, LinksMixin, Pagination, PaginationMixin, SearchFilters, SessionMixin, div;
 
 div = React.DOM.div;
@@ -89179,22 +89519,29 @@ module.exports = React.createFactory(React.createClass({
       }
     ];
   },
+  newItemStyle: function() {
+    return {
+      width: "100%"
+    };
+  },
   render: function() {
     return div({}, Header({}, ''), div({
       className: "experts-wrapper"
     }, div({
       className: "experts-content"
-    }, this.getParameterByName("from_search") != null ? div({
-      className: "predictions__back-to-search",
-      onClick: this.goBackToSearch
-    }, 'Back to Search') : void 0, SearchFilters({
+    }, SearchFilters({
       sortOptions: this.getSortOptions(),
       search: this.search
-    }), React.createElement(Material.RaisedButton, {
+    }), div({
+      className: "default__card"
+    }, React.createElement(Material.RaisedButton, {
       label: "Create New Expert",
       primary: true,
-      onClick: this.goToNewExpert
-    }), div({
+      onClick: this.goToNewExpert,
+      style: this.newItemStyle()
+    })), div({
+      className: "default__card"
+    }, div({
       className: "experts__list"
     }, this.state.experts != null ? this.state.experts.map(function(expert, index) {
       return ExpertCard({
@@ -89207,13 +89554,13 @@ module.exports = React.createFactory(React.createClass({
       nextPage: this.nextPage,
       previousPage: this.previousPage,
       specificPage: this.specificPage
-    }) : void 0)), Footer({}, ''));
+    }) : void 0))), Footer({}, ''));
   }
 }));
 
 
-},{"components/ExpertCard":580,"components/Footer":585,"components/Header":587,"components/Pagination":589,"components/SearchFilters":596,"mixins/LinksMixin":598,"mixins/PaginationMixin":599,"mixins/SessionMixin":600}],619:[function(require,module,exports){
-var ClaimCard, ExpertCard, Footer, Header, PredictionCard, div;
+},{"components/ExpertCard":580,"components/Footer":586,"components/Header":588,"components/Pagination":590,"components/SearchFilters":598,"mixins/LinksMixin":600,"mixins/PaginationMixin":601,"mixins/SessionMixin":602}],621:[function(require,module,exports){
+var ClaimCard, ExpertCard, ExpertTextCard, Footer, Header, PredictionCard, PredictionTextCard, div;
 
 div = React.DOM.div;
 
@@ -89223,7 +89570,11 @@ Footer = require("components/Footer");
 
 PredictionCard = require("components/PredictionCard");
 
+PredictionTextCard = require("components/PredictionTextCard");
+
 ExpertCard = require("components/ExpertCard");
+
+ExpertTextCard = require("components/ExpertTextCard");
 
 ClaimCard = require("components/ClaimCard");
 
@@ -89268,70 +89619,102 @@ module.exports = React.createFactory(React.createClass({
       className: "landing-wrapper"
     }, div({
       className: "landing-content"
-    }, this.state.data != null ? div({}, div({
-      className: "landing__predictions__recent-active"
-    }, "Recent Active Predictions:", this.state.data.most_recent_active_predictions.map(function(prediction, index) {
+    }, this.state.data == null ? div({}, div({
+      className: "default__card"
+    }, div({
+      className: "not-found"
+    }, "Loading..."))) : void 0, this.state.data != null ? div({}, div({
+      className: "default__card landing__predictions__recent-active"
+    }, div({
+      className: "text__title"
+    }, "Recent Active Predictions"), this.state.data.most_recent_active_predictions.length > 0 ? this.state.data.most_recent_active_predictions.map(function(prediction, index) {
       return PredictionCard({
         prediction: prediction,
         key: "most-recent-active-predictions-" + index
       });
-    })), div({
-      className: "landing__predictions__recent-settled"
-    }, "Recent Settled Predictions:", this.state.data.most_recent_settled_predictions.map(function(prediction, index) {
+    }) : div({
+      className: "not-found"
+    }, "No items were found.")), div({
+      className: "default__card landing__predictions__recent-settled"
+    }, div({
+      className: "text__title"
+    }, "Recent Settled Predictions"), this.state.data.most_recent_settled_predictions.length > 0 ? this.state.data.most_recent_settled_predictions.map(function(prediction, index) {
       return PredictionCard({
         prediction: prediction,
         key: "most-recent-settled-predictions-" + index
       });
-    })), div({
-      className: "landing__claims__recent-active"
-    }, "Recent Active Claims:", this.state.data.most_recent_active_claims.map(function(claim, index) {
+    }) : div({
+      className: "not-found"
+    }, "No items were found.")), div({
+      className: "default__card landing__claims__recent-active"
+    }, div({
+      className: "text__title"
+    }, "Recent Active Claims"), this.state.data.most_recent_active_claims.length > 0 ? this.state.data.most_recent_active_claims.map(function(claim, index) {
       return ClaimCard({
         claim: claim,
         key: "most-recent-active-claims-" + index
       });
-    })), div({
-      className: "landing__claims__recent-settled"
-    }, "Recent Settled Claims:", this.state.data.most_recent_settled_claims.map(function(claim, index) {
+    }) : div({
+      className: "not-found"
+    }, "No items were found.")), div({
+      className: "default__card landing__claims__recent-settled"
+    }, div({
+      className: "text__title"
+    }, "Recent Settled Claims"), this.state.data.most_recent_settled_claims.length > 0 ? this.state.data.most_recent_settled_claims.map(function(claim, index) {
       return ClaimCard({
         claim: claim,
         key: "most-recent-settled-claims-" + index
       });
-    })), div({
-      className: "landing__experts__random"
-    }, "Random Expert:", ExpertCard({
-      expert: this.state.data.random_expert
-    })), div({
-      className: "landing__claim__random"
-    }, "Random Claim:", ClaimCard({
-      claim: this.state.data.random_claim,
-      key: "random-claim"
-    })), div({
-      className: "landing__predictions__random"
-    }, "Random Prediction:", PredictionCard({
-      prediction: this.state.data.random_prediction,
-      key: "random-prediction"
-    })), div({
-      className: "landing__experts__most-accurate"
-    }, "Most accurate Experts:", this.state.data.most_accurate_experts.map(function(claim, index) {
+    }) : div({
+      className: "not-found"
+    }, "No items were found.")), div({
+      className: "default__card landing__experts__text"
+    }, div({
+      className: "text__title"
+    }, "Most Accurate Experts:"), this.state.data.most_accurate_experts.map(function(expert, index) {
       return ExpertCard({
-        expert: claim,
+        expert: expert,
         key: "most-accurate-experts-" + index
       });
     })), div({
-      className: "landing__experts__least-accurate"
-    }, "Least accurate Experts:", this.state.data.most_accurate_experts.map(function(claim, index) {
+      className: "default__card landing__experts__text"
+    }, div({
+      className: "text__title"
+    }, "Least Accurate Experts:"), this.state.data.least_accurate_experts.map(function(expert, index) {
       return ExpertCard({
-        expert: claim,
-        key: "most-accurate-experts-" + index
+        expert: expert,
+        key: "least-accurate-experts-" + index
       });
-    }))) : this.state.loadError != null ? div({
+    })), div({
+      className: "default__card landing__experts__text"
+    }, div({
+      className: "landing__experts__text-column"
+    }, div({
+      className: "text__title"
+    }, "Most Popular Experts:"), this.state.data.most_popular_experts.map(function(expert, index) {
+      return ExpertTextCard({
+        expert: expert,
+        key: "most-popular-experts-" + index
+      });
+    })), div({
+      className: "landing__experts__text-column"
+    }, div({
+      className: "text__title"
+    }, "Most Popular Claims:"), this.state.data.most_popular_predictions.map(function(prediction, index) {
+      return PredictionTextCard({
+        prediction: prediction,
+        key: "most-popular-predictions-" + index
+      });
+    })))) : this.state.loadError != null ? div({
+      className: "default__card"
+    }, div({
       className: "landing-error"
-    }, "Error: " + this.state.homepageError) : void 0)), Footer({}, ''));
+    }, "Error: " + this.state.homepageError)) : void 0)), Footer({}, ''));
   }
 }));
 
 
-},{"components/ClaimCard":574,"components/ExpertCard":580,"components/Footer":585,"components/Header":587,"components/PredictionCard":590}],620:[function(require,module,exports){
+},{"components/ClaimCard":574,"components/ExpertCard":580,"components/ExpertTextCard":585,"components/Footer":586,"components/Header":588,"components/PredictionCard":591,"components/PredictionTextCard":595}],622:[function(require,module,exports){
 var AddToPrediction, BookmarkIndicator, Comments, Footer, Header, LinksMixin, PredictionEvidences, PredictionExpertCard, SessionMixin, Votes, div, img, ref;
 
 ref = React.DOM, div = ref.div, img = ref.img;
@@ -89578,7 +89961,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/AddToPrediction":568,"components/BookmarkIndicator":569,"components/Comments":578,"components/Footer":585,"components/Header":587,"components/PredictionEvidences":591,"components/PredictionExpertCard":592,"components/Votes":597,"mixins/LinksMixin":598,"mixins/SessionMixin":600}],621:[function(require,module,exports){
+},{"components/AddToPrediction":568,"components/BookmarkIndicator":569,"components/Comments":578,"components/Footer":586,"components/Header":588,"components/PredictionEvidences":592,"components/PredictionExpertCard":593,"components/Votes":599,"mixins/LinksMixin":600,"mixins/SessionMixin":602}],623:[function(require,module,exports){
 var Footer, Header, LinksMixin, Pagination, PaginationMixin, PredictionCard, SearchFilters, SessionMixin, div;
 
 div = React.DOM.div;
@@ -89698,22 +90081,29 @@ module.exports = React.createFactory(React.createClass({
       }
     ];
   },
+  newItemStyle: function() {
+    return {
+      width: "100%"
+    };
+  },
   render: function() {
     return div({}, Header({}, ''), div({
       className: "predictions-wrapper"
     }, div({
       className: "predictions-content"
-    }, this.getParameterByName("from_search") != null ? div({
-      className: "predictions__back-to-search",
-      onClick: this.goBackToSearch
-    }, 'Back to Search') : void 0, SearchFilters({
+    }, SearchFilters({
       sortOptions: this.getSortOptions(),
       search: this.search
-    }), React.createElement(Material.RaisedButton, {
+    }), div({
+      className: "default__card"
+    }, React.createElement(Material.RaisedButton, {
       label: "Create New Prediction",
       primary: true,
-      onClick: this.goToNewPrediction
-    }), div({
+      onClick: this.goToNewPrediction,
+      style: this.newItemStyle()
+    })), div({
+      className: "default__card"
+    }, div({
       className: "predictions__list"
     }, this.state.predictions != null ? this.state.predictions.map(function(prediction, index) {
       return PredictionCard({
@@ -89726,12 +90116,12 @@ module.exports = React.createFactory(React.createClass({
       nextPage: this.nextPage,
       previousPage: this.previousPage,
       specificPage: this.specificPage
-    }) : void 0)), Footer({}, ''));
+    }) : void 0))), Footer({}, ''));
   }
 }));
 
 
-},{"components/Footer":585,"components/Header":587,"components/Pagination":589,"components/PredictionCard":590,"components/SearchFilters":596,"mixins/LinksMixin":598,"mixins/PaginationMixin":599,"mixins/SessionMixin":600}],622:[function(require,module,exports){
+},{"components/Footer":586,"components/Header":588,"components/Pagination":590,"components/PredictionCard":591,"components/SearchFilters":598,"mixins/LinksMixin":600,"mixins/PaginationMixin":601,"mixins/SessionMixin":602}],624:[function(require,module,exports){
 var ClaimCard, ExpertCard, Footer, Header, LinksMixin, PredictionCard, SearchFilters, SessionMixin, div;
 
 div = React.DOM.div;
@@ -89924,7 +90314,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ClaimCard":574,"components/ExpertCard":580,"components/Footer":585,"components/Header":587,"components/PredictionCard":590,"components/SearchFilters":596,"mixins/LinksMixin":598,"mixins/SessionMixin":600}],623:[function(require,module,exports){
+},{"components/ClaimCard":574,"components/ExpertCard":580,"components/Footer":586,"components/Header":588,"components/PredictionCard":591,"components/SearchFilters":598,"mixins/LinksMixin":600,"mixins/SessionMixin":602}],625:[function(require,module,exports){
 var Footer, Header, br, div, img, input, ref;
 
 ref = React.DOM, div = ref.div, input = ref.input, br = ref.br, img = ref.img;
@@ -90188,7 +90578,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":585,"components/Header":587}],624:[function(require,module,exports){
+},{"components/Footer":586,"components/Header":588}],626:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -90209,4 +90599,4 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":585,"components/Header":587}]},{},[3])
+},{"components/Footer":586,"components/Header":588}]},{},[3])

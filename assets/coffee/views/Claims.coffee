@@ -84,32 +84,35 @@ module.exports = React.createFactory React.createClass
     ]
 
 
+  newItemStyle: ->
+    return {
+      width: "100%"
+    }
+
+
   render: ->
     div {},
       Header {}, ''
       div { className: "claims-wrapper" },
         div { className: "claims-content" },
-          if @getParameterByName("from_search")?
-            div
-              className: "predictions__back-to-search"
-              onClick: @goBackToSearch
-              'Back to Search'
           SearchFilters
             sortOptions: @getSortOptions()
             search: @search
-          React.createElement(Material.RaisedButton, { label: "Create New Claim", primary: true, onClick: @goToNewClaim })
-          div { className: "claims__list" },
+          div { className: "default__card" },
+            React.createElement(Material.RaisedButton, { label: "Create New Claim", primary: true, onClick: @goToNewClaim, style: @newItemStyle() })
+          div { className: "default__card" },
+            div { className: "claims__list" },
+              if @state.claims?
+                @state.claims.map (claim, index) ->
+                  ClaimCard
+                    claim: claim
+                    key: "claim-card-#{index}"
             if @state.claims?
-              @state.claims.map (claim, index) ->
-                ClaimCard
-                  claim: claim
-                  key: "claim-card-#{index}"
-          if @state.claims?
-            Pagination
-              page: @state.page
-              numberOfPages: @state.numberOfPages
-              nextPage: @nextPage
-              previousPage: @previousPage
-              specificPage: @specificPage
+              Pagination
+                page: @state.page
+                numberOfPages: @state.numberOfPages
+                nextPage: @nextPage
+                previousPage: @previousPage
+                specificPage: @specificPage
 
       Footer {}, ''

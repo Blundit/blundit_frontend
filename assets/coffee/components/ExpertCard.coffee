@@ -20,6 +20,12 @@ module.exports = React.createFactory React.createClass
 
     return ''
 
+  getExpertOccupation: ->
+    if @props.expert.occupation?
+      return @props.expert.occupation
+    
+    return 'Occupation'
+
   
   showAccuracy: ->
     accuracy = @props.expert.accuracy
@@ -32,59 +38,60 @@ module.exports = React.createFactory React.createClass
     return "#{expert.comments_count} comments"
 
 
+  expertCardStyle: ->
+    return {
+      height: "100%"
+      position: "relative"
+    }
+
+  
+  viewButtonStyle: ->
+    return {
+      width: "100%"
+      textAlign: "center"
+    }
+
   render: ->
     { expert } = @props
     div { className: "expert-card" },
-      React.createElement(Material.Card, {},
+      React.createElement(Material.Card, { style: @expertCardStyle() },
         React.createElement(Material.CardMedia,
           {
-            overlay: React.createElement(Material.CardTitle, { title: expert.name, subtitle: @getExpertDescription() })
+            overlay: React.createElement(Material.CardTitle, { title: expert.name, subtitle: @getExpertOccupation() })
           },
           img {src: @avatar() }
         )
        
-        React.createElement(Material.CardText, {}, @getAccuracy)
-
+        if expert.categories.length > 0
+          div { className: "expert-card-category" },
+            span
+              onClick: @goToCategory.bind(@, expert.categories[0].id)
+              expert.categories[0].name
         div { className: "expert-card-meta" },
           div { className: "expert-card-meta__left" },
-            @showAccuracy()
+            "Accuracy: #{@showAccuracy()}"
           div { className: "expert-card-meta__right" },
             span { className: "expert-card-meta__predictions" },
-              expert.number_of_predictions
+              expert.number_of_predictions + " P"
             span { className: "expert-card-meta__claims" },
-              expert.number_of_claims
+              expert.number_of_claims + " C"
 
         div { className: "expert-card-comments" },
           @getCommentInfo()
         
         if (expert.most_recent_claim? and expert.most_recent_claim.length > 0) or (expert.most_recent_prediction? and expert.most_recent_prediction.length > 0)
-          div { className: "expert-card-links"},
+          div { className: "expert-card-links" },
             if expert.most_recent_claim.length > 0
-              div {},
-                "Most recent Claim: "
-                a
-                  onClick: @goToMostRecentClaim
-                  expert.most_recent_claim[0].title
+              a
+                onClick: @goToMostRecentClaim
+                expert.most_recent_claim[0].title
 
             if expert.most_recent_prediction.length > 0
-              div {},
-                "Most recent Prediction: "
-                a
-                  onClick: @goToMostRecentPrediction
-                  expert.most_recent_prediction[0].title
-        if expert.categories.length > 0
-          div { className: "expert-card-categories" },
-            expert.categories.map (category, index) =>
-              span
-                key: "expert-card-category-#{index}"
-                className: "expert-card-categories__category"
-                onClick: @goToCategory.bind(@, category.id)
-                category.name
-
-
-
+              a
+                onClick: @goToMostRecentPrediction
+                expert.most_recent_prediction[0].title
 
         React.createElement(Material.CardActions, {},
-          React.createElement(Material.FlatButton, { label: "View", onClick: @goToExpert.bind(@, expert.alias) })
+          React.createElement(Material.FlatButton, { label: "View", onClick: @goToExpert.bind(@, expert.alias), style: @viewButtonStyle() })
         )
       )

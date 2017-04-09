@@ -12,6 +12,85 @@
 
 .prediction-card
   float: left
-  width: 100%
+  width: calc(100% - 10px)
   margin: 5px
+
+  &-title
+    @extend %title-text
+    padding: 10px
+    color: $expert-card-link-color
+    cursor: pointer
+
+    &:hover
+      font-weight: bold
+
+  &-category
+    width: 100%
+    color: $not-found-color
+    font-style: italic
+    padding: 5px 10px 0px 10px
+
+  &-experts
+    width: 100%
+    display: inline-block
+    padding: 10px
+
+    &:after
+      +clearfix
+
+    &__expert
+      float: left
+      margin-right: 5px
+
+
+    &__expert-avatar
+      height: 20px
+      width: 20px
+      border-radius: 20px
+      border: 1px solid $avatar-border-color
+      background-size: cover
+      float: left
+      margin-right: 5px
+
+    &__expert-name
+      float: left
+      padding-top: 4px
+
   
+.prediction-text-card
+  width: 100%
+  display: inline-block
+  margin-bottom: 5px
+  height: 22px
+
+  &__title
+    width: calc(100% - 120px)
+    float: left
+    color: $expert-card-link-color
+    // TODO: Add colour-coded classes to denote accuracy
+    cursor: pointer
+    padding-top: 4px
+    overflow: hidden
+    height: 15px
+    white-space: nowrap
+    text-overflow: ellipsis
+
+    &:hover
+      font-weight: bold
+
+  &__comments
+    width: 100px
+    text-align: right
+    margin-right: 5px
+    float: left
+    padding-top: 4px
+    color: $not-found-color
+    font-size: 11px
+
+    span
+      margin-left: 5px
+      font-size: 14px
+      color: $black-color
+
+  &:after
+    +clearfix

@@ -3,3 +3,13 @@
 
 .landing-content
   @extend %margin-width
+
+.landing__experts__text-column
+  width: 50%
+  float: left
+
+  @media (max-width: $tablet-breakpoint)
+    width: 100%
+
+    &:first-of-type
+      margin-bottom: 10px

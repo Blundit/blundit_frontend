@@ -62,9 +62,12 @@ module.exports = React.createFactory React.createClass
 
   
   render: ->
-    div { className: "sarch__filter" },
-      "Search Filter:"
-
+    div { className: "default__card sarch__filter" },
+      if @getParameterByName("from_search")?
+        div
+          className: "predictions__back-to-search"
+          onClick: @goBackToSearch
+          'Back to Search'
       React.createElement(Material.TextField,
         {
           id: "search-field",

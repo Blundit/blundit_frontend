@@ -36,24 +36,50 @@ module.exports = React.createFactory React.createClass
     return "#{prediction.comments_count} comments"
 
 
+  formatDate: (date) ->
+    monthNames = [
+      "January", "February", "March",
+      "April", "May", "June", "July",
+      "August", "September", "October",
+      "November", "December"
+    ]
+
+    day = date.getDate()
+    monthIndex = date.getMonth()
+    year = date.getFullYear()
+
+    if day == 1 or day == 11 or day == 21 or day == 31
+      suffix = 'st'
+    else if day == 2 or day == 12 or day == 22
+      suffix = 'nd'
+    else if day == 3 or day == 13 or day == 23
+      suffix = 'rd'
+    else
+      suffix = 'th'
+
+    return monthNames[monthIndex] + ' ' + day + suffix + ', ' + year
+
+
   predictionDate: ->
     { prediction } = @props
-    return prediction.created_at
+    @d = new Date(prediction.created_at)
+
+    return @formatDate(@d)
 
 
   render: ->
     { prediction } = @props
     div { className: "prediction-card" },
       React.createElement(Material.Card, {},
-        React.createElement(Material.CardHeader,
-          {
-            title: prediction.title
-            subtitle: @getDescription()
-          },
-        ),
+        div
+          className: "prediction-card-title"
+          onClick: @goToPrediction.bind(@, prediction.alias)
+          prediction.title
         div { className: "prediction-card-text" },
           div { className: "prediction-card-date" },
-            @predictionDate()
+            "Will happen on "
+            span {},
+              @predictionDate()
           div { className: "prediction-card-status" },
             @getStatus()
           div { className: "prediction-card-votes" },
@@ -61,13 +87,10 @@ module.exports = React.createFactory React.createClass
           div { className: "prediction-card-comments" },
             @getCommentInfo()
           if prediction.categories.length > 0
-            div { className: "prediction-card-categories" },
-              prediction.categories.map (category, index) =>
-                span
-                  key: "prediction-card-category-#{index}"
-                  className: "prediction-card-categories__category"
-                  onClick: @goToCategory.bind(@, category.id)
-                  category.name
+            div { className: "prediction-card-category" },
+              span
+                onClick: @goToCategory.bind(@, prediction.categories[0].id)
+                prediction.categories[0].name
 
           if prediction.recent_experts.length > 0
             div { className: "prediction-card-experts" },
@@ -96,7 +119,5 @@ module.exports = React.createFactory React.createClass
             div { className: "prediction-card-vote" },
               "Log in to Vote"
 
-
-          React.createElement(Material.FlatButton, { label: "View", onClick: @goToPrediction.bind(@, prediction.alias) })
         )
       )

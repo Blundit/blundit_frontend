@@ -86,34 +86,36 @@ module.exports = React.createFactory React.createClass
       { id: 5, title: "Least Accurate" }
     ]
 
+
+  newItemStyle: ->
+    return {
+      width: "100%"
+    }
+
   
   render: ->
-    
     div {},
       Header {}, ''
       div { className: "predictions-wrapper" },
         div { className: "predictions-content" },
-          if @getParameterByName("from_search")?
-            div
-              className: "predictions__back-to-search"
-              onClick: @goBackToSearch
-              'Back to Search'
           SearchFilters
             sortOptions: @getSortOptions()
             search: @search
-          React.createElement(Material.RaisedButton, { label: "Create New Prediction", primary: true, onClick: @goToNewPrediction })
-          div { className: "predictions__list" },
+          div { className: "default__card" },
+            React.createElement(Material.RaisedButton, { label: "Create New Prediction", primary: true, onClick: @goToNewPrediction, style: @newItemStyle() })
+          div { className: "default__card" },
+            div { className: "predictions__list" },
+              if @state.predictions?
+                @state.predictions.map (prediction, index) ->
+                  PredictionCard
+                    prediction: prediction
+                    key: "prediction-card-#{index}"
             if @state.predictions?
-              @state.predictions.map (prediction, index) ->
-                PredictionCard
-                  prediction: prediction
-                  key: "prediction-card-#{index}"
-          if @state.predictions?
-            Pagination
-              page: @state.page
-              numberOfPages: @state.numberOfPages
-              nextPage: @nextPage
-              previousPage: @previousPage
-              specificPage: @specificPage
+              Pagination
+                page: @state.page
+                numberOfPages: @state.numberOfPages
+                nextPage: @nextPage
+                previousPage: @previousPage
+                specificPage: @specificPage
 
       Footer {}, ''

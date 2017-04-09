@@ -85,33 +85,36 @@ module.exports = React.createFactory React.createClass
       { id: 5, title: "Least Accurate" }
     ]
 
+  
+  newItemStyle: ->
+    return {
+      width: "100%"
+    }
+
 
   render: ->
     div {},
       Header {}, ''
       div { className: "experts-wrapper" },
         div { className: "experts-content" },
-          if @getParameterByName("from_search")?
-            div
-              className: "predictions__back-to-search"
-              onClick: @goBackToSearch
-              'Back to Search'
           SearchFilters
             sortOptions: @getSortOptions()
             search: @search
-          React.createElement(Material.RaisedButton, { label: "Create New Expert", primary: true, onClick: @goToNewExpert })
-          div { className: "experts__list" },
+          div { className: "default__card" },
+            React.createElement(Material.RaisedButton, { label: "Create New Expert", primary: true, onClick: @goToNewExpert, style: @newItemStyle() })
+          div { className: "default__card" },
+            div { className: "experts__list" },
+              if @state.experts?
+                @state.experts.map (expert, index) ->
+                  ExpertCard
+                    expert: expert
+                    key: "expert-card-#{index}"
             if @state.experts?
-              @state.experts.map (expert, index) ->
-                ExpertCard
-                  expert: expert
-                  key: "expert-card-#{index}"
-          if @state.experts?
-            Pagination
-              page: @state.page
-              numberOfPages: @state.numberOfPages
-              nextPage: @nextPage
-              previousPage: @previousPage
-              specificPage: @specificPage
+              Pagination
+                page: @state.page
+                numberOfPages: @state.numberOfPages
+                nextPage: @nextPage
+                previousPage: @previousPage
+                specificPage: @specificPage
 
       Footer {}, ''

@@ -51,8 +51,6 @@ module.exports = React.createFactory React.createClass
           },
         ),
         div { className: "claim-card-text" },
-          div { className: "claim-card-date" },
-            @claimDate()
           div { className: "claim-card-status" },
             @getStatus()
           div { className: "claim-card-votes" },
@@ -60,13 +58,10 @@ module.exports = React.createFactory React.createClass
           div { className: "claim-card-comments" },
             @getCommentInfo()
           if claim.categories.length > 0
-            div { className: "claim-card-categories" },
-              claim.categories.map (category, index) =>
-                span
-                  key: "claim-card-category-#{index}"
-                  className: "claim-card-categories__category"
-                  onClick: @goToCategory.bind(@, category.id)
-                  category.name
+            div { className: "claim-card-category" },
+              span
+                onClick: @goToCategory.bind(@, claim.categories[0].id)
+                claim.categories[0].name
 
           if claim.recent_experts.length > 0
             div { className: "claim-card-experts" },

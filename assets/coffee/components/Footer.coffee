@@ -29,8 +29,9 @@ module.exports = React.createFactory React.createClass
   render: ->
     div { className: "footer-wrapper" },
       div { className: "footer-content" },
-        "Footer"
-        if @state.user?.token?
-          div {},
+        div { className: "footer__card" },
+          "this is the footer."
+          if @state.user?.token?
             div {},
-              React.createElement(Material.RaisedButton, { label: "Signout", primary: true, onClick: @logout })
+              div {},
+                React.createElement(Material.RaisedButton, { label: "Signout", primary: true, onClick: @logout })
