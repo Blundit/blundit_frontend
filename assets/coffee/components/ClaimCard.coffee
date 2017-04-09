@@ -17,7 +17,7 @@ module.exports = React.createFactory React.createClass
   getStatus: ->
     { claim } = @props
     if claim.status == 0
-      return "?"
+      return "Uknown"
     else if claim.status == 1
       if claim.vote_value >= 0.5
         return "Right"
@@ -32,7 +32,13 @@ module.exports = React.createFactory React.createClass
   
   getVoteInfo: ->
     { claim } = @props
-    return "#{claim.votes_count} votes"
+
+    if !claim.votes_count?
+      votes = 0
+    else
+      votes = claim.votes_count
+    
+    return "#{votes} votes"
 
 
   getCommentInfo: ->
@@ -44,19 +50,18 @@ module.exports = React.createFactory React.createClass
     { claim } = @props
     div { className: "claim-card" },
       React.createElement(Material.Card, {},
-        React.createElement(Material.CardHeader,
-          {
-            title: claim.title
-            subtitle: @getDescription()
-          },
-        ),
+        div
+          className: "claim-card-title"
+          onClick: @goToClaim.bind(@, claim.alias)
+          claim.title
         div { className: "claim-card-text" },
-          div { className: "claim-card-status" },
-            @getStatus()
-          div { className: "claim-card-votes" },
-            @getVoteInfo()
-          div { className: "claim-card-comments" },
-            @getCommentInfo()
+          div { className: "claim-card-meta" },
+            div { className: "claim-card-meta__status" },
+              @getStatus()
+            div { className: "claim-card-meta__votes" },
+              @getVoteInfo()
+            div { className: "claim-card-meta__comments" },
+              @getCommentInfo()
           if claim.categories.length > 0
             div { className: "claim-card-category" },
               span
@@ -84,13 +89,10 @@ module.exports = React.createFactory React.createClass
             # and add vote buttons
             div
               className: "claim-card-vote"
-              onClick: @goToClaim
+              onClick: @goToClaim.bind(@, claim.alias)
               "VOTE"
           else if claim.status == 0 and !UserStore.loggedIn()
             div { className: "claim-card-vote" },
               "Log in to Vote"
-
-
-          React.createElement(Material.FlatButton, { label: "View", onClick: @goToClaim.bind(@, claim.alias) })
         )
       )

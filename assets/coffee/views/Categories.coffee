@@ -35,7 +35,7 @@ module.exports = React.createFactory React.createClass
       Header {}, ''
       div { className: "categories-wrapper" },
         div { className: "categories-content" },
-          div { className: "categories__list" },
+          div { className: "default__card categories__list" },
             if @state.categories?
               @state.categories.map (category, index) =>
                 div

@@ -18,7 +18,7 @@ module.exports = React.createFactory React.createClass
   getStatus: ->
     { prediction } = @props
     if prediction.status == 0
-      return "?"
+      return "Unknown"
     else if prediction.status == 1
       if prediction.vote_value >= 0.5
         return "Right"
@@ -28,7 +28,11 @@ module.exports = React.createFactory React.createClass
 
   getVoteInfo: ->
     { prediction } = @props
-    return "#{prediction.votes_count} votes"
+    if !prediction.votes_count?
+      votes = 0
+    else
+      votes = prediction.votes_count
+    return "#{votes} votes"
 
 
   getCommentInfo: ->
@@ -77,15 +81,19 @@ module.exports = React.createFactory React.createClass
           prediction.title
         div { className: "prediction-card-text" },
           div { className: "prediction-card-date" },
-            "Will happen on "
+            if prediction.status == 0
+              "Will happen on "
+            else if prediction.status == 1
+              "Happened on "
             span {},
               @predictionDate()
-          div { className: "prediction-card-status" },
-            @getStatus()
-          div { className: "prediction-card-votes" },
-            @getVoteInfo()
-          div { className: "prediction-card-comments" },
-            @getCommentInfo()
+          div { className: "prediction-card-meta" },
+            div { className: "prediction-card-meta__status" },
+              @getStatus()
+            div { className: "prediction-card-meta__votes" },
+              @getVoteInfo()
+            div { className: "prediction-card-meta__comments" },
+              @getCommentInfo()
           if prediction.categories.length > 0
             div { className: "prediction-card-category" },
               span
@@ -113,7 +121,7 @@ module.exports = React.createFactory React.createClass
             # and add vote buttons
             div
               className: "prediction-card-vote"
-              onClick: @goToPrediction
+              onClick: @goToPrediction.bind(@, prediction.alias)
               "VOTE"
           else if prediction.status == 0 and !UserStore.loggedIn()
             div { className: "prediction-card-vote" },

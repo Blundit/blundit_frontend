@@ -1015,7 +1015,7 @@ module.exports = React.createFactory(React.createClass({
       var claim;
       claim = this.props.claim;
       if (claim.status === 0) {
-        return "?";
+        return "Uknown";
       } else if (claim.status === 1) {
         if (claim.vote_value >= 0.5) {
           return "Right";
@@ -1030,9 +1030,14 @@ module.exports = React.createFactory(React.createClass({
       return claim.created_at;
     },
     getVoteInfo: function() {
-      var claim;
+      var claim, votes;
       claim = this.props.claim;
-      return claim.votes_count + " votes";
+      if (claim.votes_count == null) {
+        votes = 0;
+      } else {
+        votes = claim.votes_count;
+      }
+      return votes + " votes";
     },
     getCommentInfo: function() {
       var claim;
@@ -1044,18 +1049,20 @@ module.exports = React.createFactory(React.createClass({
       claim = this.props.claim;
       return div({
         className: "claim-card"
-      }, React.createElement(Material.Card, {}, React.createElement(Material.CardHeader, {
-        title: claim.title,
-        subtitle: this.getDescription()
-      }), div({
+      }, React.createElement(Material.Card, {}, div({
+        className: "claim-card-title",
+        onClick: this.goToClaim.bind(this, claim.alias)
+      }, claim.title), div({
         className: "claim-card-text"
       }, div({
-        className: "claim-card-status"
+        className: "claim-card-meta"
+      }, div({
+        className: "claim-card-meta__status"
       }, this.getStatus()), div({
-        className: "claim-card-votes"
+        className: "claim-card-meta__votes"
       }, this.getVoteInfo()), div({
-        className: "claim-card-comments"
-      }, this.getCommentInfo()), claim.categories.length > 0 ? div({
+        className: "claim-card-meta__comments"
+      }, this.getCommentInfo())), claim.categories.length > 0 ? div({
         className: "claim-card-category"
       }, span({
         onClick: this.goToCategory.bind(this, claim.categories[0].id)
@@ -1078,13 +1085,10 @@ module.exports = React.createFactory(React.createClass({
         };
       })(this))) : void 0), React.createElement(Material.CardActions, {}, claim.status === 0 && UserStore.loggedIn() ? div({
         className: "claim-card-vote",
-        onClick: this.goToClaim
+        onClick: this.goToClaim.bind(this, claim.alias)
       }, "VOTE") : claim.status === 0 && !UserStore.loggedIn() ? div({
         className: "claim-card-vote"
-      }, "Log in to Vote") : void 0, React.createElement(Material.FlatButton, {
-        label: "View",
-        onClick: this.goToClaim.bind(this, claim.alias)
-      }))));
+      }, "Log in to Vote") : void 0)));
     }
   }));
 
@@ -2717,7 +2721,7 @@ module.exports = React.createFactory(React.createClass({
       var prediction;
       prediction = this.props.prediction;
       if (prediction.status === 0) {
-        return "?";
+        return "Unknown";
       } else if (prediction.status === 1) {
         if (prediction.vote_value >= 0.5) {
           return "Right";
@@ -2727,9 +2731,14 @@ module.exports = React.createFactory(React.createClass({
       }
     },
     getVoteInfo: function() {
-      var prediction;
+      var prediction, votes;
       prediction = this.props.prediction;
-      return prediction.votes_count + " votes";
+      if (prediction.votes_count == null) {
+        votes = 0;
+      } else {
+        votes = prediction.votes_count;
+      }
+      return votes + " votes";
     },
     getCommentInfo: function() {
       var prediction;
@@ -2771,13 +2780,15 @@ module.exports = React.createFactory(React.createClass({
         className: "prediction-card-text"
       }, div({
         className: "prediction-card-date"
-      }, "Will happen on ", span({}, this.predictionDate())), div({
-        className: "prediction-card-status"
+      }, prediction.status === 0 ? "Will happen on " : prediction.status === 1 ? "Happened on " : void 0, span({}, this.predictionDate())), div({
+        className: "prediction-card-meta"
+      }, div({
+        className: "prediction-card-meta__status"
       }, this.getStatus()), div({
-        className: "prediction-card-votes"
+        className: "prediction-card-meta__votes"
       }, this.getVoteInfo()), div({
-        className: "prediction-card-comments"
-      }, this.getCommentInfo()), prediction.categories.length > 0 ? div({
+        className: "prediction-card-meta__comments"
+      }, this.getCommentInfo())), prediction.categories.length > 0 ? div({
         className: "prediction-card-category"
       }, span({
         onClick: this.goToCategory.bind(this, prediction.categories[0].id)
@@ -2800,7 +2811,7 @@ module.exports = React.createFactory(React.createClass({
         };
       })(this))) : void 0), React.createElement(Material.CardActions, {}, prediction.status === 0 && UserStore.loggedIn() ? div({
         className: "prediction-card-vote",
-        onClick: this.goToPrediction
+        onClick: this.goToPrediction.bind(this, prediction.alias)
       }, "VOTE") : prediction.status === 0 && !UserStore.loggedIn() ? div({
         className: "prediction-card-vote"
       }, "Log in to Vote") : void 0)));
@@ -4360,7 +4371,7 @@ module.exports = React.createFactory(React.createClass({
       }, div({
         className: "bookmarks-content"
       }, div({
-        className: "bookmarks__list"
+        className: "default__card bookmarks__list"
       }, this.state.bookmarks != null ? this.state.bookmarks.map((function(_this) {
         return function(bookmark, index) {
           return div({
@@ -4424,7 +4435,7 @@ module.exports = React.createFactory(React.createClass({
       }, div({
         className: "categories-content"
       }, div({
-        className: "categories__list"
+        className: "default__card categories__list"
       }, this.state.categories != null ? this.state.categories.map((function(_this) {
         return function(category, index) {
           return div({
@@ -5239,7 +5250,11 @@ module.exports = React.createFactory(React.createClass({
         className: "claims-wrapper"
       }, div({
         className: "claims-content"
-      }, "Create Claim", UserStore.loggedIn() ? div({}, ClaimFields({
+      }, div({
+        className: "default__card"
+      }, div({
+        className: "text__title"
+      }, "Create Claim"), UserStore.loggedIn() ? div({}, ClaimFields({
         claim: this.state.claim,
         errors: this.state.errors,
         updateField: this.updateField
@@ -5256,7 +5271,9 @@ module.exports = React.createFactory(React.createClass({
         left: 0,
         top: 0,
         status: "loading"
-      })), this.state.submitClaimError != null ? div({}, this.state.submitClaimError) : void 0) : div({}, "You must be logged in to add an claim to the sytem."))), Footer({}, ''));
+      })), this.state.submitClaimError != null ? div({}, this.state.submitClaimError) : void 0) : div({
+        className: "not-found"
+      }, "You must be logged in to add an claim to the sytem.")))), Footer({}, ''));
     }
   }));
 
@@ -5375,7 +5392,11 @@ module.exports = React.createFactory(React.createClass({
         className: "experts-wrapper"
       }, div({
         className: "experts-content"
-      }, "Create Expert", UserStore.loggedIn() ? div({}, ExpertFields({
+      }, div({
+        className: "default__card"
+      }, div({
+        className: "text__title"
+      }, "Create Expert"), UserStore.loggedIn() ? div({}, ExpertFields({
         expert: this.state.expert,
         errors: this.state.errors,
         updateField: this.updateField
@@ -5392,7 +5413,9 @@ module.exports = React.createFactory(React.createClass({
         left: 0,
         top: 0,
         status: "loading"
-      })), this.state.submitExpertError != null ? div({}, this.state.submitExpertError) : void 0) : div({}, "You must be logged in to add an expert to the sytem."))), Footer({}, ''));
+      })), this.state.submitExpertError != null ? div({}, this.state.submitExpertError) : void 0) : div({
+        className: "not-found"
+      }, "You must be logged in to add an expert to the sytem.")))), Footer({}, ''));
     }
   }));
 
@@ -5510,7 +5533,11 @@ module.exports = React.createFactory(React.createClass({
         className: "predictions-wrapper"
       }, div({
         className: "predictions-content"
-      }, "Create Prediction", UserStore.loggedIn() ? div({}, PredictionFields({
+      }, div({
+        className: "default__card"
+      }, div({
+        className: "text__title"
+      }, "Create Prediction"), UserStore.loggedIn() ? div({}, PredictionFields({
         prediction: this.state.prediction,
         errors: this.state.errors,
         updateField: this.updateField
@@ -5527,7 +5554,9 @@ module.exports = React.createFactory(React.createClass({
         left: 0,
         top: 0,
         status: "loading"
-      })), this.state.submitPredictionError != null ? div({}, this.state.submitPredictionError) : void 0) : div({}, "You must be logged in to add an prediction to the sytem."))), Footer({}, ''));
+      })), this.state.submitPredictionError != null ? div({}, this.state.submitPredictionError) : void 0) : div({
+        className: "not-found"
+      }, "You must be logged in to add an prediction to the sytem.")))), Footer({}, ''));
     }
   }));
 
@@ -6468,7 +6497,8 @@ module.exports = React.createFactory(React.createClass({
       return {
         data: null,
         query: this.getQuery(),
-        sort: this.getSort()
+        sort: this.getSort(),
+        searchError: null
       };
     },
     componentDidMount: function() {
@@ -6572,16 +6602,20 @@ module.exports = React.createFactory(React.createClass({
         display: 'inline-block',
         position: 'relative',
         boxShadow: 'none'
+      }, div({
+        className: "default__card"
       }, React.createElement(Material.RefreshIndicator, {
         style: this.style,
         size: 50,
         left: 0,
         top: 0,
         status: "loading"
-      })) : void 0, this.state.data != null ? div({}, div({
-        className: "search__experts"
+      }))) : void 0, this.state.data != null ? div({
+        className: ""
       }, div({
-        className: "search__experts-title"
+        className: "default__card search__experts"
+      }, div({
+        className: "text__title"
       }, "Experts:"), this.state.data.experts.length === 0 ? div({
         className: "search__experts-items--empty"
       }, "No expert found for '" + this.state.data.query + "'") : div({
@@ -6595,9 +6629,9 @@ module.exports = React.createFactory(React.createClass({
         className: "search__experts-all",
         onClick: this.goToExperts
       }, 'View All'))), div({
-        className: "search__predictions"
+        className: "default__card search__predictions"
       }, div({
-        className: "search__predictions-title"
+        className: "text__title"
       }, "Predictions:"), this.state.data.predictions.length === 0 ? div({
         className: "search__predictions-items--empty"
       }, "No prediction found for '" + this.state.data.query + "'") : div({
@@ -6611,9 +6645,9 @@ module.exports = React.createFactory(React.createClass({
         className: "search__predictions-all",
         onClick: this.goToPredictions
       }, 'View All'))), div({
-        className: "search__claims"
+        className: "default__card search__claims"
       }, div({
-        className: "search__claims-title"
+        className: "text__title"
       }, "Claims:"), this.state.data.claims.length === 0 ? div({
         className: "search__claims-items--empty"
       }, "No claim found for '" + this.state.data.query + "'") : div({
@@ -6627,7 +6661,7 @@ module.exports = React.createFactory(React.createClass({
         className: "search__claims-all",
         onClick: this.goToClaims
       }, 'View All')))) : void 0, this.state.searchError != null ? div({
-        className: "search__error"
+        className: "default__card search__error"
       }, this.state.searchError) : void 0)), Footer({}, ''));
     }
   }));
@@ -84669,7 +84703,7 @@ module.exports = React.createFactory(React.createClass({
     var claim;
     claim = this.props.claim;
     if (claim.status === 0) {
-      return "?";
+      return "Uknown";
     } else if (claim.status === 1) {
       if (claim.vote_value >= 0.5) {
         return "Right";
@@ -84684,9 +84718,14 @@ module.exports = React.createFactory(React.createClass({
     return claim.created_at;
   },
   getVoteInfo: function() {
-    var claim;
+    var claim, votes;
     claim = this.props.claim;
-    return claim.votes_count + " votes";
+    if (claim.votes_count == null) {
+      votes = 0;
+    } else {
+      votes = claim.votes_count;
+    }
+    return votes + " votes";
   },
   getCommentInfo: function() {
     var claim;
@@ -84698,18 +84737,20 @@ module.exports = React.createFactory(React.createClass({
     claim = this.props.claim;
     return div({
       className: "claim-card"
-    }, React.createElement(Material.Card, {}, React.createElement(Material.CardHeader, {
-      title: claim.title,
-      subtitle: this.getDescription()
-    }), div({
+    }, React.createElement(Material.Card, {}, div({
+      className: "claim-card-title",
+      onClick: this.goToClaim.bind(this, claim.alias)
+    }, claim.title), div({
       className: "claim-card-text"
     }, div({
-      className: "claim-card-status"
+      className: "claim-card-meta"
+    }, div({
+      className: "claim-card-meta__status"
     }, this.getStatus()), div({
-      className: "claim-card-votes"
+      className: "claim-card-meta__votes"
     }, this.getVoteInfo()), div({
-      className: "claim-card-comments"
-    }, this.getCommentInfo()), claim.categories.length > 0 ? div({
+      className: "claim-card-meta__comments"
+    }, this.getCommentInfo())), claim.categories.length > 0 ? div({
       className: "claim-card-category"
     }, span({
       onClick: this.goToCategory.bind(this, claim.categories[0].id)
@@ -84732,13 +84773,10 @@ module.exports = React.createFactory(React.createClass({
       };
     })(this))) : void 0), React.createElement(Material.CardActions, {}, claim.status === 0 && UserStore.loggedIn() ? div({
       className: "claim-card-vote",
-      onClick: this.goToClaim
+      onClick: this.goToClaim.bind(this, claim.alias)
     }, "VOTE") : claim.status === 0 && !UserStore.loggedIn() ? div({
       className: "claim-card-vote"
-    }, "Log in to Vote") : void 0, React.createElement(Material.FlatButton, {
-      label: "View",
-      onClick: this.goToClaim.bind(this, claim.alias)
-    }))));
+    }, "Log in to Vote") : void 0)));
   }
 }));
 
@@ -86272,7 +86310,7 @@ module.exports = React.createFactory(React.createClass({
     var prediction;
     prediction = this.props.prediction;
     if (prediction.status === 0) {
-      return "?";
+      return "Unknown";
     } else if (prediction.status === 1) {
       if (prediction.vote_value >= 0.5) {
         return "Right";
@@ -86282,9 +86320,14 @@ module.exports = React.createFactory(React.createClass({
     }
   },
   getVoteInfo: function() {
-    var prediction;
+    var prediction, votes;
     prediction = this.props.prediction;
-    return prediction.votes_count + " votes";
+    if (prediction.votes_count == null) {
+      votes = 0;
+    } else {
+      votes = prediction.votes_count;
+    }
+    return votes + " votes";
   },
   getCommentInfo: function() {
     var prediction;
@@ -86326,13 +86369,15 @@ module.exports = React.createFactory(React.createClass({
       className: "prediction-card-text"
     }, div({
       className: "prediction-card-date"
-    }, "Will happen on ", span({}, this.predictionDate())), div({
-      className: "prediction-card-status"
+    }, prediction.status === 0 ? "Will happen on " : prediction.status === 1 ? "Happened on " : void 0, span({}, this.predictionDate())), div({
+      className: "prediction-card-meta"
+    }, div({
+      className: "prediction-card-meta__status"
     }, this.getStatus()), div({
-      className: "prediction-card-votes"
+      className: "prediction-card-meta__votes"
     }, this.getVoteInfo()), div({
-      className: "prediction-card-comments"
-    }, this.getCommentInfo()), prediction.categories.length > 0 ? div({
+      className: "prediction-card-meta__comments"
+    }, this.getCommentInfo())), prediction.categories.length > 0 ? div({
       className: "prediction-card-category"
     }, span({
       onClick: this.goToCategory.bind(this, prediction.categories[0].id)
@@ -86355,7 +86400,7 @@ module.exports = React.createFactory(React.createClass({
       };
     })(this))) : void 0), React.createElement(Material.CardActions, {}, prediction.status === 0 && UserStore.loggedIn() ? div({
       className: "prediction-card-vote",
-      onClick: this.goToPrediction
+      onClick: this.goToPrediction.bind(this, prediction.alias)
     }, "VOTE") : prediction.status === 0 && !UserStore.loggedIn() ? div({
       className: "prediction-card-vote"
     }, "Log in to Vote") : void 0)));
@@ -87977,7 +88022,7 @@ module.exports = React.createFactory(React.createClass({
     }, div({
       className: "bookmarks-content"
     }, div({
-      className: "bookmarks__list"
+      className: "default__card bookmarks__list"
     }, this.state.bookmarks != null ? this.state.bookmarks.map((function(_this) {
       return function(bookmark, index) {
         return div({
@@ -88045,7 +88090,7 @@ module.exports = React.createFactory(React.createClass({
     }, div({
       className: "categories-content"
     }, div({
-      className: "categories__list"
+      className: "default__card categories__list"
     }, this.state.categories != null ? this.state.categories.map((function(_this) {
       return function(category, index) {
         return div({
@@ -88888,7 +88933,11 @@ module.exports = React.createFactory(React.createClass({
       className: "claims-wrapper"
     }, div({
       className: "claims-content"
-    }, "Create Claim", UserStore.loggedIn() ? div({}, ClaimFields({
+    }, div({
+      className: "default__card"
+    }, div({
+      className: "text__title"
+    }, "Create Claim"), UserStore.loggedIn() ? div({}, ClaimFields({
       claim: this.state.claim,
       errors: this.state.errors,
       updateField: this.updateField
@@ -88905,7 +88954,9 @@ module.exports = React.createFactory(React.createClass({
       left: 0,
       top: 0,
       status: "loading"
-    })), this.state.submitClaimError != null ? div({}, this.state.submitClaimError) : void 0) : div({}, "You must be logged in to add an claim to the sytem."))), Footer({}, ''));
+    })), this.state.submitClaimError != null ? div({}, this.state.submitClaimError) : void 0) : div({
+      className: "not-found"
+    }, "You must be logged in to add an claim to the sytem.")))), Footer({}, ''));
   }
 }));
 
@@ -89028,7 +89079,11 @@ module.exports = React.createFactory(React.createClass({
       className: "experts-wrapper"
     }, div({
       className: "experts-content"
-    }, "Create Expert", UserStore.loggedIn() ? div({}, ExpertFields({
+    }, div({
+      className: "default__card"
+    }, div({
+      className: "text__title"
+    }, "Create Expert"), UserStore.loggedIn() ? div({}, ExpertFields({
       expert: this.state.expert,
       errors: this.state.errors,
       updateField: this.updateField
@@ -89045,7 +89100,9 @@ module.exports = React.createFactory(React.createClass({
       left: 0,
       top: 0,
       status: "loading"
-    })), this.state.submitExpertError != null ? div({}, this.state.submitExpertError) : void 0) : div({}, "You must be logged in to add an expert to the sytem."))), Footer({}, ''));
+    })), this.state.submitExpertError != null ? div({}, this.state.submitExpertError) : void 0) : div({
+      className: "not-found"
+    }, "You must be logged in to add an expert to the sytem.")))), Footer({}, ''));
   }
 }));
 
@@ -89167,7 +89224,11 @@ module.exports = React.createFactory(React.createClass({
       className: "predictions-wrapper"
     }, div({
       className: "predictions-content"
-    }, "Create Prediction", UserStore.loggedIn() ? div({}, PredictionFields({
+    }, div({
+      className: "default__card"
+    }, div({
+      className: "text__title"
+    }, "Create Prediction"), UserStore.loggedIn() ? div({}, PredictionFields({
       prediction: this.state.prediction,
       errors: this.state.errors,
       updateField: this.updateField
@@ -89184,7 +89245,9 @@ module.exports = React.createFactory(React.createClass({
       left: 0,
       top: 0,
       status: "loading"
-    })), this.state.submitPredictionError != null ? div({}, this.state.submitPredictionError) : void 0) : div({}, "You must be logged in to add an prediction to the sytem."))), Footer({}, ''));
+    })), this.state.submitPredictionError != null ? div({}, this.state.submitPredictionError) : void 0) : div({
+      className: "not-found"
+    }, "You must be logged in to add an prediction to the sytem.")))), Footer({}, ''));
   }
 }));
 
@@ -90149,7 +90212,8 @@ module.exports = React.createFactory(React.createClass({
     return {
       data: null,
       query: this.getQuery(),
-      sort: this.getSort()
+      sort: this.getSort(),
+      searchError: null
     };
   },
   componentDidMount: function() {
@@ -90253,16 +90317,20 @@ module.exports = React.createFactory(React.createClass({
       display: 'inline-block',
       position: 'relative',
       boxShadow: 'none'
+    }, div({
+      className: "default__card"
     }, React.createElement(Material.RefreshIndicator, {
       style: this.style,
       size: 50,
       left: 0,
       top: 0,
       status: "loading"
-    })) : void 0, this.state.data != null ? div({}, div({
-      className: "search__experts"
+    }))) : void 0, this.state.data != null ? div({
+      className: ""
     }, div({
-      className: "search__experts-title"
+      className: "default__card search__experts"
+    }, div({
+      className: "text__title"
     }, "Experts:"), this.state.data.experts.length === 0 ? div({
       className: "search__experts-items--empty"
     }, "No expert found for '" + this.state.data.query + "'") : div({
@@ -90276,9 +90344,9 @@ module.exports = React.createFactory(React.createClass({
       className: "search__experts-all",
       onClick: this.goToExperts
     }, 'View All'))), div({
-      className: "search__predictions"
+      className: "default__card search__predictions"
     }, div({
-      className: "search__predictions-title"
+      className: "text__title"
     }, "Predictions:"), this.state.data.predictions.length === 0 ? div({
       className: "search__predictions-items--empty"
     }, "No prediction found for '" + this.state.data.query + "'") : div({
@@ -90292,9 +90360,9 @@ module.exports = React.createFactory(React.createClass({
       className: "search__predictions-all",
       onClick: this.goToPredictions
     }, 'View All'))), div({
-      className: "search__claims"
+      className: "default__card search__claims"
     }, div({
-      className: "search__claims-title"
+      className: "text__title"
     }, "Claims:"), this.state.data.claims.length === 0 ? div({
       className: "search__claims-items--empty"
     }, "No claim found for '" + this.state.data.query + "'") : div({
@@ -90308,7 +90376,7 @@ module.exports = React.createFactory(React.createClass({
       className: "search__claims-all",
       onClick: this.goToClaims
     }, 'View All')))) : void 0, this.state.searchError != null ? div({
-      className: "search__error"
+      className: "default__card search__error"
     }, this.state.searchError) : void 0)), Footer({}, ''));
   }
 }));

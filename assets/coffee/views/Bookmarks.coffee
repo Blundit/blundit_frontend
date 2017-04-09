@@ -107,7 +107,7 @@ module.exports = React.createFactory React.createClass
       Header {}, ''
       div { className: "bookmarks-wrapper" },
         div { className: "bookmarks-content" },
-          div { className: "bookmarks__list" },
+          div { className: "default__card bookmarks__list" },
             if @state.bookmarks?
               @state.bookmarks.map (bookmark, index) =>
                 div

@@ -19,6 +19,7 @@ module.exports = React.createFactory React.createClass
     data: null
     query: @getQuery()
     sort: @getSort()
+    searchError: null
 
   
   componentDidMount: ->
@@ -111,11 +112,12 @@ module.exports = React.createFactory React.createClass
               position: 'relative'
               boxShadow: 'none'
             }
-            React.createElement(Material.RefreshIndicator, { style: @style, size: 50, left: 0, top: 0, status:"loading" })
+            div { className: "default__card" },
+              React.createElement(Material.RefreshIndicator, { style: @style, size: 50, left: 0, top: 0, status:"loading" })
           if @state.data?
-            div {},
-              div { className: "search__experts" },
-                div { className: "search__experts-title" },
+            div { className: "" },
+              div { className: "default__card search__experts" },
+                div { className: "text__title" },
                   "Experts:"
                 if @state.data.experts.length == 0
                   div { className: "search__experts-items--empty" },
@@ -130,8 +132,8 @@ module.exports = React.createFactory React.createClass
                       className: "search__experts-all"
                       onClick: @goToExperts
                       'View All'
-              div { className: "search__predictions" },
-                div { className: "search__predictions-title" },
+              div { className: "default__card search__predictions" },
+                div { className: "text__title" },
                   "Predictions:"
                 if @state.data.predictions.length == 0
                   div { className: "search__predictions-items--empty" },
@@ -146,8 +148,8 @@ module.exports = React.createFactory React.createClass
                       className: "search__predictions-all"
                       onClick: @goToPredictions
                       'View All'
-              div { className: "search__claims" },
-                div { className: "search__claims-title" },
+              div { className: "default__card search__claims" },
+                div { className: "text__title" },
                   "Claims:"
                 if @state.data.claims.length == 0
                   div { className: "search__claims-items--empty" },
@@ -165,6 +167,6 @@ module.exports = React.createFactory React.createClass
 
           
           if @state.searchError?
-            div { className: "search__error" },
+            div { className: "default__card search__error" },
               @state.searchError
       Footer {}, ''

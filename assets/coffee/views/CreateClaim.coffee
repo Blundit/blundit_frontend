@@ -84,28 +84,30 @@ module.exports = React.createFactory React.createClass
       Header {}, ''
       div { className: "claims-wrapper" },
         div { className: "claims-content" },
-          "Create Claim"
-          if UserStore.loggedIn()
-            div {},
-              ClaimFields
-                claim: @state.claim
-                errors: @state.errors
-                updateField: @updateField
+          div { className: "default__card" },
+            div { className: "text__title" },
+              "Create Claim"
+            if UserStore.loggedIn()
+              div {},
+                ClaimFields
+                  claim: @state.claim
+                  errors: @state.errors
+                  updateField: @updateField
 
-              if @state.submittingClaim != true
-                React.createElement(Material.RaisedButton, { label: "Create", onClick: @createClaim })
-              else
-                @style = {
-                  display: 'inline-block'
-                  position: 'relative'
-                  boxShadow: 'none'
-                }
-                React.createElement(Material.RefreshIndicator, { style: @style, size: 50, left: 0, top: 0, status:"loading" })
-              if @state.submitClaimError?
-                div {},
-                  @state.submitClaimError
+                if @state.submittingClaim != true
+                  React.createElement(Material.RaisedButton, { label: "Create", onClick: @createClaim })
+                else
+                  @style = {
+                    display: 'inline-block'
+                    position: 'relative'
+                    boxShadow: 'none'
+                  }
+                  React.createElement(Material.RefreshIndicator, { style: @style, size: 50, left: 0, top: 0, status:"loading" })
+                if @state.submitClaimError?
+                  div {},
+                    @state.submitClaimError
 
-          else
-            div {},
-              "You must be logged in to add an claim to the sytem."
+            else
+              div { className: "not-found" },
+                "You must be logged in to add an claim to the sytem."
       Footer {}, ''

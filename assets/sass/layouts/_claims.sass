@@ -15,11 +15,35 @@
   width: calc(100% - 10px)
   margin: 5px
 
+  &-title
+    @extend %title-text
+    padding: 10px
+    color: $expert-card-link-color
+    cursor: pointer
+
   &-category
     width: 100%
     color: $not-found-color
     font-style: italic
     padding: 5px 5px 0px 5px
+
+  &-meta
+    width: 100%
+    padding: 5px 10px 5px 10px
+    +clearfix
+
+    &__status
+      float: left
+      width: 100px
+      margin-right: 5px
+    
+    &__votes
+      float: left
+      margin-right: 5px
+
+    &__comments
+      float: left
+      width: 100px
 
   &-experts
     width: 100%

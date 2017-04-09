@@ -94,28 +94,30 @@ module.exports = React.createFactory React.createClass
       Header {}, ''
       div { className: "experts-wrapper" },
         div { className: "experts-content" },
-          "Create Expert"
-          if UserStore.loggedIn()
-            div {},
-              ExpertFields
-                expert: @state.expert
-                errors: @state.errors
-                updateField: @updateField
+          div { className: "default__card" },
+            div { className: "text__title" },
+              "Create Expert"
+            if UserStore.loggedIn()
+              div {},
+                ExpertFields
+                  expert: @state.expert
+                  errors: @state.errors
+                  updateField: @updateField
 
-              if @state.submittingExpert != true
-                React.createElement(Material.RaisedButton, { label: "Create", onClick: @createExpert })
-              else
-                @style = {
-                  display: 'inline-block'
-                  position: 'relative'
-                  boxShadow: 'none'
-                }
-                React.createElement(Material.RefreshIndicator, { style: @style, size: 50, left: 0, top: 0, status:"loading" })
-              if @state.submitExpertError?
-                div {},
-                  @state.submitExpertError
+                if @state.submittingExpert != true
+                  React.createElement(Material.RaisedButton, { label: "Create", onClick: @createExpert })
+                else
+                  @style = {
+                    display: 'inline-block'
+                    position: 'relative'
+                    boxShadow: 'none'
+                  }
+                  React.createElement(Material.RefreshIndicator, { style: @style, size: 50, left: 0, top: 0, status:"loading" })
+                if @state.submitExpertError?
+                  div {},
+                    @state.submitExpertError
 
-          else
-            div {},
-              "You must be logged in to add an expert to the sytem."
+            else
+              div { className: "not-found" },
+                "You must be logged in to add an expert to the sytem."
       Footer {}, ''

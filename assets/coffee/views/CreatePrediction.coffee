@@ -89,28 +89,30 @@ module.exports = React.createFactory React.createClass
       Header {}, ''
       div { className: "predictions-wrapper" },
         div { className: "predictions-content" },
-          "Create Prediction"
-          if UserStore.loggedIn()
-            div {},
-              PredictionFields
-                prediction: @state.prediction
-                errors: @state.errors
-                updateField: @updateField
+          div { className: "default__card" },
+            div { className: "text__title" },
+            "Create Prediction"
+            if UserStore.loggedIn()
+              div {},
+                PredictionFields
+                  prediction: @state.prediction
+                  errors: @state.errors
+                  updateField: @updateField
 
-              if @state.submittingPrediction != true
-                React.createElement(Material.RaisedButton, { label: "Create", onClick: @createPrediction })
-              else
-                @style = {
-                  display: 'inline-block'
-                  position: 'relative'
-                  boxShadow: 'none'
-                }
-                React.createElement(Material.RefreshIndicator, { style: @style, size: 50, left: 0, top: 0, status:"loading" })
-              if @state.submitPredictionError?
-                div {},
-                  @state.submitPredictionError
+                if @state.submittingPrediction != true
+                  React.createElement(Material.RaisedButton, { label: "Create", onClick: @createPrediction })
+                else
+                  @style = {
+                    display: 'inline-block'
+                    position: 'relative'
+                    boxShadow: 'none'
+                  }
+                  React.createElement(Material.RefreshIndicator, { style: @style, size: 50, left: 0, top: 0, status:"loading" })
+                if @state.submitPredictionError?
+                  div {},
+                    @state.submitPredictionError
 
-          else
-            div {},
-              "You must be logged in to add an prediction to the sytem."
+            else
+              div { className: "not-found" },
+                "You must be logged in to add an prediction to the sytem."
       Footer {}, ''
