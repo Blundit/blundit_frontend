@@ -95,12 +95,39 @@
 
     @media (max-width: $mobile-breakpoint)
       +span(12 of 12)
-      
+
   &__bookmark
     float: left
     width: 20px
-    
 
+  &__accuracy-category
+    width: 100%
+    margin-bottom: 20px
+    &__name
+      font-weight: bold
+      float: left
+
+      width: 50%
+
+      @media (max-width: $mobile-breakpoint)
+        width: 100%
+
+    &__claim
+      float: left
+      color: $mid-grey-color
+      width: 25%
+
+      @media (max-width: $mobile-breakpoint)
+        width: 50%
+    
+    &__prediction
+      float: left
+      color: $mid-grey-color
+      width: 25%
+
+      @media (max-width: $mobile-breakpoint)
+        width: 50%
+      
 
 .expert-text-card
   width: 100%
@@ -148,3 +175,42 @@
 
   &:after
     +clearfix
+
+.expert__predictions-list-item
+  width: 100%
+  margin-bottom: 10px
+
+  &__title
+    width: 50%
+    float: left
+    cursor: pointer
+    color: $default-link-color
+
+    &:hover
+      font-weight: bold
+
+    @media (max-width: $mobile-breakpoint)
+      width: 100%
+      float: left
+
+  &__substantiations
+    @extend %normal-text
+    color: $mid-grey-color
+    cursor: pointer
+    border: 1px solid $white-color
+
+    span
+      color: $alert-color
+
+
+
+    &:hover
+      font-weight: bold
+  
+  .substantiation-list
+    background-color: $very-light-grey-color
+    padding: 5px
+
+    &__add
+      @extend %large-text
+      margin-top: 20px

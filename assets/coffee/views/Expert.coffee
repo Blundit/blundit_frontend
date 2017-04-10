@@ -129,14 +129,6 @@ module.exports = React.createFactory React.createClass
                       id: @state.expert.id
                       updateBookmark: @updateBookmark
 
-
-              ExpertBonaFides
-                expert: expert
-                refresh: @fetchExpert
-              
-  
-
-
               div { className: "default__card expert__categories" },
                 div { className: "text__title" },
                   "Categories"
@@ -153,25 +145,35 @@ module.exports = React.createFactory React.createClass
                         category.name
                       )
 
-              div { className: "expert__accuracy" },
+
+              div { className: "default__card expert__accuracy" },
                 "This expert has an overall accuracy of: #{@showAccuracy(expert.accuracy)}"
 
                 div { className: "expert__accuracy-categories" },
                   "Accuracy by Category: "
-                  expert.category_accuracies.map (accuracy, index) =>
-                    div
-                      className: "expert__accuracy-category"
-                      key: "expert-accuracy-category-#{index}"
-                      "#{accuracy.category_name}"
-                      div { className: "expert__accuracy-category__claim" },
-                        "#{@showAccuracy(accuracy.claim_accuracy)} (Claims: #{accuracy.correct_claims + accuracy.incorrect_claims})"
-                      div { className: "expert__accuracy-category__prediction" },
-                        "#{@showAccuracy(accuracy.prediction_accuracy)} (Predictions: #{accuracy.correct_predictions + accuracy.incorrect_predictions})"
+                  if expert.category_accuracies.length > 0
+                    expert.category_accuracies.map (accuracy, index) =>
+                      div
+                        className: "expert__accuracy-category"
+                        key: "expert-accuracy-category-#{index}"
+                        div { className: "expert__accuracy-category__name" },
+                          "#{accuracy.category_name}"
+                        div { className: "expert__accuracy-category__claim" },
+                          "Claims: #{@showAccuracy(accuracy.claim_accuracy)} (#{accuracy.correct_claims}/#{accuracy.correct_claims + accuracy.incorrect_claims} C)"
+                        div { className: "expert__accuracy-category__prediction" },
+                          "Predictions: #{@showAccuracy(accuracy.prediction_accuracy)} (#{accuracy.correct_predictions}/#{accuracy.correct_predictions + accuracy.incorrect_predictions} P)"
+                  else
+                    div { className: "not-found" },
+                      "No category accuracies to display."
                     
 
-              div { className: "expert__predictions" },
-                div { className: "expert__predictions-title" },
-                  "Predictions:"
+              ExpertBonaFides
+                expert: expert
+                refresh: @fetchExpert
+
+              div { className: "default__card expert__predictions" },
+                div { className: "text__title" },
+                  "Predictions this expert has made:"
                 div { className: "expert__predictions-list" },
                   if predictions.length > 0
                     predictions.map (prediction, index) ->
@@ -180,16 +182,17 @@ module.exports = React.createFactory React.createClass
                         key: "expert-prediction-card-#{index}"
                         prediction: prediction
                   else
-                    "No predictions"
-                  # if UserStore.loggedIn()
+                    div { className: "not-found" },
+                      "No predictions"
                   AddToExpert
                     expert: expert
                     type: "prediction"
                     items: @state.predictions
                     refresh: @fetchExpert
-              div { className: "expert__claims" },
-                div { className: "expert__claims-title" },
-                  "Claims:"
+
+              div { className: "default__card expert__claims" },
+                div { className: "text__title" },
+                  "Claims this expert has made:"
                 div { className: "expert__claims-list" },
                   if claims.length > 0
                     claims.map (claim, index) ->
@@ -198,7 +201,8 @@ module.exports = React.createFactory React.createClass
                         claim: claim
                         key: "expert-claim-card-#{index}"
                   else
-                    "No claims"
+                    div { className: "not-found" },
+                      "No claims found."
                   if UserStore.loggedIn()
                     AddToExpert
                       expert: expert

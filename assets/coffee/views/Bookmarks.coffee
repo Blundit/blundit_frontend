@@ -143,7 +143,6 @@ module.exports = React.createFactory React.createClass
                 "You must be logged in to view this content."
 
           if @state.user? and @state.user.token?
-            console.log @state.bookmarks
             div { className: "default__card bookmarks__list" },
               div { className: "text__title" },
                 "My bookmarks"

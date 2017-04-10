@@ -1,5 +1,7 @@
 { div, a } = React.DOM
 
+InlineLink = require("components/InlineLink")
+
 module.exports = React.createFactory React.createClass
   getInitialState: ->
     url: ''
@@ -62,12 +64,9 @@ module.exports = React.createFactory React.createClass
             "This expert currently has no bona fides."
         else
           bona_fides.map (bona_fide, index) ->
-            div { className: "expert__bona-fide" },
-              a
-                href: bona_fide.url
-                target: "_blank"
-                key: "expert-bona-fide-#{index}"
-                bona_fide.title
+            InlineLink
+              item: bona_fide
+              key: "expert-bona-fide-#{index}"
       if UserStore.loggedIn()
         if @state.submittingBonaFide == true
           React.createElement(Material.RefreshIndicator, { style: @refreshStyle, size: 50, left: 0, top: 0, status:"loading" })

@@ -126,7 +126,7 @@ module.exports = React.createFactory React.createClass
   render: ->
     div { className: "default__card comments" },
       div { className: "text__title" },
-        "Comments for #{@getCommentName()}"
+        "Comments about #{@getCommentName()}"
 
       if @state.comments == null
         div { className: "not-found" },

@@ -79,3 +79,42 @@ body
   @extend .default__card
   background-color: $brand-secondary
   color: $white-color
+
+
+.inline-link
+  margin-top: 10px
+  width: 100%
+  display: inline-block
+
+  &__image
+    width: 150px
+    height: 75px
+    background-size: cover
+    -webkit-background-size: cover
+    float: left
+
+    @media (max-width: $mobile-breakpoint)
+      width: 75px
+      height: 37.5px
+
+  &__meta
+    width: calc(100% - 155px)
+    margin-left: 5px
+    float: left
+
+    @media (max-width: $mobile-breakpoint)
+      width: calc(100% - 80px)
+
+  &__meta-url
+    color: $default-link-color
+    cursor: pointer
+    display: block
+    text-decoration: underline
+    margin-bottom: 5px
+
+    &:hover
+      font-weight: bold
+
+  &__meta-description
+    @extend %normal-text
+    margin-bottom: 10px

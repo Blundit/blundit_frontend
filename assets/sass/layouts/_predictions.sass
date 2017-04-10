@@ -115,3 +115,33 @@
 
   &:after
     +clearfix
+
+.expert__claims-list-item
+  width: 100%
+  margin-bottom: 10px
+
+  &__title
+    width: 50%
+    float: left
+    cursor: pointer
+    color: $default-link-color
+
+    &:hover
+      font-weight: bold
+
+    @media (max-width: $mobile-breakpoint)
+      width: 100%
+      float: left
+
+  &__substantiations
+    @extend %normal-text
+    color: $mid-grey-color
+    cursor: pointer
+    border: 1px solid $white-color
+
+    span
+      color: $alert-color
+
+    &:hover
+      font-weight: bold
+  

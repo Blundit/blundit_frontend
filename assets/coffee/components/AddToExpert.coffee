@@ -100,10 +100,7 @@ module.exports = React.createFactory React.createClass
   render: ->
     div { className: "add-to-expert" },
       if @state.showItems == false
-        div
-          className: "add-to-expert__button"
-          onClick: @doShowItems
-          "Add #{@props.type} to Expert"
+        React.createElement(Material.RaisedButton, {label: "Add #{@props.type} to Expert", primary: true, onClick: @doShowItems })
       else
         if @state.itemList?
           div {},

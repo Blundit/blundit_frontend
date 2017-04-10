@@ -1,4 +1,4 @@
-{ div } = React.DOM
+{ div, span } = React.DOM
 
 ExpertSubstantiations = require("components/ExpertSubstantiations")
 
@@ -14,7 +14,7 @@ module.exports = React.createFactory React.createClass
 
   showSubstantiation: ->
     { claim } = @props
-    return "X" if @state.showSubstantiation == true
+    return span { className: "fa fa-close" }, '' if @state.showSubstantiation == true
     
     if claim.evidence_of_beliefs == 0
       return "Unsubstantiated"

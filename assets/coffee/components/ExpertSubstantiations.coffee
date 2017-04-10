@@ -1,5 +1,7 @@
 { div, a } = React.DOM
 
+InlineLink = require("components/InlineLink")
+
 module.exports = React.createFactory React.createClass
   displayName: "ExpertSubstantiations"
   getInitialState: ->
@@ -73,11 +75,6 @@ module.exports = React.createFactory React.createClass
     @setState url: event.target.value
 
 
-  getSubstantiationTitle: (sub) ->
-    return sub.title if sub.title > ''
-    return sub.url if sub.title == ''
-
-
   render: ->
     @refreshStyle = {
       display: 'inline-block'
@@ -89,24 +86,18 @@ module.exports = React.createFactory React.createClass
     if @state.data == null
       React.createElement(Material.RefreshIndicator, { style: @refreshStyle, size: 50, left: 0, top: 0, status:"loading" })
     else
-      div { className: "substantiation-list" },
-        if @state.data.length > 0
-          @state.data.map (substantiation, index) =>
-            div
-              className: "substantiation-list__item"
-              key: "substantiation-list-#{@props.id}-#{index}"
-              a
-                className: "substantiation-list__item-link"
-                href: substantiation.url
-                target: "_blank"
-                @getSubstantiationTitle(substantiation)
-              div { className: "substantiation-list__item-description" },
-                substantiation.description
-        else
-          "There are currently no links substantianting #{expert.name}'s belief in this #{type}."
+      div {},
+        div { className: "substantiation-list" },
+          if @state.data.length > 0
+            @state.data.map (substantiation, index) =>
+              InlineLink
+                item: substantiation
+                key: "substantiation-list-#{@props.id}-#{index}"
+          else
+            "There are currently no links substantianting #{expert.name}'s belief in this #{type}."
 
         if UserStore.loggedIn()
-          div { },
+          div { className: "substantiation-list__add" },
             "Add Substantiation:"
             React.createElement(Material.TextField,
               {

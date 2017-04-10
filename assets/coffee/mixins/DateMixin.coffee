@@ -37,7 +37,6 @@ module.exports =
     year = date.getFullYear()
 
     hours = date.getHours()
-    console.log hours
     ampm = "AM"
 
     if hours >= 12

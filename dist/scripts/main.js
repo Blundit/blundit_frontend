@@ -66,7 +66,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"mixins/LinksMixin":601,"mixins/SessionMixin":603}],2:[function(require,module,exports){
+},{"mixins/LinksMixin":602,"mixins/SessionMixin":604}],2:[function(require,module,exports){
 var LinksMixin, LoginModal, div, img, menuItems, ref;
 
 ref = React.DOM, div = ref.div, img = ref.img;
@@ -190,9 +190,9 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"mixins/LinksMixin":601,"modals/LoginModal":604}],3:[function(require,module,exports){
+},{"mixins/LinksMixin":602,"modals/LoginModal":605}],3:[function(require,module,exports){
 (function() {
-  var API, AddToClaim, AddToExpert, AddToPrediction, Blundit, BookmarkIndicator, CategoryClaims, CategoryExperts, CategoryPredictions, CategorySubHead, ClaimCard, ClaimEvidences, ClaimExpertCard, ClaimFields, Comments, DateMixin, ExpertBonaFides, ExpertCard, ExpertClaimCard, ExpertFields, ExpertPredictionCard, ExpertSubstantiations, ExpertTextCard, Footer, ForgotPassword, Global, Header, LinksMixin, Login, LoginModal, MuiThemeProvider, Pagination, PaginationMixin, PredictionCard, PredictionEvidences, PredictionExpertCard, PredictionFields, PredictionTextCard, Register, RegistrationSuccessful, RouterMixin, SearchFilters, SessionMixin, UserStore, Votes, a, br, deepOrange500, div, getMuiTheme, img, input, menuItems, muiTheme, ref, ref1, ref10, ref11, ref12, ref13, ref14, ref15, ref16, ref17, ref18, ref19, ref2, ref20, ref3, ref4, ref5, ref6, ref7, ref8, ref9, span, startBlundit,
+  var API, AddToClaim, AddToExpert, AddToPrediction, Blundit, BookmarkIndicator, CategoryClaims, CategoryExperts, CategoryPredictions, CategorySubHead, ClaimCard, ClaimEvidences, ClaimExpertCard, ClaimFields, Comments, DateMixin, ExpertBonaFides, ExpertCard, ExpertClaimCard, ExpertFields, ExpertPredictionCard, ExpertSubstantiations, ExpertTextCard, Footer, ForgotPassword, Global, Header, InlineLink, LinksMixin, Login, LoginModal, MuiThemeProvider, Pagination, PaginationMixin, PredictionCard, PredictionEvidences, PredictionExpertCard, PredictionFields, PredictionTextCard, Register, RegistrationSuccessful, RouterMixin, SearchFilters, SessionMixin, UserStore, Votes, a, br, deepOrange500, div, getMuiTheme, img, input, menuItems, muiTheme, ref, ref1, ref10, ref11, ref12, ref13, ref14, ref15, ref16, ref17, ref18, ref19, ref2, ref20, ref21, ref22, ref23, ref3, ref4, ref5, ref6, ref7, ref8, ref9, span, startBlundit,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   window.React = require('react');
@@ -663,10 +663,11 @@ module.exports = React.createFactory(React.createClass({
     render: function() {
       return div({
         className: "add-to-expert"
-      }, this.state.showItems === false ? div({
-        className: "add-to-expert__button",
+      }, this.state.showItems === false ? React.createElement(Material.RaisedButton, {
+        label: "Add " + this.props.type + " to Expert",
+        primary: true,
         onClick: this.doShowItems
-      }, "Add " + this.props.type + " to Expert") : this.state.itemList != null ? div({}, React.createElement(Material.SelectField, {
+      }) : this.state.itemList != null ? div({}, React.createElement(Material.SelectField, {
         floatingLabelText: this.sentenceCase(this.props.type),
         value: this.state.item,
         onChange: this.handleChange
@@ -1502,7 +1503,7 @@ module.exports = React.createFactory(React.createClass({
         className: "default__card comments"
       }, div({
         className: "text__title"
-      }, "Comments for " + (this.getCommentName())), this.state.comments === null ? div({
+      }, "Comments about " + (this.getCommentName())), this.state.comments === null ? div({
         className: "not-found"
       }, "Loading Comments") : this.state.comments.length === 0 ? div({
         className: "not-found"
@@ -1568,6 +1569,8 @@ module.exports = React.createFactory(React.createClass({
   }));
 
   ref3 = React.DOM, div = ref3.div, a = ref3.a;
+
+  InlineLink = require("components/InlineLink");
 
   module.exports = React.createFactory(React.createClass({
     getInitialState: function() {
@@ -1643,13 +1646,10 @@ module.exports = React.createFactory(React.createClass({
       }, bona_fides.length === 0 ? div({
         className: "not-found"
       }, "This expert currently has no bona fides.") : bona_fides.map(function(bona_fide, index) {
-        return div({
-          className: "expert__bona-fide"
-        }, a({
-          href: bona_fide.url,
-          target: "_blank",
+        return InlineLink({
+          item: bona_fide,
           key: "expert-bona-fide-" + index
-        }, bona_fide.title));
+        });
       })), UserStore.loggedIn() ? this.state.submittingBonaFide === true ? React.createElement(Material.RefreshIndicator, {
         style: this.refreshStyle,
         size: 50,
@@ -1765,7 +1765,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  div = React.DOM.div;
+  ref5 = React.DOM, div = ref5.div, span = ref5.span;
 
   ExpertSubstantiations = require("components/ExpertSubstantiations");
 
@@ -1783,7 +1783,9 @@ module.exports = React.createFactory(React.createClass({
       var claim;
       claim = this.props.claim;
       if (this.state.showSubstantiation === true) {
-        return "X";
+        return span({
+          className: "fa fa-close"
+        }, '');
       }
       if (claim.evidence_of_beliefs === 0) {
         return "Unsubstantiated";
@@ -1849,10 +1851,10 @@ module.exports = React.createFactory(React.createClass({
       return this.props.updateField("category", value);
     },
     getErrorText: function(key) {
-      var error, j, len, ref5;
-      ref5 = this.props.errors;
-      for (j = 0, len = ref5.length; j < len; j++) {
-        error = ref5[j];
+      var error, j, len, ref6;
+      ref6 = this.props.errors;
+      for (j = 0, len = ref6.length; j < len; j++) {
+        error = ref6[j];
         if (error.id === key) {
           return error.text;
         }
@@ -1941,7 +1943,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  div = React.DOM.div;
+  ref6 = React.DOM, div = ref6.div, span = ref6.span;
 
   ExpertSubstantiations = require("components/ExpertSubstantiations");
 
@@ -1959,7 +1961,9 @@ module.exports = React.createFactory(React.createClass({
       var prediction;
       prediction = this.props.prediction;
       if (this.state.showSubstantiation === true) {
-        return "X";
+        return span({
+          className: "fa fa-close"
+        }, '');
       }
       if (prediction.evidence_of_beliefs === 0) {
         return "Unsubstantiated";
@@ -1973,15 +1977,15 @@ module.exports = React.createFactory(React.createClass({
       });
     },
     render: function() {
-      var expert, prediction, ref5;
-      ref5 = this.props, prediction = ref5.prediction, expert = ref5.expert;
+      var expert, prediction, ref7;
+      ref7 = this.props, prediction = ref7.prediction, expert = ref7.expert;
       return div({
         className: "expert__predictions-list-item"
       }, div({
         className: "expert__predictions-list-item__title",
         onClick: this.goToPrediction.bind(this, prediction.alias)
       }, prediction.title), div({
-        className: "expert__predictions-list-item__substatiations",
+        className: "expert__predictions-list-item__substantiations",
         onClick: this.toggleSubstantiation
       }, this.showSubstantiation()), this.state.showSubstantiation === true ? ExpertSubstantiations({
         expert: expert,
@@ -1991,7 +1995,9 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref5 = React.DOM, div = ref5.div, a = ref5.a;
+  ref7 = React.DOM, div = ref7.div, a = ref7.a;
+
+  InlineLink = require("components/InlineLink");
 
   module.exports = React.createFactory(React.createClass({
     displayName: "ExpertSubstantiations",
@@ -2071,22 +2077,14 @@ module.exports = React.createFactory(React.createClass({
         url: event.target.value
       });
     },
-    getSubstantiationTitle: function(sub) {
-      if (sub.title > '') {
-        return sub.title;
-      }
-      if (sub.title === '') {
-        return sub.url;
-      }
-    },
     render: function() {
-      var expert, ref6, type;
+      var expert, ref8, type;
       this.refreshStyle = {
         display: 'inline-block',
         position: 'relative',
         boxShadow: 'none'
       };
-      ref6 = this.props, expert = ref6.expert, type = ref6.type;
+      ref8 = this.props, expert = ref8.expert, type = ref8.type;
       if (this.state.data === null) {
         return React.createElement(Material.RefreshIndicator, {
           style: this.refreshStyle,
@@ -2096,22 +2094,18 @@ module.exports = React.createFactory(React.createClass({
           status: "loading"
         });
       } else {
-        return div({
+        return div({}, div({
           className: "substantiation-list"
         }, this.state.data.length > 0 ? this.state.data.map((function(_this) {
           return function(substantiation, index) {
-            return div({
-              className: "substantiation-list__item",
+            return InlineLink({
+              item: substantiation,
               key: "substantiation-list-" + _this.props.id + "-" + index
-            }, a({
-              className: "substantiation-list__item-link",
-              href: substantiation.url,
-              target: "_blank"
-            }, _this.getSubstantiationTitle(substantiation)), div({
-              className: "substantiation-list__item-description"
-            }, substantiation.description));
+            });
           };
-        })(this)) : "There are currently no links substantianting " + expert.name + "'s belief in this " + type + ".", UserStore.loggedIn() ? div({}, "Add Substantiation:", React.createElement(Material.TextField, {
+        })(this)) : "There are currently no links substantianting " + expert.name + "'s belief in this " + type + "."), UserStore.loggedIn() ? div({
+          className: "substantiation-list__add"
+        }, "Add Substantiation:", React.createElement(Material.TextField, {
           value: this.state.url,
           fullWidth: true,
           onChange: this.changeURL,
@@ -2124,7 +2118,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref6 = React.DOM, div = ref6.div, img = ref6.img, br = ref6.br, span = ref6.span, a = ref6.a;
+  ref8 = React.DOM, div = ref8.div, img = ref8.img, br = ref8.br, span = ref8.span, a = ref8.a;
 
   LinksMixin = require("mixins/LinksMixin");
 
@@ -2178,7 +2172,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref7 = React.DOM, div = ref7.div, a = ref7.a, span = ref7.span;
+  ref9 = React.DOM, div = ref9.div, a = ref9.a, span = ref9.span;
 
   SessionMixin = require("mixins/SessionMixin");
 
@@ -2203,7 +2197,7 @@ module.exports = React.createFactory(React.createClass({
       });
     },
     render: function() {
-      var ref8;
+      var ref10;
       return div({
         className: "footer-wrapper"
       }, div({
@@ -2235,14 +2229,14 @@ module.exports = React.createFactory(React.createClass({
         className: "fa fa-youtube"
       }, ''), span({
         className: "fa fa-podcast"
-      }, '')), ((ref8 = this.state.user) != null ? ref8.token : void 0) != null ? div({
+      }, '')), ((ref10 = this.state.user) != null ? ref10.token : void 0) != null ? div({
         className: "footer__link--signout",
         onClick: this.logout
       }, "Sign out") : void 0))));
     }
   }));
 
-  ref8 = React.DOM, div = ref8.div, a = ref8.a;
+  ref10 = React.DOM, div = ref10.div, a = ref10.a;
 
   LinksMixin = require("mixins/LinksMixin");
 
@@ -2310,10 +2304,10 @@ module.exports = React.createFactory(React.createClass({
       return false;
     },
     getErrorText: function(key) {
-      var error, j, len, ref9;
-      ref9 = this.state.errors;
-      for (j = 0, len = ref9.length; j < len; j++) {
-        error = ref9[j];
+      var error, j, len, ref11;
+      ref11 = this.state.errors;
+      for (j = 0, len = ref11.length; j < len; j++) {
+        error = ref11[j];
         if (error.id === key) {
           return error.text;
         }
@@ -2365,7 +2359,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref9 = React.DOM, div = ref9.div, img = ref9.img;
+  ref11 = React.DOM, div = ref11.div, img = ref11.img;
 
   menuItems = [
     {
@@ -2444,7 +2438,7 @@ module.exports = React.createFactory(React.createClass({
       return this["class"];
     },
     render: function() {
-      var ref10;
+      var ref12;
       return div({
         className: "header-wrapper"
       }, div({
@@ -2458,8 +2452,8 @@ module.exports = React.createFactory(React.createClass({
         className: "header__items"
       }, menuItems.map((function(_this) {
         return function(item, index) {
-          var ref10;
-          if (((item.logged != null) && (((ref10 = _this.state.user) != null ? ref10.token : void 0) != null)) || !item.logged) {
+          var ref12;
+          if (((item.logged != null) && (((ref12 = _this.state.user) != null ? ref12.token : void 0) != null)) || !item.logged) {
             return div({
               className: _this.getHeaderItemClass(item),
               key: "header-item-" + index,
@@ -2469,7 +2463,7 @@ module.exports = React.createFactory(React.createClass({
         };
       })(this))), div({
         className: "header__user"
-      }, ((ref10 = this.state.user) != null ? ref10.token : void 0) != null ? div({
+      }, ((ref12 = this.state.user) != null ? ref12.token : void 0) != null ? div({
         className: "header__user__avatar",
         onClick: this.navigateToLocation.bind(this, "/me"),
         style: {
@@ -2485,7 +2479,64 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref10 = React.DOM, div = ref10.div, a = ref10.a;
+  ref12 = React.DOM, div = ref12.div, a = ref12.a, span = ref12.span;
+
+  module.exports = React.createFactory(React.createClass({
+    getInlineLinkImage: function() {
+      var item;
+      item = this.props.item;
+      if (item.pic != null) {
+        return "url(" + item.pic + ")";
+      }
+      if (item.image != null) {
+        return "url(" + item.image + ")";
+      }
+      return "url()";
+    },
+    getTitle: function() {
+      var item;
+      item = this.props.item;
+      if (item.title > '') {
+        return item.title;
+      }
+      if (item.title === '') {
+        return item.url;
+      }
+    },
+    getDescription: function() {
+      var item;
+      item = this.props.item;
+      if (item.description != null) {
+        return span({}, item.description);
+      } else {
+        return span({
+          className: "not-found"
+        }, "No description found.");
+      }
+    },
+    render: function() {
+      var item;
+      item = this.props.item;
+      return div({
+        className: "inline-link"
+      }, div({
+        className: "inline-link__image",
+        style: {
+          backgroundImage: this.getInlineLinkImage()
+        }
+      }), div({
+        className: "inline-link__meta"
+      }, a({
+        className: "inline-link__meta-url",
+        href: item.url,
+        target: "_blank"
+      }, this.getTitle()), div({
+        className: "inline-link__meta-description"
+      }, this.getDescription())));
+    }
+  }));
+
+  ref13 = React.DOM, div = ref13.div, a = ref13.a;
 
   SessionMixin = require("mixins/SessionMixin");
 
@@ -2581,10 +2632,10 @@ module.exports = React.createFactory(React.createClass({
       }
     },
     getErrorText: function(key) {
-      var error, j, len, ref11;
-      ref11 = this.state.errors;
-      for (j = 0, len = ref11.length; j < len; j++) {
-        error = ref11[j];
+      var error, j, len, ref14;
+      ref14 = this.state.errors;
+      for (j = 0, len = ref14.length; j < len; j++) {
+        error = ref14[j];
         if (error.id === key) {
           return error.text;
         }
@@ -2728,9 +2779,9 @@ module.exports = React.createFactory(React.createClass({
       return div({
         className: "pagination__pages"
       }, (function() {
-        var j, ref11, ref12, results1;
+        var j, ref14, ref15, results1;
         results1 = [];
-        for (page = j = ref11 = this.leftPage, ref12 = this.rightPage; ref11 <= ref12 ? j <= ref12 : j >= ref12; page = ref11 <= ref12 ? ++j : --j) {
+        for (page = j = ref14 = this.leftPage, ref15 = this.rightPage; ref14 <= ref15 ? j <= ref15 : j >= ref15; page = ref14 <= ref15 ? ++j : --j) {
           if (page === this.props.page) {
             results1.push(React.createElement(Material.FlatButton, {
               key: "page-" + page,
@@ -2761,7 +2812,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref11 = React.DOM, div = ref11.div, img = ref11.img, a = ref11.a, br = ref11.br, span = ref11.span;
+  ref14 = React.DOM, div = ref14.div, img = ref14.img, a = ref14.a, br = ref14.br, span = ref14.span;
 
   LinksMixin = require("mixins/LinksMixin");
 
@@ -2861,7 +2912,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref12 = React.DOM, div = ref12.div, a = ref12.a;
+  ref15 = React.DOM, div = ref15.div, a = ref15.a;
 
   module.exports = React.createFactory(React.createClass({
     displayName: "PredictionEvidences",
@@ -2978,8 +3029,8 @@ module.exports = React.createFactory(React.createClass({
       });
     },
     render: function() {
-      var expert, prediction, ref13;
-      ref13 = this.props, expert = ref13.expert, prediction = ref13.prediction;
+      var expert, prediction, ref16;
+      ref16 = this.props, expert = ref16.expert, prediction = ref16.prediction;
       return div({
         className: "prediction__experts-list-item"
       }, div({
@@ -3030,10 +3081,10 @@ module.exports = React.createFactory(React.createClass({
       return this.props.updateField("category", value);
     },
     getErrorText: function(key) {
-      var error, j, len, ref13;
-      ref13 = this.props.errors;
-      for (j = 0, len = ref13.length; j < len; j++) {
-        error = ref13[j];
+      var error, j, len, ref16;
+      ref16 = this.props.errors;
+      for (j = 0, len = ref16.length; j < len; j++) {
+        error = ref16[j];
         if (error.id === key) {
           return error.text;
         }
@@ -3095,7 +3146,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref13 = React.DOM, div = ref13.div, img = ref13.img, a = ref13.a, br = ref13.br, span = ref13.span;
+  ref16 = React.DOM, div = ref16.div, img = ref16.img, a = ref16.a, br = ref16.br, span = ref16.span;
 
   LinksMixin = require("mixins/LinksMixin");
 
@@ -3154,7 +3205,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref14 = React.DOM, div = ref14.div, a = ref14.a;
+  ref17 = React.DOM, div = ref17.div, a = ref17.a;
 
   LinksMixin = require("mixins/LinksMixin");
 
@@ -3266,10 +3317,10 @@ module.exports = React.createFactory(React.createClass({
       }
     },
     getErrorText: function(key) {
-      var error, j, len, ref15;
-      ref15 = this.state.errors;
-      for (j = 0, len = ref15.length; j < len; j++) {
-        error = ref15[j];
+      var error, j, len, ref18;
+      ref18 = this.state.errors;
+      for (j = 0, len = ref18.length; j < len; j++) {
+        error = ref18[j];
         if (error.id === key) {
           return error.text;
         }
@@ -3376,10 +3427,10 @@ module.exports = React.createFactory(React.createClass({
       });
     },
     getErrorText: function(key) {
-      var error, j, len, ref15;
-      ref15 = this.state.errors;
-      for (j = 0, len = ref15.length; j < len; j++) {
-        error = ref15[j];
+      var error, j, len, ref18;
+      ref18 = this.state.errors;
+      for (j = 0, len = ref18.length; j < len; j++) {
+        error = ref18[j];
         if (error.id === key) {
           return error.text;
         }
@@ -3432,10 +3483,10 @@ module.exports = React.createFactory(React.createClass({
   module.exports = React.createFactory(React.createClass({
     displayName: 'Votes',
     getVoteValText: function() {
-      var item, ref15;
+      var item, ref18;
       item = this.props.item;
       if (item.user_vote != null) {
-        return (ref15 = item.user_vote.vote === 1) != null ? ref15 : {
+        return (ref18 = item.user_vote.vote === 1) != null ? ref18 : {
           "True": "False"
         };
       } else {
@@ -3449,8 +3500,8 @@ module.exports = React.createFactory(React.createClass({
       return this.props.vote(0);
     },
     notOpenYet: function() {
-      var d1, d2, item, ref15, type;
-      ref15 = this.props, item = ref15.item, type = ref15.type;
+      var d1, d2, item, ref18, type;
+      ref18 = this.props, item = ref18.item, type = ref18.type;
       if (type !== "prediction") {
         return false;
       } else {
@@ -3471,8 +3522,8 @@ module.exports = React.createFactory(React.createClass({
       };
     },
     render: function() {
-      var item, ref15, submitted, submitting, type;
-      ref15 = this.props, type = ref15.type, item = ref15.item, submitting = ref15.submitting, submitted = ref15.submitted;
+      var item, ref18, submitted, submitting, type;
+      ref18 = this.props, type = ref18.type, item = ref18.item, submitting = ref18.submitting, submitted = ref18.submitted;
       return div({
         className: type + "__vote"
       }, div({
@@ -3532,7 +3583,6 @@ module.exports = React.createFactory(React.createClass({
       monthIndex = date.getMonth();
       year = date.getFullYear();
       hours = date.getHours();
-      console.log(hours);
       ampm = "AM";
       if (hours >= 12) {
         hours -= 12;
@@ -3660,13 +3710,13 @@ module.exports = React.createFactory(React.createClass({
       return decodeURIComponent(results[2].replace(/\+/g, " "));
     },
     getUrlParams: function() {
-      var j, key, len, params, query, raw_vars, ref15, v, val;
+      var j, key, len, params, query, raw_vars, ref18, v, val;
       query = window.location.search.substring(1);
       raw_vars = query.split("&");
       params = {};
       for (j = 0, len = raw_vars.length; j < len; j++) {
         v = raw_vars[j];
-        ref15 = v.split("="), key = ref15[0], val = ref15[1];
+        ref18 = v.split("="), key = ref18[0], val = ref18[1];
         params[key] = decodeURIComponent(val);
       }
       return params;
@@ -3733,7 +3783,7 @@ module.exports = React.createFactory(React.createClass({
     updateUserHeaderInfo: function(request) {}
   };
 
-  ref15 = React.DOM, div = ref15.div, span = ref15.span;
+  ref18 = React.DOM, div = ref18.div, span = ref18.span;
 
   Login = require("components/Login");
 
@@ -4019,11 +4069,11 @@ module.exports = React.createFactory(React.createClass({
     };
 
     API.path = function(params) {
-      var key, ref16, value;
+      var key, ref19, value;
       this.p = this.server(params) + this.paths[params.path].path;
-      ref16 = params.path_variables;
-      for (key in ref16) {
-        value = ref16[key];
+      ref19 = params.path_variables;
+      for (key in ref19) {
+        value = ref19[key];
         this.p = this.p.replace('%' + key + '%', value);
       }
       if (this.paths[params.path].method === "GET") {
@@ -4379,7 +4429,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref16 = React.DOM, div = ref16.div, span = ref16.span;
+  ref19 = React.DOM, div = ref19.div, span = ref19.span;
 
   Header = require("components/Header");
 
@@ -4510,7 +4560,7 @@ module.exports = React.createFactory(React.createClass({
         className: "text__title"
       }, "My bookmarks"), div({
         className: "not-found"
-      }, "You must be logged in to view this content.")) : void 0, (this.state.user != null) && (this.state.user.token != null) ? (console.log(this.state.bookmarks), div({
+      }, "You must be logged in to view this content.")) : void 0, (this.state.user != null) && (this.state.user.token != null) ? div({
         className: "default__card bookmarks__list"
       }, div({
         className: "text__title"
@@ -4540,7 +4590,7 @@ module.exports = React.createFactory(React.createClass({
             className: "fa fa-remove"
           }, ''))));
         };
-      })(this)) : void 0)) : void 0)), Footer({}, ''));
+      })(this)) : void 0) : void 0)), Footer({}, ''));
     }
   }));
 
@@ -4943,7 +4993,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref17 = React.DOM, div = ref17.div, img = ref17.img;
+  ref20 = React.DOM, div = ref20.div, img = ref20.img;
 
   Header = require("components/Header");
 
@@ -5107,8 +5157,8 @@ module.exports = React.createFactory(React.createClass({
       }
     },
     render: function() {
-      var claim, experts, ref18;
-      ref18 = this.state, claim = ref18.claim, experts = ref18.experts;
+      var claim, experts, ref21;
+      ref21 = this.state, claim = ref21.claim, experts = ref21.experts;
       return div({}, Header({}, ''), div({
         className: "claims-wrapper"
       }, div({
@@ -5754,7 +5804,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref18 = React.DOM, div = ref18.div, img = ref18.img;
+  ref21 = React.DOM, div = ref21.div, img = ref21.img;
 
   Header = require("components/Header");
 
@@ -5865,8 +5915,8 @@ module.exports = React.createFactory(React.createClass({
       }, "Success! You've added a new expert to the system. Now you can add more information to them!") : void 0);
     },
     render: function() {
-      var claims, expert, predictions, ref19;
-      ref19 = this.state, expert = ref19.expert, predictions = ref19.predictions, claims = ref19.claims;
+      var claims, expert, predictions, ref22;
+      ref22 = this.state, expert = ref22.expert, predictions = ref22.predictions, claims = ref22.claims;
       return div({}, Header({}, ''), div({
         className: "experts-wrapper"
       }, div({
@@ -5895,10 +5945,7 @@ module.exports = React.createFactory(React.createClass({
         type: "expert",
         id: this.state.expert.id,
         updateBookmark: this.updateBookmark
-      })) : void 0), ExpertBonaFides({
-        expert: expert,
-        refresh: this.fetchExpert
-      }), div({
+      })) : void 0), div({
         className: "default__card expert__categories"
       }, div({
         className: "text__title"
@@ -5915,25 +5962,32 @@ module.exports = React.createFactory(React.createClass({
           }, category.name);
         };
       })(this)))), div({
-        className: "expert__accuracy"
+        className: "default__card expert__accuracy"
       }, "This expert has an overall accuracy of: " + (this.showAccuracy(expert.accuracy)), div({
         className: "expert__accuracy-categories"
-      }, "Accuracy by Category: ", expert.category_accuracies.map((function(_this) {
+      }, "Accuracy by Category: ", expert.category_accuracies.length > 0 ? expert.category_accuracies.map((function(_this) {
         return function(accuracy, index) {
           return div({
             className: "expert__accuracy-category",
             key: "expert-accuracy-category-" + index
-          }, "" + accuracy.category_name, div({
+          }, div({
+            className: "expert__accuracy-category__name"
+          }, "" + accuracy.category_name), div({
             className: "expert__accuracy-category__claim"
-          }, (_this.showAccuracy(accuracy.claim_accuracy)) + " (Claims: " + (accuracy.correct_claims + accuracy.incorrect_claims) + ")"), div({
+          }, "Claims: " + (_this.showAccuracy(accuracy.claim_accuracy)) + " (" + accuracy.correct_claims + "/" + (accuracy.correct_claims + accuracy.incorrect_claims) + " C)"), div({
             className: "expert__accuracy-category__prediction"
-          }, (_this.showAccuracy(accuracy.prediction_accuracy)) + " (Predictions: " + (accuracy.correct_predictions + accuracy.incorrect_predictions) + ")"));
+          }, "Predictions: " + (_this.showAccuracy(accuracy.prediction_accuracy)) + " (" + accuracy.correct_predictions + "/" + (accuracy.correct_predictions + accuracy.incorrect_predictions) + " P)"));
         };
-      })(this)))), div({
-        className: "expert__predictions"
+      })(this)) : div({
+        className: "not-found"
+      }, "No category accuracies to display."))), ExpertBonaFides({
+        expert: expert,
+        refresh: this.fetchExpert
+      }), div({
+        className: "default__card expert__predictions"
       }, div({
-        className: "expert__predictions-title"
-      }, "Predictions:"), div({
+        className: "text__title"
+      }, "Predictions this expert has made:"), div({
         className: "expert__predictions-list"
       }, predictions.length > 0 ? predictions.map(function(prediction, index) {
         return ExpertPredictionCard({
@@ -5941,16 +5995,18 @@ module.exports = React.createFactory(React.createClass({
           key: "expert-prediction-card-" + index,
           prediction: prediction
         });
-      }) : "No predictions", AddToExpert({
+      }) : div({
+        className: "not-found"
+      }, "No predictions"), AddToExpert({
         expert: expert,
         type: "prediction",
         items: this.state.predictions,
         refresh: this.fetchExpert
       }))), div({
-        className: "expert__claims"
+        className: "default__card expert__claims"
       }, div({
-        className: "expert__claims-title"
-      }, "Claims:"), div({
+        className: "text__title"
+      }, "Claims this expert has made:"), div({
         className: "expert__claims-list"
       }, claims.length > 0 ? claims.map(function(claim, index) {
         return ExpertClaimCard({
@@ -5958,7 +6014,9 @@ module.exports = React.createFactory(React.createClass({
           claim: claim,
           key: "expert-claim-card-" + index
         });
-      }) : "No claims", UserStore.loggedIn() ? AddToExpert({
+      }) : div({
+        className: "not-found"
+      }, "No claims found."), UserStore.loggedIn() ? AddToExpert({
         expert: expert,
         type: "claim",
         items: this.state.claims,
@@ -6279,7 +6337,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref19 = React.DOM, div = ref19.div, img = ref19.img;
+  ref22 = React.DOM, div = ref22.div, img = ref22.img;
 
   Header = require("components/Header");
 
@@ -6446,8 +6504,8 @@ module.exports = React.createFactory(React.createClass({
       return date;
     },
     render: function() {
-      var experts, prediction, ref20;
-      ref20 = this.state, prediction = ref20.prediction, experts = ref20.experts;
+      var experts, prediction, ref23;
+      ref23 = this.state, prediction = ref23.prediction, experts = ref23.experts;
       return div({}, Header({}, ''), div({
         className: "predictions-wrapper"
       }, div({
@@ -6884,7 +6942,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref20 = React.DOM, div = ref20.div, input = ref20.input, br = ref20.br, img = ref20.img;
+  ref23 = React.DOM, div = ref23.div, input = ref23.input, br = ref23.br, img = ref23.img;
 
   Header = require("components/Header");
 
@@ -7012,10 +7070,10 @@ module.exports = React.createFactory(React.createClass({
       return false;
     },
     getErrorText: function(key) {
-      var error, j, len, ref21;
-      ref21 = this.state.errors;
-      for (j = 0, len = ref21.length; j < len; j++) {
-        error = ref21[j];
+      var error, j, len, ref24;
+      ref24 = this.state.errors;
+      for (j = 0, len = ref24.length; j < len; j++) {
+        error = ref24[j];
         if (error.id === key) {
           return error.text;
         }
@@ -7163,7 +7221,7 @@ module.exports = React.createFactory(React.createClass({
 
 }).call(this);
 
-},{"./components/Footer":1,"./components/Header":2,"components/AddToClaim":566,"components/AddToExpert":567,"components/AddToPrediction":568,"components/BookmarkIndicator":569,"components/CategoryClaims":570,"components/CategoryExperts":571,"components/CategoryPredictions":572,"components/CategorySubHead":573,"components/ClaimCard":574,"components/ClaimEvidences":575,"components/ClaimExpertCard":576,"components/ClaimFields":577,"components/Comments":578,"components/ExpertBonaFides":579,"components/ExpertCard":580,"components/ExpertClaimCard":581,"components/ExpertFields":582,"components/ExpertPredictionCard":583,"components/ExpertSubstantiations":584,"components/ExpertTextCard":585,"components/Footer":586,"components/ForgotPassword":587,"components/Header":588,"components/Login":589,"components/Pagination":590,"components/PredictionCard":591,"components/PredictionEvidences":592,"components/PredictionExpertCard":593,"components/PredictionFields":594,"components/PredictionTextCard":595,"components/Register":596,"components/RegistrationSuccessful":597,"components/SearchFilters":598,"components/Votes":599,"lodash":180,"material-ui":318,"material-ui/styles/MuiThemeProvider":337,"material-ui/styles/colors":339,"material-ui/styles/getMuiTheme":340,"mixins/DateMixin":600,"mixins/LinksMixin":601,"mixins/PaginationMixin":602,"mixins/SessionMixin":603,"modals/LoginModal":604,"react":551,"react-dom":377,"react-mini-router":509,"react-tap-event-plugin":520,"shared/API":605,"shared/Global":606,"stores/UserStore":607,"views/404":608,"views/Bookmarks":609,"views/Categories":610,"views/CategoryAll":611,"views/CategoryClaims":612,"views/CategoryExperts":613,"views/CategoryPredictions":614,"views/Claim":615,"views/Claims":616,"views/CreateClaim":617,"views/CreateExpert":618,"views/CreatePrediction":619,"views/Expert":620,"views/Experts":621,"views/Landing":622,"views/Prediction":623,"views/Predictions":624,"views/Search":625,"views/User":626,"views/Users":627}],4:[function(require,module,exports){
+},{"./components/Footer":1,"./components/Header":2,"components/AddToClaim":566,"components/AddToExpert":567,"components/AddToPrediction":568,"components/BookmarkIndicator":569,"components/CategoryClaims":570,"components/CategoryExperts":571,"components/CategoryPredictions":572,"components/CategorySubHead":573,"components/ClaimCard":574,"components/ClaimEvidences":575,"components/ClaimExpertCard":576,"components/ClaimFields":577,"components/Comments":578,"components/ExpertBonaFides":579,"components/ExpertCard":580,"components/ExpertClaimCard":581,"components/ExpertFields":582,"components/ExpertPredictionCard":583,"components/ExpertSubstantiations":584,"components/ExpertTextCard":585,"components/Footer":586,"components/ForgotPassword":587,"components/Header":588,"components/InlineLink":589,"components/Login":590,"components/Pagination":591,"components/PredictionCard":592,"components/PredictionEvidences":593,"components/PredictionExpertCard":594,"components/PredictionFields":595,"components/PredictionTextCard":596,"components/Register":597,"components/RegistrationSuccessful":598,"components/SearchFilters":599,"components/Votes":600,"lodash":180,"material-ui":318,"material-ui/styles/MuiThemeProvider":337,"material-ui/styles/colors":339,"material-ui/styles/getMuiTheme":340,"mixins/DateMixin":601,"mixins/LinksMixin":602,"mixins/PaginationMixin":603,"mixins/SessionMixin":604,"modals/LoginModal":605,"react":551,"react-dom":377,"react-mini-router":509,"react-tap-event-plugin":520,"shared/API":606,"shared/Global":607,"stores/UserStore":608,"views/404":609,"views/Bookmarks":610,"views/Categories":611,"views/CategoryAll":612,"views/CategoryClaims":613,"views/CategoryExperts":614,"views/CategoryPredictions":615,"views/Claim":616,"views/Claims":617,"views/CreateClaim":618,"views/CreateExpert":619,"views/CreatePrediction":620,"views/Expert":621,"views/Experts":622,"views/Landing":623,"views/Prediction":624,"views/Predictions":625,"views/Search":626,"views/User":627,"views/Users":628}],4:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/array/from"), __esModule: true };
 },{"core-js/library/fn/array/from":26}],5:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/get-iterator"), __esModule: true };
@@ -84520,10 +84578,11 @@ module.exports = React.createFactory(React.createClass({
   render: function() {
     return div({
       className: "add-to-expert"
-    }, this.state.showItems === false ? div({
-      className: "add-to-expert__button",
+    }, this.state.showItems === false ? React.createElement(Material.RaisedButton, {
+      label: "Add " + this.props.type + " to Expert",
+      primary: true,
       onClick: this.doShowItems
-    }, "Add " + this.props.type + " to Expert") : this.state.itemList != null ? div({}, React.createElement(Material.SelectField, {
+    }) : this.state.itemList != null ? div({}, React.createElement(Material.SelectField, {
       floatingLabelText: this.sentenceCase(this.props.type),
       value: this.state.item,
       onChange: this.handleChange
@@ -84766,7 +84825,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ClaimCard":574,"mixins/LinksMixin":601}],571:[function(require,module,exports){
+},{"components/ClaimCard":574,"mixins/LinksMixin":602}],571:[function(require,module,exports){
 var ExpertCard, LinksMixin, div;
 
 div = React.DOM.div;
@@ -84797,7 +84856,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ExpertCard":580,"mixins/LinksMixin":601}],572:[function(require,module,exports){
+},{"components/ExpertCard":580,"mixins/LinksMixin":602}],572:[function(require,module,exports){
 var LinksMixin, PredictionCard, div;
 
 div = React.DOM.div;
@@ -84828,7 +84887,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/PredictionCard":591,"mixins/LinksMixin":601}],573:[function(require,module,exports){
+},{"components/PredictionCard":592,"mixins/LinksMixin":602}],573:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -84997,7 +85056,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"mixins/LinksMixin":601}],575:[function(require,module,exports){
+},{"mixins/LinksMixin":602}],575:[function(require,module,exports){
 var a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
@@ -85140,7 +85199,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ExpertSubstantiations":584,"mixins/LinksMixin":601}],577:[function(require,module,exports){
+},{"components/ExpertSubstantiations":584,"mixins/LinksMixin":602}],577:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -85403,7 +85462,7 @@ module.exports = React.createFactory(React.createClass({
       className: "default__card comments"
     }, div({
       className: "text__title"
-    }, "Comments for " + (this.getCommentName())), this.state.comments === null ? div({
+    }, "Comments about " + (this.getCommentName())), this.state.comments === null ? div({
       className: "not-found"
     }, "Loading Comments") : this.state.comments.length === 0 ? div({
       className: "not-found"
@@ -85469,10 +85528,12 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Pagination":590,"mixins/DateMixin":600,"mixins/PaginationMixin":602}],579:[function(require,module,exports){
-var a, div, ref;
+},{"components/Pagination":591,"mixins/DateMixin":601,"mixins/PaginationMixin":603}],579:[function(require,module,exports){
+var InlineLink, a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
+
+InlineLink = require("components/InlineLink");
 
 module.exports = React.createFactory(React.createClass({
   getInitialState: function() {
@@ -85548,13 +85609,10 @@ module.exports = React.createFactory(React.createClass({
     }, bona_fides.length === 0 ? div({
       className: "not-found"
     }, "This expert currently has no bona fides.") : bona_fides.map(function(bona_fide, index) {
-      return div({
-        className: "expert__bona-fide"
-      }, a({
-        href: bona_fide.url,
-        target: "_blank",
+      return InlineLink({
+        item: bona_fide,
         key: "expert-bona-fide-" + index
-      }, bona_fide.title));
+      });
     })), UserStore.loggedIn() ? this.state.submittingBonaFide === true ? React.createElement(Material.RefreshIndicator, {
       style: this.refreshStyle,
       size: 50,
@@ -85578,7 +85636,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],580:[function(require,module,exports){
+},{"components/InlineLink":589}],580:[function(require,module,exports){
 var LinksMixin, a, br, div, img, ref, span;
 
 ref = React.DOM, div = ref.div, img = ref.img, br = ref.br, span = ref.span, a = ref.a;
@@ -85675,10 +85733,10 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"mixins/LinksMixin":601}],581:[function(require,module,exports){
-var ExpertSubstantiations, LinksMixin, div;
+},{"mixins/LinksMixin":602}],581:[function(require,module,exports){
+var ExpertSubstantiations, LinksMixin, div, ref, span;
 
-div = React.DOM.div;
+ref = React.DOM, div = ref.div, span = ref.span;
 
 ExpertSubstantiations = require("components/ExpertSubstantiations");
 
@@ -85696,7 +85754,9 @@ module.exports = React.createFactory(React.createClass({
     var claim;
     claim = this.props.claim;
     if (this.state.showSubstantiation === true) {
-      return "X";
+      return span({
+        className: "fa fa-close"
+      }, '');
     }
     if (claim.evidence_of_beliefs === 0) {
       return "Unsubstantiated";
@@ -85729,7 +85789,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ExpertSubstantiations":584,"mixins/LinksMixin":601}],582:[function(require,module,exports){
+},{"components/ExpertSubstantiations":584,"mixins/LinksMixin":602}],582:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -85860,9 +85920,9 @@ module.exports = React.createFactory(React.createClass({
 
 
 },{}],583:[function(require,module,exports){
-var ExpertSubstantiations, LinksMixin, div;
+var ExpertSubstantiations, LinksMixin, div, ref, span;
 
-div = React.DOM.div;
+ref = React.DOM, div = ref.div, span = ref.span;
 
 ExpertSubstantiations = require("components/ExpertSubstantiations");
 
@@ -85880,7 +85940,9 @@ module.exports = React.createFactory(React.createClass({
     var prediction;
     prediction = this.props.prediction;
     if (this.state.showSubstantiation === true) {
-      return "X";
+      return span({
+        className: "fa fa-close"
+      }, '');
     }
     if (prediction.evidence_of_beliefs === 0) {
       return "Unsubstantiated";
@@ -85894,15 +85956,15 @@ module.exports = React.createFactory(React.createClass({
     });
   },
   render: function() {
-    var expert, prediction, ref;
-    ref = this.props, prediction = ref.prediction, expert = ref.expert;
+    var expert, prediction, ref1;
+    ref1 = this.props, prediction = ref1.prediction, expert = ref1.expert;
     return div({
       className: "expert__predictions-list-item"
     }, div({
       className: "expert__predictions-list-item__title",
       onClick: this.goToPrediction.bind(this, prediction.alias)
     }, prediction.title), div({
-      className: "expert__predictions-list-item__substatiations",
+      className: "expert__predictions-list-item__substantiations",
       onClick: this.toggleSubstantiation
     }, this.showSubstantiation()), this.state.showSubstantiation === true ? ExpertSubstantiations({
       expert: expert,
@@ -85913,10 +85975,12 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ExpertSubstantiations":584,"mixins/LinksMixin":601}],584:[function(require,module,exports){
-var a, div, ref;
+},{"components/ExpertSubstantiations":584,"mixins/LinksMixin":602}],584:[function(require,module,exports){
+var InlineLink, a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
+
+InlineLink = require("components/InlineLink");
 
 module.exports = React.createFactory(React.createClass({
   displayName: "ExpertSubstantiations",
@@ -85996,14 +86060,6 @@ module.exports = React.createFactory(React.createClass({
       url: event.target.value
     });
   },
-  getSubstantiationTitle: function(sub) {
-    if (sub.title > '') {
-      return sub.title;
-    }
-    if (sub.title === '') {
-      return sub.url;
-    }
-  },
   render: function() {
     var expert, ref1, type;
     this.refreshStyle = {
@@ -86021,22 +86077,18 @@ module.exports = React.createFactory(React.createClass({
         status: "loading"
       });
     } else {
-      return div({
+      return div({}, div({
         className: "substantiation-list"
       }, this.state.data.length > 0 ? this.state.data.map((function(_this) {
         return function(substantiation, index) {
-          return div({
-            className: "substantiation-list__item",
+          return InlineLink({
+            item: substantiation,
             key: "substantiation-list-" + _this.props.id + "-" + index
-          }, a({
-            className: "substantiation-list__item-link",
-            href: substantiation.url,
-            target: "_blank"
-          }, _this.getSubstantiationTitle(substantiation)), div({
-            className: "substantiation-list__item-description"
-          }, substantiation.description));
+          });
         };
-      })(this)) : "There are currently no links substantianting " + expert.name + "'s belief in this " + type + ".", UserStore.loggedIn() ? div({}, "Add Substantiation:", React.createElement(Material.TextField, {
+      })(this)) : "There are currently no links substantianting " + expert.name + "'s belief in this " + type + "."), UserStore.loggedIn() ? div({
+        className: "substantiation-list__add"
+      }, "Add Substantiation:", React.createElement(Material.TextField, {
         value: this.state.url,
         fullWidth: true,
         onChange: this.changeURL,
@@ -86050,7 +86102,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],585:[function(require,module,exports){
+},{"components/InlineLink":589}],585:[function(require,module,exports){
 var LinksMixin, a, br, div, img, ref, span;
 
 ref = React.DOM, div = ref.div, img = ref.img, br = ref.br, span = ref.span, a = ref.a;
@@ -86108,9 +86160,9 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"mixins/LinksMixin":601}],586:[function(require,module,exports){
+},{"mixins/LinksMixin":602}],586:[function(require,module,exports){
 module.exports=require(1)
-},{"mixins/LinksMixin":601,"mixins/SessionMixin":603}],587:[function(require,module,exports){
+},{"mixins/LinksMixin":602,"mixins/SessionMixin":604}],587:[function(require,module,exports){
 var LinksMixin, a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
@@ -86237,9 +86289,70 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"mixins/LinksMixin":601}],588:[function(require,module,exports){
+},{"mixins/LinksMixin":602}],588:[function(require,module,exports){
 module.exports=require(2)
-},{"mixins/LinksMixin":601,"modals/LoginModal":604}],589:[function(require,module,exports){
+},{"mixins/LinksMixin":602,"modals/LoginModal":605}],589:[function(require,module,exports){
+var a, div, ref, span;
+
+ref = React.DOM, div = ref.div, a = ref.a, span = ref.span;
+
+module.exports = React.createFactory(React.createClass({
+  getInlineLinkImage: function() {
+    var item;
+    item = this.props.item;
+    if (item.pic != null) {
+      return "url(" + item.pic + ")";
+    }
+    if (item.image != null) {
+      return "url(" + item.image + ")";
+    }
+    return "url()";
+  },
+  getTitle: function() {
+    var item;
+    item = this.props.item;
+    if (item.title > '') {
+      return item.title;
+    }
+    if (item.title === '') {
+      return item.url;
+    }
+  },
+  getDescription: function() {
+    var item;
+    item = this.props.item;
+    if (item.description != null) {
+      return span({}, item.description);
+    } else {
+      return span({
+        className: "not-found"
+      }, "No description found.");
+    }
+  },
+  render: function() {
+    var item;
+    item = this.props.item;
+    return div({
+      className: "inline-link"
+    }, div({
+      className: "inline-link__image",
+      style: {
+        backgroundImage: this.getInlineLinkImage()
+      }
+    }), div({
+      className: "inline-link__meta"
+    }, a({
+      className: "inline-link__meta-url",
+      href: item.url,
+      target: "_blank"
+    }, this.getTitle()), div({
+      className: "inline-link__meta-description"
+    }, this.getDescription())));
+  }
+}));
+
+
+},{}],590:[function(require,module,exports){
 var SessionMixin, a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
@@ -86385,7 +86498,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"mixins/SessionMixin":603}],590:[function(require,module,exports){
+},{"mixins/SessionMixin":604}],591:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -86523,7 +86636,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],591:[function(require,module,exports){
+},{}],592:[function(require,module,exports){
 var DateMixin, LinksMixin, a, br, div, img, ref, span;
 
 ref = React.DOM, div = ref.div, img = ref.img, a = ref.a, br = ref.br, span = ref.span;
@@ -86627,7 +86740,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"mixins/DateMixin":600,"mixins/LinksMixin":601}],592:[function(require,module,exports){
+},{"mixins/DateMixin":601,"mixins/LinksMixin":602}],593:[function(require,module,exports){
 var a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
@@ -86716,7 +86829,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],593:[function(require,module,exports){
+},{}],594:[function(require,module,exports){
 var ExpertSubstantiations, LinksMixin, div;
 
 div = React.DOM.div;
@@ -86770,7 +86883,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ExpertSubstantiations":584,"mixins/LinksMixin":601}],594:[function(require,module,exports){
+},{"components/ExpertSubstantiations":584,"mixins/LinksMixin":602}],595:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -86873,7 +86986,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],595:[function(require,module,exports){
+},{}],596:[function(require,module,exports){
 var LinksMixin, a, br, div, img, ref, span;
 
 ref = React.DOM, div = ref.div, img = ref.img, a = ref.a, br = ref.br, span = ref.span;
@@ -86936,7 +87049,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"mixins/LinksMixin":601}],596:[function(require,module,exports){
+},{"mixins/LinksMixin":602}],597:[function(require,module,exports){
 var LinksMixin, a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
@@ -87106,7 +87219,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"mixins/LinksMixin":601}],597:[function(require,module,exports){
+},{"mixins/LinksMixin":602}],598:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -87118,7 +87231,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],598:[function(require,module,exports){
+},{}],599:[function(require,module,exports){
 var SessionMixin, div;
 
 div = React.DOM.div;
@@ -87221,7 +87334,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"mixins/SessionMixin":603}],599:[function(require,module,exports){
+},{"mixins/SessionMixin":604}],600:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -87303,7 +87416,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],600:[function(require,module,exports){
+},{}],601:[function(require,module,exports){
 module.exports = {
   formatDate: function(d) {
     var date, day, monthIndex, monthNames, suffix, year;
@@ -87331,7 +87444,6 @@ module.exports = {
     monthIndex = date.getMonth();
     year = date.getFullYear();
     hours = date.getHours();
-    console.log(hours);
     ampm = "AM";
     if (hours >= 12) {
       hours -= 12;
@@ -87358,7 +87470,7 @@ module.exports = {
 };
 
 
-},{}],601:[function(require,module,exports){
+},{}],602:[function(require,module,exports){
 module.exports = {
   goToClaim: function(id) {
     return navigate("/claims/" + id);
@@ -87400,7 +87512,7 @@ module.exports = {
 };
 
 
-},{}],602:[function(require,module,exports){
+},{}],603:[function(require,module,exports){
 module.exports = {
   getInitialState: function() {
     return {
@@ -87433,7 +87545,7 @@ module.exports = {
 };
 
 
-},{}],603:[function(require,module,exports){
+},{}],604:[function(require,module,exports){
 module.exports = {
   setUser: function(data, request) {
     window.UserStore.set(data, request);
@@ -87539,7 +87651,7 @@ module.exports = {
 };
 
 
-},{}],604:[function(require,module,exports){
+},{}],605:[function(require,module,exports){
 var ForgotPassword, Login, Register, RegistrationSuccessful, div, ref, span;
 
 ref = React.DOM, div = ref.div, span = ref.span;
@@ -87598,7 +87710,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ForgotPassword":587,"components/Login":589,"components/Register":596,"components/RegistrationSuccessful":597}],605:[function(require,module,exports){
+},{"components/ForgotPassword":587,"components/Login":590,"components/Register":597,"components/RegistrationSuccessful":598}],606:[function(require,module,exports){
 
 /*
 API Class.
@@ -87933,7 +88045,7 @@ module.exports = API = (function() {
 })();
 
 
-},{}],606:[function(require,module,exports){
+},{}],607:[function(require,module,exports){
 var Global;
 
 module.exports = Global = (function() {
@@ -87978,7 +88090,7 @@ module.exports = Global = (function() {
 })();
 
 
-},{}],607:[function(require,module,exports){
+},{}],608:[function(require,module,exports){
 var UserStore,
   bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
@@ -88184,7 +88296,7 @@ module.exports = new UserStore({
 });
 
 
-},{}],608:[function(require,module,exports){
+},{}],609:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -88205,7 +88317,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":586,"components/Header":588}],609:[function(require,module,exports){
+},{"components/Footer":586,"components/Header":588}],610:[function(require,module,exports){
 var Footer, Header, div, ref, span;
 
 ref = React.DOM, div = ref.div, span = ref.span;
@@ -88339,7 +88451,7 @@ module.exports = React.createFactory(React.createClass({
       className: "text__title"
     }, "My bookmarks"), div({
       className: "not-found"
-    }, "You must be logged in to view this content.")) : void 0, (this.state.user != null) && (this.state.user.token != null) ? (console.log(this.state.bookmarks), div({
+    }, "You must be logged in to view this content.")) : void 0, (this.state.user != null) && (this.state.user.token != null) ? div({
       className: "default__card bookmarks__list"
     }, div({
       className: "text__title"
@@ -88369,12 +88481,12 @@ module.exports = React.createFactory(React.createClass({
           className: "fa fa-remove"
         }, ''))));
       };
-    })(this)) : void 0)) : void 0)), Footer({}, ''));
+    })(this)) : void 0) : void 0)), Footer({}, ''));
   }
 }));
 
 
-},{"components/Footer":586,"components/Header":588}],610:[function(require,module,exports){
+},{"components/Footer":586,"components/Header":588}],611:[function(require,module,exports){
 var Footer, Header, LinksMixin, div;
 
 div = React.DOM.div;
@@ -88443,7 +88555,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":586,"components/Header":588,"mixins/LinksMixin":601}],611:[function(require,module,exports){
+},{"components/Footer":586,"components/Header":588,"mixins/LinksMixin":602}],612:[function(require,module,exports){
 var CategoryClaims, CategoryExperts, CategoryPredictions, CategorySubHead, Footer, Header, div;
 
 div = React.DOM.div;
@@ -88538,7 +88650,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/CategoryClaims":570,"components/CategoryExperts":571,"components/CategoryPredictions":572,"components/CategorySubHead":573,"components/Footer":586,"components/Header":588}],612:[function(require,module,exports){
+},{"components/CategoryClaims":570,"components/CategoryExperts":571,"components/CategoryPredictions":572,"components/CategorySubHead":573,"components/Footer":586,"components/Header":588}],613:[function(require,module,exports){
 var CategoryClaims, CategorySubHead, Footer, Header, div;
 
 div = React.DOM.div;
@@ -88623,7 +88735,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/CategoryClaims":570,"components/CategorySubHead":573,"components/Footer":586,"components/Header":588}],613:[function(require,module,exports){
+},{"components/CategoryClaims":570,"components/CategorySubHead":573,"components/Footer":586,"components/Header":588}],614:[function(require,module,exports){
 var CategoryExperts, CategorySubHead, Footer, Header, div;
 
 div = React.DOM.div;
@@ -88708,7 +88820,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/CategoryExperts":571,"components/CategorySubHead":573,"components/Footer":586,"components/Header":588}],614:[function(require,module,exports){
+},{"components/CategoryExperts":571,"components/CategorySubHead":573,"components/Footer":586,"components/Header":588}],615:[function(require,module,exports){
 var CategoryPredictions, CategorySubHead, Footer, Header, div;
 
 div = React.DOM.div;
@@ -88793,7 +88905,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/CategoryPredictions":572,"components/CategorySubHead":573,"components/Footer":586,"components/Header":588}],615:[function(require,module,exports){
+},{"components/CategoryPredictions":572,"components/CategorySubHead":573,"components/Footer":586,"components/Header":588}],616:[function(require,module,exports){
 var AddToClaim, BookmarkIndicator, ClaimEvidences, ClaimExpertCard, Comments, Footer, Header, LinksMixin, SessionMixin, Votes, div, img, ref;
 
 ref = React.DOM, div = ref.div, img = ref.img;
@@ -89042,7 +89154,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/AddToClaim":566,"components/BookmarkIndicator":569,"components/ClaimEvidences":575,"components/ClaimExpertCard":576,"components/Comments":578,"components/Footer":586,"components/Header":588,"components/Votes":599,"mixins/LinksMixin":601,"mixins/SessionMixin":603}],616:[function(require,module,exports){
+},{"components/AddToClaim":566,"components/BookmarkIndicator":569,"components/ClaimEvidences":575,"components/ClaimExpertCard":576,"components/Comments":578,"components/Footer":586,"components/Header":588,"components/Votes":600,"mixins/LinksMixin":602,"mixins/SessionMixin":604}],617:[function(require,module,exports){
 var ClaimCard, Footer, Header, LinksMixin, Pagination, PaginationMixin, SearchFilters, SessionMixin, div;
 
 div = React.DOM.div;
@@ -89196,7 +89308,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ClaimCard":574,"components/Footer":586,"components/Header":588,"components/Pagination":590,"components/SearchFilters":598,"mixins/LinksMixin":601,"mixins/PaginationMixin":602,"mixins/SessionMixin":603}],617:[function(require,module,exports){
+},{"components/ClaimCard":574,"components/Footer":586,"components/Header":588,"components/Pagination":591,"components/SearchFilters":599,"mixins/LinksMixin":602,"mixins/PaginationMixin":603,"mixins/SessionMixin":604}],618:[function(require,module,exports){
 var ClaimFields, Footer, Header, div;
 
 div = React.DOM.div;
@@ -89333,7 +89445,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ClaimFields":577,"components/Footer":586,"components/Header":588}],618:[function(require,module,exports){
+},{"components/ClaimFields":577,"components/Footer":586,"components/Header":588}],619:[function(require,module,exports){
 var ExpertFields, Footer, Header, div;
 
 div = React.DOM.div;
@@ -89479,7 +89591,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ExpertFields":582,"components/Footer":586,"components/Header":588}],619:[function(require,module,exports){
+},{"components/ExpertFields":582,"components/Footer":586,"components/Header":588}],620:[function(require,module,exports){
 var Footer, Header, PredictionFields, div;
 
 div = React.DOM.div;
@@ -89624,7 +89736,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":586,"components/Header":588,"components/PredictionFields":594}],620:[function(require,module,exports){
+},{"components/Footer":586,"components/Header":588,"components/PredictionFields":595}],621:[function(require,module,exports){
 var AddToExpert, BookmarkIndicator, Comments, ExpertBonaFides, ExpertClaimCard, ExpertPredictionCard, Footer, Header, LinksMixin, SessionMixin, div, img, ref;
 
 ref = React.DOM, div = ref.div, img = ref.img;
@@ -89768,10 +89880,7 @@ module.exports = React.createFactory(React.createClass({
       type: "expert",
       id: this.state.expert.id,
       updateBookmark: this.updateBookmark
-    })) : void 0), ExpertBonaFides({
-      expert: expert,
-      refresh: this.fetchExpert
-    }), div({
+    })) : void 0), div({
       className: "default__card expert__categories"
     }, div({
       className: "text__title"
@@ -89788,25 +89897,32 @@ module.exports = React.createFactory(React.createClass({
         }, category.name);
       };
     })(this)))), div({
-      className: "expert__accuracy"
+      className: "default__card expert__accuracy"
     }, "This expert has an overall accuracy of: " + (this.showAccuracy(expert.accuracy)), div({
       className: "expert__accuracy-categories"
-    }, "Accuracy by Category: ", expert.category_accuracies.map((function(_this) {
+    }, "Accuracy by Category: ", expert.category_accuracies.length > 0 ? expert.category_accuracies.map((function(_this) {
       return function(accuracy, index) {
         return div({
           className: "expert__accuracy-category",
           key: "expert-accuracy-category-" + index
-        }, "" + accuracy.category_name, div({
+        }, div({
+          className: "expert__accuracy-category__name"
+        }, "" + accuracy.category_name), div({
           className: "expert__accuracy-category__claim"
-        }, (_this.showAccuracy(accuracy.claim_accuracy)) + " (Claims: " + (accuracy.correct_claims + accuracy.incorrect_claims) + ")"), div({
+        }, "Claims: " + (_this.showAccuracy(accuracy.claim_accuracy)) + " (" + accuracy.correct_claims + "/" + (accuracy.correct_claims + accuracy.incorrect_claims) + " C)"), div({
           className: "expert__accuracy-category__prediction"
-        }, (_this.showAccuracy(accuracy.prediction_accuracy)) + " (Predictions: " + (accuracy.correct_predictions + accuracy.incorrect_predictions) + ")"));
+        }, "Predictions: " + (_this.showAccuracy(accuracy.prediction_accuracy)) + " (" + accuracy.correct_predictions + "/" + (accuracy.correct_predictions + accuracy.incorrect_predictions) + " P)"));
       };
-    })(this)))), div({
-      className: "expert__predictions"
+    })(this)) : div({
+      className: "not-found"
+    }, "No category accuracies to display."))), ExpertBonaFides({
+      expert: expert,
+      refresh: this.fetchExpert
+    }), div({
+      className: "default__card expert__predictions"
     }, div({
-      className: "expert__predictions-title"
-    }, "Predictions:"), div({
+      className: "text__title"
+    }, "Predictions this expert has made:"), div({
       className: "expert__predictions-list"
     }, predictions.length > 0 ? predictions.map(function(prediction, index) {
       return ExpertPredictionCard({
@@ -89814,16 +89930,18 @@ module.exports = React.createFactory(React.createClass({
         key: "expert-prediction-card-" + index,
         prediction: prediction
       });
-    }) : "No predictions", AddToExpert({
+    }) : div({
+      className: "not-found"
+    }, "No predictions"), AddToExpert({
       expert: expert,
       type: "prediction",
       items: this.state.predictions,
       refresh: this.fetchExpert
     }))), div({
-      className: "expert__claims"
+      className: "default__card expert__claims"
     }, div({
-      className: "expert__claims-title"
-    }, "Claims:"), div({
+      className: "text__title"
+    }, "Claims this expert has made:"), div({
       className: "expert__claims-list"
     }, claims.length > 0 ? claims.map(function(claim, index) {
       return ExpertClaimCard({
@@ -89831,7 +89949,9 @@ module.exports = React.createFactory(React.createClass({
         claim: claim,
         key: "expert-claim-card-" + index
       });
-    }) : "No claims", UserStore.loggedIn() ? AddToExpert({
+    }) : div({
+      className: "not-found"
+    }, "No claims found."), UserStore.loggedIn() ? AddToExpert({
       expert: expert,
       type: "claim",
       items: this.state.claims,
@@ -89846,7 +89966,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/AddToExpert":567,"components/BookmarkIndicator":569,"components/Comments":578,"components/ExpertBonaFides":579,"components/ExpertClaimCard":581,"components/ExpertPredictionCard":583,"components/Footer":586,"components/Header":588,"mixins/LinksMixin":601,"mixins/SessionMixin":603}],621:[function(require,module,exports){
+},{"components/AddToExpert":567,"components/BookmarkIndicator":569,"components/Comments":578,"components/ExpertBonaFides":579,"components/ExpertClaimCard":581,"components/ExpertPredictionCard":583,"components/Footer":586,"components/Header":588,"mixins/LinksMixin":602,"mixins/SessionMixin":604}],622:[function(require,module,exports){
 var ExpertCard, Footer, Header, LinksMixin, Pagination, PaginationMixin, SearchFilters, SessionMixin, div;
 
 div = React.DOM.div;
@@ -90006,7 +90126,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ExpertCard":580,"components/Footer":586,"components/Header":588,"components/Pagination":590,"components/SearchFilters":598,"mixins/LinksMixin":601,"mixins/PaginationMixin":602,"mixins/SessionMixin":603}],622:[function(require,module,exports){
+},{"components/ExpertCard":580,"components/Footer":586,"components/Header":588,"components/Pagination":591,"components/SearchFilters":599,"mixins/LinksMixin":602,"mixins/PaginationMixin":603,"mixins/SessionMixin":604}],623:[function(require,module,exports){
 var ClaimCard, ExpertCard, ExpertTextCard, Footer, Header, PredictionCard, PredictionTextCard, div;
 
 div = React.DOM.div;
@@ -90161,7 +90281,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ClaimCard":574,"components/ExpertCard":580,"components/ExpertTextCard":585,"components/Footer":586,"components/Header":588,"components/PredictionCard":591,"components/PredictionTextCard":595}],623:[function(require,module,exports){
+},{"components/ClaimCard":574,"components/ExpertCard":580,"components/ExpertTextCard":585,"components/Footer":586,"components/Header":588,"components/PredictionCard":592,"components/PredictionTextCard":596}],624:[function(require,module,exports){
 var AddToPrediction, BookmarkIndicator, Comments, Footer, Header, LinksMixin, PredictionEvidences, PredictionExpertCard, SessionMixin, Votes, div, img, ref;
 
 ref = React.DOM, div = ref.div, img = ref.img;
@@ -90417,7 +90537,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/AddToPrediction":568,"components/BookmarkIndicator":569,"components/Comments":578,"components/Footer":586,"components/Header":588,"components/PredictionEvidences":592,"components/PredictionExpertCard":593,"components/Votes":599,"mixins/LinksMixin":601,"mixins/SessionMixin":603}],624:[function(require,module,exports){
+},{"components/AddToPrediction":568,"components/BookmarkIndicator":569,"components/Comments":578,"components/Footer":586,"components/Header":588,"components/PredictionEvidences":593,"components/PredictionExpertCard":594,"components/Votes":600,"mixins/LinksMixin":602,"mixins/SessionMixin":604}],625:[function(require,module,exports){
 var Footer, Header, LinksMixin, Pagination, PaginationMixin, PredictionCard, SearchFilters, SessionMixin, div;
 
 div = React.DOM.div;
@@ -90577,7 +90697,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":586,"components/Header":588,"components/Pagination":590,"components/PredictionCard":591,"components/SearchFilters":598,"mixins/LinksMixin":601,"mixins/PaginationMixin":602,"mixins/SessionMixin":603}],625:[function(require,module,exports){
+},{"components/Footer":586,"components/Header":588,"components/Pagination":591,"components/PredictionCard":592,"components/SearchFilters":599,"mixins/LinksMixin":602,"mixins/PaginationMixin":603,"mixins/SessionMixin":604}],626:[function(require,module,exports){
 var ClaimCard, ExpertCard, Footer, Header, LinksMixin, PredictionCard, SearchFilters, SessionMixin, div;
 
 div = React.DOM.div;
@@ -90778,7 +90898,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ClaimCard":574,"components/ExpertCard":580,"components/Footer":586,"components/Header":588,"components/PredictionCard":591,"components/SearchFilters":598,"mixins/LinksMixin":601,"mixins/SessionMixin":603}],626:[function(require,module,exports){
+},{"components/ClaimCard":574,"components/ExpertCard":580,"components/Footer":586,"components/Header":588,"components/PredictionCard":592,"components/SearchFilters":599,"mixins/LinksMixin":602,"mixins/SessionMixin":604}],627:[function(require,module,exports){
 var Footer, Header, br, div, img, input, ref;
 
 ref = React.DOM, div = ref.div, input = ref.input, br = ref.br, img = ref.img;
@@ -91042,7 +91162,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":586,"components/Header":588}],627:[function(require,module,exports){
+},{"components/Footer":586,"components/Header":588}],628:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
