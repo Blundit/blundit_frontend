@@ -21,6 +21,11 @@
   font-weight: bold
 
 
+%large-text
+  font-size: em(16px)
+  font-weight: bold
+
+
 %normal-text
   font-size: em(14px)
   font-weight: normal
@@ -46,6 +51,8 @@ body
 .text__title
   @extend %title-text
   margin-bottom: 10px
+  padding-bottom: 5px
+  border-bottom: 1px solid $very-light-grey-color
 
 .text__normal
   @extend %normal-text

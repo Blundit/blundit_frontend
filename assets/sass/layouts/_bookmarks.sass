@@ -3,3 +3,58 @@
 
 .bookmarks-content
   @extend %margin-width
+
+
+.bookmarks__list
+  width: 100%
+  display: inline-block
+
+  &__item
+    width: 100%
+    display: inline-block
+    padding: 10px
+    border: 1px solid $very-light-grey-color
+    margin-bottom: 20px
+    box-sizing: border-box
+
+    &--has-new
+      @extend .bookmarks__list__item
+      border: 1px solid $brand-secondary
+
+    &-row
+      +span(12 of 12 no-gutters)
+
+    &-type
+      float: left
+      width: 100px
+    
+    &-title
+      float: left
+      width: calc(100% - 120px)
+      cursor: pointer
+      color: $default-link-color
+      
+      &:hover
+        font-weight: bold
+
+    &-new
+      float: left
+      width: 20px
+      height: 20px
+
+    &-notify
+      width: calc(100% - 20px)
+      float: left
+      cursor: pointer
+    
+    &-remove
+      color: $alert-color
+      width: 20px
+      height: 20px
+      float: left
+      cursor: pointer
+
+.bookmark-indicator
+  color: $default-link-color
+  font-size: 20px
+  cursor: pointer

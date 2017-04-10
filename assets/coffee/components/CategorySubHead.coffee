@@ -40,6 +40,7 @@ module.exports = React.createFactory React.createClass
   render: ->
     div { className: "page-subhead" },
       div
+        className: "page-subhead__back"
         onClick: @goBack
         '<<'
       if @currentPage('')

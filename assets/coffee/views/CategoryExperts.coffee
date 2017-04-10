@@ -61,14 +61,19 @@ module.exports = React.createFactory React.createClass
       Header {}, ''
       div { className: "categories-wrapper" },
         div { className: "categories-content" },
-          if @state.category
-            div { className: "page-title" },
-              "Category '#{@state.category.name}' - Showing Experts"
+          if @state.category?
+            div { className: "default__card" },
+              div { className: "text__title" },
+                "Category '#{@state.category.name}' - Showing Experts"
               CategorySubHead
                 category_id: @props.id
+          else
+            div { className: "default__card" },
+              div { className: "not-found" },
+                "Loading..."
 
           if @state.data?
-            div { className: "categories" },
+            div { className: "default__card categories" },
               CategoryExperts
                 experts: @state.data
       Footer {}, ''

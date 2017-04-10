@@ -8,10 +8,22 @@ module.exports = React.createFactory React.createClass
 
   getInitialState: ->
     bookmarks: null
+    user: null
 
 
   componentDidMount: ->
-    @fetchBookmarks()
+    UserStore.subscribe(@updateUser)
+
+
+  componentWillUnmount: ->
+    UserStore.unsubscribe(@updateUser)
+
+
+  updateUser: ->
+    if @state.bookmarks == null
+      @fetchBookmarks()
+
+    @setState user: UserStore.get()
 
   
   fetchBookmarks: ->
@@ -101,39 +113,63 @@ module.exports = React.createFactory React.createClass
   removeBookmarkError: (error) ->
     # console.log error
 
+
+  getItemClass: (bookmark) ->
+    @class = "bookmarks__list__item"
+
+    if bookmark.new == true
+      @class += "--has-new"
+
+    return @class
+
   
   render: ->
     div {},
       Header {}, ''
       div { className: "bookmarks-wrapper" },
         div { className: "bookmarks-content" },
-          div { className: "default__card bookmarks__list" },
-            if @state.bookmarks?
-              @state.bookmarks.map (bookmark, index) =>
-                div
-                  className: "bookmarks__list__item"
-                  key: "bookmark-#{index}"
-                  div {},
-                    div { className: "bookmarks__list__item-type" },
-                      @sentenceCase(bookmark.type) + ": "
-                    div
-                      className: "bookmarks__list__item-title"
-                      onClick: @goToBookmarkItem.bind(@, bookmark)
-                      bookmark.title
-                    div
-                      className: "bookmarks__list__item-new"
-                      @showBookmarkNewStatus(bookmark.new)
-                  div {},
-                    div
-                      className: "bookmarks__list__item-notify"
-                      onClick: @changeNotificationSettings.bind(@, bookmark)
-                      @showNotificationSettings(bookmark)
-                    div
-                      className: "bookmarks__list__item-remove"
-                      onClick: @removeBookmark.bind(@, bookmark)
-                      span { className: "fa fa-remove" }, ''
+          if @state.user == null
+            div { className: "default__card" },
+              div { className: "text__title" },
+                "My bookmarks"
+              div { className: "not-found" },
+                "Loading..."
 
+          if @state.user? and !@state.user.token?
+            div { className: "default__card" },
+              div { className: "text__title" },
+                "My bookmarks"
+              div { className: "not-found" },
+                "You must be logged in to view this content."
 
-
-
+          if @state.user? and @state.user.token?
+            console.log @state.bookmarks
+            div { className: "default__card bookmarks__list" },
+              div { className: "text__title" },
+                "My bookmarks"
+              if @state.bookmarks?
+                @state.bookmarks.map (bookmark, index) =>
+                  div
+                    className: @getItemClass(bookmark)
+                    key: "bookmark-#{index}"
+                    div { className: "bookmarks__list__item-row" },
+                      div { className: "bookmarks__list__item-type" },
+                        @sentenceCase(bookmark.type) + ": "
+                      div
+                        className: "bookmarks__list__item-title"
+                        onClick: @goToBookmarkItem.bind(@, bookmark)
+                        bookmark.title
+                      div
+                        className: "bookmarks__list__item-new"
+                        @showBookmarkNewStatus(bookmark.new)
+                    div { className: "bookmarks__list__item-row" },
+                      div
+                        className: "bookmarks__list__item-notify"
+                        onClick: @changeNotificationSettings.bind(@, bookmark)
+                        "Notify of updates: "
+                        @showNotificationSettings(bookmark)
+                      div
+                        className: "bookmarks__list__item-remove"
+                        onClick: @removeBookmark.bind(@, bookmark)
+                        span { className: "fa fa-remove" }, ''
       Footer {}, ''

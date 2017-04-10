@@ -68,7 +68,7 @@ module.exports = React.createFactory React.createClass
 
   searchSuccess: (data) ->
     @setState searching: false
-    @setState searchError: false
+    @setState searchError: null
     @setState data: data
 
 
@@ -123,15 +123,14 @@ module.exports = React.createFactory React.createClass
                   div { className: "search__experts-items--empty" },
                     "No expert found for '#{@state.data.query}'"
                 else
-                  div { className: "search__experts-items" },
-                    @state.data.experts.map (expert, index) ->
-                      ExpertCard
-                        expert: expert
-                        key: "search-expert-card-#{index}"
-                    div
-                      className: "search__experts-all"
-                      onClick: @goToExperts
-                      'View All'
+                  div {},
+                    div { className: "search__experts-items" },
+                      @state.data.experts.map (expert, index) ->
+                        ExpertCard
+                          expert: expert
+                          key: "search-expert-card-#{index}"
+                    div {},
+                      React.createElement(Material.RaisedButton, { label: "View All", primary: true, onClick: @goToExperts })
               div { className: "default__card search__predictions" },
                 div { className: "text__title" },
                   "Predictions:"
@@ -139,15 +138,14 @@ module.exports = React.createFactory React.createClass
                   div { className: "search__predictions-items--empty" },
                     "No prediction found for '#{@state.data.query}'"
                 else
-                  div { className: "search__predictions-items" },
-                    @state.data.predictions.map (prediction, index) ->
-                      PredictionCard
-                        prediction: prediction
-                        key: "search-prediction-card-#{index}"
-                    div
-                      className: "search__predictions-all"
-                      onClick: @goToPredictions
-                      'View All'
+                  div {},
+                    div { className: "search__predictions-items" },
+                      @state.data.predictions.map (prediction, index) ->
+                        PredictionCard
+                          prediction: prediction
+                          key: "search-prediction-card-#{index}"
+                    div {},
+                      React.createElement(Material.RaisedButton, { label: "View All", primary: true, onClick: @goToPredictions })
               div { className: "default__card search__claims" },
                 div { className: "text__title" },
                   "Claims:"
@@ -155,16 +153,14 @@ module.exports = React.createFactory React.createClass
                   div { className: "search__claims-items--empty" },
                     "No claim found for '#{@state.data.query}'"
                 else
-                  div { className: "search__claims-items" },
-                    @state.data.claims.map (claim, index) ->
-                      ClaimCard
-                        claim: claim
-                        key: "search-claim-card-#{index}"
-                    div
-                      className: "search__claims-all"
-                      onClick: @goToClaims
-                      'View All'
-
+                  div {},
+                    div { className: "search__claims-items" },
+                      @state.data.claims.map (claim, index) ->
+                        ClaimCard
+                          claim: claim
+                          key: "search-claim-card-#{index}"
+                    div {},
+                      React.createElement(Material.RaisedButton, { label: "View All", primary: true, onClick: @goToClaims })
           
           if @state.searchError?
             div { className: "default__card search__error" },

@@ -1,10 +1,42 @@
 .comments
+  &__comment
+    width: 100%
+    display: inline-block
+    margin-bottom: 25px
+    border-bottom: 1px solid $very-light-grey-color
 
-  &__comment-user-avatar
-    background-size: cover
-    -webkit-background-size: cover
-    background-position: center center
-    width: 20px
-    height: 20px
-    border: 1px solid $avatar-border-color
-    border-radius: 20px
+    &__meta
+      width: 100%
+      display: inline-block
+
+    &__meta-text
+      width: calc(100% - 50px)
+      float: left
+    
+    &__meta-text-username
+      font-size: 14px
+      color: $mid-grey-color
+      margin: 5px 0px 4px 0px
+
+    &__meta-text-created-at
+      font-size: 12px
+      color: $light-grey-color
+  
+
+    &__meta-user-avatar
+      float: left
+      background-size: cover
+      -webkit-background-size: cover
+      background-position: center center
+      width: 40px
+      height: 40px
+      border: 1px solid $avatar-border-color
+      border-radius: 20px
+      margin-right: 10px
+
+
+    &-text
+      font-size: 15px
+      width: 100%
+      padding: 10px 0px
+      margin-left: 53px

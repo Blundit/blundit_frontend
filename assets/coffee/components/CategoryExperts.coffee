@@ -2,23 +2,21 @@
 
 LinksMixin = require("mixins/LinksMixin")
 
+ExpertCard = require("components/ExpertCard")
+
 module.exports = React.createFactory React.createClass
   displayName: "Category Experts - Latest"
   mixins: [LinksMixin]
 
   render: ->
-    div { className: "categories__experts" },
-      div { className: "categories__experts-title" },
+    div { className: "default__card categories__experts" },
+      div { className: "text__title" },
         "Experts:"
       if @props.experts.length > 0
         @props.experts.map (expert, index) =>
-          div
-            className: "categories__experts__expert"
+          ExpertCard
+            expert: expert
             key: "category-expert-#{index}"
-            div
-              className: "categories__experts__expert-name"
-              onClick: @goToExpert.bind(@, expert.id)
-              expert.name
       else
-        div { className: "categories__experts--empty" },
+        div { className: "not-found" },
           "There are no experts in this category."

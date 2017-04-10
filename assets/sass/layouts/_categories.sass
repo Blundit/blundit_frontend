@@ -3,3 +3,61 @@
 
 .categories-content
   @extend %margin-width
+
+.categories__list
+
+  &__item
+    +span(6 of 12 no-gutters)
+    cursor: pointer
+    margin-bottom: 20px
+    &:hover
+      color: $expert-card-link-color
+
+    @media (max-width: $mobile-breakpoint)
+      +span(12 of 12)
+    
+    &-title
+      @extend %large-text
+      font-size: 16px
+      font-weight: bold
+
+    &-description
+      @extend %normal-text
+      color: $black-color
+      font-weight: normal
+
+    &-description--not-found
+      font-style: italic
+      font-weight: normal
+      color: $not-found-color
+
+.page-subhead
+  margin-top: 10px
+  display: inline-block
+
+  &__back
+    @extend %normal-text
+    float: left
+    font-weight: bold
+    cursor: pointer
+
+    &:hover
+      color: $expert-card-link-color
+
+
+  &__item
+    @extend %normal-text
+    float: left
+    margin-left: 10px
+    cursor: pointer
+    
+    &:hover
+      color: $expert-card-link-color
+
+
+  &__item--active
+    @extend .page-subhead__item
+    color: $expert-card-link-color
+
+
+

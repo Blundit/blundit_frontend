@@ -29,3 +29,20 @@ module.exports =
   
   goBackToSearch: ->
     navigate("/search?query=#{@state.query}&sort=#{@state.sort}")
+
+
+  logout: ->
+    UserStore.logout()
+    @setUser {}
+
+  
+  goToAbout: ->
+    navigate('/about')
+
+  
+  goToContact: ->
+    navigate('/contact')
+
+
+  goToPrivacyPolicy: ->
+    navigate('/privacy_policy')

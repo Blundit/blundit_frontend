@@ -1,10 +1,11 @@
 { div, img, a, br, span } = React.DOM
 
 LinksMixin = require("mixins/LinksMixin")
+DateMixin = require("mixins/DateMixin")
 
 module.exports = React.createFactory React.createClass
   displayName: 'PredictionCard'
-  mixins: [LinksMixin]
+  mixins: [LinksMixin, DateMixin]
 
 
   getDescription: ->
@@ -40,35 +41,9 @@ module.exports = React.createFactory React.createClass
     return "#{prediction.comments_count} comments"
 
 
-  formatDate: (date) ->
-    monthNames = [
-      "January", "February", "March",
-      "April", "May", "June", "July",
-      "August", "September", "October",
-      "November", "December"
-    ]
-
-    day = date.getDate()
-    monthIndex = date.getMonth()
-    year = date.getFullYear()
-
-    if day == 1 or day == 11 or day == 21 or day == 31
-      suffix = 'st'
-    else if day == 2 or day == 12 or day == 22
-      suffix = 'nd'
-    else if day == 3 or day == 13 or day == 23
-      suffix = 'rd'
-    else
-      suffix = 'th'
-
-    return monthNames[monthIndex] + ' ' + day + suffix + ', ' + year
-
-
   predictionDate: ->
     { prediction } = @props
-    @d = new Date(prediction.created_at)
-
-    return @formatDate(@d)
+    return @formatDate(prediction.created_at)
 
 
   render: ->

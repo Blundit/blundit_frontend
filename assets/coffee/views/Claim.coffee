@@ -166,10 +166,13 @@ module.exports = React.createFactory React.createClass
                   "This claim is #{@showStatus()}"
               div { className: "claim__description" },
                 claim.description
-              div { className: "claim__categories" },
-                "These are the categories this claim is connected to:"
+              div { className: "default__card claim__categories" },
+                div { className: "text__title" },
+                  "Categories"
+                div { className: "text__normal" },
+                  "These are the categories this claim is connected to:"
                 if claim.categories.length == 0
-                  div {},
+                  div { className: "not-found" },
                     "No categories yet."
                 else
                   div {},
@@ -211,6 +214,7 @@ module.exports = React.createFactory React.createClass
               Comments
                 type: "claim"
                 id: claim.id
+                item: claim
                 num: claim.comments_count
           else
             div {},

@@ -106,23 +106,23 @@ module.exports = React.createFactory React.createClass
           if expert?
             div { className: "expert" },
               @showNewExpertText()
-              div { className: "expert__name" },
-                expert.name
-              div { className: "expert__description" },
-                if expert.description?
-                  expert.description
-                else
-                  "This expert has no description yet."
-              div { className: "expert__avatar" },
-                img { src: expert.avatar }
-
-              ExpertBonaFides
-                expert: expert
-                refresh: @fetchExpert
-              
-              div { className: "expert__meta" },
+              div { className: "default__card" },
+                div { className: "text__title expert__name" },
+                  expert.name
+                div
+                  className: "expert__avatar"
+                  style:
+                    backgroundImage: "url(#{expert.avatar})"
+                div { className: "expert__meta" },
+                  div { className: "expert__meta-description" },
+                    if expert.description?
+                      "!!!#{expert.description}"
+                    else
+                      "This expert has no description yet."
+                  div { className: "not-found" },
+                    "TODO: Add other fields here."
                 if UserStore.loggedIn()
-                  div { className: "expert__meta-bookmark" },
+                  div { className: "expert__bookmark" },
                     BookmarkIndicator
                       bookmark: @state.expert.bookmark
                       type: "expert"
@@ -130,10 +130,20 @@ module.exports = React.createFactory React.createClass
                       updateBookmark: @updateBookmark
 
 
-              div { className: "expert__categories" },
-                "These are the categories this expert is connected to:"
+              ExpertBonaFides
+                expert: expert
+                refresh: @fetchExpert
+              
+  
+
+
+              div { className: "default__card expert__categories" },
+                div { className: "text__title" },
+                  "Categories"
+                div { className: "text__normal" },
+                  "These are the categories this expert is connected to:"
                 if expert.categories.length == 0
-                  div {},
+                  div { className: "not-found" },
                     "No categories yet."
                 else
                   div {},
@@ -197,6 +207,7 @@ module.exports = React.createFactory React.createClass
                       refresh: @fetchExpert
               Comments
                 type: "expert"
+                item: expert
                 id: expert.id
                 num: expert.comments_count
           else

@@ -1,12 +1,14 @@
 { div } = React.DOM
 
 PaginationMixin = require("mixins/PaginationMixin")
+DateMixin = require("mixins/DateMixin")
+
 Pagination = require("components/Pagination")
 
 
 module.exports = React.createFactory React.createClass
   displayName: 'Comments'
-  mixins: [PaginationMixin]
+  mixins: [PaginationMixin, DateMixin]
 
   getInitialState: ->
     comments: null
@@ -98,9 +100,6 @@ module.exports = React.createFactory React.createClass
     else
       @setState commentError: "There was an error."
 
-  formatDate: (date) ->
-    return date
-
 
   getErrorText: (key) ->
     for error in @state.errors
@@ -117,36 +116,43 @@ module.exports = React.createFactory React.createClass
     @setState inputs: @inputs
 
 
+  getCommentName: ->
+    if @props.type == "expert"
+      return @props.item.name
+    else
+      return @props.item.title
+
+
   render: ->
-    div { className: "comments" },
-      "Comments: #{@props.id}"
+    div { className: "default__card comments" },
+      div { className: "text__title" },
+        "Comments for #{@getCommentName()}"
 
       if @state.comments == null
-        div {},
+        div { className: "not-found" },
           "Loading Comments"
       else if @state.comments.length == 0
-        div {},
+        div { className: "not-found" },
           "Currently No Comments"
 
       if @state.comments?
         @state.comments.map (comment, index) =>
           if comment.user?
-            console.log "!", comment.user
             div
               className: "comments__comment"
               key: "comment-#{index}"
-              div { className: "comments__comment-user" },
+              div { className: "comments__comment__meta" },
                 div
-                  className: "comments__comment-user-avatar"
+                  className: "comments__comment__meta-user-avatar"
                   style:
                     backgroundImage: "url(http://localhost:3000/images/user_avatars/#{comment.user.avatar_file_name})"
-                div { className: "comments__comment-user-name" },
-                  comment.user.first_name + " " + comment.user.last_name
-              div { className: "comments__comment-meta" },
-                div { className: "comments__comment-meta-text" },
-                  comment.content
-                div { className: "comments__comment-meta-created-at" },
-                  @formatDate(comment.created_at)
+                div { className: "comments__comment__meta-text"}
+                  div { className: "comments__comment__meta-text-username" },
+                    comment.user.first_name + " " + comment.user.last_name
+                  div { className: "comments__comment__meta-text-created-at" },
+                    @formatDateAndTime(comment.created_at)
+              div { className: "comments__comment-text" },
+                comment.content
 
       if @state.comments?
         Pagination
@@ -163,9 +169,9 @@ module.exports = React.createFactory React.createClass
             {
               id: "comment-content",
               hintText: "Add Comment",
-              floatingLabelText: "Content",
+              floatingLabelText: "Add Comment",
               multiLine: true,
-              rows: 2,
+              rows: 1,
               fullWidth: true,
               rowsMax: 4
               value: @state.inputs.content.val,

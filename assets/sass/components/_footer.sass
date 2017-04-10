@@ -4,3 +4,52 @@
 
 .footer-content
   @extend %margin-width
+
+.footer__card-row
+  +span(6 of 12 no-gutters)
+  box-sizing: border-box
+  padding: 10px 0px 10px 0px
+
+  &:first-of-type
+    border-right: 2px solid $white-color
+    padding-right: 10px
+
+    .footer__link, .footer__text
+      text-align: right
+  
+  &:last-of-type
+    padding-left: 10px
+
+.footer__text
+  color: $light-grey-color
+  line-height: 1.5em
+
+.footer__link
+  display: block
+  
+  color: $white-color
+  cursor: pointer
+  line-height: 1.5em
+
+  &:hover
+    font-weight: bold
+
+.footer__icons
+  width: 100%
+  padding-top: 2px
+  margin-bottom: 5px
+  color: $white-color
+
+  span
+    margin-right: 10px
+    font-size: 14px
+    cursor: pointer
+    color: $white-color
+    background-color: $brand-secondary
+
+    &:hover
+      background-color: $white-color
+      color: $brand-secondary
+
+.footer__link--signout
+  @extend .footer__link

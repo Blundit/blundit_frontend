@@ -36,7 +36,6 @@ module.exports = React.createFactory React.createClass
 
 
   getUserAvatar: ->
-    console.log UserStore.get()
     if !UserStore.get() or !UserStore.get().avatar_file_name?
       avatar = "/images/avatars/placeholder.png"
     else

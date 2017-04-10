@@ -11,6 +11,7 @@
     @extend %margin-width
     +clearfix
 
+
 .expert-card
   float: left
   width: calc(25% - 10px)
@@ -70,6 +71,36 @@
 .expert
   &__created
     margin-bottom: 20px
+
+  &__avatar
+    width: 320px
+    height: 320px
+    background-size: cover
+    -webkit-background-size: cover
+
+    float: left
+    margin-right: 10px
+    
+
+    @media (max-width: $mobile-breakpoint)
+      margin-right: 0px
+
+  &__meta
+    float: left
+    width: calc(100% - 350px)
+
+    @media (max-width: $mobile-breakpoint)
+      width: 100%
+      float: none
+
+    @media (max-width: $mobile-breakpoint)
+      +span(12 of 12)
+      
+  &__bookmark
+    float: left
+    width: 20px
+    
+
 
 .expert-text-card
   width: 100%

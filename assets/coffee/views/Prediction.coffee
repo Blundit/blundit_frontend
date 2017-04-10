@@ -154,8 +154,9 @@ module.exports = React.createFactory React.createClass
           if prediction?
             div { className: "prediction" },
               @showNewPredictionText()
-              div { className: "prediction__title" },
-                prediction.title
+              div { className: "default__card" },
+                div { className: "text__title prediction__title" },
+                  prediction.title
               div { className: "prediction__image" },
                 img { src: prediction.pic }
               div { className: "prediction__meta" },
@@ -173,10 +174,13 @@ module.exports = React.createFactory React.createClass
                   "This prediction is #{@showStatus()}"
               div { className: "prediction__description" },
                 prediction.description
-              div { className: "prediction__categories" },
-                "These are the categories this prediction is connected to:"
+              div { className: "default__card prediction__categories" },
+                div { className: "text__title" },
+                  "Categories"
+                div { className: "text__normal" },
+                  "These are the categories this prediction is connected to:"
                 if prediction.categories.length == 0
-                  div {},
+                  div { className: "not-found" },
                     "No categories yet."
                 else
                   div {},
@@ -218,6 +222,7 @@ module.exports = React.createFactory React.createClass
               Comments
                 type: "prediction"
                 id: prediction.id
+                item: prediction
                 num: prediction.comments_count
           else
             div {},

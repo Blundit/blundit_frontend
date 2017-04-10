@@ -1,12 +1,14 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var SessionMixin, div;
+var LinksMixin, SessionMixin, a, div, ref, span;
 
-div = React.DOM.div;
+ref = React.DOM, div = ref.div, a = ref.a, span = ref.span;
 
 SessionMixin = require("mixins/SessionMixin");
 
+LinksMixin = require("mixins/LinksMixin");
+
 module.exports = React.createFactory(React.createClass({
-  mixins: [SessionMixin],
+  mixins: [SessionMixin, LinksMixin],
   getInitialState: function() {
     return {
       user: null
@@ -23,28 +25,48 @@ module.exports = React.createFactory(React.createClass({
       user: UserStore.get()
     });
   },
-  logout: function() {
-    UserStore.logout();
-    return this.setUser({});
-  },
   render: function() {
-    var ref;
+    var ref1;
     return div({
       className: "footer-wrapper"
     }, div({
       className: "footer-content"
     }, div({
       className: "footer__card"
-    }, "this is the footer.", ((ref = this.state.user) != null ? ref.token : void 0) != null ? div({}, div({}, React.createElement(Material.RaisedButton, {
-      label: "Signout",
-      primary: true,
+    }, div({
+      className: "footer__card-row"
+    }, div({
+      className: "footer__text"
+    }, "This has been blundit."), a({
+      className: "footer__link",
+      onClick: this.goToAbout
+    }, 'About'), a({
+      className: "footer__link",
+      onClick: this.goToContact
+    }, 'Contact'), a({
+      className: "footer__link",
+      onClick: this.goToPrivacyPolicy
+    }, 'Privacy Policy')), div({
+      className: "footer__card-row"
+    }, div({
+      className: "footer__icons"
+    }, span({
+      className: "fa fa-facebook"
+    }, ''), span({
+      className: "fa fa-twitter"
+    }, ''), span({
+      className: "fa fa-youtube"
+    }, ''), span({
+      className: "fa fa-podcast"
+    }, '')), ((ref1 = this.state.user) != null ? ref1.token : void 0) != null ? div({
+      className: "footer__link--signout",
       onClick: this.logout
-    }))) : void 0)));
+    }, "Sign out") : void 0))));
   }
 }));
 
 
-},{"mixins/SessionMixin":602}],2:[function(require,module,exports){
+},{"mixins/LinksMixin":601,"mixins/SessionMixin":603}],2:[function(require,module,exports){
 var LinksMixin, LoginModal, div, img, menuItems, ref;
 
 ref = React.DOM, div = ref.div, img = ref.img;
@@ -100,7 +122,6 @@ module.exports = React.createFactory(React.createClass({
   },
   getUserAvatar: function() {
     var avatar;
-    console.log(UserStore.get());
     if (!UserStore.get() || (UserStore.get().avatar_file_name == null)) {
       avatar = "/images/avatars/placeholder.png";
     } else {
@@ -169,9 +190,9 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"mixins/LinksMixin":600,"modals/LoginModal":603}],3:[function(require,module,exports){
+},{"mixins/LinksMixin":601,"modals/LoginModal":604}],3:[function(require,module,exports){
 (function() {
-  var API, AddToClaim, AddToExpert, AddToPrediction, Blundit, BookmarkIndicator, CategoryClaims, CategoryExperts, CategoryPredictions, CategorySubHead, ClaimCard, ClaimEvidences, ClaimExpertCard, ClaimFields, Comments, ExpertBonaFides, ExpertCard, ExpertClaimCard, ExpertFields, ExpertPredictionCard, ExpertSubstantiations, ExpertTextCard, Footer, ForgotPassword, Global, Header, LinksMixin, Login, LoginModal, MuiThemeProvider, Pagination, PaginationMixin, PredictionCard, PredictionEvidences, PredictionExpertCard, PredictionFields, PredictionTextCard, Register, RegistrationSuccessful, RouterMixin, SearchFilters, SessionMixin, UserStore, Votes, a, br, deepOrange500, div, getMuiTheme, img, input, menuItems, muiTheme, ref, ref1, ref10, ref11, ref12, ref13, ref14, ref15, ref16, ref17, ref18, ref19, ref2, ref3, ref4, ref5, ref6, ref7, ref8, ref9, span, startBlundit,
+  var API, AddToClaim, AddToExpert, AddToPrediction, Blundit, BookmarkIndicator, CategoryClaims, CategoryExperts, CategoryPredictions, CategorySubHead, ClaimCard, ClaimEvidences, ClaimExpertCard, ClaimFields, Comments, DateMixin, ExpertBonaFides, ExpertCard, ExpertClaimCard, ExpertFields, ExpertPredictionCard, ExpertSubstantiations, ExpertTextCard, Footer, ForgotPassword, Global, Header, LinksMixin, Login, LoginModal, MuiThemeProvider, Pagination, PaginationMixin, PredictionCard, PredictionEvidences, PredictionExpertCard, PredictionFields, PredictionTextCard, Register, RegistrationSuccessful, RouterMixin, SearchFilters, SessionMixin, UserStore, Votes, a, br, deepOrange500, div, getMuiTheme, img, input, menuItems, muiTheme, ref, ref1, ref10, ref11, ref12, ref13, ref14, ref15, ref16, ref17, ref18, ref19, ref2, ref20, ref3, ref4, ref5, ref6, ref7, ref8, ref9, span, startBlundit,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   window.React = require('react');
@@ -852,26 +873,25 @@ module.exports = React.createFactory(React.createClass({
 
   LinksMixin = require("mixins/LinksMixin");
 
+  ClaimCard = require("components/ClaimCard");
+
   module.exports = React.createFactory(React.createClass({
     displayName: "Category Claims - Latest",
     mixins: [LinksMixin],
     render: function() {
       return div({
-        className: "categories__claims"
+        className: "default__card categories__claims"
       }, div({
-        className: "categories__claims-title"
+        className: "text__title"
       }, "Claims:"), this.props.claims.length > 0 ? this.props.claims.map((function(_this) {
         return function(claim, index) {
-          return div({
-            className: "categories__claims__claim",
+          return ClaimCard({
+            claim: claim,
             key: "category-claim-" + index
-          }, div({
-            className: "categories__claims__claim-title",
-            onClick: _this.goToClaim.bind(_this, claim.id)
-          }, claim.title));
+          });
         };
       })(this)) : div({
-        className: "categories__claims--empty"
+        className: "not-found"
       }, "There are no claims in this category."));
     }
   }));
@@ -880,26 +900,25 @@ module.exports = React.createFactory(React.createClass({
 
   LinksMixin = require("mixins/LinksMixin");
 
+  ExpertCard = require("components/ExpertCard");
+
   module.exports = React.createFactory(React.createClass({
     displayName: "Category Experts - Latest",
     mixins: [LinksMixin],
     render: function() {
       return div({
-        className: "categories__experts"
+        className: "default__card categories__experts"
       }, div({
-        className: "categories__experts-title"
+        className: "text__title"
       }, "Experts:"), this.props.experts.length > 0 ? this.props.experts.map((function(_this) {
         return function(expert, index) {
-          return div({
-            className: "categories__experts__expert",
+          return ExpertCard({
+            expert: expert,
             key: "category-expert-" + index
-          }, div({
-            className: "categories__experts__expert-name",
-            onClick: _this.goToExpert.bind(_this, expert.id)
-          }, expert.name));
+          });
         };
       })(this)) : div({
-        className: "categories__experts--empty"
+        className: "not-found"
       }, "There are no experts in this category."));
     }
   }));
@@ -908,26 +927,25 @@ module.exports = React.createFactory(React.createClass({
 
   LinksMixin = require("mixins/LinksMixin");
 
+  PredictionCard = require("components/PredictionCard");
+
   module.exports = React.createFactory(React.createClass({
     displayName: "Category Predictions - Latest",
     mixins: [LinksMixin],
     render: function() {
       return div({
-        className: "categories__predictions"
+        className: "default__card categories__predictions"
       }, div({
-        className: "categories__predictions-title"
+        className: "text__title"
       }, "Predictions:"), this.props.predictions.length > 0 ? this.props.predictions.map((function(_this) {
         return function(prediction, index) {
-          return div({
-            className: "categories__predictions__prediction",
+          return PredictionCard({
+            prediction: prediction,
             key: "category-predictions-" + index
-          }, div({
-            className: "categories__predictions__prediction-title",
-            onClick: _this.goToPrediction.bind(_this, prediction.id)
-          }, prediction.title));
+          });
         };
       })(this)) : div({
-        className: "categories__predictions--empty"
+        className: "not-found"
       }, "There are no predictions in this category."));
     }
   }));
@@ -971,6 +989,7 @@ module.exports = React.createFactory(React.createClass({
       return div({
         className: "page-subhead"
       }, div({
+        className: "page-subhead__back",
         onClick: this.goBack
       }, '<<'), this.currentPage('') ? div({
         className: "page-subhead__item--active"
@@ -1322,11 +1341,13 @@ module.exports = React.createFactory(React.createClass({
 
   PaginationMixin = require("mixins/PaginationMixin");
 
+  DateMixin = require("mixins/DateMixin");
+
   Pagination = require("components/Pagination");
 
   module.exports = React.createFactory(React.createClass({
     displayName: 'Comments',
-    mixins: [PaginationMixin],
+    mixins: [PaginationMixin, DateMixin],
     getInitialState: function() {
       return {
         comments: null,
@@ -1451,9 +1472,6 @@ module.exports = React.createFactory(React.createClass({
         });
       }
     },
-    formatDate: function(date) {
-      return date;
-    },
     getErrorText: function(key) {
       var error, j, len, ref3;
       ref3 = this.state.errors;
@@ -1472,32 +1490,44 @@ module.exports = React.createFactory(React.createClass({
         inputs: this.inputs
       });
     },
+    getCommentName: function() {
+      if (this.props.type === "expert") {
+        return this.props.item.name;
+      } else {
+        return this.props.item.title;
+      }
+    },
     render: function() {
       return div({
-        className: "comments"
-      }, "Comments: " + this.props.id, this.state.comments === null ? div({}, "Loading Comments") : this.state.comments.length === 0 ? div({}, "Currently No Comments") : void 0, this.state.comments != null ? this.state.comments.map((function(_this) {
+        className: "default__card comments"
+      }, div({
+        className: "text__title"
+      }, "Comments for " + (this.getCommentName())), this.state.comments === null ? div({
+        className: "not-found"
+      }, "Loading Comments") : this.state.comments.length === 0 ? div({
+        className: "not-found"
+      }, "Currently No Comments") : void 0, this.state.comments != null ? this.state.comments.map((function(_this) {
         return function(comment, index) {
           if (comment.user != null) {
-            console.log("!", comment.user);
             return div({
               className: "comments__comment",
               key: "comment-" + index
             }, div({
-              className: "comments__comment-user"
+              className: "comments__comment__meta"
             }, div({
-              className: "comments__comment-user-avatar",
+              className: "comments__comment__meta-user-avatar",
               style: {
                 backgroundImage: "url(http://localhost:3000/images/user_avatars/" + comment.user.avatar_file_name + ")"
               }
             }), div({
-              className: "comments__comment-user-name"
-            }, comment.user.first_name + " " + comment.user.last_name)), div({
-              className: "comments__comment-meta"
-            }, div({
-              className: "comments__comment-meta-text"
-            }, comment.content), div({
-              className: "comments__comment-meta-created-at"
-            }, _this.formatDate(comment.created_at))));
+              className: "comments__comment__meta-text"
+            }), div({
+              className: "comments__comment__meta-text-username"
+            }, comment.user.first_name + " " + comment.user.last_name), div({
+              className: "comments__comment__meta-text-created-at"
+            }, _this.formatDateAndTime(comment.created_at))), div({
+              className: "comments__comment-text"
+            }, comment.content));
           }
         };
       })(this)) : void 0, this.state.comments != null ? Pagination({
@@ -1511,9 +1541,9 @@ module.exports = React.createFactory(React.createClass({
       }, div({}, React.createElement(Material.TextField, {
         id: "comment-content",
         hintText: "Add Comment",
-        floatingLabelText: "Content",
+        floatingLabelText: "Add Comment",
         multiLine: true,
-        rows: 2,
+        rows: 1,
         fullWidth: true,
         rowsMax: 4,
         value: this.state.inputs.content.val,
@@ -1605,8 +1635,14 @@ module.exports = React.createFactory(React.createClass({
       };
       bona_fides = this.props.expert.bona_fides;
       return div({
+        className: "default__card"
+      }, div({
+        className: "text__title"
+      }, "Bona Fides"), div({
         className: "expert__bona-fides"
-      }, bona_fides.length === 0 ? "This expert currently has no bona fides." : bona_fides.map(function(bona_fide, index) {
+      }, bona_fides.length === 0 ? div({
+        className: "not-found"
+      }, "This expert currently has no bona fides.") : bona_fides.map(function(bona_fide, index) {
         return div({
           className: "expert__bona-fide"
         }, a({
@@ -1614,7 +1650,7 @@ module.exports = React.createFactory(React.createClass({
           target: "_blank",
           key: "expert-bona-fide-" + index
         }, bona_fide.title));
-      }), UserStore.loggedIn() ? this.state.submittingBonaFide === true ? React.createElement(Material.RefreshIndicator, {
+      })), UserStore.loggedIn() ? this.state.submittingBonaFide === true ? React.createElement(Material.RefreshIndicator, {
         style: this.refreshStyle,
         size: 50,
         left: 0,
@@ -1626,7 +1662,9 @@ module.exports = React.createFactory(React.createClass({
         value: this.state.url,
         fullWidth: true,
         onChange: this.changeURL,
-        id: "add-bonafide"
+        id: "add-bonafide",
+        hintText: "Add URL demonstrating that this expert is knowledgeable",
+        floatingLabelText: "Add Bona Fide"
       }), React.createElement(Material.FlatButton, {
         label: "Add",
         onClick: this.addBonaFide
@@ -2140,12 +2178,14 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  div = React.DOM.div;
+  ref7 = React.DOM, div = ref7.div, a = ref7.a, span = ref7.span;
 
   SessionMixin = require("mixins/SessionMixin");
 
+  LinksMixin = require("mixins/LinksMixin");
+
   module.exports = React.createFactory(React.createClass({
-    mixins: [SessionMixin],
+    mixins: [SessionMixin, LinksMixin],
     getInitialState: function() {
       return {
         user: null
@@ -2162,27 +2202,47 @@ module.exports = React.createFactory(React.createClass({
         user: UserStore.get()
       });
     },
-    logout: function() {
-      UserStore.logout();
-      return this.setUser({});
-    },
     render: function() {
-      var ref7;
+      var ref8;
       return div({
         className: "footer-wrapper"
       }, div({
         className: "footer-content"
       }, div({
         className: "footer__card"
-      }, "this is the footer.", ((ref7 = this.state.user) != null ? ref7.token : void 0) != null ? div({}, div({}, React.createElement(Material.RaisedButton, {
-        label: "Signout",
-        primary: true,
+      }, div({
+        className: "footer__card-row"
+      }, div({
+        className: "footer__text"
+      }, "This has been blundit."), a({
+        className: "footer__link",
+        onClick: this.goToAbout
+      }, 'About'), a({
+        className: "footer__link",
+        onClick: this.goToContact
+      }, 'Contact'), a({
+        className: "footer__link",
+        onClick: this.goToPrivacyPolicy
+      }, 'Privacy Policy')), div({
+        className: "footer__card-row"
+      }, div({
+        className: "footer__icons"
+      }, span({
+        className: "fa fa-facebook"
+      }, ''), span({
+        className: "fa fa-twitter"
+      }, ''), span({
+        className: "fa fa-youtube"
+      }, ''), span({
+        className: "fa fa-podcast"
+      }, '')), ((ref8 = this.state.user) != null ? ref8.token : void 0) != null ? div({
+        className: "footer__link--signout",
         onClick: this.logout
-      }))) : void 0)));
+      }, "Sign out") : void 0))));
     }
   }));
 
-  ref7 = React.DOM, div = ref7.div, a = ref7.a;
+  ref8 = React.DOM, div = ref8.div, a = ref8.a;
 
   LinksMixin = require("mixins/LinksMixin");
 
@@ -2250,10 +2310,10 @@ module.exports = React.createFactory(React.createClass({
       return false;
     },
     getErrorText: function(key) {
-      var error, j, len, ref8;
-      ref8 = this.state.errors;
-      for (j = 0, len = ref8.length; j < len; j++) {
-        error = ref8[j];
+      var error, j, len, ref9;
+      ref9 = this.state.errors;
+      for (j = 0, len = ref9.length; j < len; j++) {
+        error = ref9[j];
         if (error.id === key) {
           return error.text;
         }
@@ -2305,7 +2365,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref8 = React.DOM, div = ref8.div, img = ref8.img;
+  ref9 = React.DOM, div = ref9.div, img = ref9.img;
 
   menuItems = [
     {
@@ -2358,7 +2418,6 @@ module.exports = React.createFactory(React.createClass({
     },
     getUserAvatar: function() {
       var avatar;
-      console.log(UserStore.get());
       if (!UserStore.get() || (UserStore.get().avatar_file_name == null)) {
         avatar = "/images/avatars/placeholder.png";
       } else {
@@ -2385,7 +2444,7 @@ module.exports = React.createFactory(React.createClass({
       return this["class"];
     },
     render: function() {
-      var ref9;
+      var ref10;
       return div({
         className: "header-wrapper"
       }, div({
@@ -2399,8 +2458,8 @@ module.exports = React.createFactory(React.createClass({
         className: "header__items"
       }, menuItems.map((function(_this) {
         return function(item, index) {
-          var ref9;
-          if (((item.logged != null) && (((ref9 = _this.state.user) != null ? ref9.token : void 0) != null)) || !item.logged) {
+          var ref10;
+          if (((item.logged != null) && (((ref10 = _this.state.user) != null ? ref10.token : void 0) != null)) || !item.logged) {
             return div({
               className: _this.getHeaderItemClass(item),
               key: "header-item-" + index,
@@ -2410,7 +2469,7 @@ module.exports = React.createFactory(React.createClass({
         };
       })(this))), div({
         className: "header__user"
-      }, ((ref9 = this.state.user) != null ? ref9.token : void 0) != null ? div({
+      }, ((ref10 = this.state.user) != null ? ref10.token : void 0) != null ? div({
         className: "header__user__avatar",
         onClick: this.navigateToLocation.bind(this, "/me"),
         style: {
@@ -2426,7 +2485,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref9 = React.DOM, div = ref9.div, a = ref9.a;
+  ref10 = React.DOM, div = ref10.div, a = ref10.a;
 
   SessionMixin = require("mixins/SessionMixin");
 
@@ -2522,10 +2581,10 @@ module.exports = React.createFactory(React.createClass({
       }
     },
     getErrorText: function(key) {
-      var error, j, len, ref10;
-      ref10 = this.state.errors;
-      for (j = 0, len = ref10.length; j < len; j++) {
-        error = ref10[j];
+      var error, j, len, ref11;
+      ref11 = this.state.errors;
+      for (j = 0, len = ref11.length; j < len; j++) {
+        error = ref11[j];
         if (error.id === key) {
           return error.text;
         }
@@ -2669,9 +2728,9 @@ module.exports = React.createFactory(React.createClass({
       return div({
         className: "pagination__pages"
       }, (function() {
-        var j, ref10, ref11, results1;
+        var j, ref11, ref12, results1;
         results1 = [];
-        for (page = j = ref10 = this.leftPage, ref11 = this.rightPage; ref10 <= ref11 ? j <= ref11 : j >= ref11; page = ref10 <= ref11 ? ++j : --j) {
+        for (page = j = ref11 = this.leftPage, ref12 = this.rightPage; ref11 <= ref12 ? j <= ref12 : j >= ref12; page = ref11 <= ref12 ? ++j : --j) {
           if (page === this.props.page) {
             results1.push(React.createElement(Material.FlatButton, {
               key: "page-" + page,
@@ -2702,13 +2761,15 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref10 = React.DOM, div = ref10.div, img = ref10.img, a = ref10.a, br = ref10.br, span = ref10.span;
+  ref11 = React.DOM, div = ref11.div, img = ref11.img, a = ref11.a, br = ref11.br, span = ref11.span;
 
   LinksMixin = require("mixins/LinksMixin");
 
+  DateMixin = require("mixins/DateMixin");
+
   module.exports = React.createFactory(React.createClass({
     displayName: 'PredictionCard',
-    mixins: [LinksMixin],
+    mixins: [LinksMixin, DateMixin],
     getDescription: function() {
       var prediction;
       prediction = this.props.prediction;
@@ -2745,28 +2806,10 @@ module.exports = React.createFactory(React.createClass({
       prediction = this.props.prediction;
       return prediction.comments_count + " comments";
     },
-    formatDate: function(date) {
-      var day, monthIndex, monthNames, suffix, year;
-      monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-      day = date.getDate();
-      monthIndex = date.getMonth();
-      year = date.getFullYear();
-      if (day === 1 || day === 11 || day === 21 || day === 31) {
-        suffix = 'st';
-      } else if (day === 2 || day === 12 || day === 22) {
-        suffix = 'nd';
-      } else if (day === 3 || day === 13 || day === 23) {
-        suffix = 'rd';
-      } else {
-        suffix = 'th';
-      }
-      return monthNames[monthIndex] + ' ' + day + suffix + ', ' + year;
-    },
     predictionDate: function() {
       var prediction;
       prediction = this.props.prediction;
-      this.d = new Date(prediction.created_at);
-      return this.formatDate(this.d);
+      return this.formatDate(prediction.created_at);
     },
     render: function() {
       var prediction;
@@ -2818,7 +2861,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref11 = React.DOM, div = ref11.div, a = ref11.a;
+  ref12 = React.DOM, div = ref12.div, a = ref12.a;
 
   module.exports = React.createFactory(React.createClass({
     displayName: "PredictionEvidences",
@@ -2935,8 +2978,8 @@ module.exports = React.createFactory(React.createClass({
       });
     },
     render: function() {
-      var expert, prediction, ref12;
-      ref12 = this.props, expert = ref12.expert, prediction = ref12.prediction;
+      var expert, prediction, ref13;
+      ref13 = this.props, expert = ref13.expert, prediction = ref13.prediction;
       return div({
         className: "prediction__experts-list-item"
       }, div({
@@ -2987,10 +3030,10 @@ module.exports = React.createFactory(React.createClass({
       return this.props.updateField("category", value);
     },
     getErrorText: function(key) {
-      var error, j, len, ref12;
-      ref12 = this.props.errors;
-      for (j = 0, len = ref12.length; j < len; j++) {
-        error = ref12[j];
+      var error, j, len, ref13;
+      ref13 = this.props.errors;
+      for (j = 0, len = ref13.length; j < len; j++) {
+        error = ref13[j];
         if (error.id === key) {
           return error.text;
         }
@@ -3052,7 +3095,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref12 = React.DOM, div = ref12.div, img = ref12.img, a = ref12.a, br = ref12.br, span = ref12.span;
+  ref13 = React.DOM, div = ref13.div, img = ref13.img, a = ref13.a, br = ref13.br, span = ref13.span;
 
   LinksMixin = require("mixins/LinksMixin");
 
@@ -3111,7 +3154,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref13 = React.DOM, div = ref13.div, a = ref13.a;
+  ref14 = React.DOM, div = ref14.div, a = ref14.a;
 
   LinksMixin = require("mixins/LinksMixin");
 
@@ -3223,10 +3266,10 @@ module.exports = React.createFactory(React.createClass({
       }
     },
     getErrorText: function(key) {
-      var error, j, len, ref14;
-      ref14 = this.state.errors;
-      for (j = 0, len = ref14.length; j < len; j++) {
-        error = ref14[j];
+      var error, j, len, ref15;
+      ref15 = this.state.errors;
+      for (j = 0, len = ref15.length; j < len; j++) {
+        error = ref15[j];
         if (error.id === key) {
           return error.text;
         }
@@ -3333,10 +3376,10 @@ module.exports = React.createFactory(React.createClass({
       });
     },
     getErrorText: function(key) {
-      var error, j, len, ref14;
-      ref14 = this.state.errors;
-      for (j = 0, len = ref14.length; j < len; j++) {
-        error = ref14[j];
+      var error, j, len, ref15;
+      ref15 = this.state.errors;
+      for (j = 0, len = ref15.length; j < len; j++) {
+        error = ref15[j];
         if (error.id === key) {
           return error.text;
         }
@@ -3389,10 +3432,10 @@ module.exports = React.createFactory(React.createClass({
   module.exports = React.createFactory(React.createClass({
     displayName: 'Votes',
     getVoteValText: function() {
-      var item, ref14;
+      var item, ref15;
       item = this.props.item;
       if (item.user_vote != null) {
-        return (ref14 = item.user_vote.vote === 1) != null ? ref14 : {
+        return (ref15 = item.user_vote.vote === 1) != null ? ref15 : {
           "True": "False"
         };
       } else {
@@ -3406,8 +3449,8 @@ module.exports = React.createFactory(React.createClass({
       return this.props.vote(0);
     },
     notOpenYet: function() {
-      var d1, d2, item, ref14, type;
-      ref14 = this.props, item = ref14.item, type = ref14.type;
+      var d1, d2, item, ref15, type;
+      ref15 = this.props, item = ref15.item, type = ref15.type;
       if (type !== "prediction") {
         return false;
       } else {
@@ -3428,8 +3471,8 @@ module.exports = React.createFactory(React.createClass({
       };
     },
     render: function() {
-      var item, ref14, submitted, submitting, type;
-      ref14 = this.props, type = ref14.type, item = ref14.item, submitting = ref14.submitting, submitted = ref14.submitted;
+      var item, ref15, submitted, submitting, type;
+      ref15 = this.props, type = ref15.type, item = ref15.item, submitting = ref15.submitting, submitted = ref15.submitted;
       return div({
         className: type + "__vote"
       }, div({
@@ -3463,6 +3506,59 @@ module.exports = React.createFactory(React.createClass({
   }));
 
   module.exports = {
+    formatDate: function(d) {
+      var date, day, monthIndex, monthNames, suffix, year;
+      date = new Date(d);
+      monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+      day = date.getDate();
+      monthIndex = date.getMonth();
+      year = date.getFullYear();
+      if (day === 1 || day === 11 || day === 21 || day === 31) {
+        suffix = 'st';
+      } else if (day === 2 || day === 12 || day === 22) {
+        suffix = 'nd';
+      } else if (day === 3 || day === 13 || day === 23) {
+        suffix = 'rd';
+      } else {
+        suffix = 'th';
+      }
+      return monthNames[monthIndex] + ' ' + day + suffix + ', ' + year;
+    },
+    formatDateAndTime: function(d) {
+      var ampm, date, day, hours, minutes, monthIndex, monthNames, suffix, year;
+      date = new Date(d);
+      monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+      day = date.getDate();
+      monthIndex = date.getMonth();
+      year = date.getFullYear();
+      hours = date.getHours();
+      console.log(hours);
+      ampm = "AM";
+      if (hours >= 12) {
+        hours -= 12;
+        ampm = "PM";
+      }
+      if (hours === 0) {
+        hours = 12;
+      }
+      minutes = date.getMinutes();
+      if (minutes < 10) {
+        minutes = "0" + minutes;
+      }
+      if (day === 1 || day === 11 || day === 21 || day === 31) {
+        suffix = 'st';
+      } else if (day === 2 || day === 12 || day === 22) {
+        suffix = 'nd';
+      } else if (day === 3 || day === 13 || day === 23) {
+        suffix = 'rd';
+      } else {
+        suffix = 'th';
+      }
+      return monthNames[monthIndex] + ' ' + day + suffix + ', ' + year + ' at ' + hours + ':' + minutes + ' ' + ampm;
+    }
+  };
+
+  module.exports = {
     goToClaim: function(id) {
       return navigate("/claims/" + id);
     },
@@ -3486,6 +3582,19 @@ module.exports = React.createFactory(React.createClass({
     },
     goBackToSearch: function() {
       return navigate("/search?query=" + this.state.query + "&sort=" + this.state.sort);
+    },
+    logout: function() {
+      UserStore.logout();
+      return this.setUser({});
+    },
+    goToAbout: function() {
+      return navigate('/about');
+    },
+    goToContact: function() {
+      return navigate('/contact');
+    },
+    goToPrivacyPolicy: function() {
+      return navigate('/privacy_policy');
     }
   };
 
@@ -3551,13 +3660,13 @@ module.exports = React.createFactory(React.createClass({
       return decodeURIComponent(results[2].replace(/\+/g, " "));
     },
     getUrlParams: function() {
-      var j, key, len, params, query, raw_vars, ref14, v, val;
+      var j, key, len, params, query, raw_vars, ref15, v, val;
       query = window.location.search.substring(1);
       raw_vars = query.split("&");
       params = {};
       for (j = 0, len = raw_vars.length; j < len; j++) {
         v = raw_vars[j];
-        ref14 = v.split("="), key = ref14[0], val = ref14[1];
+        ref15 = v.split("="), key = ref15[0], val = ref15[1];
         params[key] = decodeURIComponent(val);
       }
       return params;
@@ -3624,7 +3733,7 @@ module.exports = React.createFactory(React.createClass({
     updateUserHeaderInfo: function(request) {}
   };
 
-  ref14 = React.DOM, div = ref14.div, span = ref14.span;
+  ref15 = React.DOM, div = ref15.div, span = ref15.span;
 
   Login = require("components/Login");
 
@@ -3910,11 +4019,11 @@ module.exports = React.createFactory(React.createClass({
     };
 
     API.path = function(params) {
-      var key, ref15, value;
+      var key, ref16, value;
       this.p = this.server(params) + this.paths[params.path].path;
-      ref15 = params.path_variables;
-      for (key in ref15) {
-        value = ref15[key];
+      ref16 = params.path_variables;
+      for (key in ref16) {
+        value = ref16[key];
         this.p = this.p.replace('%' + key + '%', value);
       }
       if (this.paths[params.path].method === "GET") {
@@ -4270,7 +4379,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref15 = React.DOM, div = ref15.div, span = ref15.span;
+  ref16 = React.DOM, div = ref16.div, span = ref16.span;
 
   Header = require("components/Header");
 
@@ -4280,11 +4389,23 @@ module.exports = React.createFactory(React.createClass({
     displayName: 'Bookmarks',
     getInitialState: function() {
       return {
-        bookmarks: null
+        bookmarks: null,
+        user: null
       };
     },
     componentDidMount: function() {
-      return this.fetchBookmarks();
+      return UserStore.subscribe(this.updateUser);
+    },
+    componentWillUnmount: function() {
+      return UserStore.unsubscribe(this.updateUser);
+    },
+    updateUser: function() {
+      if (this.state.bookmarks === null) {
+        this.fetchBookmarks();
+      }
+      return this.setState({
+        user: UserStore.get()
+      });
     },
     fetchBookmarks: function() {
       var params;
@@ -4365,36 +4486,61 @@ module.exports = React.createFactory(React.createClass({
       return this.fetchBookmarks();
     },
     removeBookmarkError: function(error) {},
+    getItemClass: function(bookmark) {
+      this["class"] = "bookmarks__list__item";
+      if (bookmark["new"] === true) {
+        this["class"] += "--has-new";
+      }
+      return this["class"];
+    },
     render: function() {
       return div({}, Header({}, ''), div({
         className: "bookmarks-wrapper"
       }, div({
         className: "bookmarks-content"
+      }, this.state.user === null ? div({
+        className: "default__card"
       }, div({
+        className: "text__title"
+      }, "My bookmarks"), div({
+        className: "not-found"
+      }, "Loading...")) : void 0, (this.state.user != null) && (this.state.user.token == null) ? div({
+        className: "default__card"
+      }, div({
+        className: "text__title"
+      }, "My bookmarks"), div({
+        className: "not-found"
+      }, "You must be logged in to view this content.")) : void 0, (this.state.user != null) && (this.state.user.token != null) ? (console.log(this.state.bookmarks), div({
         className: "default__card bookmarks__list"
-      }, this.state.bookmarks != null ? this.state.bookmarks.map((function(_this) {
+      }, div({
+        className: "text__title"
+      }, "My bookmarks"), this.state.bookmarks != null ? this.state.bookmarks.map((function(_this) {
         return function(bookmark, index) {
           return div({
-            className: "bookmarks__list__item",
+            className: _this.getItemClass(bookmark),
             key: "bookmark-" + index
-          }, div({}, div({
+          }, div({
+            className: "bookmarks__list__item-row"
+          }, div({
             className: "bookmarks__list__item-type"
           }, _this.sentenceCase(bookmark.type) + ": "), div({
             className: "bookmarks__list__item-title",
             onClick: _this.goToBookmarkItem.bind(_this, bookmark)
           }, bookmark.title), div({
             className: "bookmarks__list__item-new"
-          }, _this.showBookmarkNewStatus(bookmark["new"]))), div({}, div({
+          }, _this.showBookmarkNewStatus(bookmark["new"]))), div({
+            className: "bookmarks__list__item-row"
+          }, div({
             className: "bookmarks__list__item-notify",
             onClick: _this.changeNotificationSettings.bind(_this, bookmark)
-          }, _this.showNotificationSettings(bookmark)), div({
+          }, "Notify of updates: ", _this.showNotificationSettings(bookmark)), div({
             className: "bookmarks__list__item-remove",
             onClick: _this.removeBookmark.bind(_this, bookmark)
           }, span({
             className: "fa fa-remove"
           }, ''))));
         };
-      })(this)) : void 0))), Footer({}, ''));
+      })(this)) : void 0)) : void 0)), Footer({}, ''));
     }
   }));
 
@@ -4429,6 +4575,17 @@ module.exports = React.createFactory(React.createClass({
       });
     },
     categoryListError: function(error) {},
+    getCategoryDescription: function(category) {
+      this["class"] = "categories__list__item-description";
+      this.description = category.description;
+      if ((category.description == null) || category.description === "") {
+        this["class"] += "--not-found";
+        this.description = "Description not found. I'm sure one will be coming soon.";
+      }
+      return div({
+        className: this["class"]
+      }, this.description);
+    },
     render: function() {
       return div({}, Header({}, ''), div({
         className: "categories-wrapper"
@@ -4436,13 +4593,17 @@ module.exports = React.createFactory(React.createClass({
         className: "categories-content"
       }, div({
         className: "default__card categories__list"
-      }, this.state.categories != null ? this.state.categories.map((function(_this) {
+      }, div({
+        className: "text__title"
+      }, "Categories"), this.state.categories != null ? this.state.categories.map((function(_this) {
         return function(category, index) {
           return div({
             className: "categories__list__item",
             key: "category-" + index,
             onClick: _this.goToCategory.bind(_this, category.id)
-          }, category.name);
+          }, div({
+            className: "categories__list__item-title"
+          }, category.name + " (" + category.experts + " E, " + category.predictions + " P, " + category.claims + " C)"), _this.getCategoryDescription(category));
         };
       })(this)) : void 0))), Footer({}, ''));
     }
@@ -4515,11 +4676,19 @@ module.exports = React.createFactory(React.createClass({
         className: "categories-wrapper"
       }, div({
         className: "categories-content"
-      }, this.state.category != null ? div({
-        className: "page-title"
-      }, "Category '" + this.state.category.name + "' - Showing Experts, Claims and Predictions", CategorySubHead({
+      }, div({}, this.state.category != null ? div({
+        className: "default__card"
+      }, div({
+        className: "text__title"
+      }, "Category '" + this.state.category.name + "'"), div({
+        className: "text__subtitle"
+      }, "Showing Experts, Claims and Predictions"), CategorySubHead({
         category_id: this.props.id
-      })) : div({}, "Loading..."), this.state.data != null ? div({
+      })) : div({
+        className: "default__card"
+      }, div({
+        className: "not-found"
+      }, "Loading..."))), this.state.data != null ? div({
         className: "categories"
       }, CategoryExperts({
         experts: this.state.data.experts
@@ -4594,12 +4763,18 @@ module.exports = React.createFactory(React.createClass({
         className: "categories-wrapper"
       }, div({
         className: "categories-content"
-      }, this.state.category ? div({
-        className: "page-title"
-      }, "Category '" + this.state.category.name + "' - Showing Claims", CategorySubHead({
+      }, this.state.category != null ? div({
+        className: "default__card"
+      }, div({
+        className: "text__title"
+      }, "Category '" + this.state.category.name + "' - Showing Claims"), CategorySubHead({
         category_id: this.props.id
-      })) : void 0, this.state.data != null ? div({
-        className: "categories"
+      })) : div({
+        className: "default__card"
+      }, div({
+        className: "not-found"
+      }, "Loading...")), this.state.data != null ? div({
+        className: "default__card ategories"
       }, CategoryClaims({
         claims: this.state.data
       })) : void 0)), Footer({}, ''));
@@ -4669,12 +4844,18 @@ module.exports = React.createFactory(React.createClass({
         className: "categories-wrapper"
       }, div({
         className: "categories-content"
-      }, this.state.category ? div({
-        className: "page-title"
-      }, "Category '" + this.state.category.name + "' - Showing Experts", CategorySubHead({
+      }, this.state.category != null ? div({
+        className: "default__card"
+      }, div({
+        className: "text__title"
+      }, "Category '" + this.state.category.name + "' - Showing Experts"), CategorySubHead({
         category_id: this.props.id
-      })) : void 0, this.state.data != null ? div({
-        className: "categories"
+      })) : div({
+        className: "default__card"
+      }, div({
+        className: "not-found"
+      }, "Loading...")), this.state.data != null ? div({
+        className: "default__card categories"
       }, CategoryExperts({
         experts: this.state.data
       })) : void 0)), Footer({}, ''));
@@ -4744,11 +4925,17 @@ module.exports = React.createFactory(React.createClass({
         className: "categories-wrapper"
       }, div({
         className: "categories-content"
-      }, this.state.category ? div({
-        className: "page-title"
-      }, "Category '" + this.state.category.name + "' - Showing Experts, Claims and Predictions", CategorySubHead({
+      }, this.state.category != null ? div({
+        className: "default__card"
+      }, div({
+        className: "text__title"
+      }, "Category '" + this.state.category.name + "' - Showing Experts, Claims and Predictions"), CategorySubHead({
         category_id: this.props.id
-      })) : void 0, this.state.data != null ? div({
+      })) : div({
+        className: "default__card"
+      }, div({
+        className: "not-found"
+      }, "Loading...")), this.state.data != null ? div({
         className: "categories"
       }, CategoryPredictions({
         predictions: this.state.data
@@ -4756,7 +4943,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref16 = React.DOM, div = ref16.div, img = ref16.img;
+  ref17 = React.DOM, div = ref17.div, img = ref17.img;
 
   Header = require("components/Header");
 
@@ -4920,8 +5107,8 @@ module.exports = React.createFactory(React.createClass({
       }
     },
     render: function() {
-      var claim, experts, ref17;
-      ref17 = this.state, claim = ref17.claim, experts = ref17.experts;
+      var claim, experts, ref18;
+      ref18 = this.state, claim = ref18.claim, experts = ref18.experts;
       return div({}, Header({}, ''), div({
         className: "claims-wrapper"
       }, div({
@@ -4948,8 +5135,14 @@ module.exports = React.createFactory(React.createClass({
       }, "This claim is " + (this.showStatus()))), div({
         className: "claim__description"
       }, claim.description), div({
-        className: "claim__categories"
-      }, "These are the categories this claim is connected to:", claim.categories.length === 0 ? div({}, "No categories yet.") : div({}, claim.categories.map((function(_this) {
+        className: "default__card claim__categories"
+      }, div({
+        className: "text__title"
+      }, "Categories"), div({
+        className: "text__normal"
+      }, "These are the categories this claim is connected to:"), claim.categories.length === 0 ? div({
+        className: "not-found"
+      }, "No categories yet.") : div({}, claim.categories.map((function(_this) {
         return function(category, index) {
           return React.createElement(Material.Chip, {
             onTouchTap: _this.goToCategory.bind(_this, category.id),
@@ -4989,6 +5182,7 @@ module.exports = React.createFactory(React.createClass({
       }), Comments({
         type: "claim",
         id: claim.id,
+        item: claim,
         num: claim.comments_count
       })) : div({}, this.state.loadError))), Footer({}, ''));
     }
@@ -5560,7 +5754,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref17 = React.DOM, div = ref17.div, img = ref17.img;
+  ref18 = React.DOM, div = ref18.div, img = ref18.img;
 
   Header = require("components/Header");
 
@@ -5671,8 +5865,8 @@ module.exports = React.createFactory(React.createClass({
       }, "Success! You've added a new expert to the system. Now you can add more information to them!") : void 0);
     },
     render: function() {
-      var claims, expert, predictions, ref18;
-      ref18 = this.state, expert = ref18.expert, predictions = ref18.predictions, claims = ref18.claims;
+      var claims, expert, predictions, ref19;
+      ref19 = this.state, expert = ref19.expert, predictions = ref19.predictions, claims = ref19.claims;
       return div({}, Header({}, ''), div({
         className: "experts-wrapper"
       }, div({
@@ -5680,28 +5874,39 @@ module.exports = React.createFactory(React.createClass({
       }, expert != null ? div({
         className: "expert"
       }, this.showNewExpertText(), div({
-        className: "expert__name"
+        className: "default__card"
+      }, div({
+        className: "text__title expert__name"
       }, expert.name), div({
-        className: "expert__description"
-      }, expert.description != null ? expert.description : "This expert has no description yet."), div({
-        className: "expert__avatar"
-      }, img({
-        src: expert.avatar
-      })), ExpertBonaFides({
-        expert: expert,
-        refresh: this.fetchExpert
+        className: "expert__avatar",
+        style: {
+          backgroundImage: "url(" + expert.avatar + ")"
+        }
       }), div({
         className: "expert__meta"
-      }, UserStore.loggedIn() ? div({
-        className: "expert__meta-bookmark"
+      }, div({
+        className: "expert__meta-description"
+      }, expert.description != null ? "!!!" + expert.description : "This expert has no description yet."), div({
+        className: "not-found"
+      }, "TODO: Add other fields here.")), UserStore.loggedIn() ? div({
+        className: "expert__bookmark"
       }, BookmarkIndicator({
         bookmark: this.state.expert.bookmark,
         type: "expert",
         id: this.state.expert.id,
         updateBookmark: this.updateBookmark
-      })) : void 0), div({
-        className: "expert__categories"
-      }, "These are the categories this expert is connected to:", expert.categories.length === 0 ? div({}, "No categories yet.") : div({}, expert.categories.map((function(_this) {
+      })) : void 0), ExpertBonaFides({
+        expert: expert,
+        refresh: this.fetchExpert
+      }), div({
+        className: "default__card expert__categories"
+      }, div({
+        className: "text__title"
+      }, "Categories"), div({
+        className: "text__normal"
+      }, "These are the categories this expert is connected to:"), expert.categories.length === 0 ? div({
+        className: "not-found"
+      }, "No categories yet.") : div({}, expert.categories.map((function(_this) {
         return function(category, index) {
           return React.createElement(Material.Chip, {
             onTouchTap: _this.goToCategory.bind(_this, category.id),
@@ -5760,6 +5965,7 @@ module.exports = React.createFactory(React.createClass({
         refresh: this.fetchExpert
       }) : void 0)), Comments({
         type: "expert",
+        item: expert,
         id: expert.id,
         num: expert.comments_count
       })) : div({}, this.state.loadError))), Footer({}, ''));
@@ -6073,7 +6279,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref18 = React.DOM, div = ref18.div, img = ref18.img;
+  ref19 = React.DOM, div = ref19.div, img = ref19.img;
 
   Header = require("components/Header");
 
@@ -6240,8 +6446,8 @@ module.exports = React.createFactory(React.createClass({
       return date;
     },
     render: function() {
-      var experts, prediction, ref19;
-      ref19 = this.state, prediction = ref19.prediction, experts = ref19.experts;
+      var experts, prediction, ref20;
+      ref20 = this.state, prediction = ref20.prediction, experts = ref20.experts;
       return div({}, Header({}, ''), div({
         className: "predictions-wrapper"
       }, div({
@@ -6249,8 +6455,10 @@ module.exports = React.createFactory(React.createClass({
       }, prediction != null ? div({
         className: "prediction"
       }, this.showNewPredictionText(), div({
-        className: "prediction__title"
-      }, prediction.title), div({
+        className: "default__card"
+      }, div({
+        className: "text__title prediction__title"
+      }, prediction.title)), div({
         className: "prediction__image"
       }, img({
         src: prediction.pic
@@ -6270,8 +6478,14 @@ module.exports = React.createFactory(React.createClass({
       }, "This prediction is " + (this.showStatus()))), div({
         className: "prediction__description"
       }, prediction.description), div({
-        className: "prediction__categories"
-      }, "These are the categories this prediction is connected to:", prediction.categories.length === 0 ? div({}, "No categories yet.") : div({}, prediction.categories.map((function(_this) {
+        className: "default__card prediction__categories"
+      }, div({
+        className: "text__title"
+      }, "Categories"), div({
+        className: "text__normal"
+      }, "These are the categories this prediction is connected to:"), prediction.categories.length === 0 ? div({
+        className: "not-found"
+      }, "No categories yet.") : div({}, prediction.categories.map((function(_this) {
         return function(category, index) {
           return React.createElement(Material.Chip, {
             onTouchTap: _this.goToCategory.bind(_this, category.id),
@@ -6311,6 +6525,7 @@ module.exports = React.createFactory(React.createClass({
       }), Comments({
         type: "prediction",
         id: prediction.id,
+        item: prediction,
         num: prediction.comments_count
       })) : div({}, this.state.loadError))), Footer({}, ''));
     }
@@ -6558,7 +6773,7 @@ module.exports = React.createFactory(React.createClass({
         searching: false
       });
       this.setState({
-        searchError: false
+        searchError: null
       });
       return this.setState({
         data: data
@@ -6618,55 +6833,58 @@ module.exports = React.createFactory(React.createClass({
         className: "text__title"
       }, "Experts:"), this.state.data.experts.length === 0 ? div({
         className: "search__experts-items--empty"
-      }, "No expert found for '" + this.state.data.query + "'") : div({
+      }, "No expert found for '" + this.state.data.query + "'") : div({}, div({
         className: "search__experts-items"
       }, this.state.data.experts.map(function(expert, index) {
         return ExpertCard({
           expert: expert,
           key: "search-expert-card-" + index
         });
-      }), div({
-        className: "search__experts-all",
+      })), div({}, React.createElement(Material.RaisedButton, {
+        label: "View All",
+        primary: true,
         onClick: this.goToExperts
-      }, 'View All'))), div({
+      })))), div({
         className: "default__card search__predictions"
       }, div({
         className: "text__title"
       }, "Predictions:"), this.state.data.predictions.length === 0 ? div({
         className: "search__predictions-items--empty"
-      }, "No prediction found for '" + this.state.data.query + "'") : div({
+      }, "No prediction found for '" + this.state.data.query + "'") : div({}, div({
         className: "search__predictions-items"
       }, this.state.data.predictions.map(function(prediction, index) {
         return PredictionCard({
           prediction: prediction,
           key: "search-prediction-card-" + index
         });
-      }), div({
-        className: "search__predictions-all",
+      })), div({}, React.createElement(Material.RaisedButton, {
+        label: "View All",
+        primary: true,
         onClick: this.goToPredictions
-      }, 'View All'))), div({
+      })))), div({
         className: "default__card search__claims"
       }, div({
         className: "text__title"
       }, "Claims:"), this.state.data.claims.length === 0 ? div({
         className: "search__claims-items--empty"
-      }, "No claim found for '" + this.state.data.query + "'") : div({
+      }, "No claim found for '" + this.state.data.query + "'") : div({}, div({
         className: "search__claims-items"
       }, this.state.data.claims.map(function(claim, index) {
         return ClaimCard({
           claim: claim,
           key: "search-claim-card-" + index
         });
-      }), div({
-        className: "search__claims-all",
+      })), div({}, React.createElement(Material.RaisedButton, {
+        label: "View All",
+        primary: true,
         onClick: this.goToClaims
-      }, 'View All')))) : void 0, this.state.searchError != null ? div({
+      }))))) : void 0, this.state.searchError != null ? div({
         className: "default__card search__error"
       }, this.state.searchError) : void 0)), Footer({}, ''));
     }
   }));
 
-  ref19 = React.DOM, div = ref19.div, input = ref19.input, br = ref19.br, img = ref19.img;
+  ref20 = React.DOM, div = ref20.div, input = ref20.input, br = ref20.br, img = ref20.img;
 
   Header = require("components/Header");
 
@@ -6794,10 +7012,10 @@ module.exports = React.createFactory(React.createClass({
       return false;
     },
     getErrorText: function(key) {
-      var error, j, len, ref20;
-      ref20 = this.state.errors;
-      for (j = 0, len = ref20.length; j < len; j++) {
-        error = ref20[j];
+      var error, j, len, ref21;
+      ref21 = this.state.errors;
+      for (j = 0, len = ref21.length; j < len; j++) {
+        error = ref21[j];
         if (error.id === key) {
           return error.text;
         }
@@ -6945,7 +7163,7 @@ module.exports = React.createFactory(React.createClass({
 
 }).call(this);
 
-},{"./components/Footer":1,"./components/Header":2,"components/AddToClaim":566,"components/AddToExpert":567,"components/AddToPrediction":568,"components/BookmarkIndicator":569,"components/CategoryClaims":570,"components/CategoryExperts":571,"components/CategoryPredictions":572,"components/CategorySubHead":573,"components/ClaimCard":574,"components/ClaimEvidences":575,"components/ClaimExpertCard":576,"components/ClaimFields":577,"components/Comments":578,"components/ExpertBonaFides":579,"components/ExpertCard":580,"components/ExpertClaimCard":581,"components/ExpertFields":582,"components/ExpertPredictionCard":583,"components/ExpertSubstantiations":584,"components/ExpertTextCard":585,"components/Footer":586,"components/ForgotPassword":587,"components/Header":588,"components/Login":589,"components/Pagination":590,"components/PredictionCard":591,"components/PredictionEvidences":592,"components/PredictionExpertCard":593,"components/PredictionFields":594,"components/PredictionTextCard":595,"components/Register":596,"components/RegistrationSuccessful":597,"components/SearchFilters":598,"components/Votes":599,"lodash":180,"material-ui":318,"material-ui/styles/MuiThemeProvider":337,"material-ui/styles/colors":339,"material-ui/styles/getMuiTheme":340,"mixins/LinksMixin":600,"mixins/PaginationMixin":601,"mixins/SessionMixin":602,"modals/LoginModal":603,"react":551,"react-dom":377,"react-mini-router":509,"react-tap-event-plugin":520,"shared/API":604,"shared/Global":605,"stores/UserStore":606,"views/404":607,"views/Bookmarks":608,"views/Categories":609,"views/CategoryAll":610,"views/CategoryClaims":611,"views/CategoryExperts":612,"views/CategoryPredictions":613,"views/Claim":614,"views/Claims":615,"views/CreateClaim":616,"views/CreateExpert":617,"views/CreatePrediction":618,"views/Expert":619,"views/Experts":620,"views/Landing":621,"views/Prediction":622,"views/Predictions":623,"views/Search":624,"views/User":625,"views/Users":626}],4:[function(require,module,exports){
+},{"./components/Footer":1,"./components/Header":2,"components/AddToClaim":566,"components/AddToExpert":567,"components/AddToPrediction":568,"components/BookmarkIndicator":569,"components/CategoryClaims":570,"components/CategoryExperts":571,"components/CategoryPredictions":572,"components/CategorySubHead":573,"components/ClaimCard":574,"components/ClaimEvidences":575,"components/ClaimExpertCard":576,"components/ClaimFields":577,"components/Comments":578,"components/ExpertBonaFides":579,"components/ExpertCard":580,"components/ExpertClaimCard":581,"components/ExpertFields":582,"components/ExpertPredictionCard":583,"components/ExpertSubstantiations":584,"components/ExpertTextCard":585,"components/Footer":586,"components/ForgotPassword":587,"components/Header":588,"components/Login":589,"components/Pagination":590,"components/PredictionCard":591,"components/PredictionEvidences":592,"components/PredictionExpertCard":593,"components/PredictionFields":594,"components/PredictionTextCard":595,"components/Register":596,"components/RegistrationSuccessful":597,"components/SearchFilters":598,"components/Votes":599,"lodash":180,"material-ui":318,"material-ui/styles/MuiThemeProvider":337,"material-ui/styles/colors":339,"material-ui/styles/getMuiTheme":340,"mixins/DateMixin":600,"mixins/LinksMixin":601,"mixins/PaginationMixin":602,"mixins/SessionMixin":603,"modals/LoginModal":604,"react":551,"react-dom":377,"react-mini-router":509,"react-tap-event-plugin":520,"shared/API":605,"shared/Global":606,"stores/UserStore":607,"views/404":608,"views/Bookmarks":609,"views/Categories":610,"views/CategoryAll":611,"views/CategoryClaims":612,"views/CategoryExperts":613,"views/CategoryPredictions":614,"views/Claim":615,"views/Claims":616,"views/CreateClaim":617,"views/CreateExpert":618,"views/CreatePrediction":619,"views/Expert":620,"views/Experts":621,"views/Landing":622,"views/Prediction":623,"views/Predictions":624,"views/Search":625,"views/User":626,"views/Users":627}],4:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/array/from"), __esModule: true };
 },{"core-js/library/fn/array/from":26}],5:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/get-iterator"), __esModule: true };
@@ -84518,102 +84736,99 @@ module.exports = React.createFactory(React.createClass({
 
 
 },{}],570:[function(require,module,exports){
-var LinksMixin, div;
+var ClaimCard, LinksMixin, div;
 
 div = React.DOM.div;
 
 LinksMixin = require("mixins/LinksMixin");
+
+ClaimCard = require("components/ClaimCard");
 
 module.exports = React.createFactory(React.createClass({
   displayName: "Category Claims - Latest",
   mixins: [LinksMixin],
   render: function() {
     return div({
-      className: "categories__claims"
+      className: "default__card categories__claims"
     }, div({
-      className: "categories__claims-title"
+      className: "text__title"
     }, "Claims:"), this.props.claims.length > 0 ? this.props.claims.map((function(_this) {
       return function(claim, index) {
-        return div({
-          className: "categories__claims__claim",
+        return ClaimCard({
+          claim: claim,
           key: "category-claim-" + index
-        }, div({
-          className: "categories__claims__claim-title",
-          onClick: _this.goToClaim.bind(_this, claim.id)
-        }, claim.title));
+        });
       };
     })(this)) : div({
-      className: "categories__claims--empty"
+      className: "not-found"
     }, "There are no claims in this category."));
   }
 }));
 
 
-},{"mixins/LinksMixin":600}],571:[function(require,module,exports){
-var LinksMixin, div;
+},{"components/ClaimCard":574,"mixins/LinksMixin":601}],571:[function(require,module,exports){
+var ExpertCard, LinksMixin, div;
 
 div = React.DOM.div;
 
 LinksMixin = require("mixins/LinksMixin");
+
+ExpertCard = require("components/ExpertCard");
 
 module.exports = React.createFactory(React.createClass({
   displayName: "Category Experts - Latest",
   mixins: [LinksMixin],
   render: function() {
     return div({
-      className: "categories__experts"
+      className: "default__card categories__experts"
     }, div({
-      className: "categories__experts-title"
+      className: "text__title"
     }, "Experts:"), this.props.experts.length > 0 ? this.props.experts.map((function(_this) {
       return function(expert, index) {
-        return div({
-          className: "categories__experts__expert",
+        return ExpertCard({
+          expert: expert,
           key: "category-expert-" + index
-        }, div({
-          className: "categories__experts__expert-name",
-          onClick: _this.goToExpert.bind(_this, expert.id)
-        }, expert.name));
+        });
       };
     })(this)) : div({
-      className: "categories__experts--empty"
+      className: "not-found"
     }, "There are no experts in this category."));
   }
 }));
 
 
-},{"mixins/LinksMixin":600}],572:[function(require,module,exports){
-var LinksMixin, div;
+},{"components/ExpertCard":580,"mixins/LinksMixin":601}],572:[function(require,module,exports){
+var LinksMixin, PredictionCard, div;
 
 div = React.DOM.div;
 
 LinksMixin = require("mixins/LinksMixin");
+
+PredictionCard = require("components/PredictionCard");
 
 module.exports = React.createFactory(React.createClass({
   displayName: "Category Predictions - Latest",
   mixins: [LinksMixin],
   render: function() {
     return div({
-      className: "categories__predictions"
+      className: "default__card categories__predictions"
     }, div({
-      className: "categories__predictions-title"
+      className: "text__title"
     }, "Predictions:"), this.props.predictions.length > 0 ? this.props.predictions.map((function(_this) {
       return function(prediction, index) {
-        return div({
-          className: "categories__predictions__prediction",
+        return PredictionCard({
+          prediction: prediction,
           key: "category-predictions-" + index
-        }, div({
-          className: "categories__predictions__prediction-title",
-          onClick: _this.goToPrediction.bind(_this, prediction.id)
-        }, prediction.title));
+        });
       };
     })(this)) : div({
-      className: "categories__predictions--empty"
+      className: "not-found"
     }, "There are no predictions in this category."));
   }
 }));
 
 
-},{"mixins/LinksMixin":600}],573:[function(require,module,exports){
+},{"components/PredictionCard":591,"mixins/LinksMixin":601}],573:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -84655,6 +84870,7 @@ module.exports = React.createFactory(React.createClass({
     return div({
       className: "page-subhead"
     }, div({
+      className: "page-subhead__back",
       onClick: this.goBack
     }, '<<'), this.currentPage('') ? div({
       className: "page-subhead__item--active"
@@ -84781,7 +84997,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"mixins/LinksMixin":600}],575:[function(require,module,exports){
+},{"mixins/LinksMixin":601}],575:[function(require,module,exports){
 var a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
@@ -84924,7 +85140,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ExpertSubstantiations":584,"mixins/LinksMixin":600}],577:[function(require,module,exports){
+},{"components/ExpertSubstantiations":584,"mixins/LinksMixin":601}],577:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -85020,17 +85236,19 @@ module.exports = React.createFactory(React.createClass({
 
 
 },{}],578:[function(require,module,exports){
-var Pagination, PaginationMixin, div;
+var DateMixin, Pagination, PaginationMixin, div;
 
 div = React.DOM.div;
 
 PaginationMixin = require("mixins/PaginationMixin");
 
+DateMixin = require("mixins/DateMixin");
+
 Pagination = require("components/Pagination");
 
 module.exports = React.createFactory(React.createClass({
   displayName: 'Comments',
-  mixins: [PaginationMixin],
+  mixins: [PaginationMixin, DateMixin],
   getInitialState: function() {
     return {
       comments: null,
@@ -85155,9 +85373,6 @@ module.exports = React.createFactory(React.createClass({
       });
     }
   },
-  formatDate: function(date) {
-    return date;
-  },
   getErrorText: function(key) {
     var error, i, len, ref;
     ref = this.state.errors;
@@ -85176,32 +85391,44 @@ module.exports = React.createFactory(React.createClass({
       inputs: this.inputs
     });
   },
+  getCommentName: function() {
+    if (this.props.type === "expert") {
+      return this.props.item.name;
+    } else {
+      return this.props.item.title;
+    }
+  },
   render: function() {
     return div({
-      className: "comments"
-    }, "Comments: " + this.props.id, this.state.comments === null ? div({}, "Loading Comments") : this.state.comments.length === 0 ? div({}, "Currently No Comments") : void 0, this.state.comments != null ? this.state.comments.map((function(_this) {
+      className: "default__card comments"
+    }, div({
+      className: "text__title"
+    }, "Comments for " + (this.getCommentName())), this.state.comments === null ? div({
+      className: "not-found"
+    }, "Loading Comments") : this.state.comments.length === 0 ? div({
+      className: "not-found"
+    }, "Currently No Comments") : void 0, this.state.comments != null ? this.state.comments.map((function(_this) {
       return function(comment, index) {
         if (comment.user != null) {
-          console.log("!", comment.user);
           return div({
             className: "comments__comment",
             key: "comment-" + index
           }, div({
-            className: "comments__comment-user"
+            className: "comments__comment__meta"
           }, div({
-            className: "comments__comment-user-avatar",
+            className: "comments__comment__meta-user-avatar",
             style: {
               backgroundImage: "url(http://localhost:3000/images/user_avatars/" + comment.user.avatar_file_name + ")"
             }
           }), div({
-            className: "comments__comment-user-name"
-          }, comment.user.first_name + " " + comment.user.last_name)), div({
-            className: "comments__comment-meta"
-          }, div({
-            className: "comments__comment-meta-text"
-          }, comment.content), div({
-            className: "comments__comment-meta-created-at"
-          }, _this.formatDate(comment.created_at))));
+            className: "comments__comment__meta-text"
+          }), div({
+            className: "comments__comment__meta-text-username"
+          }, comment.user.first_name + " " + comment.user.last_name), div({
+            className: "comments__comment__meta-text-created-at"
+          }, _this.formatDateAndTime(comment.created_at))), div({
+            className: "comments__comment-text"
+          }, comment.content));
         }
       };
     })(this)) : void 0, this.state.comments != null ? Pagination({
@@ -85215,9 +85442,9 @@ module.exports = React.createFactory(React.createClass({
     }, div({}, React.createElement(Material.TextField, {
       id: "comment-content",
       hintText: "Add Comment",
-      floatingLabelText: "Content",
+      floatingLabelText: "Add Comment",
       multiLine: true,
-      rows: 2,
+      rows: 1,
       fullWidth: true,
       rowsMax: 4,
       value: this.state.inputs.content.val,
@@ -85242,7 +85469,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Pagination":590,"mixins/PaginationMixin":601}],579:[function(require,module,exports){
+},{"components/Pagination":590,"mixins/DateMixin":600,"mixins/PaginationMixin":602}],579:[function(require,module,exports){
 var a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
@@ -85313,8 +85540,14 @@ module.exports = React.createFactory(React.createClass({
     };
     bona_fides = this.props.expert.bona_fides;
     return div({
+      className: "default__card"
+    }, div({
+      className: "text__title"
+    }, "Bona Fides"), div({
       className: "expert__bona-fides"
-    }, bona_fides.length === 0 ? "This expert currently has no bona fides." : bona_fides.map(function(bona_fide, index) {
+    }, bona_fides.length === 0 ? div({
+      className: "not-found"
+    }, "This expert currently has no bona fides.") : bona_fides.map(function(bona_fide, index) {
       return div({
         className: "expert__bona-fide"
       }, a({
@@ -85322,7 +85555,7 @@ module.exports = React.createFactory(React.createClass({
         target: "_blank",
         key: "expert-bona-fide-" + index
       }, bona_fide.title));
-    }), UserStore.loggedIn() ? this.state.submittingBonaFide === true ? React.createElement(Material.RefreshIndicator, {
+    })), UserStore.loggedIn() ? this.state.submittingBonaFide === true ? React.createElement(Material.RefreshIndicator, {
       style: this.refreshStyle,
       size: 50,
       left: 0,
@@ -85334,7 +85567,9 @@ module.exports = React.createFactory(React.createClass({
       value: this.state.url,
       fullWidth: true,
       onChange: this.changeURL,
-      id: "add-bonafide"
+      id: "add-bonafide",
+      hintText: "Add URL demonstrating that this expert is knowledgeable",
+      floatingLabelText: "Add Bona Fide"
     }), React.createElement(Material.FlatButton, {
       label: "Add",
       onClick: this.addBonaFide
@@ -85440,7 +85675,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"mixins/LinksMixin":600}],581:[function(require,module,exports){
+},{"mixins/LinksMixin":601}],581:[function(require,module,exports){
 var ExpertSubstantiations, LinksMixin, div;
 
 div = React.DOM.div;
@@ -85494,7 +85729,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ExpertSubstantiations":584,"mixins/LinksMixin":600}],582:[function(require,module,exports){
+},{"components/ExpertSubstantiations":584,"mixins/LinksMixin":601}],582:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -85678,7 +85913,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ExpertSubstantiations":584,"mixins/LinksMixin":600}],584:[function(require,module,exports){
+},{"components/ExpertSubstantiations":584,"mixins/LinksMixin":601}],584:[function(require,module,exports){
 var a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
@@ -85873,9 +86108,9 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"mixins/LinksMixin":600}],586:[function(require,module,exports){
+},{"mixins/LinksMixin":601}],586:[function(require,module,exports){
 module.exports=require(1)
-},{"mixins/SessionMixin":602}],587:[function(require,module,exports){
+},{"mixins/LinksMixin":601,"mixins/SessionMixin":603}],587:[function(require,module,exports){
 var LinksMixin, a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
@@ -86002,9 +86237,9 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"mixins/LinksMixin":600}],588:[function(require,module,exports){
+},{"mixins/LinksMixin":601}],588:[function(require,module,exports){
 module.exports=require(2)
-},{"mixins/LinksMixin":600,"modals/LoginModal":603}],589:[function(require,module,exports){
+},{"mixins/LinksMixin":601,"modals/LoginModal":604}],589:[function(require,module,exports){
 var SessionMixin, a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
@@ -86150,7 +86385,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"mixins/SessionMixin":602}],590:[function(require,module,exports){
+},{"mixins/SessionMixin":603}],590:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -86289,15 +86524,17 @@ module.exports = React.createFactory(React.createClass({
 
 
 },{}],591:[function(require,module,exports){
-var LinksMixin, a, br, div, img, ref, span;
+var DateMixin, LinksMixin, a, br, div, img, ref, span;
 
 ref = React.DOM, div = ref.div, img = ref.img, a = ref.a, br = ref.br, span = ref.span;
 
 LinksMixin = require("mixins/LinksMixin");
 
+DateMixin = require("mixins/DateMixin");
+
 module.exports = React.createFactory(React.createClass({
   displayName: 'PredictionCard',
-  mixins: [LinksMixin],
+  mixins: [LinksMixin, DateMixin],
   getDescription: function() {
     var prediction;
     prediction = this.props.prediction;
@@ -86334,28 +86571,10 @@ module.exports = React.createFactory(React.createClass({
     prediction = this.props.prediction;
     return prediction.comments_count + " comments";
   },
-  formatDate: function(date) {
-    var day, monthIndex, monthNames, suffix, year;
-    monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-    day = date.getDate();
-    monthIndex = date.getMonth();
-    year = date.getFullYear();
-    if (day === 1 || day === 11 || day === 21 || day === 31) {
-      suffix = 'st';
-    } else if (day === 2 || day === 12 || day === 22) {
-      suffix = 'nd';
-    } else if (day === 3 || day === 13 || day === 23) {
-      suffix = 'rd';
-    } else {
-      suffix = 'th';
-    }
-    return monthNames[monthIndex] + ' ' + day + suffix + ', ' + year;
-  },
   predictionDate: function() {
     var prediction;
     prediction = this.props.prediction;
-    this.d = new Date(prediction.created_at);
-    return this.formatDate(this.d);
+    return this.formatDate(prediction.created_at);
   },
   render: function() {
     var prediction;
@@ -86408,7 +86627,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"mixins/LinksMixin":600}],592:[function(require,module,exports){
+},{"mixins/DateMixin":600,"mixins/LinksMixin":601}],592:[function(require,module,exports){
 var a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
@@ -86551,7 +86770,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ExpertSubstantiations":584,"mixins/LinksMixin":600}],594:[function(require,module,exports){
+},{"components/ExpertSubstantiations":584,"mixins/LinksMixin":601}],594:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -86717,7 +86936,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"mixins/LinksMixin":600}],596:[function(require,module,exports){
+},{"mixins/LinksMixin":601}],596:[function(require,module,exports){
 var LinksMixin, a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
@@ -86887,7 +87106,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"mixins/LinksMixin":600}],597:[function(require,module,exports){
+},{"mixins/LinksMixin":601}],597:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -87002,7 +87221,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"mixins/SessionMixin":602}],599:[function(require,module,exports){
+},{"mixins/SessionMixin":603}],599:[function(require,module,exports){
 var div;
 
 div = React.DOM.div;
@@ -87086,6 +87305,61 @@ module.exports = React.createFactory(React.createClass({
 
 },{}],600:[function(require,module,exports){
 module.exports = {
+  formatDate: function(d) {
+    var date, day, monthIndex, monthNames, suffix, year;
+    date = new Date(d);
+    monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    day = date.getDate();
+    monthIndex = date.getMonth();
+    year = date.getFullYear();
+    if (day === 1 || day === 11 || day === 21 || day === 31) {
+      suffix = 'st';
+    } else if (day === 2 || day === 12 || day === 22) {
+      suffix = 'nd';
+    } else if (day === 3 || day === 13 || day === 23) {
+      suffix = 'rd';
+    } else {
+      suffix = 'th';
+    }
+    return monthNames[monthIndex] + ' ' + day + suffix + ', ' + year;
+  },
+  formatDateAndTime: function(d) {
+    var ampm, date, day, hours, minutes, monthIndex, monthNames, suffix, year;
+    date = new Date(d);
+    monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    day = date.getDate();
+    monthIndex = date.getMonth();
+    year = date.getFullYear();
+    hours = date.getHours();
+    console.log(hours);
+    ampm = "AM";
+    if (hours >= 12) {
+      hours -= 12;
+      ampm = "PM";
+    }
+    if (hours === 0) {
+      hours = 12;
+    }
+    minutes = date.getMinutes();
+    if (minutes < 10) {
+      minutes = "0" + minutes;
+    }
+    if (day === 1 || day === 11 || day === 21 || day === 31) {
+      suffix = 'st';
+    } else if (day === 2 || day === 12 || day === 22) {
+      suffix = 'nd';
+    } else if (day === 3 || day === 13 || day === 23) {
+      suffix = 'rd';
+    } else {
+      suffix = 'th';
+    }
+    return monthNames[monthIndex] + ' ' + day + suffix + ', ' + year + ' at ' + hours + ':' + minutes + ' ' + ampm;
+  }
+};
+
+
+},{}],601:[function(require,module,exports){
+module.exports = {
   goToClaim: function(id) {
     return navigate("/claims/" + id);
   },
@@ -87109,11 +87383,24 @@ module.exports = {
   },
   goBackToSearch: function() {
     return navigate("/search?query=" + this.state.query + "&sort=" + this.state.sort);
+  },
+  logout: function() {
+    UserStore.logout();
+    return this.setUser({});
+  },
+  goToAbout: function() {
+    return navigate('/about');
+  },
+  goToContact: function() {
+    return navigate('/contact');
+  },
+  goToPrivacyPolicy: function() {
+    return navigate('/privacy_policy');
   }
 };
 
 
-},{}],601:[function(require,module,exports){
+},{}],602:[function(require,module,exports){
 module.exports = {
   getInitialState: function() {
     return {
@@ -87146,7 +87433,7 @@ module.exports = {
 };
 
 
-},{}],602:[function(require,module,exports){
+},{}],603:[function(require,module,exports){
 module.exports = {
   setUser: function(data, request) {
     window.UserStore.set(data, request);
@@ -87252,7 +87539,7 @@ module.exports = {
 };
 
 
-},{}],603:[function(require,module,exports){
+},{}],604:[function(require,module,exports){
 var ForgotPassword, Login, Register, RegistrationSuccessful, div, ref, span;
 
 ref = React.DOM, div = ref.div, span = ref.span;
@@ -87311,7 +87598,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ForgotPassword":587,"components/Login":589,"components/Register":596,"components/RegistrationSuccessful":597}],604:[function(require,module,exports){
+},{"components/ForgotPassword":587,"components/Login":589,"components/Register":596,"components/RegistrationSuccessful":597}],605:[function(require,module,exports){
 
 /*
 API Class.
@@ -87646,7 +87933,7 @@ module.exports = API = (function() {
 })();
 
 
-},{}],605:[function(require,module,exports){
+},{}],606:[function(require,module,exports){
 var Global;
 
 module.exports = Global = (function() {
@@ -87691,7 +87978,7 @@ module.exports = Global = (function() {
 })();
 
 
-},{}],606:[function(require,module,exports){
+},{}],607:[function(require,module,exports){
 var UserStore,
   bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
@@ -87897,7 +88184,7 @@ module.exports = new UserStore({
 });
 
 
-},{}],607:[function(require,module,exports){
+},{}],608:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;
@@ -87918,7 +88205,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":586,"components/Header":588}],608:[function(require,module,exports){
+},{"components/Footer":586,"components/Header":588}],609:[function(require,module,exports){
 var Footer, Header, div, ref, span;
 
 ref = React.DOM, div = ref.div, span = ref.span;
@@ -87931,11 +88218,23 @@ module.exports = React.createFactory(React.createClass({
   displayName: 'Bookmarks',
   getInitialState: function() {
     return {
-      bookmarks: null
+      bookmarks: null,
+      user: null
     };
   },
   componentDidMount: function() {
-    return this.fetchBookmarks();
+    return UserStore.subscribe(this.updateUser);
+  },
+  componentWillUnmount: function() {
+    return UserStore.unsubscribe(this.updateUser);
+  },
+  updateUser: function() {
+    if (this.state.bookmarks === null) {
+      this.fetchBookmarks();
+    }
+    return this.setState({
+      user: UserStore.get()
+    });
   },
   fetchBookmarks: function() {
     var params;
@@ -88016,41 +88315,66 @@ module.exports = React.createFactory(React.createClass({
     return this.fetchBookmarks();
   },
   removeBookmarkError: function(error) {},
+  getItemClass: function(bookmark) {
+    this["class"] = "bookmarks__list__item";
+    if (bookmark["new"] === true) {
+      this["class"] += "--has-new";
+    }
+    return this["class"];
+  },
   render: function() {
     return div({}, Header({}, ''), div({
       className: "bookmarks-wrapper"
     }, div({
       className: "bookmarks-content"
+    }, this.state.user === null ? div({
+      className: "default__card"
     }, div({
+      className: "text__title"
+    }, "My bookmarks"), div({
+      className: "not-found"
+    }, "Loading...")) : void 0, (this.state.user != null) && (this.state.user.token == null) ? div({
+      className: "default__card"
+    }, div({
+      className: "text__title"
+    }, "My bookmarks"), div({
+      className: "not-found"
+    }, "You must be logged in to view this content.")) : void 0, (this.state.user != null) && (this.state.user.token != null) ? (console.log(this.state.bookmarks), div({
       className: "default__card bookmarks__list"
-    }, this.state.bookmarks != null ? this.state.bookmarks.map((function(_this) {
+    }, div({
+      className: "text__title"
+    }, "My bookmarks"), this.state.bookmarks != null ? this.state.bookmarks.map((function(_this) {
       return function(bookmark, index) {
         return div({
-          className: "bookmarks__list__item",
+          className: _this.getItemClass(bookmark),
           key: "bookmark-" + index
-        }, div({}, div({
+        }, div({
+          className: "bookmarks__list__item-row"
+        }, div({
           className: "bookmarks__list__item-type"
         }, _this.sentenceCase(bookmark.type) + ": "), div({
           className: "bookmarks__list__item-title",
           onClick: _this.goToBookmarkItem.bind(_this, bookmark)
         }, bookmark.title), div({
           className: "bookmarks__list__item-new"
-        }, _this.showBookmarkNewStatus(bookmark["new"]))), div({}, div({
+        }, _this.showBookmarkNewStatus(bookmark["new"]))), div({
+          className: "bookmarks__list__item-row"
+        }, div({
           className: "bookmarks__list__item-notify",
           onClick: _this.changeNotificationSettings.bind(_this, bookmark)
-        }, _this.showNotificationSettings(bookmark)), div({
+        }, "Notify of updates: ", _this.showNotificationSettings(bookmark)), div({
           className: "bookmarks__list__item-remove",
           onClick: _this.removeBookmark.bind(_this, bookmark)
         }, span({
           className: "fa fa-remove"
         }, ''))));
       };
-    })(this)) : void 0))), Footer({}, ''));
+    })(this)) : void 0)) : void 0)), Footer({}, ''));
   }
 }));
 
 
-},{"components/Footer":586,"components/Header":588}],609:[function(require,module,exports){
+},{"components/Footer":586,"components/Header":588}],610:[function(require,module,exports){
 var Footer, Header, LinksMixin, div;
 
 div = React.DOM.div;
@@ -88084,6 +88408,17 @@ module.exports = React.createFactory(React.createClass({
     });
   },
   categoryListError: function(error) {},
+  getCategoryDescription: function(category) {
+    this["class"] = "categories__list__item-description";
+    this.description = category.description;
+    if ((category.description == null) || category.description === "") {
+      this["class"] += "--not-found";
+      this.description = "Description not found. I'm sure one will be coming soon.";
+    }
+    return div({
+      className: this["class"]
+    }, this.description);
+  },
   render: function() {
     return div({}, Header({}, ''), div({
       className: "categories-wrapper"
@@ -88091,20 +88426,24 @@ module.exports = React.createFactory(React.createClass({
       className: "categories-content"
     }, div({
       className: "default__card categories__list"
-    }, this.state.categories != null ? this.state.categories.map((function(_this) {
+    }, div({
+      className: "text__title"
+    }, "Categories"), this.state.categories != null ? this.state.categories.map((function(_this) {
       return function(category, index) {
         return div({
           className: "categories__list__item",
           key: "category-" + index,
           onClick: _this.goToCategory.bind(_this, category.id)
-        }, category.name);
+        }, div({
+          className: "categories__list__item-title"
+        }, category.name + " (" + category.experts + " E, " + category.predictions + " P, " + category.claims + " C)"), _this.getCategoryDescription(category));
       };
     })(this)) : void 0))), Footer({}, ''));
   }
 }));
 
 
-},{"components/Footer":586,"components/Header":588,"mixins/LinksMixin":600}],610:[function(require,module,exports){
+},{"components/Footer":586,"components/Header":588,"mixins/LinksMixin":601}],611:[function(require,module,exports){
 var CategoryClaims, CategoryExperts, CategoryPredictions, CategorySubHead, Footer, Header, div;
 
 div = React.DOM.div;
@@ -88174,11 +88513,19 @@ module.exports = React.createFactory(React.createClass({
       className: "categories-wrapper"
     }, div({
       className: "categories-content"
-    }, this.state.category != null ? div({
-      className: "page-title"
-    }, "Category '" + this.state.category.name + "' - Showing Experts, Claims and Predictions", CategorySubHead({
+    }, div({}, this.state.category != null ? div({
+      className: "default__card"
+    }, div({
+      className: "text__title"
+    }, "Category '" + this.state.category.name + "'"), div({
+      className: "text__subtitle"
+    }, "Showing Experts, Claims and Predictions"), CategorySubHead({
       category_id: this.props.id
-    })) : div({}, "Loading..."), this.state.data != null ? div({
+    })) : div({
+      className: "default__card"
+    }, div({
+      className: "not-found"
+    }, "Loading..."))), this.state.data != null ? div({
       className: "categories"
     }, CategoryExperts({
       experts: this.state.data.experts
@@ -88191,7 +88538,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/CategoryClaims":570,"components/CategoryExperts":571,"components/CategoryPredictions":572,"components/CategorySubHead":573,"components/Footer":586,"components/Header":588}],611:[function(require,module,exports){
+},{"components/CategoryClaims":570,"components/CategoryExperts":571,"components/CategoryPredictions":572,"components/CategorySubHead":573,"components/Footer":586,"components/Header":588}],612:[function(require,module,exports){
 var CategoryClaims, CategorySubHead, Footer, Header, div;
 
 div = React.DOM.div;
@@ -88257,12 +88604,18 @@ module.exports = React.createFactory(React.createClass({
       className: "categories-wrapper"
     }, div({
       className: "categories-content"
-    }, this.state.category ? div({
-      className: "page-title"
-    }, "Category '" + this.state.category.name + "' - Showing Claims", CategorySubHead({
+    }, this.state.category != null ? div({
+      className: "default__card"
+    }, div({
+      className: "text__title"
+    }, "Category '" + this.state.category.name + "' - Showing Claims"), CategorySubHead({
       category_id: this.props.id
-    })) : void 0, this.state.data != null ? div({
-      className: "categories"
+    })) : div({
+      className: "default__card"
+    }, div({
+      className: "not-found"
+    }, "Loading...")), this.state.data != null ? div({
+      className: "default__card ategories"
     }, CategoryClaims({
       claims: this.state.data
     })) : void 0)), Footer({}, ''));
@@ -88270,7 +88623,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/CategoryClaims":570,"components/CategorySubHead":573,"components/Footer":586,"components/Header":588}],612:[function(require,module,exports){
+},{"components/CategoryClaims":570,"components/CategorySubHead":573,"components/Footer":586,"components/Header":588}],613:[function(require,module,exports){
 var CategoryExperts, CategorySubHead, Footer, Header, div;
 
 div = React.DOM.div;
@@ -88336,12 +88689,18 @@ module.exports = React.createFactory(React.createClass({
       className: "categories-wrapper"
     }, div({
       className: "categories-content"
-    }, this.state.category ? div({
-      className: "page-title"
-    }, "Category '" + this.state.category.name + "' - Showing Experts", CategorySubHead({
+    }, this.state.category != null ? div({
+      className: "default__card"
+    }, div({
+      className: "text__title"
+    }, "Category '" + this.state.category.name + "' - Showing Experts"), CategorySubHead({
       category_id: this.props.id
-    })) : void 0, this.state.data != null ? div({
-      className: "categories"
+    })) : div({
+      className: "default__card"
+    }, div({
+      className: "not-found"
+    }, "Loading...")), this.state.data != null ? div({
+      className: "default__card categories"
     }, CategoryExperts({
       experts: this.state.data
     })) : void 0)), Footer({}, ''));
@@ -88349,7 +88708,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/CategoryExperts":571,"components/CategorySubHead":573,"components/Footer":586,"components/Header":588}],613:[function(require,module,exports){
+},{"components/CategoryExperts":571,"components/CategorySubHead":573,"components/Footer":586,"components/Header":588}],614:[function(require,module,exports){
 var CategoryPredictions, CategorySubHead, Footer, Header, div;
 
 div = React.DOM.div;
@@ -88415,11 +88774,17 @@ module.exports = React.createFactory(React.createClass({
       className: "categories-wrapper"
     }, div({
       className: "categories-content"
-    }, this.state.category ? div({
-      className: "page-title"
-    }, "Category '" + this.state.category.name + "' - Showing Experts, Claims and Predictions", CategorySubHead({
+    }, this.state.category != null ? div({
+      className: "default__card"
+    }, div({
+      className: "text__title"
+    }, "Category '" + this.state.category.name + "' - Showing Experts, Claims and Predictions"), CategorySubHead({
       category_id: this.props.id
-    })) : void 0, this.state.data != null ? div({
+    })) : div({
+      className: "default__card"
+    }, div({
+      className: "not-found"
+    }, "Loading...")), this.state.data != null ? div({
       className: "categories"
     }, CategoryPredictions({
       predictions: this.state.data
@@ -88428,7 +88793,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/CategoryPredictions":572,"components/CategorySubHead":573,"components/Footer":586,"components/Header":588}],614:[function(require,module,exports){
+},{"components/CategoryPredictions":572,"components/CategorySubHead":573,"components/Footer":586,"components/Header":588}],615:[function(require,module,exports){
 var AddToClaim, BookmarkIndicator, ClaimEvidences, ClaimExpertCard, Comments, Footer, Header, LinksMixin, SessionMixin, Votes, div, img, ref;
 
 ref = React.DOM, div = ref.div, img = ref.img;
@@ -88623,8 +88988,14 @@ module.exports = React.createFactory(React.createClass({
     }, "This claim is " + (this.showStatus()))), div({
       className: "claim__description"
     }, claim.description), div({
-      className: "claim__categories"
-    }, "These are the categories this claim is connected to:", claim.categories.length === 0 ? div({}, "No categories yet.") : div({}, claim.categories.map((function(_this) {
+      className: "default__card claim__categories"
+    }, div({
+      className: "text__title"
+    }, "Categories"), div({
+      className: "text__normal"
+    }, "These are the categories this claim is connected to:"), claim.categories.length === 0 ? div({
+      className: "not-found"
+    }, "No categories yet.") : div({}, claim.categories.map((function(_this) {
       return function(category, index) {
         return React.createElement(Material.Chip, {
           onTouchTap: _this.goToCategory.bind(_this, category.id),
@@ -88664,13 +89035,14 @@ module.exports = React.createFactory(React.createClass({
     }), Comments({
       type: "claim",
       id: claim.id,
+      item: claim,
       num: claim.comments_count
     })) : div({}, this.state.loadError))), Footer({}, ''));
   }
 }));
 
 
-},{"components/AddToClaim":566,"components/BookmarkIndicator":569,"components/ClaimEvidences":575,"components/ClaimExpertCard":576,"components/Comments":578,"components/Footer":586,"components/Header":588,"components/Votes":599,"mixins/LinksMixin":600,"mixins/SessionMixin":602}],615:[function(require,module,exports){
+},{"components/AddToClaim":566,"components/BookmarkIndicator":569,"components/ClaimEvidences":575,"components/ClaimExpertCard":576,"components/Comments":578,"components/Footer":586,"components/Header":588,"components/Votes":599,"mixins/LinksMixin":601,"mixins/SessionMixin":603}],616:[function(require,module,exports){
 var ClaimCard, Footer, Header, LinksMixin, Pagination, PaginationMixin, SearchFilters, SessionMixin, div;
 
 div = React.DOM.div;
@@ -88824,7 +89196,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ClaimCard":574,"components/Footer":586,"components/Header":588,"components/Pagination":590,"components/SearchFilters":598,"mixins/LinksMixin":600,"mixins/PaginationMixin":601,"mixins/SessionMixin":602}],616:[function(require,module,exports){
+},{"components/ClaimCard":574,"components/Footer":586,"components/Header":588,"components/Pagination":590,"components/SearchFilters":598,"mixins/LinksMixin":601,"mixins/PaginationMixin":602,"mixins/SessionMixin":603}],617:[function(require,module,exports){
 var ClaimFields, Footer, Header, div;
 
 div = React.DOM.div;
@@ -88961,7 +89333,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ClaimFields":577,"components/Footer":586,"components/Header":588}],617:[function(require,module,exports){
+},{"components/ClaimFields":577,"components/Footer":586,"components/Header":588}],618:[function(require,module,exports){
 var ExpertFields, Footer, Header, div;
 
 div = React.DOM.div;
@@ -89107,7 +89479,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ExpertFields":582,"components/Footer":586,"components/Header":588}],618:[function(require,module,exports){
+},{"components/ExpertFields":582,"components/Footer":586,"components/Header":588}],619:[function(require,module,exports){
 var Footer, Header, PredictionFields, div;
 
 div = React.DOM.div;
@@ -89252,7 +89624,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":586,"components/Header":588,"components/PredictionFields":594}],619:[function(require,module,exports){
+},{"components/Footer":586,"components/Header":588,"components/PredictionFields":594}],620:[function(require,module,exports){
 var AddToExpert, BookmarkIndicator, Comments, ExpertBonaFides, ExpertClaimCard, ExpertPredictionCard, Footer, Header, LinksMixin, SessionMixin, div, img, ref;
 
 ref = React.DOM, div = ref.div, img = ref.img;
@@ -89375,28 +89747,39 @@ module.exports = React.createFactory(React.createClass({
     }, expert != null ? div({
       className: "expert"
     }, this.showNewExpertText(), div({
-      className: "expert__name"
+      className: "default__card"
+    }, div({
+      className: "text__title expert__name"
     }, expert.name), div({
-      className: "expert__description"
-    }, expert.description != null ? expert.description : "This expert has no description yet."), div({
-      className: "expert__avatar"
-    }, img({
-      src: expert.avatar
-    })), ExpertBonaFides({
-      expert: expert,
-      refresh: this.fetchExpert
+      className: "expert__avatar",
+      style: {
+        backgroundImage: "url(" + expert.avatar + ")"
+      }
     }), div({
       className: "expert__meta"
-    }, UserStore.loggedIn() ? div({
-      className: "expert__meta-bookmark"
+    }, div({
+      className: "expert__meta-description"
+    }, expert.description != null ? "!!!" + expert.description : "This expert has no description yet."), div({
+      className: "not-found"
+    }, "TODO: Add other fields here.")), UserStore.loggedIn() ? div({
+      className: "expert__bookmark"
     }, BookmarkIndicator({
       bookmark: this.state.expert.bookmark,
       type: "expert",
       id: this.state.expert.id,
       updateBookmark: this.updateBookmark
-    })) : void 0), div({
-      className: "expert__categories"
-    }, "These are the categories this expert is connected to:", expert.categories.length === 0 ? div({}, "No categories yet.") : div({}, expert.categories.map((function(_this) {
+    })) : void 0), ExpertBonaFides({
+      expert: expert,
+      refresh: this.fetchExpert
+    }), div({
+      className: "default__card expert__categories"
+    }, div({
+      className: "text__title"
+    }, "Categories"), div({
+      className: "text__normal"
+    }, "These are the categories this expert is connected to:"), expert.categories.length === 0 ? div({
+      className: "not-found"
+    }, "No categories yet.") : div({}, expert.categories.map((function(_this) {
       return function(category, index) {
         return React.createElement(Material.Chip, {
           onTouchTap: _this.goToCategory.bind(_this, category.id),
@@ -89455,6 +89838,7 @@ module.exports = React.createFactory(React.createClass({
       refresh: this.fetchExpert
     }) : void 0)), Comments({
       type: "expert",
+      item: expert,
       id: expert.id,
       num: expert.comments_count
     })) : div({}, this.state.loadError))), Footer({}, ''));
@@ -89462,7 +89846,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/AddToExpert":567,"components/BookmarkIndicator":569,"components/Comments":578,"components/ExpertBonaFides":579,"components/ExpertClaimCard":581,"components/ExpertPredictionCard":583,"components/Footer":586,"components/Header":588,"mixins/LinksMixin":600,"mixins/SessionMixin":602}],620:[function(require,module,exports){
+},{"components/AddToExpert":567,"components/BookmarkIndicator":569,"components/Comments":578,"components/ExpertBonaFides":579,"components/ExpertClaimCard":581,"components/ExpertPredictionCard":583,"components/Footer":586,"components/Header":588,"mixins/LinksMixin":601,"mixins/SessionMixin":603}],621:[function(require,module,exports){
 var ExpertCard, Footer, Header, LinksMixin, Pagination, PaginationMixin, SearchFilters, SessionMixin, div;
 
 div = React.DOM.div;
@@ -89622,7 +90006,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ExpertCard":580,"components/Footer":586,"components/Header":588,"components/Pagination":590,"components/SearchFilters":598,"mixins/LinksMixin":600,"mixins/PaginationMixin":601,"mixins/SessionMixin":602}],621:[function(require,module,exports){
+},{"components/ExpertCard":580,"components/Footer":586,"components/Header":588,"components/Pagination":590,"components/SearchFilters":598,"mixins/LinksMixin":601,"mixins/PaginationMixin":602,"mixins/SessionMixin":603}],622:[function(require,module,exports){
 var ClaimCard, ExpertCard, ExpertTextCard, Footer, Header, PredictionCard, PredictionTextCard, div;
 
 div = React.DOM.div;
@@ -89777,7 +90161,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/ClaimCard":574,"components/ExpertCard":580,"components/ExpertTextCard":585,"components/Footer":586,"components/Header":588,"components/PredictionCard":591,"components/PredictionTextCard":595}],622:[function(require,module,exports){
+},{"components/ClaimCard":574,"components/ExpertCard":580,"components/ExpertTextCard":585,"components/Footer":586,"components/Header":588,"components/PredictionCard":591,"components/PredictionTextCard":595}],623:[function(require,module,exports){
 var AddToPrediction, BookmarkIndicator, Comments, Footer, Header, LinksMixin, PredictionEvidences, PredictionExpertCard, SessionMixin, Votes, div, img, ref;
 
 ref = React.DOM, div = ref.div, img = ref.img;
@@ -89956,8 +90340,10 @@ module.exports = React.createFactory(React.createClass({
     }, prediction != null ? div({
       className: "prediction"
     }, this.showNewPredictionText(), div({
-      className: "prediction__title"
-    }, prediction.title), div({
+      className: "default__card"
+    }, div({
+      className: "text__title prediction__title"
+    }, prediction.title)), div({
       className: "prediction__image"
     }, img({
       src: prediction.pic
@@ -89977,8 +90363,14 @@ module.exports = React.createFactory(React.createClass({
     }, "This prediction is " + (this.showStatus()))), div({
       className: "prediction__description"
     }, prediction.description), div({
-      className: "prediction__categories"
-    }, "These are the categories this prediction is connected to:", prediction.categories.length === 0 ? div({}, "No categories yet.") : div({}, prediction.categories.map((function(_this) {
+      className: "default__card prediction__categories"
+    }, div({
+      className: "text__title"
+    }, "Categories"), div({
+      className: "text__normal"
+    }, "These are the categories this prediction is connected to:"), prediction.categories.length === 0 ? div({
+      className: "not-found"
+    }, "No categories yet.") : div({}, prediction.categories.map((function(_this) {
       return function(category, index) {
         return React.createElement(Material.Chip, {
           onTouchTap: _this.goToCategory.bind(_this, category.id),
@@ -90018,13 +90410,14 @@ module.exports = React.createFactory(React.createClass({
     }), Comments({
       type: "prediction",
       id: prediction.id,
+      item: prediction,
       num: prediction.comments_count
     })) : div({}, this.state.loadError))), Footer({}, ''));
   }
 }));
 
 
-},{"components/AddToPrediction":568,"components/BookmarkIndicator":569,"components/Comments":578,"components/Footer":586,"components/Header":588,"components/PredictionEvidences":592,"components/PredictionExpertCard":593,"components/Votes":599,"mixins/LinksMixin":600,"mixins/SessionMixin":602}],623:[function(require,module,exports){
+},{"components/AddToPrediction":568,"components/BookmarkIndicator":569,"components/Comments":578,"components/Footer":586,"components/Header":588,"components/PredictionEvidences":592,"components/PredictionExpertCard":593,"components/Votes":599,"mixins/LinksMixin":601,"mixins/SessionMixin":603}],624:[function(require,module,exports){
 var Footer, Header, LinksMixin, Pagination, PaginationMixin, PredictionCard, SearchFilters, SessionMixin, div;
 
 div = React.DOM.div;
@@ -90184,7 +90577,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":586,"components/Header":588,"components/Pagination":590,"components/PredictionCard":591,"components/SearchFilters":598,"mixins/LinksMixin":600,"mixins/PaginationMixin":601,"mixins/SessionMixin":602}],624:[function(require,module,exports){
+},{"components/Footer":586,"components/Header":588,"components/Pagination":590,"components/PredictionCard":591,"components/SearchFilters":598,"mixins/LinksMixin":601,"mixins/PaginationMixin":602,"mixins/SessionMixin":603}],625:[function(require,module,exports){
 var ClaimCard, ExpertCard, Footer, Header, LinksMixin, PredictionCard, SearchFilters, SessionMixin, div;
 
 div = React.DOM.div;
@@ -90273,7 +90666,7 @@ module.exports = React.createFactory(React.createClass({
       searching: false
     });
     this.setState({
-      searchError: false
+      searchError: null
     });
     return this.setState({
       data: data
@@ -90333,56 +90726,59 @@ module.exports = React.createFactory(React.createClass({
       className: "text__title"
     }, "Experts:"), this.state.data.experts.length === 0 ? div({
       className: "search__experts-items--empty"
-    }, "No expert found for '" + this.state.data.query + "'") : div({
+    }, "No expert found for '" + this.state.data.query + "'") : div({}, div({
       className: "search__experts-items"
     }, this.state.data.experts.map(function(expert, index) {
       return ExpertCard({
         expert: expert,
         key: "search-expert-card-" + index
       });
-    }), div({
-      className: "search__experts-all",
+    })), div({}, React.createElement(Material.RaisedButton, {
+      label: "View All",
+      primary: true,
       onClick: this.goToExperts
-    }, 'View All'))), div({
+    })))), div({
       className: "default__card search__predictions"
     }, div({
       className: "text__title"
     }, "Predictions:"), this.state.data.predictions.length === 0 ? div({
       className: "search__predictions-items--empty"
-    }, "No prediction found for '" + this.state.data.query + "'") : div({
+    }, "No prediction found for '" + this.state.data.query + "'") : div({}, div({
       className: "search__predictions-items"
     }, this.state.data.predictions.map(function(prediction, index) {
       return PredictionCard({
         prediction: prediction,
         key: "search-prediction-card-" + index
       });
-    }), div({
-      className: "search__predictions-all",
+    })), div({}, React.createElement(Material.RaisedButton, {
+      label: "View All",
+      primary: true,
       onClick: this.goToPredictions
-    }, 'View All'))), div({
+    })))), div({
       className: "default__card search__claims"
     }, div({
       className: "text__title"
     }, "Claims:"), this.state.data.claims.length === 0 ? div({
       className: "search__claims-items--empty"
-    }, "No claim found for '" + this.state.data.query + "'") : div({
+    }, "No claim found for '" + this.state.data.query + "'") : div({}, div({
       className: "search__claims-items"
     }, this.state.data.claims.map(function(claim, index) {
       return ClaimCard({
         claim: claim,
         key: "search-claim-card-" + index
       });
-    }), div({
-      className: "search__claims-all",
+    })), div({}, React.createElement(Material.RaisedButton, {
+      label: "View All",
+      primary: true,
       onClick: this.goToClaims
-    }, 'View All')))) : void 0, this.state.searchError != null ? div({
+    }))))) : void 0, this.state.searchError != null ? div({
       className: "default__card search__error"
     }, this.state.searchError) : void 0)), Footer({}, ''));
   }
 }));
 
 
-},{"components/ClaimCard":574,"components/ExpertCard":580,"components/Footer":586,"components/Header":588,"components/PredictionCard":591,"components/SearchFilters":598,"mixins/LinksMixin":600,"mixins/SessionMixin":602}],625:[function(require,module,exports){
+},{"components/ClaimCard":574,"components/ExpertCard":580,"components/Footer":586,"components/Header":588,"components/PredictionCard":591,"components/SearchFilters":598,"mixins/LinksMixin":601,"mixins/SessionMixin":603}],626:[function(require,module,exports){
 var Footer, Header, br, div, img, input, ref;
 
 ref = React.DOM, div = ref.div, input = ref.input, br = ref.br, img = ref.img;
@@ -90646,7 +91042,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/Footer":586,"components/Header":588}],626:[function(require,module,exports){
+},{"components/Footer":586,"components/Header":588}],627:[function(require,module,exports){
 var Footer, Header, div;
 
 div = React.DOM.div;

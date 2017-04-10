@@ -1,9 +1,10 @@
-{ div } = React.DOM
+{ div, a, span } = React.DOM
 
 SessionMixin = require("mixins/SessionMixin")
+LinksMixin = require("mixins/LinksMixin")
 
 module.exports = React.createFactory React.createClass
-  mixins: [SessionMixin]
+  mixins: [SessionMixin, LinksMixin]
 
   getInitialState: ->
     user: null
@@ -20,18 +21,36 @@ module.exports = React.createFactory React.createClass
   handleUserChange: (data) ->
     @setState user: UserStore.get()
 
-
-  logout: ->
-    UserStore.logout()
-    @setUser {}
-
   
   render: ->
     div { className: "footer-wrapper" },
       div { className: "footer-content" },
         div { className: "footer__card" },
-          "this is the footer."
-          if @state.user?.token?
-            div {},
-              div {},
-                React.createElement(Material.RaisedButton, { label: "Signout", primary: true, onClick: @logout })
+          div { className: "footer__card-row" },
+            div { className: "footer__text" },
+              "This has been blundit."
+            a
+              className: "footer__link"
+              onClick: @goToAbout
+              'About'
+            a
+              className: "footer__link"
+              onClick: @goToContact
+              'Contact'
+            a
+              className: "footer__link"
+              onClick: @goToPrivacyPolicy
+              'Privacy Policy'
+
+
+          div { className: "footer__card-row" },
+            div { className: "footer__icons" },
+              span { className: "fa fa-facebook" }, ''
+              span { className: "fa fa-twitter" }, ''
+              span { className: "fa fa-youtube" }, ''
+              span { className: "fa fa-podcast" }, ''
+            if @state.user?.token?
+              div
+                className: "footer__link--signout"
+                onClick: @logout
+                "Sign out"
