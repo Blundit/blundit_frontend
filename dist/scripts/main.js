@@ -67,9 +67,9 @@ module.exports = React.createFactory(React.createClass({
 
 
 },{"mixins/LinksMixin":602,"mixins/SessionMixin":604}],2:[function(require,module,exports){
-var LinksMixin, LoginModal, div, img, menuItems, ref;
+var LinksMixin, LoginModal, div, img, menuItems, ref, span;
 
-ref = React.DOM, div = ref.div, img = ref.img;
+ref = React.DOM, div = ref.div, img = ref.img, span = ref.span;
 
 menuItems = [
   {
@@ -103,7 +103,8 @@ module.exports = React.createFactory(React.createClass({
   getInitialState: function() {
     return {
       user: null,
-      showLoginModal: false
+      showLoginModal: false,
+      mobileMenu: false
     };
   },
   handleUserChange: function(data) {
@@ -118,6 +119,10 @@ module.exports = React.createFactory(React.createClass({
     return UserStore.unsubscribe(this.handleUserChange);
   },
   navigateToLocation: function(path) {
+    this.setState({
+      mobileMenu: false
+    });
+    scroll(0, 0);
     return navigate(path);
   },
   getUserAvatar: function() {
@@ -147,6 +152,29 @@ module.exports = React.createFactory(React.createClass({
     }
     return this["class"];
   },
+  getHeaderItemsClass: function() {
+    return this["class"] = "header__items";
+  },
+  getHeaderUserClass: function() {
+    return this["class"] = "header__user";
+  },
+  getHamburgerIcon: function() {
+    if (this.state.mobileMenu === true) {
+      return span({
+        className: "fa fa-close"
+      }, '');
+    } else {
+      return span({
+        className: "fa fa-align-justify"
+      }, '');
+    }
+  },
+  toggleMobileMenu: function() {
+    this.setState({
+      mobileMenu: !this.state.mobileMenu
+    });
+    return $("html, body").scrollTop(0);
+  },
   render: function() {
     var ref1;
     return div({
@@ -159,7 +187,10 @@ module.exports = React.createFactory(React.createClass({
     }, img({
       src: "/images/logo_wordmark.png"
     })), div({
-      className: "header__items"
+      className: "header__hamburger",
+      onClick: this.toggleMobileMenu
+    }, this.getHamburgerIcon()), div({
+      className: this.getHeaderItemsClass()
     }, menuItems.map((function(_this) {
       return function(item, index) {
         var ref1;
@@ -172,20 +203,50 @@ module.exports = React.createFactory(React.createClass({
         }
       };
     })(this))), div({
-      className: "header__user"
+      className: this.getHeaderUserClass()
     }, ((ref1 = this.state.user) != null ? ref1.token : void 0) != null ? div({
       className: "header__user__avatar",
       onClick: this.navigateToLocation.bind(this, "/me"),
       style: {
         backgroundImage: this.getUserAvatar()
       }
-    }) : div({}, React.createElement(Material.RaisedButton, {
-      label: "Login/Signup",
-      primary: true,
+    }) : div({}, div({
+      className: "header__login",
       onClick: this.showLogin
-    }))), this.state.showLoginModal === true ? LoginModal({
+    }, span({
+      className: "fa fa-sign-in"
+    }, '')))), this.state.showLoginModal === true ? LoginModal({
       hideLogin: this.hideLogin
-    }) : void 0));
+    }) : void 0, this.state.mobileMenu === true ? div({
+      className: "mobile-menu"
+    }, div({
+      className: "header"
+    }, div({
+      className: "header__logo",
+      onClick: this.navigateToLocation.bind(this, "/")
+    }, img({
+      src: "/images/logo_wordmark.png"
+    })), div({
+      className: "header__hamburger",
+      onClick: this.toggleMobileMenu
+    }, this.getHamburgerIcon())), div({
+      className: "mobile-menu__bg"
+    }, ''), div({
+      className: "mobile-menu__content-wrapper"
+    }, div({
+      className: "mobile-menu__content"
+    }, menuItems.reverse().map((function(_this) {
+      return function(item, index) {
+        var ref2;
+        if (((item.logged != null) && (((ref2 = _this.state.user) != null ? ref2.token : void 0) != null)) || !item.logged) {
+          return div({
+            className: "mobile-menu__item",
+            key: "mobile-menu__item-" + index,
+            onClick: _this.navigateToLocation.bind(_this, item.path)
+          }, item.label);
+        }
+      };
+    })(this))))) : void 0));
   }
 }));
 
@@ -2367,7 +2428,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref11 = React.DOM, div = ref11.div, img = ref11.img;
+  ref11 = React.DOM, div = ref11.div, img = ref11.img, span = ref11.span;
 
   menuItems = [
     {
@@ -2401,7 +2462,8 @@ module.exports = React.createFactory(React.createClass({
     getInitialState: function() {
       return {
         user: null,
-        showLoginModal: false
+        showLoginModal: false,
+        mobileMenu: false
       };
     },
     handleUserChange: function(data) {
@@ -2416,6 +2478,10 @@ module.exports = React.createFactory(React.createClass({
       return UserStore.unsubscribe(this.handleUserChange);
     },
     navigateToLocation: function(path) {
+      this.setState({
+        mobileMenu: false
+      });
+      scroll(0, 0);
       return navigate(path);
     },
     getUserAvatar: function() {
@@ -2445,6 +2511,29 @@ module.exports = React.createFactory(React.createClass({
       }
       return this["class"];
     },
+    getHeaderItemsClass: function() {
+      return this["class"] = "header__items";
+    },
+    getHeaderUserClass: function() {
+      return this["class"] = "header__user";
+    },
+    getHamburgerIcon: function() {
+      if (this.state.mobileMenu === true) {
+        return span({
+          className: "fa fa-close"
+        }, '');
+      } else {
+        return span({
+          className: "fa fa-align-justify"
+        }, '');
+      }
+    },
+    toggleMobileMenu: function() {
+      this.setState({
+        mobileMenu: !this.state.mobileMenu
+      });
+      return $("html, body").scrollTop(0);
+    },
     render: function() {
       var ref12;
       return div({
@@ -2457,7 +2546,10 @@ module.exports = React.createFactory(React.createClass({
       }, img({
         src: "/images/logo_wordmark.png"
       })), div({
-        className: "header__items"
+        className: "header__hamburger",
+        onClick: this.toggleMobileMenu
+      }, this.getHamburgerIcon()), div({
+        className: this.getHeaderItemsClass()
       }, menuItems.map((function(_this) {
         return function(item, index) {
           var ref12;
@@ -2470,20 +2562,50 @@ module.exports = React.createFactory(React.createClass({
           }
         };
       })(this))), div({
-        className: "header__user"
+        className: this.getHeaderUserClass()
       }, ((ref12 = this.state.user) != null ? ref12.token : void 0) != null ? div({
         className: "header__user__avatar",
         onClick: this.navigateToLocation.bind(this, "/me"),
         style: {
           backgroundImage: this.getUserAvatar()
         }
-      }) : div({}, React.createElement(Material.RaisedButton, {
-        label: "Login/Signup",
-        primary: true,
+      }) : div({}, div({
+        className: "header__login",
         onClick: this.showLogin
-      }))), this.state.showLoginModal === true ? LoginModal({
+      }, span({
+        className: "fa fa-sign-in"
+      }, '')))), this.state.showLoginModal === true ? LoginModal({
         hideLogin: this.hideLogin
-      }) : void 0));
+      }) : void 0, this.state.mobileMenu === true ? div({
+        className: "mobile-menu"
+      }, div({
+        className: "header"
+      }, div({
+        className: "header__logo",
+        onClick: this.navigateToLocation.bind(this, "/")
+      }, img({
+        src: "/images/logo_wordmark.png"
+      })), div({
+        className: "header__hamburger",
+        onClick: this.toggleMobileMenu
+      }, this.getHamburgerIcon())), div({
+        className: "mobile-menu__bg"
+      }, ''), div({
+        className: "mobile-menu__content-wrapper"
+      }, div({
+        className: "mobile-menu__content"
+      }, menuItems.reverse().map((function(_this) {
+        return function(item, index) {
+          var ref13;
+          if (((item.logged != null) && (((ref13 = _this.state.user) != null ? ref13.token : void 0) != null)) || !item.logged) {
+            return div({
+              className: "mobile-menu__item",
+              key: "mobile-menu__item-" + index,
+              onClick: _this.navigateToLocation.bind(_this, item.path)
+            }, item.label);
+          }
+        };
+      })(this))))) : void 0));
     }
   }));
 
@@ -7205,7 +7327,11 @@ module.exports = React.createFactory(React.createClass({
         className: "user-wrapper"
       }, div({
         className: "user-content"
-      }, this.state.user === null || (this.state.user.token == null) ? div({
+      }, div({
+        className: "default__card"
+      }, div({
+        className: "text__title"
+      }, "User Info"), this.state.user === null || (this.state.user.token == null) ? div({
         className: "user__not-logged-in"
       }, "You must be logged in to view this content.") : div({
         className: "user"
@@ -7264,7 +7390,7 @@ module.exports = React.createFactory(React.createClass({
         label: "Update User",
         primary: true,
         onClick: this.submitUserUpdate
-      })), this.state.updateError != null ? div({}, this.state.updateError) : void 0, this.state.updateSuccess != null ? div({}, this.state.updateSuccess) : void 0))), Footer({}, ''));
+      })), this.state.updateError != null ? div({}, this.state.updateError) : void 0, this.state.updateSuccess != null ? div({}, this.state.updateSuccess) : void 0)))), Footer({}, ''));
     }
   }));
 
@@ -91230,7 +91356,11 @@ module.exports = React.createFactory(React.createClass({
       className: "user-wrapper"
     }, div({
       className: "user-content"
-    }, this.state.user === null || (this.state.user.token == null) ? div({
+    }, div({
+      className: "default__card"
+    }, div({
+      className: "text__title"
+    }, "User Info"), this.state.user === null || (this.state.user.token == null) ? div({
       className: "user__not-logged-in"
     }, "You must be logged in to view this content.") : div({
       className: "user"
@@ -91289,7 +91419,7 @@ module.exports = React.createFactory(React.createClass({
       label: "Update User",
       primary: true,
       onClick: this.submitUserUpdate
-    })), this.state.updateError != null ? div({}, this.state.updateError) : void 0, this.state.updateSuccess != null ? div({}, this.state.updateSuccess) : void 0))), Footer({}, ''));
+    })), this.state.updateError != null ? div({}, this.state.updateError) : void 0, this.state.updateSuccess != null ? div({}, this.state.updateSuccess) : void 0)))), Footer({}, ''));
   }
 }));
 

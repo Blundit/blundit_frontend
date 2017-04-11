@@ -1,4 +1,4 @@
-{ div, img } = React.DOM
+{ div, img, span } = React.DOM
 
 menuItems = [
   { label: "My Bookmarks", path: "/bookmarks", logged: true }
@@ -18,6 +18,8 @@ module.exports = React.createFactory React.createClass
   getInitialState: ->
     user: null
     showLoginModal: false
+    mobileMenu: false
+
 
   handleUserChange: (data) ->
     @setState user: UserStore.get()
@@ -32,6 +34,8 @@ module.exports = React.createFactory React.createClass
 
 
   navigateToLocation: (path) ->
+    @setState mobileMenu: false
+    scroll(0,0)
     navigate(path)
 
 
@@ -62,6 +66,27 @@ module.exports = React.createFactory React.createClass
     return @class
 
 
+  getHeaderItemsClass: ->
+    @class = "header__items"
+
+  
+  getHeaderUserClass: ->
+    @class = "header__user"
+
+  
+  getHamburgerIcon: ->
+    if @state.mobileMenu == true
+      span { className: "fa fa-close" }, ''
+    else
+      span { className: "fa fa-align-justify" }, ''
+
+
+  toggleMobileMenu: ->
+    @setState mobileMenu: !@state.mobileMenu
+    
+    $("html, body").scrollTop(0)
+
+
   render: ->
     div { className: "header-wrapper" },
       div { className: "header" },
@@ -69,8 +94,12 @@ module.exports = React.createFactory React.createClass
           className: "header__logo"
           onClick: @navigateToLocation.bind(@, "/")
           img { src: "/images/logo_wordmark.png" }
+        div
+          className: "header__hamburger"
+          onClick: @toggleMobileMenu
+          @getHamburgerIcon()
 
-        div { className: "header__items" },
+        div { className: @getHeaderItemsClass() },
           menuItems.map (item, index) =>
             if (item.logged? and @state.user?.token?) or !item.logged
               div
@@ -79,7 +108,7 @@ module.exports = React.createFactory React.createClass
                 onClick: @navigateToLocation.bind(@, item.path)
                 item.label
         
-        div { className: "header__user" },
+        div { className: @getHeaderUserClass() },
           if @state.user?.token?
             div
               className: "header__user__avatar"
@@ -88,7 +117,32 @@ module.exports = React.createFactory React.createClass
                 backgroundImage: @getUserAvatar()
           else
             div {},
-              React.createElement(Material.RaisedButton, { label: "Login/Signup", primary: true, onClick: @showLogin })
+              div
+                className: "header__login"
+                onClick: @showLogin
+                span { className: "fa fa-sign-in" }, ''
         if @state.showLoginModal == true
           LoginModal
             hideLogin: @hideLogin
+
+        if @state.mobileMenu == true
+          div { className: "mobile-menu" },
+            div { className: "header" },
+              div
+                className: "header__logo"
+                onClick: @navigateToLocation.bind(@, "/")
+                img { src: "/images/logo_wordmark.png" }
+              div
+                className: "header__hamburger"
+                onClick: @toggleMobileMenu
+                @getHamburgerIcon()
+            div { className: "mobile-menu__bg" }, ''
+            div { className: "mobile-menu__content-wrapper" },
+              div { className: "mobile-menu__content" },
+                menuItems.reverse().map (item, index) =>
+                  if (item.logged? and @state.user?.token?) or !item.logged
+                    div
+                      className: "mobile-menu__item"
+                      key: "mobile-menu__item-#{index}"
+                      onClick: @navigateToLocation.bind(@, item.path)
+                      item.label

@@ -153,77 +153,78 @@ module.exports = React.createFactory React.createClass
       Header {}, ''
       div { className: "user-wrapper" },
         div { className: "user-content" },
-          if @state.user == null or !@state.user.token?
-            div { className: "user__not-logged-in" },
-              "You must be logged in to view this content."
-          else
-            div { className: "user" },
-              "If you want to update some basic info about yourself, here's the place. (Eventually, you'll be able to see stats and other cool stuff here.)"
-              React.createElement(Material.TextField,
-              {
-                id: "user-first-name",
-                hintText: "First Name",
-                floatingLabelText: "First Name",
-                fullWidth: true,
-                value: @state.inputs.first_name.val,
-                onChange: @handleFirstNameChange,
-                errorText: @getErrorText("first_name")
-              })
-              React.createElement(Material.TextField,
-              {
-                id: "user-last-name",
-                hintText: "Last Name",
-                floatingLabelText: "Last Name",
-                fullWidth: true,
-                value: @state.inputs.last_name.val,
-                onChange: @handleLastNameChange,
-                errorText: @getErrorText("last_name")
-              })
-              React.createElement(Material.TextField,
-              {
-                id: "user-email",
-                hintText: "Email",
-                floatingLabelText: "Email",
-                fullWidth: true,
-                value: @state.inputs.email.val,
-                onChange: @handleEmailChange,
-                errorText: @getErrorText("email")
-              })
-              React.createElement(Material.SelectField,
-                { floatingLabelText: "Notification Frequency", value: @state.inputs.notification_frequency.val, onChange: @handleChange },
-                @state.notification_frequencies.map (item, index) ->
-                  React.createElement(Material.MenuItem, {value: item.id, primaryText: item.title, key: "user-notification-frequency-#{index}"})
-              )
-              br {}
-              br {}
-              br {}
-              div {},
-                "Your Avatar:"
+          div { className: "default__card" },
+            div { className: "text__title" },
+              "User Info"
+            if @state.user == null or !@state.user.token?
+              div { className: "user__not-logged-in" },
+                "You must be logged in to view this content."
+            else
+              div { className: "user" },
+                "If you want to update some basic info about yourself, here's the place. (Eventually, you'll be able to see stats and other cool stuff here.)"
+                React.createElement(Material.TextField,
+                {
+                  id: "user-first-name",
+                  hintText: "First Name",
+                  floatingLabelText: "First Name",
+                  fullWidth: true,
+                  value: @state.inputs.first_name.val,
+                  onChange: @handleFirstNameChange,
+                  errorText: @getErrorText("first_name")
+                })
+                React.createElement(Material.TextField,
+                {
+                  id: "user-last-name",
+                  hintText: "Last Name",
+                  floatingLabelText: "Last Name",
+                  fullWidth: true,
+                  value: @state.inputs.last_name.val,
+                  onChange: @handleLastNameChange,
+                  errorText: @getErrorText("last_name")
+                })
+                React.createElement(Material.TextField,
+                {
+                  id: "user-email",
+                  hintText: "Email",
+                  floatingLabelText: "Email",
+                  fullWidth: true,
+                  value: @state.inputs.email.val,
+                  onChange: @handleEmailChange,
+                  errorText: @getErrorText("email")
+                })
+                React.createElement(Material.SelectField,
+                  { floatingLabelText: "Notification Frequency", value: @state.inputs.notification_frequency.val, onChange: @handleChange },
+                  @state.notification_frequencies.map (item, index) ->
+                    React.createElement(Material.MenuItem, {value: item.id, primaryText: item.title, key: "user-notification-frequency-#{index}"})
+                )
                 br {}
-                if @state.user.avatar_file_name?
-                  img { src: @getUserAvatarPath() }
-                input
-                  className: "user__avatar"
-                  type: "file"
-                  id: "user__avatar"
-                  accept: ".png,.jpeg,.jpg,.gif"
-              div {},
-                if @state.updateSubmitting == true
-                  @style = {
-                    display: 'inline-block'
-                    position: 'relative'
-                    boxShadow: 'none'
-                  }
-                  React.createElement(Material.RefreshIndicator, { style: @style, size: 50, left: 0, top: 0, status:"loading" })
-                else
-                  React.createElement(Material.RaisedButton, {label: "Update User", primary: true, onClick: @submitUserUpdate })
-
-              if @state.updateError?
+                br {}
+                br {}
                 div {},
-                  @state.updateError
-              if @state.updateSuccess?
+                  "Your Avatar:"
+                  br {}
+                  if @state.user.avatar_file_name?
+                    img { src: @getUserAvatarPath() }
+                  input
+                    className: "user__avatar"
+                    type: "file"
+                    id: "user__avatar"
+                    accept: ".png,.jpeg,.jpg,.gif"
                 div {},
-                  @state.updateSuccess
+                  if @state.updateSubmitting == true
+                    @style = {
+                      display: 'inline-block'
+                      position: 'relative'
+                      boxShadow: 'none'
+                    }
+                    React.createElement(Material.RefreshIndicator, { style: @style, size: 50, left: 0, top: 0, status:"loading" })
+                  else
+                    React.createElement(Material.RaisedButton, {label: "Update User", primary: true, onClick: @submitUserUpdate })
 
-
+                if @state.updateError?
+                  div {},
+                    @state.updateError
+                if @state.updateSuccess?
+                  div {},
+                    @state.updateSuccess
       Footer {}, ''
