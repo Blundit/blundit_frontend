@@ -1,4 +1,4 @@
-{ div, img } = React.DOM
+{ div, img, span } = React.DOM
 
 Header = require("components/Header")
 Footer = require("components/Footer")
@@ -11,9 +11,10 @@ BookmarkIndicator = require("components/BookmarkIndicator")
 
 SessionMixin = require("mixins/SessionMixin")
 LinksMixin = require("mixins/LinksMixin")
+DateMixin = require("mixins/DateMixin")
 
 module.exports = React.createFactory React.createClass
-  mixins: [SessionMixin, LinksMixin]
+  mixins: [SessionMixin, LinksMixin, DateMixin]
   displayName: 'Prediction'
 
   getInitialState: ->
@@ -140,9 +141,14 @@ module.exports = React.createFactory React.createClass
     else
       return "Unknown"
 
+  
+  predictionDescription: ->
+    { prediction } = @state
 
-  formatDate: (date) ->
-    return date
+    if prediction.description? and prediction.description > ''
+      return prediction.description
+    else
+      return span { className: "not-found" }, "This prediction has no description."
 
   
   render: ->
@@ -157,9 +163,19 @@ module.exports = React.createFactory React.createClass
               div { className: "default__card" },
                 div { className: "text__title prediction__title" },
                   prediction.title
-              div { className: "prediction__image" },
-                img { src: prediction.pic }
-              div { className: "prediction__meta" },
+                div
+                  className: "prediction__image"
+                  style:
+                    backgroundImage: "url(#{prediction.pic})"
+                div { className: "prediction__meta" },
+                  div { className: "prediction__meta-date" },
+                    "This prediction will happen by #{@formatDate(prediction.prediction_date)}"
+                  div { className: "prediction__meta-status" },
+                    "This prediction is #{@showStatus()}"
+                  div { className: "prediction__meta-description" },
+                    @predictionDescription()
+                  div { className: "not-found" },
+                    "TODO: Add other fields here"
                 if UserStore.loggedIn()
                   div { className: "prediction__meta-bookmark" },
                     BookmarkIndicator
@@ -167,13 +183,6 @@ module.exports = React.createFactory React.createClass
                       type: "prediction"
                       id: @state.prediction.id
                       updateBookmark: @updateBookmark
-                      
-                div { className: "prediction__meta-date" },
-                  "This prediction will happen by #{@formatDate(prediction.prediction_date)}"
-                div { className: "prediction__meta-status" },
-                  "This prediction is #{@showStatus()}"
-              div { className: "prediction__description" },
-                prediction.description
               div { className: "default__card prediction__categories" },
                 div { className: "text__title" },
                   "Categories"
@@ -189,11 +198,13 @@ module.exports = React.createFactory React.createClass
                         { onTouchTap: @goToCategory.bind(@, category.id), key: "prediction-category-chip-#{index}", style: @categoryMaterialStyle() },
                         category.name
                       )
-              div { className: "prediction__accuracy" },
+              div { className: "default__card prediction__accuracy" },
+                div { className: "text__title" },
+                  "Accuracy"
                 "This prediction is marked: #{@showAccuracy(prediction.vote_value)}"
-              div { className: "prediction__experts" },
-                div { className: "prediction__experts-name" },
-                  "Experts:"
+              div { className: "default__card prediction__experts" },
+                div { className: "text__title prediction__experts-name" },
+                  "Experts"
                 div { className: "prediction__experts-list" },
                   if experts.length > 0
                     experts.map (expert, index) ->

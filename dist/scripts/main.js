@@ -1114,6 +1114,8 @@ module.exports = React.createFactory(React.createClass({
 
   ref2 = React.DOM, div = ref2.div, a = ref2.a;
 
+  InlineLink = require("components/InlineLink");
+
   module.exports = React.createFactory(React.createClass({
     displayName: "ClaimEvidences",
     getInitialState: function() {
@@ -1176,15 +1178,16 @@ module.exports = React.createFactory(React.createClass({
     },
     render: function() {
       return div({
-        className: "claim__evidences"
-      }, this.props.evidences.map(function(evidence, index) {
-        return div({
-          className: "claim__evidence",
+        className: "default__card claim__evidences"
+      }, div({
+        className: "text__title"
+      }, "Evidence Supporting this Claim"), this.props.evidences.length === 0 ? div({
+        className: "not-found"
+      }, "No supporting evidence has been added yet to this claim.") : void 0, this.props.evidences.map(function(evidence, index) {
+        return InlineLink({
+          item: evidence,
           key: "claim-evidence-" + index
-        }, a({
-          target: "_blank",
-          href: evidence.url
-        }, evidence.title));
+        });
       }), div({}, React.createElement(Material.TextField, {
         value: this.state.evidenceURL,
         hintText: "Add Evidence that supports this claim",
@@ -1234,6 +1237,11 @@ module.exports = React.createFactory(React.createClass({
       return div({
         className: "claim__experts-list-item"
       }, div({
+        className: "claim__experts-list-item__avatar",
+        style: {
+          backgroundImage: "url(" + expert.avatar + ")"
+        }
+      }), div({
         className: "claim__experts-list-item__title",
         onClick: this.goToExpert.bind(this, expert.alias)
       }, expert.name), div({
@@ -2914,6 +2922,8 @@ module.exports = React.createFactory(React.createClass({
 
   ref15 = React.DOM, div = ref15.div, a = ref15.a;
 
+  InlineLink = require("components/InlineLink");
+
   module.exports = React.createFactory(React.createClass({
     displayName: "PredictionEvidences",
     getInitialState: function() {
@@ -2976,15 +2986,16 @@ module.exports = React.createFactory(React.createClass({
     },
     render: function() {
       return div({
-        className: "prediction__evidences"
-      }, this.props.evidences.map(function(evidence, index) {
-        return div({
-          className: "prediction__evidence",
+        className: "default__card prediction__evidences"
+      }, div({
+        className: "text__title"
+      }, "Evidence supporting this Prediction"), this.props.evidences.length === 0 ? div({
+        className: "not-found"
+      }, "No supporting evidence has been added yet to this prediction.") : void 0, this.props.evidences.map(function(evidence, index) {
+        return InlineLink({
+          item: evidence,
           key: "prediction-evidence-" + index
-        }, a({
-          target: "_blank",
-          href: evidence.url
-        }, evidence.title));
+        });
       }), div({}, React.createElement(Material.TextField, {
         value: this.state.evidenceURL,
         hintText: "Add Evidence that supports this prediction",
@@ -3034,6 +3045,11 @@ module.exports = React.createFactory(React.createClass({
       return div({
         className: "prediction__experts-list-item"
       }, div({
+        className: "claim__experts-list-item__avatar",
+        style: {
+          backgroundImage: "url(" + expert.avatar + ")"
+        }
+      }), div({
         className: "prediction__experts-list-item__title",
         onClick: this.goToExpert.bind(this, expert.alias)
       }, expert.name), div({
@@ -3525,10 +3541,14 @@ module.exports = React.createFactory(React.createClass({
       var item, ref18, submitted, submitting, type;
       ref18 = this.props, type = ref18.type, item = ref18.item, submitting = ref18.submitting, submitted = ref18.submitted;
       return div({
-        className: type + "__vote"
+        className: "default__card " + type + "__vote"
       }, div({
-        className: type + "__vote__meta"
-      }, item.votes_count === 0 ? "Be the first person to vote on this " + type : "This " + type + " has " + item.votes_count + " votes so far!"), item.open === "true" || item.open === true ? submitted !== true ? div({
+        className: "text__title"
+      }, "Votes"), div({
+        className: "text__normal " + type + "__vote__meta"
+      }, item.votes_count === 0 ? span({
+        className: "not-found"
+      }, "Be the first person to vote on this " + type) : "This " + type + " has " + item.votes_count + " votes so far!"), item.open === "true" || item.open === true ? submitted !== true ? div({
         className: type + "__vote__info"
       }, item.user_vote != null ? div({
         className: type + "__vote__info-already-voted"
@@ -4993,7 +5013,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref20 = React.DOM, div = ref20.div, img = ref20.img;
+  ref20 = React.DOM, div = ref20.div, img = ref20.img, span = ref20.span;
 
   Header = require("components/Header");
 
@@ -5141,6 +5161,17 @@ module.exports = React.createFactory(React.createClass({
         }
       }
     },
+    claimDescription: function() {
+      var claim;
+      claim = this.state.claim;
+      if ((claim.description != null) && claim.description > '') {
+        return claim.description;
+      } else {
+        return span({
+          className: "not-found"
+        }, "This claim has no description.");
+      }
+    },
     showStatus: function() {
       var claim;
       claim = this.state.claim;
@@ -5166,25 +5197,30 @@ module.exports = React.createFactory(React.createClass({
       }, claim != null ? div({
         className: "claim"
       }, this.showNewClaimText(), div({
-        className: "claim__title"
+        className: "default__card"
+      }, div({
+        className: "text__title claim__title"
       }, claim.title), div({
-        className: "claim__image"
-      }, img({
-        src: claim.pic
-      })), div({
+        className: "claim__image",
+        style: {
+          backgroundImage: "url(" + claim.pic + ")"
+        }
+      }), div({
         className: "claim__meta"
-      }, UserStore.loggedIn() ? div({
-        className: "claim__meta-bookmark"
+      }, div({
+        className: "claim__meta-status"
+      }, "This claim is " + (this.showStatus())), div({
+        className: "claim__meta-description"
+      }, this.claimDescription()), div({
+        className: "not-found"
+      }, "TODO: Add other fields here.")), UserStore.loggedIn() ? div({
+        className: "claim__bookmark"
       }, BookmarkIndicator({
         bookmark: this.state.claim.bookmark,
         type: "claim",
         id: this.state.claim.id,
         updateBookmark: this.updateBookmark
-      })) : void 0, div({
-        className: "claim__meta-status"
-      }, "This claim is " + (this.showStatus()))), div({
-        className: "claim__description"
-      }, claim.description), div({
+      })) : void 0), div({
         className: "default__card claim__categories"
       }, div({
         className: "text__title"
@@ -5192,7 +5228,9 @@ module.exports = React.createFactory(React.createClass({
         className: "text__normal"
       }, "These are the categories this claim is connected to:"), claim.categories.length === 0 ? div({
         className: "not-found"
-      }, "No categories yet.") : div({}, claim.categories.map((function(_this) {
+      }, "No categories yet.") : div({
+        className: "default__card"
+      }, claim.categories.map((function(_this) {
         return function(category, index) {
           return React.createElement(Material.Chip, {
             onTouchTap: _this.goToCategory.bind(_this, category.id),
@@ -5201,12 +5239,20 @@ module.exports = React.createFactory(React.createClass({
           }, category.name);
         };
       })(this)))), div({
-        className: "claim__accuracy"
-      }, "This claim is marked: " + (this.showAccuracy(claim.vote_value))), div({
-        className: "claim__experts"
+        className: "default__card claim__accuracy"
       }, div({
-        className: "claim__experts-name"
-      }, "Experts:"), div({
+        className: "text__title"
+      }, "Accuracy"), "This claim is marked: " + (this.showAccuracy(claim.vote_value))), Votes({
+        type: "claim",
+        item: claim,
+        vote: this.vote,
+        submitting: this.state.voteSubmitting,
+        submitted: this.state.voteSubmitted
+      }), div({
+        className: "default__card claim__experts"
+      }, div({
+        className: "text__title claim__experts-name"
+      }, "Experts"), div({
         className: "claim__experts-list"
       }, experts.length > 0 ? experts.map(function(expert, index) {
         return ClaimExpertCard({
@@ -5223,12 +5269,6 @@ module.exports = React.createFactory(React.createClass({
         evidences: claim.evidences,
         claim: claim,
         refresh: this.fetchClaim
-      }), Votes({
-        type: "claim",
-        item: claim,
-        vote: this.vote,
-        submitting: this.state.voteSubmitting,
-        submitted: this.state.voteSubmitted
       }), Comments({
         type: "claim",
         id: claim.id,
@@ -5804,7 +5844,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref21 = React.DOM, div = ref21.div, img = ref21.img;
+  ref21 = React.DOM, div = ref21.div, img = ref21.img, span = ref21.span;
 
   Header = require("components/Header");
 
@@ -5914,6 +5954,17 @@ module.exports = React.createFactory(React.createClass({
         onRequestDelete: this.removeAlert
       }, "Success! You've added a new expert to the system. Now you can add more information to them!") : void 0);
     },
+    expertDescription: function() {
+      var expert;
+      expert = this.state.expert;
+      if ((expert.description != null) && expert.description > '') {
+        return expert.description;
+      } else {
+        return span({
+          className: "not-found"
+        }, "This expert has no description yet.");
+      }
+    },
     render: function() {
       var claims, expert, predictions, ref22;
       ref22 = this.state, expert = ref22.expert, predictions = ref22.predictions, claims = ref22.claims;
@@ -5936,7 +5987,7 @@ module.exports = React.createFactory(React.createClass({
         className: "expert__meta"
       }, div({
         className: "expert__meta-description"
-      }, expert.description != null ? "!!!" + expert.description : "This expert has no description yet."), div({
+      }, this.expertDescription()), div({
         className: "not-found"
       }, "TODO: Add other fields here.")), UserStore.loggedIn() ? div({
         className: "expert__bookmark"
@@ -6337,7 +6388,7 @@ module.exports = React.createFactory(React.createClass({
     }
   }));
 
-  ref22 = React.DOM, div = ref22.div, img = ref22.img;
+  ref22 = React.DOM, div = ref22.div, img = ref22.img, span = ref22.span;
 
   Header = require("components/Header");
 
@@ -6359,8 +6410,10 @@ module.exports = React.createFactory(React.createClass({
 
   LinksMixin = require("mixins/LinksMixin");
 
+  DateMixin = require("mixins/DateMixin");
+
   module.exports = React.createFactory(React.createClass({
-    mixins: [SessionMixin, LinksMixin],
+    mixins: [SessionMixin, LinksMixin, DateMixin],
     displayName: 'Prediction',
     getInitialState: function() {
       return {
@@ -6500,8 +6553,16 @@ module.exports = React.createFactory(React.createClass({
         return "Unknown";
       }
     },
-    formatDate: function(date) {
-      return date;
+    predictionDescription: function() {
+      var prediction;
+      prediction = this.state.prediction;
+      if ((prediction.description != null) && prediction.description > '') {
+        return prediction.description;
+      } else {
+        return span({
+          className: "not-found"
+        }, "This prediction has no description.");
+      }
     },
     render: function() {
       var experts, prediction, ref23;
@@ -6516,26 +6577,29 @@ module.exports = React.createFactory(React.createClass({
         className: "default__card"
       }, div({
         className: "text__title prediction__title"
-      }, prediction.title)), div({
-        className: "prediction__image"
-      }, img({
-        src: prediction.pic
-      })), div({
+      }, prediction.title), div({
+        className: "prediction__image",
+        style: {
+          backgroundImage: "url(" + prediction.pic + ")"
+        }
+      }), div({
         className: "prediction__meta"
-      }, UserStore.loggedIn() ? div({
+      }, div({
+        className: "prediction__meta-date"
+      }, "This prediction will happen by " + (this.formatDate(prediction.prediction_date))), div({
+        className: "prediction__meta-status"
+      }, "This prediction is " + (this.showStatus())), div({
+        className: "prediction__meta-description"
+      }, this.predictionDescription()), div({
+        className: "not-found"
+      }, "TODO: Add other fields here")), UserStore.loggedIn() ? div({
         className: "prediction__meta-bookmark"
       }, BookmarkIndicator({
         bookmark: this.state.prediction.bookmark,
         type: "prediction",
         id: this.state.prediction.id,
         updateBookmark: this.updateBookmark
-      })) : void 0, div({
-        className: "prediction__meta-date"
-      }, "This prediction will happen by " + (this.formatDate(prediction.prediction_date))), div({
-        className: "prediction__meta-status"
-      }, "This prediction is " + (this.showStatus()))), div({
-        className: "prediction__description"
-      }, prediction.description), div({
+      })) : void 0), div({
         className: "default__card prediction__categories"
       }, div({
         className: "text__title"
@@ -6552,12 +6616,14 @@ module.exports = React.createFactory(React.createClass({
           }, category.name);
         };
       })(this)))), div({
-        className: "prediction__accuracy"
-      }, "This prediction is marked: " + (this.showAccuracy(prediction.vote_value))), div({
-        className: "prediction__experts"
+        className: "default__card prediction__accuracy"
       }, div({
-        className: "prediction__experts-name"
-      }, "Experts:"), div({
+        className: "text__title"
+      }, "Accuracy"), "This prediction is marked: " + (this.showAccuracy(prediction.vote_value))), div({
+        className: "default__card prediction__experts"
+      }, div({
+        className: "text__title prediction__experts-name"
+      }, "Experts"), div({
         className: "prediction__experts-list"
       }, experts.length > 0 ? experts.map(function(expert, index) {
         return PredictionExpertCard({
@@ -85057,9 +85123,11 @@ module.exports = React.createFactory(React.createClass({
 
 
 },{"mixins/LinksMixin":602}],575:[function(require,module,exports){
-var a, div, ref;
+var InlineLink, a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
+
+InlineLink = require("components/InlineLink");
 
 module.exports = React.createFactory(React.createClass({
   displayName: "ClaimEvidences",
@@ -85123,15 +85191,16 @@ module.exports = React.createFactory(React.createClass({
   },
   render: function() {
     return div({
-      className: "claim__evidences"
-    }, this.props.evidences.map(function(evidence, index) {
-      return div({
-        className: "claim__evidence",
+      className: "default__card claim__evidences"
+    }, div({
+      className: "text__title"
+    }, "Evidence Supporting this Claim"), this.props.evidences.length === 0 ? div({
+      className: "not-found"
+    }, "No supporting evidence has been added yet to this claim.") : void 0, this.props.evidences.map(function(evidence, index) {
+      return InlineLink({
+        item: evidence,
         key: "claim-evidence-" + index
-      }, a({
-        target: "_blank",
-        href: evidence.url
-      }, evidence.title));
+      });
     }), div({}, React.createElement(Material.TextField, {
       value: this.state.evidenceURL,
       hintText: "Add Evidence that supports this claim",
@@ -85145,7 +85214,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],576:[function(require,module,exports){
+},{"components/InlineLink":589}],576:[function(require,module,exports){
 var ExpertSubstantiations, LinksMixin, div;
 
 div = React.DOM.div;
@@ -85185,6 +85254,11 @@ module.exports = React.createFactory(React.createClass({
     return div({
       className: "claim__experts-list-item"
     }, div({
+      className: "claim__experts-list-item__avatar",
+      style: {
+        backgroundImage: "url(" + expert.avatar + ")"
+      }
+    }), div({
       className: "claim__experts-list-item__title",
       onClick: this.goToExpert.bind(this, expert.alias)
     }, expert.name), div({
@@ -86741,9 +86815,11 @@ module.exports = React.createFactory(React.createClass({
 
 
 },{"mixins/DateMixin":601,"mixins/LinksMixin":602}],593:[function(require,module,exports){
-var a, div, ref;
+var InlineLink, a, div, ref;
 
 ref = React.DOM, div = ref.div, a = ref.a;
+
+InlineLink = require("components/InlineLink");
 
 module.exports = React.createFactory(React.createClass({
   displayName: "PredictionEvidences",
@@ -86807,15 +86883,16 @@ module.exports = React.createFactory(React.createClass({
   },
   render: function() {
     return div({
-      className: "prediction__evidences"
-    }, this.props.evidences.map(function(evidence, index) {
-      return div({
-        className: "prediction__evidence",
+      className: "default__card prediction__evidences"
+    }, div({
+      className: "text__title"
+    }, "Evidence supporting this Prediction"), this.props.evidences.length === 0 ? div({
+      className: "not-found"
+    }, "No supporting evidence has been added yet to this prediction.") : void 0, this.props.evidences.map(function(evidence, index) {
+      return InlineLink({
+        item: evidence,
         key: "prediction-evidence-" + index
-      }, a({
-        target: "_blank",
-        href: evidence.url
-      }, evidence.title));
+      });
     }), div({}, React.createElement(Material.TextField, {
       value: this.state.evidenceURL,
       hintText: "Add Evidence that supports this prediction",
@@ -86829,7 +86906,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{}],594:[function(require,module,exports){
+},{"components/InlineLink":589}],594:[function(require,module,exports){
 var ExpertSubstantiations, LinksMixin, div;
 
 div = React.DOM.div;
@@ -86869,6 +86946,11 @@ module.exports = React.createFactory(React.createClass({
     return div({
       className: "prediction__experts-list-item"
     }, div({
+      className: "claim__experts-list-item__avatar",
+      style: {
+        backgroundImage: "url(" + expert.avatar + ")"
+      }
+    }), div({
       className: "prediction__experts-list-item__title",
       onClick: this.goToExpert.bind(this, expert.alias)
     }, expert.name), div({
@@ -87384,10 +87466,14 @@ module.exports = React.createFactory(React.createClass({
     var item, ref, submitted, submitting, type;
     ref = this.props, type = ref.type, item = ref.item, submitting = ref.submitting, submitted = ref.submitted;
     return div({
-      className: type + "__vote"
+      className: "default__card " + type + "__vote"
     }, div({
-      className: type + "__vote__meta"
-    }, item.votes_count === 0 ? "Be the first person to vote on this " + type : "This " + type + " has " + item.votes_count + " votes so far!"), item.open === "true" || item.open === true ? submitted !== true ? div({
+      className: "text__title"
+    }, "Votes"), div({
+      className: "text__normal " + type + "__vote__meta"
+    }, item.votes_count === 0 ? span({
+      className: "not-found"
+    }, "Be the first person to vote on this " + type) : "This " + type + " has " + item.votes_count + " votes so far!"), item.open === "true" || item.open === true ? submitted !== true ? div({
       className: type + "__vote__info"
     }, item.user_vote != null ? div({
       className: type + "__vote__info-already-voted"
@@ -88906,9 +88992,9 @@ module.exports = React.createFactory(React.createClass({
 
 
 },{"components/CategoryPredictions":572,"components/CategorySubHead":573,"components/Footer":586,"components/Header":588}],616:[function(require,module,exports){
-var AddToClaim, BookmarkIndicator, ClaimEvidences, ClaimExpertCard, Comments, Footer, Header, LinksMixin, SessionMixin, Votes, div, img, ref;
+var AddToClaim, BookmarkIndicator, ClaimEvidences, ClaimExpertCard, Comments, Footer, Header, LinksMixin, SessionMixin, Votes, div, img, ref, span;
 
-ref = React.DOM, div = ref.div, img = ref.img;
+ref = React.DOM, div = ref.div, img = ref.img, span = ref.span;
 
 Header = require("components/Header");
 
@@ -89056,6 +89142,17 @@ module.exports = React.createFactory(React.createClass({
       }
     }
   },
+  claimDescription: function() {
+    var claim;
+    claim = this.state.claim;
+    if ((claim.description != null) && claim.description > '') {
+      return claim.description;
+    } else {
+      return span({
+        className: "not-found"
+      }, "This claim has no description.");
+    }
+  },
   showStatus: function() {
     var claim;
     claim = this.state.claim;
@@ -89081,25 +89178,30 @@ module.exports = React.createFactory(React.createClass({
     }, claim != null ? div({
       className: "claim"
     }, this.showNewClaimText(), div({
-      className: "claim__title"
+      className: "default__card"
+    }, div({
+      className: "text__title claim__title"
     }, claim.title), div({
-      className: "claim__image"
-    }, img({
-      src: claim.pic
-    })), div({
+      className: "claim__image",
+      style: {
+        backgroundImage: "url(" + claim.pic + ")"
+      }
+    }), div({
       className: "claim__meta"
-    }, UserStore.loggedIn() ? div({
-      className: "claim__meta-bookmark"
+    }, div({
+      className: "claim__meta-status"
+    }, "This claim is " + (this.showStatus())), div({
+      className: "claim__meta-description"
+    }, this.claimDescription()), div({
+      className: "not-found"
+    }, "TODO: Add other fields here.")), UserStore.loggedIn() ? div({
+      className: "claim__bookmark"
     }, BookmarkIndicator({
       bookmark: this.state.claim.bookmark,
       type: "claim",
       id: this.state.claim.id,
       updateBookmark: this.updateBookmark
-    })) : void 0, div({
-      className: "claim__meta-status"
-    }, "This claim is " + (this.showStatus()))), div({
-      className: "claim__description"
-    }, claim.description), div({
+    })) : void 0), div({
       className: "default__card claim__categories"
     }, div({
       className: "text__title"
@@ -89107,7 +89209,9 @@ module.exports = React.createFactory(React.createClass({
       className: "text__normal"
     }, "These are the categories this claim is connected to:"), claim.categories.length === 0 ? div({
       className: "not-found"
-    }, "No categories yet.") : div({}, claim.categories.map((function(_this) {
+    }, "No categories yet.") : div({
+      className: "default__card"
+    }, claim.categories.map((function(_this) {
       return function(category, index) {
         return React.createElement(Material.Chip, {
           onTouchTap: _this.goToCategory.bind(_this, category.id),
@@ -89116,12 +89220,20 @@ module.exports = React.createFactory(React.createClass({
         }, category.name);
       };
     })(this)))), div({
-      className: "claim__accuracy"
-    }, "This claim is marked: " + (this.showAccuracy(claim.vote_value))), div({
-      className: "claim__experts"
+      className: "default__card claim__accuracy"
     }, div({
-      className: "claim__experts-name"
-    }, "Experts:"), div({
+      className: "text__title"
+    }, "Accuracy"), "This claim is marked: " + (this.showAccuracy(claim.vote_value))), Votes({
+      type: "claim",
+      item: claim,
+      vote: this.vote,
+      submitting: this.state.voteSubmitting,
+      submitted: this.state.voteSubmitted
+    }), div({
+      className: "default__card claim__experts"
+    }, div({
+      className: "text__title claim__experts-name"
+    }, "Experts"), div({
       className: "claim__experts-list"
     }, experts.length > 0 ? experts.map(function(expert, index) {
       return ClaimExpertCard({
@@ -89138,12 +89250,6 @@ module.exports = React.createFactory(React.createClass({
       evidences: claim.evidences,
       claim: claim,
       refresh: this.fetchClaim
-    }), Votes({
-      type: "claim",
-      item: claim,
-      vote: this.vote,
-      submitting: this.state.voteSubmitting,
-      submitted: this.state.voteSubmitted
     }), Comments({
       type: "claim",
       id: claim.id,
@@ -89737,9 +89843,9 @@ module.exports = React.createFactory(React.createClass({
 
 
 },{"components/Footer":586,"components/Header":588,"components/PredictionFields":595}],621:[function(require,module,exports){
-var AddToExpert, BookmarkIndicator, Comments, ExpertBonaFides, ExpertClaimCard, ExpertPredictionCard, Footer, Header, LinksMixin, SessionMixin, div, img, ref;
+var AddToExpert, BookmarkIndicator, Comments, ExpertBonaFides, ExpertClaimCard, ExpertPredictionCard, Footer, Header, LinksMixin, SessionMixin, div, img, ref, span;
 
-ref = React.DOM, div = ref.div, img = ref.img;
+ref = React.DOM, div = ref.div, img = ref.img, span = ref.span;
 
 Header = require("components/Header");
 
@@ -89849,6 +89955,17 @@ module.exports = React.createFactory(React.createClass({
       onRequestDelete: this.removeAlert
     }, "Success! You've added a new expert to the system. Now you can add more information to them!") : void 0);
   },
+  expertDescription: function() {
+    var expert;
+    expert = this.state.expert;
+    if ((expert.description != null) && expert.description > '') {
+      return expert.description;
+    } else {
+      return span({
+        className: "not-found"
+      }, "This expert has no description yet.");
+    }
+  },
   render: function() {
     var claims, expert, predictions, ref1;
     ref1 = this.state, expert = ref1.expert, predictions = ref1.predictions, claims = ref1.claims;
@@ -89871,7 +89988,7 @@ module.exports = React.createFactory(React.createClass({
       className: "expert__meta"
     }, div({
       className: "expert__meta-description"
-    }, expert.description != null ? "!!!" + expert.description : "This expert has no description yet."), div({
+    }, this.expertDescription()), div({
       className: "not-found"
     }, "TODO: Add other fields here.")), UserStore.loggedIn() ? div({
       className: "expert__bookmark"
@@ -90282,9 +90399,9 @@ module.exports = React.createFactory(React.createClass({
 
 
 },{"components/ClaimCard":574,"components/ExpertCard":580,"components/ExpertTextCard":585,"components/Footer":586,"components/Header":588,"components/PredictionCard":592,"components/PredictionTextCard":596}],624:[function(require,module,exports){
-var AddToPrediction, BookmarkIndicator, Comments, Footer, Header, LinksMixin, PredictionEvidences, PredictionExpertCard, SessionMixin, Votes, div, img, ref;
+var AddToPrediction, BookmarkIndicator, Comments, DateMixin, Footer, Header, LinksMixin, PredictionEvidences, PredictionExpertCard, SessionMixin, Votes, div, img, ref, span;
 
-ref = React.DOM, div = ref.div, img = ref.img;
+ref = React.DOM, div = ref.div, img = ref.img, span = ref.span;
 
 Header = require("components/Header");
 
@@ -90306,8 +90423,10 @@ SessionMixin = require("mixins/SessionMixin");
 
 LinksMixin = require("mixins/LinksMixin");
 
+DateMixin = require("mixins/DateMixin");
+
 module.exports = React.createFactory(React.createClass({
-  mixins: [SessionMixin, LinksMixin],
+  mixins: [SessionMixin, LinksMixin, DateMixin],
   displayName: 'Prediction',
   getInitialState: function() {
     return {
@@ -90447,8 +90566,16 @@ module.exports = React.createFactory(React.createClass({
       return "Unknown";
     }
   },
-  formatDate: function(date) {
-    return date;
+  predictionDescription: function() {
+    var prediction;
+    prediction = this.state.prediction;
+    if ((prediction.description != null) && prediction.description > '') {
+      return prediction.description;
+    } else {
+      return span({
+        className: "not-found"
+      }, "This prediction has no description.");
+    }
   },
   render: function() {
     var experts, prediction, ref1;
@@ -90463,26 +90590,29 @@ module.exports = React.createFactory(React.createClass({
       className: "default__card"
     }, div({
       className: "text__title prediction__title"
-    }, prediction.title)), div({
-      className: "prediction__image"
-    }, img({
-      src: prediction.pic
-    })), div({
+    }, prediction.title), div({
+      className: "prediction__image",
+      style: {
+        backgroundImage: "url(" + prediction.pic + ")"
+      }
+    }), div({
       className: "prediction__meta"
-    }, UserStore.loggedIn() ? div({
+    }, div({
+      className: "prediction__meta-date"
+    }, "This prediction will happen by " + (this.formatDate(prediction.prediction_date))), div({
+      className: "prediction__meta-status"
+    }, "This prediction is " + (this.showStatus())), div({
+      className: "prediction__meta-description"
+    }, this.predictionDescription()), div({
+      className: "not-found"
+    }, "TODO: Add other fields here")), UserStore.loggedIn() ? div({
       className: "prediction__meta-bookmark"
     }, BookmarkIndicator({
       bookmark: this.state.prediction.bookmark,
       type: "prediction",
       id: this.state.prediction.id,
       updateBookmark: this.updateBookmark
-    })) : void 0, div({
-      className: "prediction__meta-date"
-    }, "This prediction will happen by " + (this.formatDate(prediction.prediction_date))), div({
-      className: "prediction__meta-status"
-    }, "This prediction is " + (this.showStatus()))), div({
-      className: "prediction__description"
-    }, prediction.description), div({
+    })) : void 0), div({
       className: "default__card prediction__categories"
     }, div({
       className: "text__title"
@@ -90499,12 +90629,14 @@ module.exports = React.createFactory(React.createClass({
         }, category.name);
       };
     })(this)))), div({
-      className: "prediction__accuracy"
-    }, "This prediction is marked: " + (this.showAccuracy(prediction.vote_value))), div({
-      className: "prediction__experts"
+      className: "default__card prediction__accuracy"
     }, div({
-      className: "prediction__experts-name"
-    }, "Experts:"), div({
+      className: "text__title"
+    }, "Accuracy"), "This prediction is marked: " + (this.showAccuracy(prediction.vote_value))), div({
+      className: "default__card prediction__experts"
+    }, div({
+      className: "text__title prediction__experts-name"
+    }, "Experts"), div({
       className: "prediction__experts-list"
     }, experts.length > 0 ? experts.map(function(expert, index) {
       return PredictionExpertCard({
@@ -90537,7 +90669,7 @@ module.exports = React.createFactory(React.createClass({
 }));
 
 
-},{"components/AddToPrediction":568,"components/BookmarkIndicator":569,"components/Comments":578,"components/Footer":586,"components/Header":588,"components/PredictionEvidences":593,"components/PredictionExpertCard":594,"components/Votes":600,"mixins/LinksMixin":602,"mixins/SessionMixin":604}],625:[function(require,module,exports){
+},{"components/AddToPrediction":568,"components/BookmarkIndicator":569,"components/Comments":578,"components/Footer":586,"components/Header":588,"components/PredictionEvidences":593,"components/PredictionExpertCard":594,"components/Votes":600,"mixins/DateMixin":601,"mixins/LinksMixin":602,"mixins/SessionMixin":604}],625:[function(require,module,exports){
 var Footer, Header, LinksMixin, Pagination, PaginationMixin, PredictionCard, SearchFilters, SessionMixin, div;
 
 div = React.DOM.div;

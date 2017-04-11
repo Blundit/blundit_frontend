@@ -29,6 +29,10 @@ module.exports = React.createFactory React.createClass
     { expert, prediction } = @props
     div { className: "prediction__experts-list-item" },
       div
+        className: "claim__experts-list-item__avatar"
+        style:
+          backgroundImage: "url(#{expert.avatar})"
+      div
         className: "prediction__experts-list-item__title"
         onClick: @goToExpert.bind(@, expert.alias)
         expert.name

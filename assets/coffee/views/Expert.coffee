@@ -1,4 +1,4 @@
-{ div, img } = React.DOM
+{ div, img, span } = React.DOM
 
 Header = require("components/Header")
 Footer = require("components/Footer")
@@ -95,6 +95,16 @@ module.exports = React.createFactory React.createClass
           "Success! You've added a new expert to the system. Now you can add more information to them!"
         )
 
+
+  expertDescription: ->
+    { expert } = @state
+
+
+    if expert.description? and expert.description > ''
+      return expert.description
+    else
+      return span { className: "not-found" }, "This expert has no description yet."
+
   
   render: ->
     { expert, predictions, claims } = @state
@@ -115,10 +125,7 @@ module.exports = React.createFactory React.createClass
                     backgroundImage: "url(#{expert.avatar})"
                 div { className: "expert__meta" },
                   div { className: "expert__meta-description" },
-                    if expert.description?
-                      "!!!#{expert.description}"
-                    else
-                      "This expert has no description yet."
+                    @expertDescription()
                   div { className: "not-found" },
                     "TODO: Add other fields here."
                 if UserStore.loggedIn()

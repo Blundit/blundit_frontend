@@ -29,6 +29,10 @@ module.exports = React.createFactory React.createClass
     { expert, claim } = @props
     div { className: "claim__experts-list-item" },
       div
+        className: "claim__experts-list-item__avatar"
+        style:
+          backgroundImage: "url(#{expert.avatar})"
+      div
         className: "claim__experts-list-item__title"
         onClick: @goToExpert.bind(@, expert.alias)
         expert.name
@@ -41,3 +45,5 @@ module.exports = React.createFactory React.createClass
           expert: expert
           id: claim.id
           type: "claim"
+
+      

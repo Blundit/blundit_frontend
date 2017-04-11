@@ -44,10 +44,13 @@ module.exports = React.createFactory React.createClass
   render: ->
     { type, item, submitting, submitted } = @props
 
-    div { className: "#{type}__vote" },
-      div { className: "#{type}__vote__meta" },
+    div { className: "default__card #{type}__vote" },
+      div { className: "text__title" },
+        "Votes"
+      div { className: "text__normal #{type}__vote__meta" },
         if item.votes_count == 0
-          "Be the first person to vote on this #{type}"
+          span { className: "not-found" },
+            "Be the first person to vote on this #{type}"
         else
           "This #{type} has #{item.votes_count} votes so far!"
       if item.open == "true" or item.open == true

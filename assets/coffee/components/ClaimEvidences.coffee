@@ -1,5 +1,7 @@
 { div, a } = React.DOM
 
+InlineLink = require("components/InlineLink")
+
 module.exports = React.createFactory React.createClass
   displayName: "ClaimEvidences"
 
@@ -49,15 +51,16 @@ module.exports = React.createFactory React.createClass
 
 
   render: ->
-    div { className: "claim__evidences" },
+    div { className: "default__card claim__evidences" },
+      div { className: "text__title" },
+        "Evidence Supporting this Claim"
+      if @props.evidences.length == 0
+        div { className: "not-found" },
+          "No supporting evidence has been added yet to this claim."
       @props.evidences.map (evidence, index) ->
-        div
-          className: "claim__evidence"
+        InlineLink
+          item: evidence
           key: "claim-evidence-#{index}"
-          a
-            target: "_blank"
-            href: evidence.url
-            evidence.title
         
       div {},
         React.createElement(Material.TextField,

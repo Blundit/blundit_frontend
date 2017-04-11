@@ -1,4 +1,4 @@
-{ div, img } = React.DOM
+{ div, img, span } = React.DOM
 
 Header = require("components/Header")
 Footer = require("components/Footer")
@@ -125,6 +125,14 @@ module.exports = React.createFactory React.createClass
       else
         return "Incorrect"
 
+  
+  claimDescription: ->
+    { claim } = @state
+    if claim.description? and claim.description > ''
+      return claim.description
+    else
+      return span { className: "not-found" }, "This claim has no description."
+
     
   showStatus: ->
     { claim } = @state
@@ -150,22 +158,27 @@ module.exports = React.createFactory React.createClass
           if claim?
             div { className: "claim" },
               @showNewClaimText()
-              div { className: "claim__title" },
-                claim.title
-              div { className: "claim__image" },
-                img { src: claim.pic }
-              div { className: "claim__meta" },
+              div { className: "default__card" },
+                div { className: "text__title claim__title" },
+                  claim.title
+                div
+                  className: "claim__image"
+                  style:
+                    backgroundImage: "url(#{claim.pic})"
+                div { className: "claim__meta" },
+                  div { className: "claim__meta-status" },
+                    "This claim is #{@showStatus()}"
+                  div { className: "claim__meta-description" },
+                    @claimDescription()
+                  div { className: "not-found" },
+                    "TODO: Add other fields here."
                 if UserStore.loggedIn()
-                  div { className: "claim__meta-bookmark" },
+                  div { className: "claim__bookmark" },
                     BookmarkIndicator
                       bookmark: @state.claim.bookmark
                       type: "claim"
                       id: @state.claim.id
                       updateBookmark: @updateBookmark
-                div { className: "claim__meta-status" },
-                  "This claim is #{@showStatus()}"
-              div { className: "claim__description" },
-                claim.description
               div { className: "default__card claim__categories" },
                 div { className: "text__title" },
                   "Categories"
@@ -175,17 +188,25 @@ module.exports = React.createFactory React.createClass
                   div { className: "not-found" },
                     "No categories yet."
                 else
-                  div {},
+                  div { className: "default__card" },
                     claim.categories.map (category, index) =>
                       React.createElement( Material.Chip,
                         { onTouchTap: @goToCategory.bind(@, category.id), key: "claim-category-chip-#{index}", style: @categoryMaterialStyle() },
                         category.name
                       )
-              div { className: "claim__accuracy" },
+              div { className: "default__card claim__accuracy" },
+                div { className: "text__title" },
+                  "Accuracy"
                 "This claim is marked: #{@showAccuracy(claim.vote_value)}"
-              div { className: "claim__experts" },
-                div { className: "claim__experts-name" },
-                  "Experts:"
+              Votes
+                type: "claim"
+                item: claim
+                vote: @vote
+                submitting: @state.voteSubmitting
+                submitted: @state.voteSubmitted
+              div { className: "default__card claim__experts" },
+                div { className: "text__title claim__experts-name" },
+                  "Experts"
                 div { className: "claim__experts-list" },
                   if experts.length > 0
                     experts.map (expert, index) ->
@@ -205,12 +226,6 @@ module.exports = React.createFactory React.createClass
                 evidences: claim.evidences
                 claim: claim
                 refresh: @fetchClaim
-              Votes
-                type: "claim"
-                item: claim
-                vote: @vote
-                submitting: @state.voteSubmitting
-                submitted: @state.voteSubmitted
               Comments
                 type: "claim"
                 id: claim.id

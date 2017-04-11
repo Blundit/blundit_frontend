@@ -70,3 +70,86 @@
       float: left
       padding-top: 4px
   
+.claim
+  &__image
+    width: 320px
+    height: 320px
+    background-size: cover
+    -webkit-background-size: cover
+
+    float: left
+    margin-right: 10px
+    
+
+    @media (max-width: $mobile-breakpoint)
+      margin-right: 0px
+
+  &__meta
+    float: left
+    width: calc(100% - 350px)
+
+    @media (max-width: $mobile-breakpoint)
+      width: 100%
+      float: none
+
+    @media (max-width: $mobile-breakpoint)
+      +span(12 of 12)
+
+  &__bookmark
+    float: left
+    width: 20px
+
+.claim__experts-list
+  width: 100%
+  display: inline-block
+
+.claim__experts-list-item, .prediction__experts-list-item
+  width: 100%
+  margin-bottom: 10px
+  display: inline-block
+
+  &__avatar
+    width: 20px
+    height: 20px
+    margin-right: 5px
+    border-radius: 20px
+    border: 1px solid $avatar-border-color
+    float: left
+    background-size: cover
+
+  &__title
+    width: 50%
+    float: left
+    cursor: pointer
+    color: $default-link-color
+
+    &:hover
+      font-weight: bold
+
+    @media (max-width: $mobile-breakpoint)
+      width: calc(100% - 25px)
+      float: left
+
+  &__substantiations
+    @extend %normal-text
+    color: $mid-grey-color
+    cursor: pointer
+    border: 1px solid $white-color
+    margin-top: 10px
+    float: left
+
+    span
+      color: $alert-color
+
+
+
+    &:hover
+      font-weight: bold
+  
+  .substantiation-list
+    background-color: $very-light-grey-color
+    padding: 5px
+
+    &__add
+      @extend %large-text
+      margin-top: 20px
