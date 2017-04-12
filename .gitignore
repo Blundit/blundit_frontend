@@ -39,3 +39,5 @@ jspm_packages
 
 images/avatars/*
 !images/avatars/placeholder.png
+dist/scripts/*
+dist/styles/*

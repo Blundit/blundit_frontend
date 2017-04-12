@@ -104,33 +104,6 @@ class UserStore
       return {}
 
 
-  fetchUserData: (navigateTarget) ->
-    return
-    $.ajax
-      type: 'GET'
-      headers: @getAuthHeader()
-      url: @urls.get_user_data
-      dataType: 'json'
-      success: (data) =>
-        @setUserAccounts @fixDates(data)
-        @doQueueMessages()
-        @fetchUserProfile()
-        if navigateTarget?
-          window.navigate navigateTarget
-
-
-  fetchUserProfile: (navigateTarget) ->
-    $.ajax
-      type: 'GET'
-      headers: @getAuthHeader()
-      url: @urls.get_current_user
-      dataType: 'json'
-      success: (data) =>
-        @setUserProfile data
-
-    
-
-
   setUserProfile: (data) ->
     @data.profile = data
     @emitChange()
