@@ -34,7 +34,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
-    "postinstall": "npm install && gulp build"
+    "postinstall": "gulp build"
   },
   "repository": {
     "type": "git",
