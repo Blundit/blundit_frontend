@@ -43,7 +43,7 @@ module.exports = React.createFactory React.createClass
     if !UserStore.get() or !UserStore.get().avatar_file_name?
       avatar = "/images/avatars/placeholder.png"
     else
-      avatar = "http://localhost:3000/images/user_avatars/#{UserStore.get().avatar_file_name}"
+      avatar = "#{API.serverBase()}images/user_avatars/#{UserStore.get().avatar_file_name}"
 
     return "url(#{avatar})"
 

@@ -70,7 +70,7 @@ module.exports = React.createFactory React.createClass
     @setState query: query
     @setState sort: sort
 
-    window.history.pushState('', 'Blundit - Claims', "http://localhost:8888/claims?query=#{query}&sort=#{sort}&page=1")
+    window.history.pushState('', 'Blundit - Claims', "#{window.location.origin}/claims?query=#{query}&sort=#{sort}&page=1")
 
     @fetchPaginatedData(1, query, sort)
 

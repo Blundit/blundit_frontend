@@ -145,7 +145,7 @@ module.exports = React.createFactory React.createClass
                 div
                   className: "comments__comment__meta-user-avatar"
                   style:
-                    backgroundImage: "url(http://localhost:3000/images/user_avatars/#{comment.user.avatar_file_name})"
+                    backgroundImage: "url(#{API.serverBase()}images/user_avatars/#{comment.user.avatar_file_name})"
                 div { className: "comments__comment__meta-text"}
                   div { className: "comments__comment__meta-text-username" },
                     comment.user.first_name + " " + comment.user.last_name

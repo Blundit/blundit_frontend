@@ -145,7 +145,7 @@ module.exports = React.createFactory React.createClass
 
 
   getUserAvatarPath: ->
-    return "http://localhost:3000/images/user_avatars/#{@state.user.avatar_file_name}"
+    return "#{API.serverBase()}images/user_avatars/#{@state.user.avatar_file_name}"
 
 
   render: ->

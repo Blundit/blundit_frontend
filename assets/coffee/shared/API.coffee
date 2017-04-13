@@ -169,15 +169,21 @@ module.exports = class API
 
 
   @server = (params) ->
-    @serverBase = "http://localhost:3000/"
-
-    if window.location.indexOf("localhost", 0) == -1
-      @serverBase = "https://fast-earth-30912.herokuapp.com/"
+    @s = @serverBase()
 
     if @paths[params.path].non_api? and @paths[params.path].non_api == true
-      return @serverBase
+      return @s
       
-    return "#{@serverBase}/api/v1/"
+    return "#{@s}/api/v1/"
+
+  
+  @serverBase: ->
+    @s = "http://localhost:5000/"
+
+    if window.location.href.indexOf("localhost", 0) == -1
+      @s = "https://fast-earth-30912.herokuapp.com/"
+
+    return @s
     
   
   @method = (params) ->

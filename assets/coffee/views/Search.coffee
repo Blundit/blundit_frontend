@@ -50,7 +50,7 @@ module.exports = React.createFactory React.createClass
 
 
   search: (query, sort) ->
-    window.history.pushState('', 'Blundit - Search', "http://localhost:8888/search?query=#{query}&sort=#{sort}")
+    window.history.pushState('', 'Blundit - Search', "#{window.location.origin}/search?query=#{query}&sort=#{sort}")
     params = {
       path: "search"
       data:
