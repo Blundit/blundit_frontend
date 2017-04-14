@@ -1,4 +1,4 @@
-{ div } = React.DOM
+{ div, span } = React.DOM
 
 module.exports = React.createFactory React.createClass
   displayName: 'Votes'

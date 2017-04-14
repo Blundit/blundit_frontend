@@ -261,7 +261,6 @@ module.exports = class API
       console.error "PATH WITH KEY '#{params.path}' NOT FOUND"
       return
 
-    console.log @paths[params.path]
     if @paths[params.path].file? and @paths[params.path].file == true
       @callFile(params)
       return
