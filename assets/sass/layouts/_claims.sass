@@ -58,11 +58,11 @@
       margin-right: 5px
 
     &__expert-avatar
+      +cover
       height: 20px
       width: 20px
       border-radius: 20px
       border: 1px solid $avatar-border-color
-      background-size: cover
       float: left
       margin-right: 5px
 
@@ -72,14 +72,12 @@
   
 .claim
   &__image
+    +cover
     width: 320px
     height: 320px
-    background-size: cover
-    -webkit-background-size: cover
-
     float: left
     margin-right: 10px
-    
+    position: relative
 
     @media (max-width: $mobile-breakpoint)
       margin-right: 0px
@@ -109,13 +107,13 @@
   display: inline-block
 
   &__avatar
+    +cover
     width: 20px
     height: 20px
     margin-right: 5px
     border-radius: 20px
     border: 1px solid $avatar-border-color
     float: left
-    background-size: cover
 
   &__title
     width: 50%

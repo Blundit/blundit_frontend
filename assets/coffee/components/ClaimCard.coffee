@@ -1,10 +1,11 @@
 { div, img, a, br, span } = React.DOM
 
 LinksMixin = require("mixins/LinksMixin")
+AvatarMixin = require("mixins/AvatarMixin")
 
 module.exports = React.createFactory React.createClass
   displayName: 'ClaimCard'
-  mixins: [LinksMixin]
+  mixins: [LinksMixin, AvatarMixin]
 
   getDescription: ->
     { claim } = @props
@@ -78,7 +79,7 @@ module.exports = React.createFactory React.createClass
                   div
                     className: "claim-card-experts__expert-avatar"
                     style:
-                      backgroundImage: "url(#{expert.avatar})"
+                      backgroundImage: "url(#{@getExpertAvatar(expert)})"
                   div { className: "claim-card-experts__expert-name" },
                     expert.name
           

@@ -1,18 +1,11 @@
 { div, img, br, span, a } = React.DOM
 
 LinksMixin = require("mixins/LinksMixin")
+AvatarMixin = require("mixins/AvatarMixin")
 
 module.exports = React.createFactory React.createClass
   displayName: 'ExpertCard'
-  mixins: [LinksMixin]
-
-  avatar: ->
-    { expert } = @props
-    if expert.avatar?
-      return expert.avatar
-    return "/images/avatars/placeholder.png"
-
-
+  mixins: [LinksMixin, AvatarMixin]
 
   getExpertDescription: ->
     if @props.expert.description?
@@ -51,6 +44,7 @@ module.exports = React.createFactory React.createClass
       textAlign: "center"
     }
 
+
   render: ->
     { expert } = @props
     div { className: "expert-card" },
@@ -59,7 +53,7 @@ module.exports = React.createFactory React.createClass
           {
             overlay: React.createElement(Material.CardTitle, { title: expert.name, subtitle: @getExpertOccupation() })
           },
-          img {src: @avatar() }
+          img { src: @getExpertAvatar(expert) }
         )
        
         if expert.categories.length > 0

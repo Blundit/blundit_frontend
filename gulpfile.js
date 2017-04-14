@@ -47,8 +47,8 @@ gulp.task('scripts', function() {
       extensions: ['.coffee'],
       paths: ['./assets/coffee/']
     }))
-    .pipe(buffer())
-    .pipe(uglify())
+    // .pipe(buffer())
+    // .pipe(uglify())
     .pipe(gulp.dest(config.outputDirs.js))
 });
 

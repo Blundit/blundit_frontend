@@ -131,6 +131,27 @@ module.exports = class API
     add_bona_fide:
       path: "experts/%expert_id%/add_bona_fide"
       method: "POST"
+    update_expert_image:
+      path: "experts/%expert_id%/update_image"
+      file: true
+      method: "PATCH"
+    delete_expert_image:
+      path: "experts/%expert_id%/delete_image"
+      method: "DELETE"
+    update_claim_image:
+      path: "claims/%claim_id%/update_image"
+      file: true
+      method: "PATCH"
+    delete_claim_image:
+      path: "claims/%claim_id%/delete_image"
+      method: "DELETE"
+    update_prediction_image:
+      path: "predictions/%prediction_id%/update_image"
+      file: true
+      method: "PATCH"
+    delete_prediction_image:
+      path: "predictions/%prediction_id%/delete_image"
+      method: "DELETE"
     bookmarks:
       path: "user/bookmarks"
       method: "GET"
@@ -164,6 +185,7 @@ module.exports = class API
       method: "POST"
     update_user:
       path: "user/update"
+      file: true
       method: "PUT"
 
 
@@ -224,7 +246,7 @@ module.exports = class API
     if params.path == "update_user"
       return false
     else
-      return 
+      return ""
 
 
   @contentType: (params) ->
@@ -235,7 +257,12 @@ module.exports = class API
 
 
   @call = (params) ->
-    if params.path == "update_user"
+    if !@paths[params.path]?
+      console.error "PATH WITH KEY '#{params.path}' NOT FOUND"
+      return
+
+    console.log @paths[params.path]
+    if @paths[params.path].file? and @paths[params.path].file == true
       @callFile(params)
       return
 

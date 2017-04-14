@@ -8,13 +8,15 @@ Votes = require("components/Votes")
 AddToPrediction = require("components/AddToPrediction")
 PredictionEvidences = require("components/PredictionEvidences")
 BookmarkIndicator = require("components/BookmarkIndicator")
+ImageUpload = require("components/ImageUpload")
 
 SessionMixin = require("mixins/SessionMixin")
 LinksMixin = require("mixins/LinksMixin")
 DateMixin = require("mixins/DateMixin")
+AvatarMixin = require("mixins/AvatarMixin")
 
 module.exports = React.createFactory React.createClass
-  mixins: [SessionMixin, LinksMixin, DateMixin]
+  mixins: [SessionMixin, LinksMixin, DateMixin, AvatarMixin]
   displayName: 'Prediction'
 
   getInitialState: ->
@@ -166,7 +168,12 @@ module.exports = React.createFactory React.createClass
                 div
                   className: "prediction__image"
                   style:
-                    backgroundImage: "url(#{prediction.pic})"
+                    backgroundImage: "url(#{@getPredictionAvatar(prediction)})"
+                  if UserStore.loggedIn()
+                    ImageUpload
+                      type: "prediction"
+                      item_id: prediction.id
+                      refresh: @fetchPrediction
                 div { className: "prediction__meta" },
                   div { className: "prediction__meta-date" },
                     "This prediction will happen by #{@formatDate(prediction.prediction_date)}"

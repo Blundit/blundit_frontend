@@ -8,12 +8,14 @@ Votes = require("components/Votes")
 AddToClaim = require("components/AddToClaim")
 ClaimEvidences = require("components/ClaimEvidences")
 BookmarkIndicator = require("components/BookmarkIndicator")
+ImageUpload = require("components/ImageUpload")
 
 SessionMixin = require("mixins/SessionMixin")
 LinksMixin = require("mixins/LinksMixin")
+AvatarMixin = require("mixins/AvatarMixin")
 
 module.exports = React.createFactory React.createClass
-  mixins: [SessionMixin, LinksMixin]
+  mixins: [SessionMixin, LinksMixin, AvatarMixin]
   displayName: 'Claim'
 
   getInitialState: ->
@@ -164,7 +166,12 @@ module.exports = React.createFactory React.createClass
                 div
                   className: "claim__image"
                   style:
-                    backgroundImage: "url(#{claim.pic})"
+                    backgroundImage: "url(#{@getClaimAvatar(claim)})"
+                  if UserStore.loggedIn()
+                    ImageUpload
+                      type: "claim"
+                      item_id: claim.id
+                      refresh: @fetchClaim
                 div { className: "claim__meta" },
                   div { className: "claim__meta-status" },
                     "This claim is #{@showStatus()}"

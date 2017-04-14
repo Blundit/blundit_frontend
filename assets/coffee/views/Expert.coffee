@@ -1,4 +1,4 @@
-{ div, img, span } = React.DOM
+{ div, img, span, input } = React.DOM
 
 Header = require("components/Header")
 Footer = require("components/Footer")
@@ -8,12 +8,14 @@ ExpertBonaFides = require("components/ExpertBonaFides")
 Comments = require("components/Comments")
 AddToExpert = require("components/AddToExpert")
 BookmarkIndicator = require("components/BookmarkIndicator")
+ImageUpload = require("components/ImageUpload")
 
 SessionMixin = require("mixins/SessionMixin")
 LinksMixin = require("mixins/LinksMixin")
+AvatarMixin = require("mixins/AvatarMixin")
 
 module.exports = React.createFactory React.createClass
-  mixins: [SessionMixin, LinksMixin]
+  mixins: [SessionMixin, LinksMixin, AvatarMixin]
   displayName: 'Experts'
 
   getInitialState: ->
@@ -122,7 +124,12 @@ module.exports = React.createFactory React.createClass
                 div
                   className: "expert__avatar"
                   style:
-                    backgroundImage: "url(#{expert.avatar})"
+                    backgroundImage: "url(#{@getExpertAvatar(expert)})"
+                  if UserStore.loggedIn()
+                    ImageUpload
+                      type: "expert"
+                      item_id: expert.id
+                      refresh: @fetchExpert
                 div { className: "expert__meta" },
                   div { className: "expert__meta-description" },
                     @expertDescription()

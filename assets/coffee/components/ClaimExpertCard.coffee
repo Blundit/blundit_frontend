@@ -2,10 +2,11 @@
 
 ExpertSubstantiations = require("components/ExpertSubstantiations")
 LinksMixin = require("mixins/LinksMixin")
+AvatarMixin = require("mixins/AvatarMixin")
 
 module.exports = React.createFactory React.createClass
   displayName: "ClaimExpertCard"
-  mixins: [LinksMixin]
+  mixins: [LinksMixin, AvatarMixin]
 
   getInitialState: ->
     showSubstantiation: false
@@ -31,7 +32,7 @@ module.exports = React.createFactory React.createClass
       div
         className: "claim__experts-list-item__avatar"
         style:
-          backgroundImage: "url(#{expert.avatar})"
+          backgroundImage: "url(#{@getExpertAvatar(expert)})"
       div
         className: "claim__experts-list-item__title"
         onClick: @goToExpert.bind(@, expert.alias)

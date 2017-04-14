@@ -2,11 +2,11 @@
 
 LinksMixin = require("mixins/LinksMixin")
 DateMixin = require("mixins/DateMixin")
+AvatarMixin = require("mixins/AvatarMixin")
 
 module.exports = React.createFactory React.createClass
   displayName: 'PredictionCard'
-  mixins: [LinksMixin, DateMixin]
-
+  mixins: [LinksMixin, DateMixin, AvatarMixin]
 
   getDescription: ->
     { prediction } = @props
@@ -45,7 +45,7 @@ module.exports = React.createFactory React.createClass
     { prediction } = @props
     return @formatDate(prediction.created_at)
 
-
+  
   render: ->
     { prediction } = @props
     div { className: "prediction-card" },
@@ -85,7 +85,7 @@ module.exports = React.createFactory React.createClass
                   div
                     className: "prediction-card-experts__expert-avatar"
                     style:
-                      backgroundImage: "url(#{expert.avatar})"
+                      backgroundImage: "url(#{@getExpertAvatar(expert)})"
                   div { className: "prediction-card-experts__expert-name" },
                     expert.name
           

@@ -1,18 +1,12 @@
 { div, img, br, span, a } = React.DOM
 
 LinksMixin = require("mixins/LinksMixin")
+AvatarMixin = require("mixins/AvatarMixin")
 
 module.exports = React.createFactory React.createClass
   displayName: 'ExpertTExtCard'
-  mixins: [LinksMixin]
+  mixins: [LinksMixin, AvatarMixin]
 
-  avatar: ->
-    { expert } = @props
-    if expert.avatar?
-      return expert.avatar
-    return "/images/avatars/placeholder.png"
-
-  
   showAccuracy: ->
     accuracy = @props.expert.accuracy
 
@@ -38,7 +32,7 @@ module.exports = React.createFactory React.createClass
       div
         className: "expert-text-card__avatar"
         style:
-          backgroundImage: "url(#{@avatar()})"
+          backgroundImage: "url(#{@getExpertAvatar(expert)})"
       div
         className: "expert-text-card__name"
         onClick: @goToExpert.bind(@, expert.alias)
