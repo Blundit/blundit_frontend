@@ -3,7 +3,10 @@
 Header = require("components/Header")
 Footer = require("components/Footer")
 
+AvatarMixin = require("mixins/AvatarMixin")
+
 module.exports = React.createFactory React.createClass
+  mixins: [AvatarMixin]
   displayName: 'User'
 
   getInitialState: ->
@@ -204,7 +207,7 @@ module.exports = React.createFactory React.createClass
                   "Your Avatar:"
                   br {}
                   if @state.user.avatar_file_name?
-                    img { src: @getUserAvatarPath() }
+                    img { src: @getUserAvatar(@state.user) }
                   input
                     className: "user__avatar"
                     type: "file"

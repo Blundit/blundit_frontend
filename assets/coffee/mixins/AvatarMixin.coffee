@@ -2,21 +2,30 @@
 
 module.exports =
   getExpertAvatar: (expert) ->
-    if expert.avatar? and expert.avatar.indexOf("placeholder", 0) == -1
-      return "#{API.serverBase()}images/expert_avatars/#{expert.id}/#{expert.avatar}"
+    if expert.avatar?
+      return expert.avatar
     else
       return "#{API.serverBase()}images/expert_avatars/default.png"
 
   
   getClaimAvatar: (claim) ->
-    if claim.pic? and claim.pic.indexOf("placeholder", 0) == -1
-      return "#{API.serverBase()}images/claim_avatars/#{claim.id}/#{claim.pic}"
+    if claim.pic?
+      return claim.pic
     else
       return "#{API.serverBase()}images/claim_avatars/default.jpg"
 
   
   getPredictionAvatar: (prediction) ->
-    if prediction.pic? and prediction.pic.indexOf("placeholder", 0) == -1
-      return "#{API.serverBase()}images/prediction_avatars/#{prediction.id}/#{prediction.pic}"
+    if prediction.pic?
+      return prediction.pic
     else
       return "#{API.serverBase()}images/prediction_avatars/default.jpg"
+
+
+  getUserAvatar: (user) ->
+    if user.avatar?
+      return user.avatar
+    else if user.avatar_url?
+      return user.avatar_url
+    else
+      return "#{API.serverBase()}images/user_avatars/default.png"

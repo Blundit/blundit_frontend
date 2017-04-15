@@ -2,13 +2,14 @@
 
 PaginationMixin = require("mixins/PaginationMixin")
 DateMixin = require("mixins/DateMixin")
+AvatarMixin = require("mixins/AvatarMixin")
 
 Pagination = require("components/Pagination")
 
 
 module.exports = React.createFactory React.createClass
   displayName: 'Comments'
-  mixins: [PaginationMixin, DateMixin]
+  mixins: [PaginationMixin, DateMixin, AvatarMixin]
 
   getInitialState: ->
     comments: null
@@ -145,7 +146,7 @@ module.exports = React.createFactory React.createClass
                 div
                   className: "comments__comment__meta-user-avatar"
                   style:
-                    backgroundImage: "url(#{API.serverBase()}images/user_avatars/#{comment.user.avatar_file_name})"
+                    backgroundImage: "url(#{@getUserAvatar(comment.user)})"
                 div { className: "comments__comment__meta-text"}
                   div { className: "comments__comment__meta-text-username" },
                     comment.user.first_name + " " + comment.user.last_name

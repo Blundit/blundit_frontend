@@ -10,11 +10,12 @@ menuItems = [
 ]
 
 LinksMixin = require("mixins/LinksMixin")
+AvatarMixin = require("mixins/AvatarMixin")
 
 LoginModal = require("modals/LoginModal")
 
 module.exports = React.createFactory React.createClass
-  mixins: [LinksMixin]
+  mixins: [LinksMixin, AvatarMixin]
   getInitialState: ->
     user: null
     showLoginModal: false
@@ -37,15 +38,6 @@ module.exports = React.createFactory React.createClass
     @setState mobileMenu: false
     scroll(0,0)
     navigate(path)
-
-
-  getUserAvatar: ->
-    if !UserStore.get() or !UserStore.get().avatar_file_name?
-      avatar = "/images/avatars/placeholder.png"
-    else
-      avatar = "#{API.serverBase()}images/user_avatars/#{UserStore.get().avatar_file_name}"
-
-    return "url(#{avatar})"
 
   
   showLogin: ->
@@ -88,6 +80,8 @@ module.exports = React.createFactory React.createClass
 
 
   render: ->
+    { user } = @state
+
     div { className: "header-wrapper" },
       div { className: "header" },
         div
@@ -114,7 +108,7 @@ module.exports = React.createFactory React.createClass
               className: "header__user__avatar"
               onClick: @navigateToLocation.bind(@, "/me")
               style:
-                backgroundImage: @getUserAvatar()
+                backgroundImage: @getUserAvatar(user)
           else
             div {},
               div
