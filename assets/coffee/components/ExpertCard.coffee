@@ -17,7 +17,7 @@ module.exports = React.createFactory React.createClass
     if @props.expert.occupation?
       return @props.expert.occupation
     
-    return 'Occupation'
+    return ''
 
   
   showAccuracy: ->

@@ -16,6 +16,10 @@ module.exports = React.createFactory React.createClass
       facebook: ''
       instagram: ''
       youtube: ''
+      city: ''
+      country: ''
+      occupation: ''
+      website: ''
       tag_list: ''
       avatar: ''
       category: ''
@@ -50,6 +54,10 @@ module.exports = React.createFactory React.createClass
           facebook: @state.expert.facebook
           instagram: @state.expert.instagram
           youtube: @state.expert.youtube
+          city: @state.expert.city
+          country: @state.expert.country
+          occupation: @state.expert.occupation
+          website: @state.expert.website
           tag_list: @state.expert.tag_list
           category: @state.expert.category
         success: @createExpertSuccess

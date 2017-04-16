@@ -72,12 +72,51 @@ module.exports = React.createFactory React.createClass
           hintText: "Description",
           floatingLabelText: "Description",
           multiLine: true,
-          rows: 2,
           fullWidth: true,
           rowsMax: 4,
           value: @props.expert.description
           onChange: @updateField,
           errorText: @getErrorText("description")
+        })
+      React.createElement(Material.TextField,
+        {
+          id: "occupation",
+          hintText: "Occupation",
+          floatingLabelText: "Occupation",
+          fullWidth: true,
+          value: @props.expert.occupation
+          onChange: @updateField,
+          errorText: @getErrorText("occupation")
+        })
+      React.createElement(Material.TextField,
+        {
+          id: "website",
+          hintText: "Website",
+          floatingLabelText: "Website",
+          fullWidth: true,
+          value: @props.expert.website
+          onChange: @updateField,
+          errorText: @getErrorText("website")
+        })
+      React.createElement(Material.TextField,
+        {
+          id: "city",
+          hintText: "City",
+          floatingLabelText: "City",
+          fullWidth: true,
+          value: @props.expert.city
+          onChange: @updateField,
+          errorText: @getErrorText("city")
+        })
+      React.createElement(Material.TextField,
+        {
+          id: "country",
+          hintText: "Country",
+          floatingLabelText: "Country",
+          fullWidth: true,
+          value: @props.expert.country
+          onChange: @updateField,
+          errorText: @getErrorText("country")
         })
       React.createElement(Material.TextField,
         {

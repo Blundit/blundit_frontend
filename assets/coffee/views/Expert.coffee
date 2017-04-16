@@ -1,4 +1,4 @@
-{ div, img, span, input } = React.DOM
+{ div, img, span, input, a } = React.DOM
 
 Header = require("components/Header")
 Footer = require("components/Footer")
@@ -48,7 +48,8 @@ module.exports = React.createFactory React.createClass
 
 
   expertError: (error) ->
-    @setState loadError: error.responseJSON.errors
+    if error.responseJSON? and error.responseJSON.errors?
+      @setState loadError: error.responseJSON.errors
 
   
   updateBookmark: (data) ->
@@ -100,12 +101,31 @@ module.exports = React.createFactory React.createClass
 
   expertDescription: ->
     { expert } = @state
-
-
     if expert.description? and expert.description > ''
       return expert.description
     else
       return span { className: "not-found" }, "This expert has no description yet."
+
+  
+  getExpertAttribute: (expert, attribute) ->
+    @na = "N/A"
+    if expert[attribute]? and expert[attribute].trim() > ""
+      @att = expert[attribute].trim()
+    else
+      @att = @na
+
+    if attribute == "website" and @att != @na
+      return a { href: @att, target: "_blank" }, @att
+    if attribute == "twitter" and @att != @na
+      return a { href: "https://www.twitter.com/#{@att}", target: "_blank" }, @att
+    if attribute == "facebook" and @att != @na
+      return a { href: "https://www.facebook.com/#{@att}", target: "_blank" }, @att
+    if attribute == "instagram" and @att != @na
+      return a { href: "http://www.instagram.com/#{@att}", target: "_blank" }, @att
+    if attribute == "youtube" and @att != @na
+      return a { href: "http://www.youtube.com/channels/#{@att}", target: "_blank" }, @att
+
+    return @att
 
   
   render: ->
@@ -131,10 +151,26 @@ module.exports = React.createFactory React.createClass
                       item_id: expert.id
                       refresh: @fetchExpert
                 div { className: "expert__meta" },
+                  div { className: "expert__meta-occupation" },
+                    "Occupation #{@getExpertAttribute(expert, 'occupation')}"
                   div { className: "expert__meta-description" },
                     @expertDescription()
-                  div { className: "not-found" },
-                    "TODO: Add other fields here."
+                  div { className: "expert__meta-website" },
+                    "Website: #{@getExpertAttribute(expert, 'website')}"
+                  div { className: "expert__meta-location" },
+                    "Location: #{@getExpertAttribute(expert, 'city')}, #{@getExpertAttribute(expert, 'country')}"
+                  div { className: "expert__meta-twitter" },
+                    "Twitter: "
+                    @getExpertAttribute(expert, 'twitter')
+                  div { className: "expert__meta-facebook" },
+                    "Facebook:"
+                    @getExpertAttribute(expert, 'facebook')
+                  div { className: "expert__meta-instagram" },
+                    "Instagram: "
+                    @getExpertAttribute(expert, 'instagram')
+                  div { className: "expert__meta-youtube" },
+                    "Youtube Channel: "
+                    @getExpertAttribute(expert, 'youtube')
                 if UserStore.loggedIn()
                   div { className: "expert__bookmark" },
                     BookmarkIndicator
