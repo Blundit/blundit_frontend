@@ -18,6 +18,7 @@ module.exports = React.createFactory React.createClass
       youtube: ''
       city: ''
       country: ''
+      wikipedia: ''
       occupation: ''
       website: ''
       tag_list: ''
@@ -58,6 +59,7 @@ module.exports = React.createFactory React.createClass
           country: @state.expert.country
           occupation: @state.expert.occupation
           website: @state.expert.website
+          wikipedia: @state.expert.wikipedia
           tag_list: @state.expert.tag_list
           category: @state.expert.category
         success: @createExpertSuccess

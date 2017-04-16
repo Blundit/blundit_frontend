@@ -124,6 +124,8 @@ module.exports = React.createFactory React.createClass
       return a { href: "http://www.instagram.com/#{@att}", target: "_blank" }, @att
     if attribute == "youtube" and @att != @na
       return a { href: "http://www.youtube.com/channels/#{@att}", target: "_blank" }, @att
+    if attribute == "wikipedia" and @att != @na
+      return a { href: "https://en.wikipedia.org/wiki/#{@att}", target: "_blank" }, @att
 
     return @att
 
@@ -171,6 +173,9 @@ module.exports = React.createFactory React.createClass
                   div { className: "expert__meta-youtube" },
                     "Youtube Channel: "
                     @getExpertAttribute(expert, 'youtube')
+                  div { className: "expert__meta-wikipedia" },
+                    "Wikipedia: "
+                    @getExpertAttribute(expert, 'wikipedia')
                 if UserStore.loggedIn()
                   div { className: "expert__bookmark" },
                     BookmarkIndicator

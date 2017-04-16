@@ -166,6 +166,16 @@ module.exports = React.createFactory React.createClass
         })
       React.createElement(Material.TextField,
         {
+          id: "wikipedia",
+          hintText: "Wikipedia",
+          floatingLabelText: "Wikipedia",
+          fullWidth: true,
+          value: @props.expert.wikipedia
+          onChange: @updateField,
+          errorText: @getErrorText("wikipedia")
+        })
+      React.createElement(Material.TextField,
+        {
           id: "tag_list",
           hintText: "Tags",
           floatingLabelText: "Tags",
