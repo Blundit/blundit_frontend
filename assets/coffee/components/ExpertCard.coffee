@@ -51,9 +51,14 @@ module.exports = React.createFactory React.createClass
       React.createElement(Material.Card, { style: @expertCardStyle() },
         React.createElement(Material.CardMedia,
           {
-            overlay: React.createElement(Material.CardTitle, { title: expert.name, subtitle: @getExpertOccupation() })
+            overlay: React.createElement(Material.CardTitle, { title: expert.name, subtitle: @getExpertOccupation() }),
+            onClick: @goToExpert.bind(@, expert.alias),
+            className: "expert-card__media"
           },
-          img { src: @getExpertAvatar(expert) }
+          div
+            className: "expert-card__avatar"
+            style:
+              backgroundImage: "url(#{@getExpertAvatar(expert)})"
         )
        
         if expert.categories.length > 0
@@ -84,8 +89,4 @@ module.exports = React.createFactory React.createClass
               a
                 onClick: @goToMostRecentPrediction
                 expert.most_recent_prediction[0].title
-
-        React.createElement(Material.CardActions, {},
-          React.createElement(Material.FlatButton, { label: "View", onClick: @goToExpert.bind(@, expert.alias), style: @viewButtonStyle() })
-        )
       )

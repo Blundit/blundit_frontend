@@ -16,11 +16,43 @@
   float: left
   width: calc(25% - 10px)
   margin: 5px
-  height: 388px
 
-  @media (max-width: $tablet-breakpoint)
+  @media (max-width: $mobile-breakpoint)
+    height: 295px
     width: calc(50% - 10px)
     margin: 5px
+
+  @media (min-width: $mobile-breakpoint + 1) and (max-width: $tablet-breakpoint)
+    height: 295px
+    width: calc(50% - 10px)
+    margin: 5px
+  
+  @media (min-width: $tablet-breakpoint + 1)
+    height: 337px
+
+  &__media
+    cursor: pointer !important
+    border: 1px solid transparent !important
+    box-sizing: border-box !important
+    +fast_transition(all)
+
+    &:hover
+      border: 1px solid $brand-secondary !important
+      +fast_transition(all)
+
+  &__avatar
+    +cover
+    width: 100%
+    cursor: pointer
+
+    @media (max-width: $mobile-breakpoint)
+      height: 200px
+
+    @media (min-width: $mobile-breakpoint + 1) and (max-width: $tablet-breakpoint)
+      height: 200px
+    
+    @media (min-width: $tablet-breakpoint + 1)
+      height: 240px
 
   &-meta
     width: 100%
