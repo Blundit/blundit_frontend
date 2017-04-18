@@ -10,9 +10,19 @@ module.exports = React.createFactory React.createClass
     itemList: null
     itemsError: false
     evidenceOfBeliefUrl: ''
+    user: null
+
+  
+  handleUserChange: (data) ->
+    @setState user: UserStore.get()
+
+
+  componentWillUnmount: ->
+    UserStore.unsubscribe(@handleUserChange)
 
 
   componentDidMount: ->
+    UserStore.subscribe(@handleUserChange)
     params = {
       path: "all_#{@props.type}s"
       success: @itemsSuccess
@@ -98,27 +108,33 @@ module.exports = React.createFactory React.createClass
 
 
   render: ->
+    { user } = @state
     div { className: "add-to-expert" },
-      if @state.showItems == false
-        React.createElement(Material.RaisedButton, {label: "Add #{@props.type} to Expert", primary: true, onClick: @doShowItems })
+      if user?.token?
+        if @state.showItems == false
+          React.createElement(Material.RaisedButton, {label: "Add #{@props.type} to Expert", primary: true, onClick: @doShowItems })
+        else
+          if @state.itemList?
+            div {},
+              React.createElement(Material.SelectField,
+                { floatingLabelText: @sentenceCase(@props.type), value: @state.item, onChange: @handleChange },
+                @state.itemList.map (item, index) ->
+                  React.createElement(Material.MenuItem, {value: item.id, primaryText: item.title, key: "add-to-expert-item-#{index}"})
+              )
+
+              React.createElement(Material.TextField,
+                {
+                  value: @state.evidence_of_belief_url,
+                  hintText: "Add Evidence that expert made this #{@props.type} (optional)",
+                  fullWidth: true,
+                  onChange: @changeEvidenceOfBelief
+                }
+              )
+              React.createElement(Material.FlatButton, { label: "Add", onClick: @addItem })
+              React.createElement(Material.FlatButton, { label: "Cancel", onClick: @cancelAddItem })
+              if @state.error?
+                div {},
+                  @state.error
       else
-        if @state.itemList?
-          div {},
-            React.createElement(Material.SelectField,
-              { floatingLabelText: @sentenceCase(@props.type), value: @state.item, onChange: @handleChange },
-              @state.itemList.map (item, index) ->
-                React.createElement(Material.MenuItem, {value: item.id, primaryText: item.title, key: "add-to-expert-item-#{index}"})
-            )
-            React.createElement(Material.TextField,
-              {
-                value: @state.evidence_of_belief_url,
-                hintText: "Add Evidence that expert made this #{@props.type} (optional)",
-                fullWidth: true,
-                onChange: @changeEvidenceOfBelief
-              }
-            )
-            React.createElement(Material.FlatButton, { label: "Add", onClick: @addItem })
-            React.createElement(Material.FlatButton, { label: "Cancel", onClick: @cancelAddItem })
-            if @state.error?
-              div {},
-                @state.error
+        div {},
+          "If you were logged in, you'd be able to add a #{@props.type} to this expert."

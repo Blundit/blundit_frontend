@@ -5,6 +5,7 @@ Footer = require("components/Footer")
 ClaimCard = require("components/ClaimCard")
 Pagination = require("components/Pagination")
 SearchFilters = require("components/SearchFilters")
+LoadingBlock = require("components/LoadingBlock")
 
 PaginationMixin = require("mixins/PaginationMixin")
 LinksMixin = require("mixins/LinksMixin")
@@ -100,19 +101,21 @@ module.exports = React.createFactory React.createClass
             search: @search
           div { className: "default__card" },
             React.createElement(Material.RaisedButton, { label: "Create New Claim", primary: true, onClick: @goToNewClaim, style: @newItemStyle() })
-          div { className: "default__card" },
-            div { className: "claims__list" },
-              if @state.claims?
+          if @state.claims?
+            div { className: "default__card" },
+              div { className: "claims__list" },
                 @state.claims.map (claim, index) ->
                   ClaimCard
                     claim: claim
                     key: "claim-card-#{index}"
-            if @state.claims?
               Pagination
                 page: @state.page
                 numberOfPages: @state.numberOfPages
                 nextPage: @nextPage
                 previousPage: @previousPage
                 specificPage: @specificPage
+          else
+            LoadingBlock
+              title: "Claims"
 
       Footer {}, ''

@@ -160,7 +160,7 @@ module.exports = React.createFactory React.createClass
             div { className: "text__title" },
               "User Info"
             if @state.user == null or !@state.user.token?
-              div { className: "user__not-logged-in" },
+              div { className: "user--not-logged-in" },
                 "You must be logged in to view this content."
             else
               div { className: "user" },

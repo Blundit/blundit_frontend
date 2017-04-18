@@ -3,6 +3,22 @@
 module.exports = React.createFactory React.createClass
   displayName: 'Votes'
 
+  getInitialState: ->
+    user: null
+
+  
+  handleUserChange: (data) ->
+    @setState user: UserStore.get()
+
+
+  componentDidMount: ->
+    UserStore.subscribe(@handleUserChange)
+
+  
+  componentWillUnmount: ->
+    UserStore.unsubscribe(@handleUserChange)
+
+
   getVoteValText: ->
     { item } = @props
     if item.user_vote?
@@ -43,6 +59,7 @@ module.exports = React.createFactory React.createClass
 
   render: ->
     { type, item, submitting, submitted } = @props
+    { user } = @state
 
     div { className: "default__card #{type}__vote" },
       div { className: "text__title" },
@@ -54,25 +71,29 @@ module.exports = React.createFactory React.createClass
         else
           "This #{type} has #{item.votes_count} votes so far!"
       if item.open == "true" or item.open == true
-        if submitted != true
-          div { className: "#{type}__vote__info" },
-            if item.user_vote?
-              div { className: "#{type}__vote__info-already-voted" },
-                "You have already voted for this item. (You thought it was #{@getVoteValText()})"
-            else
-              div { className: "#{type}__vote__info-buttons" },
-                if submitting == true
-                 React.createElement(Material.RefreshIndicator, { style: @refreshStyle, size: 50, left: 0, top: 0, status:"loading" })
-                else
-                  div {},
-                    React.createElement(Material.RaisedButton, {label: "I think it's true", primary: true, onClick: @voteYes })
-                    React.createElement(Material.RaisedButton, {label: "I think it's false", primary: true, onClick: @voteNo })
-                    if submitted == false
-                      div {},
-                        "There was an error. Please try again."
+        if user?.token?
+          if submitted != true
+            div { className: "#{type}__vote__info" },
+              if item.user_vote?
+                div { className: "#{type}__vote__info-already-voted" },
+                  "You have already voted for this item. (You thought it was #{@getVoteValText()})"
+              else
+                div { className: "#{type}__vote__info-buttons" },
+                  if submitting == true
+                    React.createElement(Material.RefreshIndicator, { style: @refreshStyle, size: 50, left: 0, top: 0, status:"loading" })
+                  else
+                    div {},
+                      React.createElement(Material.RaisedButton, {label: "I think it's true", primary: true, onClick: @voteYes })
+                      React.createElement(Material.RaisedButton, {label: "I think it's false", primary: true, onClick: @voteNo })
+                      if submitted == false
+                        div {},
+                          "There was an error. Please try again."
+          else
+            div { className: "#{type}__vote__info-voted" },
+              "Thank you for your vote!"
         else
-          div { className: "#{type}__vote__info-voted" },
-            "Thank you for your vote!"
+          div { className: "#{type}__vote--not-logged-in" },
+            "You must be logged in to vote on this #{type}"
         
       else
         div { className: "#{type}__vote--closed" },

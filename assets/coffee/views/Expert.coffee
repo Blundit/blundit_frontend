@@ -9,6 +9,7 @@ Comments = require("components/Comments")
 AddToExpert = require("components/AddToExpert")
 BookmarkIndicator = require("components/BookmarkIndicator")
 ImageUpload = require("components/ImageUpload")
+LoadingBlock = require("components/LoadingBlock")
 
 SessionMixin = require("mixins/SessionMixin")
 LinksMixin = require("mixins/LinksMixin")
@@ -24,11 +25,23 @@ module.exports = React.createFactory React.createClass
     predictions: []
     loadError: null
     showCreated: @doShowCreated()
+    user: null
+
+  
+  handleUserChange: (data) ->
+    @setState user: UserStore.get()
+
+    if @state.expert == null
+      @fetchExpert()
 
 
   componentDidMount: ->
-    @fetchExpert()
+    UserStore.subscribe(@handleUserChange)
 
+  
+  componentWillUnmount: ->
+    UserStore.unsubscribe(@handleUserChange)
+  
 
   fetchExpert: ->
     params = {
@@ -137,6 +150,10 @@ module.exports = React.createFactory React.createClass
       Header {}, ''
       div { className: "experts-wrapper" },
         div { className: "experts-content" },
+          if !expert?
+            LoadingBlock
+              title: "Expert"
+              
           if expert?
             div { className: "expert" },
               @showNewExpertText()

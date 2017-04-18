@@ -4,6 +4,7 @@ Header = require("components/Header")
 Footer = require("components/Footer")
 CategoryExperts = require("components/CategoryExperts")
 CategorySubHead = require("components/CategorySubHead")
+LoadingBlock = require("components/LoadingBlock")
 
 module.exports = React.createFactory React.createClass
   displayName: 'Category - Experts'
@@ -57,23 +58,24 @@ module.exports = React.createFactory React.createClass
 
   
   render: ->
+    { category, data } = @state
     div {},
       Header {}, ''
       div { className: "categories-wrapper" },
         div { className: "categories-content" },
-          if @state.category?
-            div { className: "default__card" },
-              div { className: "text__title" },
-                "Category '#{@state.category.name}' - Showing Experts"
-              CategorySubHead
-                category_id: @props.id
+          if !category? or !data?
+            LoadingBlock
+              text: "Category - Showing Experts"
           else
-            div { className: "default__card" },
-              div { className: "not-found" },
-                "Loading..."
-
-          if @state.data?
-            div { className: "default__card categories" },
-              CategoryExperts
-                experts: @state.data
+            div {},
+              if category?
+                div { className: "default__card" },
+                  div { className: "text__title" },
+                    "Category '#{category.name}' - Showing Experts"
+                  CategorySubHead
+                    category_id: @props.id
+              if data?
+                div { className: "default__card categories" },
+                  CategoryExperts
+                    experts: data
       Footer {}, ''

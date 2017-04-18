@@ -7,6 +7,7 @@ PredictionTextCard = require("components/PredictionTextCard")
 ExpertCard = require("components/ExpertCard")
 ExpertTextCard = require("components/ExpertTextCard")
 ClaimCard = require("components/ClaimCard")
+LoadingBlock = require("components/LoadingBlock")
 
 module.exports = React.createFactory React.createClass
   displayName: 'Landing'
@@ -42,10 +43,7 @@ module.exports = React.createFactory React.createClass
       div { className: "landing-wrapper" },
         div { className: "landing-content" },
           if !@state.data?
-            div {},
-              div { className: "default__card" },
-                div { className: "not-found" },
-                  "Loading..."
+            LoadingBlock {}
           if @state.data?
             div {},
               div { className: "default__card landing__predictions__recent-active" },

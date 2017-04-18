@@ -2,6 +2,7 @@
 
 Header = require("components/Header")
 Footer = require("components/Footer")
+LoadingBlock = require("components/LoadingBlock")
 
 LinksMixin = require("mixins/LinksMixin")
 
@@ -47,10 +48,10 @@ module.exports = React.createFactory React.createClass
       Header {}, ''
       div { className: "categories-wrapper" },
         div { className: "categories-content" },
-          div { className: "default__card categories__list" },
-            div { className: "text__title" },
-              "Categories"
-            if @state.categories?
+          if @state.categories?
+            div { className: "default__card categories__list" },
+              div { className: "text__title" },
+                "Categories"
               @state.categories.map (category, index) =>
                 div
                   className: "categories__list__item"
@@ -59,6 +60,8 @@ module.exports = React.createFactory React.createClass
                   div { className: "categories__list__item-title"},
                     "#{category.name} (#{category.experts} E, #{category.predictions} P, #{category.claims} C)"
                   @getCategoryDescription(category)
-
+          if !@state.categories?
+            LoadingBlock
+              title: "Categories"
 
       Footer {}, ''

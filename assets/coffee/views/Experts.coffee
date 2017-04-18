@@ -5,6 +5,7 @@ Footer = require("components/Footer")
 ExpertCard = require("components/ExpertCard")
 Pagination = require("components/Pagination")
 SearchFilters = require("components/SearchFilters")
+LoadingBlock = require("components/LoadingBlock")
 
 PaginationMixin = require("mixins/PaginationMixin")
 LinksMixin = require("mixins/LinksMixin")
@@ -102,19 +103,21 @@ module.exports = React.createFactory React.createClass
             search: @search
           div { className: "default__card" },
             React.createElement(Material.RaisedButton, { label: "Create New Expert", primary: true, onClick: @goToNewExpert, style: @newItemStyle() })
-          div { className: "default__card" },
-            div { className: "experts__list" },
-              if @state.experts?
+          if @state.experts?
+            div { className: "default__card" },
+              div { className: "experts__list" },
                 @state.experts.map (expert, index) ->
                   ExpertCard
                     expert: expert
                     key: "expert-card-#{index}"
-            if @state.experts?
               Pagination
                 page: @state.page
                 numberOfPages: @state.numberOfPages
                 nextPage: @nextPage
                 previousPage: @previousPage
                 specificPage: @specificPage
+          else
+            LoadingBlock
+              title: "Experts"
 
       Footer {}, ''

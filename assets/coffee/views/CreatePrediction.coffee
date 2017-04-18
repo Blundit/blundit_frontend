@@ -34,7 +34,6 @@ module.exports = React.createFactory React.createClass
   formatPredictionDate: (date) ->
     d = new Date(date)
     d2 = ('0' + d.getDate()).slice(-2) + '-' + ('0' + (d.getMonth()+1)).slice(-2) + '-' + d.getFullYear();
-    console.log d2
     return d2
 
   

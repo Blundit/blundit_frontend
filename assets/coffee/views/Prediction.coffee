@@ -9,6 +9,7 @@ AddToPrediction = require("components/AddToPrediction")
 PredictionEvidences = require("components/PredictionEvidences")
 BookmarkIndicator = require("components/BookmarkIndicator")
 ImageUpload = require("components/ImageUpload")
+LoadingBlock = require("components/LoadingBlock")
 
 SessionMixin = require("mixins/SessionMixin")
 LinksMixin = require("mixins/LinksMixin")
@@ -26,10 +27,22 @@ module.exports = React.createFactory React.createClass
     showCreated: @doShowCreated()
     voteSubmitted: null
     voteSubmitting: false
+    user: null
+
+
+  handleUserChange: (data) ->
+    @setState user: UserStore.get()
+
+    if @state.prediction == null
+      @fetchPrediction()
 
 
   componentDidMount: ->
-    @fetchPrediction()
+    UserStore.subscribe(@handleUserChange)
+
+  
+  componentWillUnmount: ->
+    UserStore.unsubscribe(@handleUserChange)
 
   
   fetchPrediction: ->
@@ -159,6 +172,9 @@ module.exports = React.createFactory React.createClass
       Header {}, ''
       div { className: "predictions-wrapper" },
         div { className: "predictions-content" },
+          if !prediction?
+            LoadingBlock
+              title: "Prediction"
           if prediction?
             div { className: "prediction" },
               @showNewPredictionText()

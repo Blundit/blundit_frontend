@@ -9,6 +9,7 @@ AddToClaim = require("components/AddToClaim")
 ClaimEvidences = require("components/ClaimEvidences")
 BookmarkIndicator = require("components/BookmarkIndicator")
 ImageUpload = require("components/ImageUpload")
+LoadingBlock = require("components/LoadingBlock")
 
 SessionMixin = require("mixins/SessionMixin")
 LinksMixin = require("mixins/LinksMixin")
@@ -25,10 +26,22 @@ module.exports = React.createFactory React.createClass
     showCreated: @doShowCreated()
     voteSubmitted: null
     voteSubmitting: false
+    user: null
+
+
+  handleUserChange: (data) ->
+    @setState user: UserStore.get()
+
+    if @state.claim == null
+      @fetchClaim()
 
 
   componentDidMount: ->
-    @fetchClaim()
+    UserStore.subscribe(@handleUserChange)
+
+  
+  componentWillUnmount: ->
+    UserStore.unsubscribe(@handleUserChange)
 
   
   fetchClaim: ->
@@ -152,11 +165,14 @@ module.exports = React.createFactory React.createClass
 
 
   render: ->
-    { claim, experts } = @state
+    { claim, experts, user } = @state
     div {},
       Header {}, ''
       div { className: "claims-wrapper" },
         div { className: "claims-content" },
+          if !claim?
+            LoadingBlock
+              text: "Claim"
           if claim?
             div { className: "claim" },
               @showNewClaimText()
@@ -179,7 +195,7 @@ module.exports = React.createFactory React.createClass
                     @claimDescription()
                   div { className: "not-found" },
                     "TODO: Add other fields here."
-                if UserStore.loggedIn()
+                if user?.token?
                   div { className: "claim__bookmark" },
                     BookmarkIndicator
                       bookmark: @state.claim.bookmark
@@ -223,7 +239,7 @@ module.exports = React.createFactory React.createClass
                         key: "claim-expert-#{index}"
                   else
                     "No experts"
-                if UserStore.loggedIn()
+                if user?.token?
                   AddToClaim
                     claim: claim
                     type: "claim"

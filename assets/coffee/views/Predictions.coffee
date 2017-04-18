@@ -5,6 +5,7 @@ Footer = require("components/Footer")
 PredictionCard = require("components/PredictionCard")
 Pagination = require("components/Pagination")
 SearchFilters = require("components/SearchFilters")
+LoadingBlock = require("components/LoadingBlock")
 
 PaginationMixin = require("mixins/PaginationMixin")
 LinksMixin = require("mixins/LinksMixin")
@@ -103,19 +104,21 @@ module.exports = React.createFactory React.createClass
             search: @search
           div { className: "default__card" },
             React.createElement(Material.RaisedButton, { label: "Create New Prediction", primary: true, onClick: @goToNewPrediction, style: @newItemStyle() })
-          div { className: "default__card" },
-            div { className: "predictions__list" },
-              if @state.predictions?
+          if @state.predictions?
+            div { className: "default__card" },
+              div { className: "predictions__list" },
                 @state.predictions.map (prediction, index) ->
                   PredictionCard
                     prediction: prediction
                     key: "prediction-card-#{index}"
-            if @state.predictions?
               Pagination
                 page: @state.page
                 numberOfPages: @state.numberOfPages
                 nextPage: @nextPage
                 previousPage: @previousPage
                 specificPage: @specificPage
+          else
+            LoadingBlock
+              title: "Predictions"
 
       Footer {}, ''

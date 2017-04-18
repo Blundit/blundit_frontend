@@ -5,6 +5,7 @@ DateMixin = require("mixins/DateMixin")
 AvatarMixin = require("mixins/AvatarMixin")
 
 Pagination = require("components/Pagination")
+LoadingBlock = require("components/LoadingBlock")
 
 
 module.exports = React.createFactory React.createClass
@@ -13,6 +14,7 @@ module.exports = React.createFactory React.createClass
 
   getInitialState: ->
     comments: null
+    user: null
     errors: []
     commentSubmitting: false
     commentError: null
@@ -20,12 +22,21 @@ module.exports = React.createFactory React.createClass
       content:
         val: ''
         minLength: 10
-  
+
+
+  handleUserChange: (data) ->
+    @setState user: UserStore.get()
+
 
   componentDidMount: ->
+    UserStore.subscribe(@handleUserChange)
     @fetchPaginatedData()
 
   
+  componentWillUnmount: ->
+    UserStore.unsubscribe(@handleUserChange)
+  
+
   fetchPaginatedData: (id = @state.page) ->
     params = {
       path: "#{@props.type}_comments"
@@ -125,70 +136,79 @@ module.exports = React.createFactory React.createClass
 
 
   render: ->
-    div { className: "default__card comments" },
-      div { className: "text__title" },
-        "Comments about #{@getCommentName()}"
+    { comments, user, page, numberOfPages, commentError } = @state
+    if !comments?
+      LoadingBlock
+        title: "Comments about #{@getCommentName()}"
+        type: "short"
+    else
+      div { className: "default__card comments" },
+        div { className: "text__title" },
+          "Comments about #{@getCommentName()}"
 
-      if @state.comments == null
-        div { className: "not-found" },
-          "Loading Comments"
-      else if @state.comments.length == 0
-        div { className: "not-found" },
-          "Currently No Comments"
+        if comments.length == 0
+          div { className: "not-found" },
+            "Currently No Comments"
 
-      if @state.comments?
-        @state.comments.map (comment, index) =>
-          if comment.user?
-            div
-              className: "comments__comment"
-              key: "comment-#{index}"
-              div { className: "comments__comment__meta" },
-                div
-                  className: "comments__comment__meta-user-avatar"
-                  style:
-                    backgroundImage: "url(#{@getUserAvatar(comment.user)})"
-                div { className: "comments__comment__meta-text"}
-                  div { className: "comments__comment__meta-text-username" },
-                    comment.user.first_name + " " + comment.user.last_name
-                  div { className: "comments__comment__meta-text-created-at" },
-                    @formatDateAndTime(comment.created_at)
-              div { className: "comments__comment-text" },
-                comment.content
+      
 
-      if @state.comments?
-        Pagination
-          page: @state.page
-          numberOfPages: @state.numberOfPages
-          nextPage: @nextPage
-          previousPage: @previousPage
-          specificPage: @specificPage
+        if comments?
+          comments.map (comment, index) =>
+            if comment.user?
+              div
+                className: "comments__comment"
+                key: "comment-#{index}"
+                div { className: "comments__comment__meta" },
+                  div
+                    className: "comments__comment__meta-user-avatar"
+                    style:
+                      backgroundImage: "url(#{@getUserAvatar(comment.user)})"
+                  div { className: "comments__comment__meta-text"}
+                    div { className: "comments__comment__meta-text-username" },
+                      comment.user.first_name + " " + comment.user.last_name
+                    div { className: "comments__comment__meta-text-created-at" },
+                      @formatDateAndTime(comment.created_at)
+                div { className: "comments__comment-text" },
+                  comment.content
 
-      if @state.comments? and UserStore.loggedIn()
-        div { className: "comments__add-comment" },
-          div {},
-            React.createElement(Material.TextField,
-            {
-              id: "comment-content",
-              hintText: "Add Comment",
-              floatingLabelText: "Add Comment",
-              multiLine: true,
-              rows: 1,
-              fullWidth: true,
-              rowsMax: 4
-              value: @state.inputs.content.val,
-              onChange: @handleCommentContentChange,
-              errorText: @getErrorText("content")
-            })
+        if comments?
+          Pagination
+            page: page
+            numberOfPages: numberOfPages
+            nextPage: @nextPage
+            previousPage: @previousPage
+            specificPage: @specificPage
+
+        if comments? and user?.token?
+          div { className: "comments__add-comment" },
             div {},
-              if @state.commentSubmitting == true
-                @style = {
-                  display: 'inline-block'
-                  position: 'relative'
-                  boxShadow: 'none'
-                }
-                React.createElement(Material.RefreshIndicator, { style: @style, size: 50, left: 0, top: 0, status:"loading" })
-              else
-                React.createElement(Material.RaisedButton, {label: "Add Comment", primary: true, onClick: @addComment })
-            if @state.commentError?
+              React.createElement(Material.TextField,
+              {
+                id: "comment-content",
+                hintText: "Add Comment",
+                floatingLabelText: "Add Comment",
+                multiLine: true,
+                rows: 1,
+                fullWidth: true,
+                rowsMax: 4
+                value: @state.inputs.content.val,
+                onChange: @handleCommentContentChange,
+                errorText: @getErrorText("content")
+              })
               div {},
-                @state.commentError
+                if @state.commentSubmitting == true
+                  @style = {
+                    display: 'inline-block'
+                    position: 'relative'
+                    boxShadow: 'none'
+                  }
+                  React.createElement(Material.RefreshIndicator, { style: @style, size: 50, left: 0, top: 0, status:"loading" })
+                else
+                  React.createElement(Material.RaisedButton, {label: "Add Comment", primary: true, onClick: @addComment })
+              if commentError?
+                div {},
+                  commentError
+        else
+          div { className: "comments__add-comment" },
+            div { className: "not-found" },
+              "You must be logged in to add a comment."

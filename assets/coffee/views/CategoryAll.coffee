@@ -6,6 +6,7 @@ CategoryExperts = require("components/CategoryExperts")
 CategoryClaims = require("components/CategoryClaims")
 CategoryPredictions = require("components/CategoryPredictions")
 CategorySubHead = require("components/CategorySubHead")
+LoadingBlock = require("components/LoadingBlock")
 
 module.exports = React.createFactory React.createClass
   displayName: 'Categories'
@@ -60,31 +61,34 @@ module.exports = React.createFactory React.createClass
 
   
   render: ->
+    console.log @state.category
     div {},
       Header {}, ''
       div { className: "categories-wrapper" },
         div { className: "categories-content" },
-          div {},
-          
-          if @state.category?
-            div { className: "default__card" },
-              div { className: "text__title" },
-                "Category '#{@state.category.name}'"
-              div { className: "text__subtitle" },
-                "Showing Experts, Claims and Predictions"
-              CategorySubHead
-                category_id: @props.id
-          else
-            div { className: "default__card" },
-              div { className: "not-found" },
-                "Loading..."
+          if !@state.category? or !@state.data?
+            LoadingBlock
+              text: "Category - Showing Experts, Claims and Predictions"
 
-          if @state.data?
-            div { className: "categories" },
-              CategoryExperts
-                experts: @state.data.experts
-              CategoryPredictions
-                predictions: @state.data.predictions
-              CategoryClaims
-                claims: @state.data.claims
+          else
+            div {},
+              if @state.category?
+                div { className: "default__card" },
+                  div { className: "text__title" },
+                    if @state.category.name?
+                      "Category '#{@state.category.name}'"
+                    else
+                      "Category"
+                  div { className: "text__subtitle" },
+                    "Showing Experts, Claims and Predictions"
+                  CategorySubHead
+                    category_id: @props.id
+              if @state.data?
+                div { className: "categories" },
+                  CategoryExperts
+                    experts: @state.data.experts
+                  CategoryPredictions
+                    predictions: @state.data.predictions
+                  CategoryClaims
+                    claims: @state.data.claims
       Footer {}, ''

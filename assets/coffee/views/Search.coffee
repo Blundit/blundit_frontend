@@ -7,6 +7,7 @@ PredictionCard = require("components/PredictionCard")
 ExpertCard = require("components/ExpertCard")
 
 SearchFilters = require("components/SearchFilters")
+LoadingBlock = require("components/LoadingBlock")
 
 LinksMixin = require("mixins/LinksMixin")
 SessionMixin = require("mixins/SessionMixin")
@@ -50,6 +51,7 @@ module.exports = React.createFactory React.createClass
 
 
   search: (query, sort) ->
+    @setState data: null
     window.history.pushState('', 'Blundit - Search', "#{window.location.origin}/search?query=#{query}&sort=#{sort}")
     params = {
       path: "search"
@@ -161,7 +163,10 @@ module.exports = React.createFactory React.createClass
                           key: "search-claim-card-#{index}"
                     div {},
                       React.createElement(Material.RaisedButton, { label: "View All", primary: true, onClick: @goToClaims })
-          
+          if !@state.data?
+            LoadingBlock
+              title: "Search"
+
           if @state.searchError?
             div { className: "default__card search__error" },
               @state.searchError
