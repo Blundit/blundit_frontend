@@ -11,15 +11,23 @@ menuItems = [
 
 LinksMixin = require("mixins/LinksMixin")
 AvatarMixin = require("mixins/AvatarMixin")
+SessionMixin = require("mixins/SessionMixin")
 
 LoginModal = require("modals/LoginModal")
 
 module.exports = React.createFactory React.createClass
-  mixins: [LinksMixin, AvatarMixin]
+  mixins: [LinksMixin, AvatarMixin, SessionMixin]
   getInitialState: ->
     user: null
-    showLoginModal: false
+    showLoginModal: @getShowLoginModal()
     mobileMenu: false
+
+
+  getShowLoginModal: ->
+    if @getParameterByName("show_login") and Number(@getParameterByName("show_login")) == 1
+      return true
+
+    return false
 
 
   handleUserChange: (data) ->

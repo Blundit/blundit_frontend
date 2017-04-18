@@ -5,13 +5,13 @@ module.exports =
 
     # save cookie
     if @user? and @user.token?
-      window.global.setCookie 'access-token', @user.token
-      window.global.setCookie 'uid', @user.uid
-      window.global.setCookie 'client', @user.client
+      window.global.setCookie 'Access-Token', @user.token
+      window.global.setCookie 'Uid', @user.uid
+      window.global.setCookie 'Client', @user.client
     else
-      window.global.deleteCookie 'access-token'
-      window.global.deleteCookie 'uid'
-      window.global.deleteCookie 'client'
+      window.global.deleteCookie 'Access-Token'
+      window.global.deleteCookie 'Uid'
+      window.global.deleteCookie 'Client'
 
 
   getParameterByName: (name, url) ->
@@ -46,9 +46,9 @@ module.exports =
   getUser: ->
     obj = {}
 
-    @token = window.global.getCookie 'access-token'
-    @client = window.global.getCookie 'client'
-    @uid = window.global.getCookie 'uid'
+    @token = window.global.getCookie 'Access-Token'
+    @client = window.global.getCookie 'Client'
+    @uid = window.global.getCookie 'Uid'
 
     if @token?
       obj.token = @token
@@ -61,9 +61,9 @@ module.exports =
 
   unsetUser: ->
     window.UserStore.set null
-    window.global.deleteCookie 'access-token'
-    window.global.deleteCookie 'client'
-    window.global.deleteCookie 'uid'
+    window.global.deleteCookie 'Access-Token'
+    window.global.deleteCookie 'Client'
+    window.global.deleteCookie 'Uid'
 
 
   authHeader: ->
@@ -71,7 +71,7 @@ module.exports =
     
 
   verifyUserToken: ->
-    if window.global.getCookie('access-token')
+    if window.global.getCookie('Access-Token')
       @verifyToken()
     else
       @setState verificationComplete: true
@@ -81,9 +81,9 @@ module.exports =
     params = {
       path: "verify_token"
       path_variables:
-        accessToken: window.global.getCookie('access-token')
-        client: window.global.getCookie('client')
-        uid: window.global.getCookie('uid')
+        accessToken: window.global.getCookie('Access-Token')
+        client: window.global.getCookie('Client')
+        uid: window.global.getCookie('Uid')
       success: @verifyTokenSuccess
       error: @verifyTokenError
     }
@@ -93,9 +93,9 @@ module.exports =
 
   verifyTokenSuccess: (data) ->
     if data
-      data.data.token = window.global.getCookie('access-token')
-      data.data.client = window.global.getCookie('client')
-      data.data.uid = window.global.getCookie('uid')
+      data.data.token = window.global.getCookie('Access-Token')
+      data.data.client = window.global.getCookie('Client')
+      data.data.uid = window.global.getCookie('Uid')
     
       @setUser data.data
   

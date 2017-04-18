@@ -51,9 +51,9 @@ class UserStore
     @data = data
 
     if request?
-      @data.token = request.getResponseHeader('access-token')
-      @data.uid = request.getResponseHeader('uid')
-      @data.client = request.getResponseHeader('client')
+      @data.token = request.getResponseHeader('Access-Token')
+      @data.uid = request.getResponseHeader('Uid')
+      @data.client = request.getResponseHeader('Client')
 
     @emitChange()
 
@@ -84,9 +84,10 @@ class UserStore
     @user = @get()
     if @user? and @user.token?
       return {
-        "access-token": @user.token,
-        "client": @user.client,
-        "uid": @user.uid
+        "Access-Token": @user.token,
+        "Token-Type": "Bearer",
+        "Client": @user.client,
+        "Uid": @user.uid
       }
     else
       return {}
@@ -96,9 +97,10 @@ class UserStore
     @user = @get()
     if @user? and @user.token?
       return {
-        "access-token": @user.token,
-        "client": @user.client,
-        "uid": @user.uid
+        "Access-Token": @user.token,
+        "Token-Type": "Bearer",
+        "Client": @user.client,
+        "Uid": @user.uid
       }
     else
       return {}
@@ -125,14 +127,14 @@ class UserStore
 
   
   updateHeaderInfo: (request) ->
-    return if !request.getResponseHeader('access-token')?
-    @token = request.getResponseHeader('access-token')
-    @uid = request.getResponseHeader('uid')
-    @client = request.getResponseHeader('client')
+    return if !request.getResponseHeader('Access-Token')?
+    @token = request.getResponseHeader('Access-Token')
+    @uid = request.getResponseHeader('Uid')
+    @client = request.getResponseHeader('Client')
 
-    window.global.setCookie 'access-token', @token
-    window.global.setCookie 'uid', @uid
-    window.global.setCookie 'client', @client
+    window.global.setCookie 'Access-Token', @token
+    window.global.setCookie 'Uid', @uid
+    window.global.setCookie 'Client', @client
 
     @user = @get()
     @user.token = @token

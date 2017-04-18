@@ -31,6 +31,13 @@ module.exports = React.createFactory React.createClass
     return @state.prediction
 
   
+  formatPredictionDate: (date) ->
+    d = new Date(date)
+    d2 = ('0' + d.getDate()).slice(-2) + '-' + ('0' + (d.getMonth()+1)).slice(-2) + '-' + d.getFullYear();
+    console.log d2
+    return d2
+
+  
   createPrediction: ->
     @setState submitPredictionError: null
 
@@ -43,7 +50,7 @@ module.exports = React.createFactory React.createClass
           title: @state.prediction.title
           description: @state.prediction.description
           url: @state.prediction.url
-          prediction_date: @state.prediction.prediction_date
+          prediction_date: @formatPredictionDate(@state.prediction.prediction_date)
           category: @state.prediction.category
         success: @createPredictionSuccess
         error: @createPredictionError
