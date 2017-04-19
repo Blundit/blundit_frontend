@@ -57,11 +57,11 @@ module.exports = React.createFactory React.createClass
 
     div { className: "default__card" },
       div { className: "text__title" },
-        "Bona Fides"
+        "Credentials"
       div { className: "expert__bona-fides" },
         if bona_fides.length == 0
           div { className: "not-found" },
-            "This expert currently has no bona fides."
+            "This expert currently has no credentials."
         else
           bona_fides.map (bona_fide, index) ->
             InlineLink
@@ -79,7 +79,7 @@ module.exports = React.createFactory React.createClass
                 onChange: @changeURL,
                 id: "add-bonafide"
                 hintText: "Add URL demonstrating that this expert is knowledgeable",
-                floatingLabelText: "Add Bona Fide",
+                floatingLabelText: "Add Credential",
               }
             )
             React.createElement(Material.FlatButton, { label: "Add", onClick: @addBonaFide })
