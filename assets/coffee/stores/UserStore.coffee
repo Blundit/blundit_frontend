@@ -141,6 +141,25 @@ class UserStore
     @user.uid = @uid
     @user.client = @client
 
+  
+  getUserAvatar: ->
+    params = {
+      path: "get_avatar"
+      success: @getUserAvatarSuccess
+      error: @getUserAvatarError
+    }
+
+    API.call(params)
+
+
+  getUserAvatarSuccess: (data) =>
+    @data.avatar_file_name = data.avatar
+    @emitChange()
+
+
+  getUserAvatarError: (error) =>
+    # console.log "error retrieving avatar"
+
 
 module.exports = new UserStore
   messagestl: 1000 * 60 # 1 minute

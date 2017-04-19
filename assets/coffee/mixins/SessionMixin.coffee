@@ -1,7 +1,7 @@
 module.exports =
   setUser: (data, request) ->
-    window.UserStore.set data, request
-    @user = window.UserStore.get()
+    UserStore.set data, request
+    @user = UserStore.get()
 
     # save cookie
     if @user? and @user.token?
@@ -60,14 +60,14 @@ module.exports =
 
 
   unsetUser: ->
-    window.UserStore.set null
+    UserStore.set null
     window.global.deleteCookie 'Access-Token'
     window.global.deleteCookie 'Client'
     window.global.deleteCookie 'Uid'
 
 
   authHeader: ->
-    @user = window.UserStore.getAuthHeader()
+    @user = UserStore.getAuthHeader()
     
 
   verifyUserToken: ->
@@ -92,16 +92,18 @@ module.exports =
     
 
   verifyTokenSuccess: (data) ->
-    if data
+    if data.data
       data.data.token = window.global.getCookie('Access-Token')
       data.data.client = window.global.getCookie('Client')
       data.data.uid = window.global.getCookie('Uid')
     
       @setUser data.data
+      
+      # TODO: Make user data load go here (additionally)
+      UserStore.getUserAvatar()
   
       
   verifyTokenError: (error) ->
     @setUser {}
 
   
-  updateUserHeaderInfo: (request) ->

@@ -66,6 +66,7 @@ module.exports = React.createFactory React.createClass
   loginSuccess: (data, request) ->
     @setState loginLoading: false
     @setUser(data.data, request)
+    UserStore.getUserAvatar()
     @props.hideLogin()
 
 

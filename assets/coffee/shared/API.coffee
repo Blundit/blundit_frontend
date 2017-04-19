@@ -156,9 +156,8 @@ module.exports = class API
       path: "user/bookmarks"
       method: "GET"
     verify_token:
-      path: "auth/validate_token?access-token=%accessToken%&client=%client%&uid=%uid%&"
+      path: "user/authenticate?access-token=%accessToken%&client=%client%&uid=%uid%&"
       method: "GET"
-      non_api: true
     expert_comments:
       path: "experts/%expert_id%/comments"
       method: "GET"
@@ -187,6 +186,10 @@ module.exports = class API
       path: "user/update"
       file: true
       method: "PUT"
+
+    get_avatar:
+      path: "user/get_avatar"
+      method: "POST"
 
 
 

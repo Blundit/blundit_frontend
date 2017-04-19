@@ -111,12 +111,12 @@ module.exports = React.createFactory React.createClass
                 item.label
         
         div { className: @getHeaderUserClass() },
-          if @state.user?.token?
+          if user?.token?
             div
               className: "header__user__avatar"
               onClick: @navigateToLocation.bind(@, "/me")
               style:
-                backgroundImage: @getUserAvatar(user)
+                backgroundImage: "url(#{@getUserAvatar(user)})"
           else
             div {},
               div

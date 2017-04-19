@@ -27,5 +27,7 @@ module.exports =
       return user.avatar
     else if user.avatar_url?
       return user.avatar_url
+    else if user.avatar_file_name?
+      return user.avatar_file_name
     else
       return "#{API.serverBase()}images/user_avatars/default.png"
