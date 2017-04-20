@@ -107,7 +107,7 @@ module.exports = React.createFactory React.createClass
 
 
   updateUserSuccess: (data) ->
-    UserStore.updateUserData(data.user)
+    UserStore.updateUserData(data)
     @setState updateSubmitting: false
     @setState updateSuccess: "User Updated!"
     
@@ -207,7 +207,8 @@ module.exports = React.createFactory React.createClass
                   "Your Avatar:"
                   br {}
                   if @state.user.avatar_file_name?
-                    img { src: @getUserAvatar(@state.user) }
+                    div { className: "user__avatar--current" },
+                      img { src: @getUserAvatar(@state.user) }
                   input
                     className: "user__avatar"
                     type: "file"

@@ -83,7 +83,7 @@ module.exports =
       path_variables:
         accessToken: window.global.getCookie('Access-Token')
         client: window.global.getCookie('Client')
-        uid: window.global.getCookie('Uid')
+        uid: encodeURIComponent(window.global.getCookie('Uid'))
       success: @verifyTokenSuccess
       error: @verifyTokenError
     }

@@ -156,8 +156,9 @@ module.exports = class API
       path: "user/bookmarks"
       method: "GET"
     verify_token:
-      path: "user/authenticate?access-token=%accessToken%&client=%client%&uid=%uid%&"
+      path: "auth/validate_token?access-token=%accessToken%&client=%client%&uid=%uid%&"
       method: "GET"
+      non_api: true
     expert_comments:
       path: "experts/%expert_id%/comments"
       method: "GET"

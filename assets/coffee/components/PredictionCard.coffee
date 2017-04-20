@@ -43,7 +43,7 @@ module.exports = React.createFactory React.createClass
 
   predictionDate: ->
     { prediction } = @props
-    return @formatDate(prediction.created_at)
+    return @formatDate(prediction.prediction_date)
 
   
   render: ->
