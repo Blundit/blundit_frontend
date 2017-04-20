@@ -21,6 +21,22 @@ module.exports = React.createFactory React.createClass
   handleUserChange: (data) ->
     @setState user: UserStore.get()
 
+
+  goToYoutube: ->
+    window.open "https://www.youtube.com/channel/UCzGxQc2HmjZHO7A-MNYNWOg", "_blank"
+
+
+  goToFacebook: ->
+    window.open "http://fb.me/blundit", "_blank"
+
+
+  goToTwitter: ->
+    window.open "http://twitter.com/heyblundit", "_blank"
+
+  
+  goToMedium: ->
+    window.open "https://medium.com/blundit", "_blank"
+
   
   render: ->
     div { className: "footer-wrapper" },
@@ -45,10 +61,23 @@ module.exports = React.createFactory React.createClass
 
           div { className: "footer__card-row" },
             div { className: "footer__icons" },
-              span { className: "fa fa-facebook" }, ''
-              span { className: "fa fa-twitter" }, ''
-              span { className: "fa fa-youtube" }, ''
-              span { className: "fa fa-podcast" }, ''
+              span
+                className: "fa fa-facebook"
+                onClick: @goToFacebook
+                ''
+              span
+                className: "fa fa-medium"
+                onClick: @goToMedium
+                ''
+              span
+                className: "fa fa-twitter"
+                onClick: @goToTwitter
+                ''
+              span
+                className: "fa fa-youtube"
+                onClick: @goToYoutube
+                ''
+              # span { className: "fa fa-podcast" }, ''
             if @state.user?.token?
               div
                 className: "footer__link--signout"
