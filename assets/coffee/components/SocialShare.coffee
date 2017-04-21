@@ -29,7 +29,7 @@ module.exports = React.createFactory React.createClass
 
 
   getSharingUrl: ->
-    return window.location.href
+    return window.location.href.split('?')[0]
 
 
   render: ->
