@@ -95,10 +95,7 @@ module.exports = React.createFactory React.createClass
   render: ->
     div { className: "add-to-prediction" },
       if @state.showItems == false
-        div
-          className: "add-to-prediction__button"
-          onClick: @doShowItems
-          "Add Expert to Prediction"
+        React.createElement(Material.RaisedButton, { label: "Add Expert to Prediction", onClick: @doShowItems })
       else
         if @state.itemList?
           div {},

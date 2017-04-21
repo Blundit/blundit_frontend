@@ -10,6 +10,7 @@ PredictionEvidences = require("components/PredictionEvidences")
 BookmarkIndicator = require("components/BookmarkIndicator")
 ImageUpload = require("components/ImageUpload")
 LoadingBlock = require("components/LoadingBlock")
+SocialShare = require("components/SocialShare")
 
 SessionMixin = require("mixins/SessionMixin")
 LinksMixin = require("mixins/LinksMixin")
@@ -204,8 +205,11 @@ module.exports = React.createFactory React.createClass
                     BookmarkIndicator
                       bookmark: @state.prediction.bookmark
                       type: "prediction"
-                      id: @state.prediction.id
+                      id: prediction.id
                       updateBookmark: @updateBookmark
+              SocialShare
+                item: prediction
+                type: "prediction"
               div { className: "default__card prediction__categories" },
                 div { className: "text__title" },
                   "Categories"

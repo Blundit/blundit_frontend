@@ -10,6 +10,7 @@ AddToExpert = require("components/AddToExpert")
 BookmarkIndicator = require("components/BookmarkIndicator")
 ImageUpload = require("components/ImageUpload")
 LoadingBlock = require("components/LoadingBlock")
+SocialShare = require("components/SocialShare")
 
 SessionMixin = require("mixins/SessionMixin")
 LinksMixin = require("mixins/LinksMixin")
@@ -198,8 +199,11 @@ module.exports = React.createFactory React.createClass
                     BookmarkIndicator
                       bookmark: @state.expert.bookmark
                       type: "expert"
-                      id: @state.expert.id
+                      id: expert.id
                       updateBookmark: @updateBookmark
+              SocialShare
+                item: expert
+                type: "expert"
 
               div { className: "default__card expert__categories" },
                 div { className: "text__title" },

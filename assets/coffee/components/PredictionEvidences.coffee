@@ -7,6 +7,8 @@ module.exports = React.createFactory React.createClass
 
   getInitialState: ->
     evidenceURL: ''
+    error: null
+    submitting: false
 
   
   addItem: ->
@@ -15,6 +17,7 @@ module.exports = React.createFactory React.createClass
       return false
 
     @setState error: null
+    @setState submitting: true
     params = {
       path: "add_evidence_to_prediction"
       path_variables:
@@ -29,11 +32,13 @@ module.exports = React.createFactory React.createClass
 
 
   addSuccess: (data) ->
-    @setState evidenceUrl: ''
+    @setState submitting: false
+    @setState evidenceURL: ''
     @props.refresh()
 
 
   addError: (error) ->
+    @setState submitting: false
     @setState error: "Error adding Evidence"
     
 
@@ -71,7 +76,10 @@ module.exports = React.createFactory React.createClass
             onChange: @changeEvidence
           }
         )
-        React.createElement(Material.FlatButton, { label: "Add", onClick: @addItem })
+        if @state.submitting == false
+          React.createElement(Material.FlatButton, { label: "Add", onClick: @addItem })
+        else
+          React.createElement(Material.LinearProgress, { mode: "indeterminate" })
         if @state.error?
           div {},
             @state.error

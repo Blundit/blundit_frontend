@@ -10,6 +10,7 @@ ClaimEvidences = require("components/ClaimEvidences")
 BookmarkIndicator = require("components/BookmarkIndicator")
 ImageUpload = require("components/ImageUpload")
 LoadingBlock = require("components/LoadingBlock")
+SocialShare = require("components/SocialShare")
 
 SessionMixin = require("mixins/SessionMixin")
 LinksMixin = require("mixins/LinksMixin")
@@ -200,8 +201,11 @@ module.exports = React.createFactory React.createClass
                     BookmarkIndicator
                       bookmark: @state.claim.bookmark
                       type: "claim"
-                      id: @state.claim.id
+                      id: claim.id
                       updateBookmark: @updateBookmark
+              SocialShare
+                item: claim
+                type: "claim"
               div { className: "default__card claim__categories" },
                 div { className: "text__title" },
                   "Categories"

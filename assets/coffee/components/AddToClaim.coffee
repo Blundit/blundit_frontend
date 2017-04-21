@@ -95,10 +95,7 @@ module.exports = React.createFactory React.createClass
   render: ->
     div { className: "add-to-claim" },
       if @state.showItems == false
-        div
-          className: "add-to-claim__button"
-          onClick: @doShowItems
-          "Add Expert to Claim"
+        React.createElement(Material.RaisedButton, { label: "Add Expert to Claim", onClick: @doShowItems })
       else
         if @state.itemList?
           div {},

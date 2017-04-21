@@ -117,3 +117,32 @@ body
   &__meta-description
     @extend %normal-text
     margin-bottom: 10px
+
+
+.social-share
+  width: 100%
+
+  &__links-facebook 
+    margin-right: 10px
+    padding: 5px
+    color: $facebook-color
+    cursor: pointer
+    +fast_transition(all)
+
+    &:hover
+      background-color: $facebook-color
+      color: $white-color
+      cursor: pointer
+      +fast_transition(all)
+
+  &__links-twitter 
+    margin-right: 10px
+    padding: 5px
+    color: $twitter-color
+    +fast_transition(all)
+    text-decoration: none
+
+    &:hover
+      background-color: $twitter-color
+      color: $white-color
+      +fast_transition(all)

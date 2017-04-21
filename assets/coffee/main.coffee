@@ -16,6 +16,9 @@ deepOrange500 = require('material-ui/styles/colors').deepOrange500
 MuiThemeProvider = require('material-ui/styles/MuiThemeProvider').default
 window.Material = require("material-ui")
 
+ReactGA = require('react-ga')
+ReactGA.initialize('UA-97844495-1')
+
 muiTheme = getMuiTheme(palette: {
   primary1Color: "#4869b2",
   accent1Color: deepOrange500

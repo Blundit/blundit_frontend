@@ -7,13 +7,16 @@ module.exports = React.createFactory React.createClass
 
   getInitialState: ->
     evidenceURL: ''
+    submitting: false
+    error: false
 
   
   addItem: ->
     if @state.evidenceUrl == ''
       @setState error: 'URL Required'
       return false
-
+    
+    @setState submitting: true
     @setState error: null
     params = {
       path: "add_evidence_to_claim"
@@ -30,11 +33,13 @@ module.exports = React.createFactory React.createClass
 
   addSuccess: (data) ->
     @setState evidenceURL: ''
+    @setState submitting: false
     @props.refresh()
 
 
   addError: (error) ->
     @setState error: "Error adding Evidence"
+    @setState submitting: false
     
 
   handleChange: (event, index, value) ->
@@ -71,7 +76,11 @@ module.exports = React.createFactory React.createClass
             onChange: @changeEvidence
           }
         )
-        React.createElement(Material.FlatButton, { label: "Add", onClick: @addItem })
+        if @state.submitting == false
+          React.createElement(Material.FlatButton, { label: "Add", onClick: @addItem })
+        else
+          React.createElement(Material.LinearProgress, { mode: "indeterminate" })
+
         if @state.error?
           div {},
             @state.error
