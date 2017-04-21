@@ -37,6 +37,10 @@ module.exports = React.createFactory React.createClass
   goToMedium: ->
     window.open "https://medium.com/blundit", "_blank"
 
+  
+  goToTrello: ->
+    window.open "https://trello.com/b/JMQX0OJP/blundit", "_blank"
+
 
   getFooterText: ->
     @path = window.location.host
@@ -87,6 +91,10 @@ module.exports = React.createFactory React.createClass
               span
                 className: "fa fa-youtube"
                 onClick: @goToYoutube
+                ''
+              span
+                className: "fa fa-trello"
+                onClick: @goToTrello
                 ''
               # span { className: "fa fa-podcast" }, ''
             if @state.user?.token?
