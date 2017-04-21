@@ -37,6 +37,17 @@ module.exports = React.createFactory React.createClass
   goToMedium: ->
     window.open "https://medium.com/blundit", "_blank"
 
+
+  getFooterText: ->
+    @path = window.location.host
+    @version = "0.2 (Pre-Alpha)"
+    @environment = "This is Blundit"
+    
+    if @path.indexOf("dev.blundit.com", 0) > -1 or @path.indexOf("localhost", 0) > -1
+      @environment = "This is the Blundit Development Server"
+
+    return "#{@environment}. We're at version #{@version}."
+    
   
   render: ->
     div { className: "footer-wrapper" },
@@ -44,7 +55,7 @@ module.exports = React.createFactory React.createClass
         div { className: "footer__card" },
           div { className: "footer__card-row" },
             div { className: "footer__text" },
-              "This has been blundit."
+              @getFooterText()
             a
               className: "footer__link"
               onClick: @goToAbout
