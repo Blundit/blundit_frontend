@@ -8,6 +8,7 @@ module.exports = React.createFactory React.createClass
     data: null
     url: ''
     addSubstantiationError: null
+    submitting: false
 
 
   componentDidMount: ->
@@ -43,6 +44,8 @@ module.exports = React.createFactory React.createClass
       @setState addSubstantiationError: "Url required"
       return
 
+    @setState submitting: true
+
     params = {
       path: "add_substantiation"
       path_variables:
@@ -62,6 +65,7 @@ module.exports = React.createFactory React.createClass
   addSubstantiationsSuccess: (data) ->
     @setState url: ''
     @fetchSubstantiationData()
+    @setState submitting: false
 
 
   addSubstantiationsError: (error) ->
@@ -69,6 +73,7 @@ module.exports = React.createFactory React.createClass
       @setState addSubstantiationError: error.responseJSON.errors[0]
     else
       @setState addSubstantiationError: "There was an error."
+      @setState submitting: false
 
 
   changeURL: (event) ->
@@ -99,15 +104,19 @@ module.exports = React.createFactory React.createClass
         if UserStore.loggedIn()
           div { className: "substantiation-list__add" },
             "Add Substantiation:"
-            React.createElement(Material.TextField,
-              {
-                value: @state.url,
-                fullWidth: true,
-                onChange: @changeURL,
-                id: "add-substantiation"
-              }
-            )
-            React.createElement(Material.FlatButton, { label: "Add", onClick: @addSubstantiation })
+            if @state.submitting == false
+              div {},
+                React.createElement(Material.TextField,
+                  {
+                    value: @state.url,
+                    fullWidth: true,
+                    onChange: @changeURL,
+                    id: "add-substantiation"
+                  }
+                )
+                React.createElement(Material.FlatButton, { label: "Add", onClick: @addSubstantiation })
+            else
+              React.createElement(Material.LinearProgress, { mode: "indeterminate" })
             
             if @state.addSubstantiationError?
               div {},

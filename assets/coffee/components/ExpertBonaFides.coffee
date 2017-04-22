@@ -9,10 +9,13 @@ module.exports = React.createFactory React.createClass
     submittingBonaFide: false
 
 
+
   addBonaFide: ->
     if @state.url == ''
       @setState addBonaFideError: "Url required"
       return
+
+    @setState submittingBonaFide: true
 
     params = {
       path: "add_bona_fide"
@@ -69,7 +72,7 @@ module.exports = React.createFactory React.createClass
               key: "expert-bona-fide-#{index}"
       if UserStore.loggedIn()
         if @state.submittingBonaFide == true
-          React.createElement(Material.RefreshIndicator, { style: @refreshStyle, size: 50, left: 0, top: 0, status:"loading" })
+          React.createElement(Material.LinearProgress, { mode: "indeterminate" })
         else
           div { className: "expert__bona-fide__add" },
             React.createElement(Material.TextField,
